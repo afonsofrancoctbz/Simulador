@@ -1,23 +1,40 @@
+export interface CnaeItem {
+  code: string;
+  revenue: number;
+}
+
 export interface TaxFormValues {
-    monthlyRevenueDomestic: number;
-    monthlyRevenueExport: number;
-    totalSalaryExpense: number;
-    proLaborePartners: number;
-    businessActivityCNAE: string;
-    municipalISSRate: number;
+  domesticActivities: CnaeItem[];
+  exportActivities: CnaeItem[];
+  exportInUSD: boolean;
+  exchangeRate: number;
+  totalSalaryExpense: number;
+  proLaborePartners: number;
+  municipalISSRate: number;
 }
 
 export interface TaxDetails {
-    regime: 'Simples Nacional' | 'Lucro Presumido';
-    totalTax: number;
-    totalMonthlyCost: number;
-    breakdown: {
-        name: string;
-        value: number;
-    }[];
+  regime: 'Simples Nacional' | 'Lucro Presumido';
+  totalTax: number;
+  totalMonthlyCost: number;
+  breakdown: {
+    name: string;
+    value: number;
+  }[];
+  notes?: string[];
 }
 
 export interface CalculationResults {
-    simplesNacional: TaxDetails;
-    lucroPresumido: TaxDetails;
+  simplesNacional: TaxDetails;
+  lucroPresumido: TaxDetails;
+}
+
+export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
+
+export interface CnaeData {
+  code: string;
+  description: string;
+  annex: Annex;
+  requiresFatorR?: boolean; // For Annex V activities that can be taxed under Annex III
+  presumedProfitRate: number; // For Lucro Presumido calculation
 }

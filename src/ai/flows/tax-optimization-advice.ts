@@ -12,24 +12,22 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const TaxOptimizationInputSchema = z.object({
-  monthlyRevenueDomestic: z
+  activities: z
+    .string()
+    .describe(
+      'A summary of all business activities (CNAEs) and their revenues.'
+    ),
+  totalDomesticRevenue: z
     .number()
-    .describe('Monthly revenue from domestic sales.'),
-  monthlyRevenueExport: z
+    .describe('Total monthly revenue from domestic sales.'),
+  totalExportRevenue: z
     .number()
-    .describe('Monthly revenue from export sales.'),
-  totalSalaryExpense: z
-    .number()
-    .describe('Total monthly salary expense.'),
+    .describe('Total monthly revenue from export sales.'),
+  totalSalaryExpense: z.number().describe('Total monthly salary expense.'),
   proLaborePartners: z
     .number()
     .describe('Monthly pro-labore amount for partners.'),
-  businessActivityCNAE: z
-    .string()
-    .describe('The business activity code (CNAE).'),
-  municipalISSRate: z
-    .number()
-    .describe('The municipal ISS rate.'),
+  municipalISSRate: z.number().describe('The municipal ISS rate.'),
   simplesNacionalTaxBurden: z
     .number()
     .describe('The tax burden under Simples Nacional.'),
@@ -62,17 +60,17 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
 
   Based on the following financial data, provide advice to the business owner on how to optimize their tax liability. Consider factors such as revenue mix (domestic vs. export), partner pro-labore, and the most suitable tax regime.
 
-  Monthly Revenue (Domestic): {{monthlyRevenueDomestic}}
-  Monthly Revenue (Export): {{monthlyRevenueExport}}
+  Activities: {{activities}}
+  Total Monthly Revenue (Domestic): {{totalDomesticRevenue}}
+  Total Monthly Revenue (Export): {{totalExportRevenue}}
   Total Salary Expense: {{totalSalaryExpense}}
   Pro-labore for Partners: {{proLaborePartners}}
-  Business Activity (CNAE): {{businessActivityCNAE}}
   Municipal ISS Rate: {{municipalISSRate}}
   Tax Burden (Simples Nacional): {{simplesNacionalTaxBurden}}
   Tax Burden (Lucro Presumido): {{lucroPresumidoTaxBurden}}
 
-  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries.
-  The advice should be no more than 3 sentences.`,
+  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries, such as adjusting pro-labore to optimize for "Fator R" if applicable.
+  The advice should be concise and no more than 3-4 sentences.`,
 });
 
 const taxOptimizationAdviceFlow = ai.defineFlow(
