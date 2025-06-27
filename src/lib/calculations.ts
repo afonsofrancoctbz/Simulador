@@ -168,7 +168,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     if (annex === 'IV') {
         const cppRate = 0.20 + 0.03 + 0.058; // Simplified INSS Patronal + RAT + Terceiros
         cppFromAnnexIV += (totalPayroll) * cppRate;
-        notes.push("Atividades do Anexo IV pagam a Contribuição Previdenciária Patronal (CPP) fora do DAS, similar ao Lucro Presumido.");
+        notes.push("Atividades do Anexo IV pagam a Contribuição Previdenciária Patronal (CPP) fora do DAS, de forma similar ao Lucro Presumido, incidindo sobre o total da folha de pagamento.");
     }
 
      // Check for last bracket taxes ("por fora")
@@ -268,6 +268,10 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const TERCEIROS_RATE = 0.058; // Assumed 5.8%
   const totalPayroll = totalSalaryExpense + proLaborePartners;
   const inssPatronal = totalPayroll * (INSS_PATRONAL_RATE + RAT_RATE + TERCEIROS_RATE);
+  
+  if (totalPayroll > 0) {
+    notes.push("A Contribuição Previdenciária Patronal (CPP) de 20% (+ RAT e Terceiros) incide sobre o total da folha de pagamento (salários + pró-labore).");
+  }
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
   const healthPlanCostPerPartner = numberOfPartners > 0 ? healthPlanCost / numberOfPartners : 0;
