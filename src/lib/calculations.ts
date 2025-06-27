@@ -116,7 +116,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const annexTable = ANNEX_TABLES[annex];
     
     const bracket = findBracket(annexTable, rbt12); // Use total RBT12 to find the bracket
-    const effectiveRate = ((rbt12 * bracket.rate - bracket.deduction) / rbt12);
+    const effectiveRate = rbt12 > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
 
     // Calculate tax on domestic revenue
     totalDas += annexInfo.domestic * effectiveRate;
