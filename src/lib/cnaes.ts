@@ -7,7 +7,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '0162-8/03',
@@ -15,7 +15,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '0322-1/07',
@@ -23,7 +23,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '1099-6/04',
@@ -38,7 +38,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRO. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRO (Conselho Regional de Odontologia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRO. Não é obrigatório indicar RT.'
   },
   {
     code: '3250-7/09',
@@ -46,7 +46,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CBOO. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CBOO. Não é obrigatório indicar RT.'
   },
   {
     code: '3312-1/02',
@@ -54,7 +54,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3312-1/03',
@@ -62,7 +62,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3312-1/04',
@@ -70,7 +70,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3313-9/01',
@@ -78,7 +78,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3313-9/02',
@@ -86,7 +86,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3313-9/99',
@@ -94,7 +94,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/01',
@@ -102,7 +102,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/02',
@@ -110,7 +110,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/03',
@@ -118,7 +118,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/04',
@@ -126,7 +126,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/05',
@@ -134,7 +134,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/06',
@@ -142,7 +142,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/07',
@@ -150,7 +150,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/08',
@@ -158,7 +158,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/09',
@@ -166,7 +166,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/10',
@@ -174,7 +174,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/11',
@@ -182,7 +182,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/12',
@@ -190,7 +190,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/13',
@@ -198,7 +198,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/14',
@@ -206,7 +206,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/15',
@@ -214,7 +214,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/16',
@@ -222,7 +222,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/17',
@@ -230,7 +230,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/18',
@@ -238,7 +238,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/19',
@@ -246,7 +246,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/20',
@@ -254,7 +254,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/21',
@@ -262,7 +262,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/22',
@@ -270,7 +270,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3314-7/99',
@@ -278,7 +278,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3315-5/00',
@@ -286,7 +286,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3316-3/01',
@@ -294,7 +294,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3316-3/02',
@@ -302,7 +302,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3317-1/01',
@@ -310,7 +310,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3317-1/02',
@@ -318,7 +318,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3319-8/00',
@@ -326,7 +326,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '3321-0/00',
@@ -334,7 +334,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4211-1/02',
@@ -342,7 +342,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4221-9/03',
@@ -350,7 +350,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4221-9/05',
@@ -358,7 +358,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4313-4/00',
@@ -366,7 +366,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4321-5/00',
@@ -374,7 +374,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório. Atenção: Cessão de mão de obra é vedada.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '4322-3/01',
@@ -382,7 +382,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório. Atenção: Cessão de mão de obra é vedada.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '4322-3/02',
@@ -390,7 +390,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório. Atenção: Cessão de mão de obra é vedada.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '4322-3/03',
@@ -398,7 +398,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4329-1/01',
@@ -406,7 +406,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4329-1/02',
@@ -414,7 +414,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4329-1/03',
@@ -422,7 +422,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4329-1/04',
@@ -430,7 +430,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4329-1/05',
@@ -438,7 +438,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4399-1/01',
@@ -446,7 +446,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA/CAU. A utilização do termo "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
+    notes: 'Essas atividades são regulamentadas pelo CREA/CAU. A utilização do termo "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
   },
   {
     code: '4399-1/02',
@@ -454,7 +454,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4511-1/01',
@@ -470,7 +470,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4520-0/01',
@@ -478,7 +478,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4520-0/02',
@@ -493,7 +493,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4520-0/04',
@@ -522,7 +522,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4520-0/08',
@@ -560,7 +560,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4541-2/03',
@@ -598,7 +598,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4543-9/00',
@@ -606,7 +606,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '4611-7/00',
@@ -615,7 +615,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4612-5/00',
@@ -624,7 +624,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4613-3/00',
@@ -633,7 +633,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4614-1/00',
@@ -642,7 +642,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4615-0/00',
@@ -651,7 +651,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4616-8/00',
@@ -660,7 +660,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4617-6/00',
@@ -669,7 +669,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4618-4/01',
@@ -678,7 +678,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4618-4/02',
@@ -687,7 +687,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4618-4/03',
@@ -696,7 +696,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4618-4/99',
@@ -705,7 +705,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4619-2/00',
@@ -714,7 +714,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '4711-3/01',
@@ -1304,7 +1304,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'I',
     presumedProfitRate: 0.08,
     isRegulated: false,
-    notes: 'Conselho: CREA (se houver engenheiro de alimentos). Atenção: Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CREA (se houver engenheiro de alimentos). Atenção: Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '5620-1/02',
@@ -1438,7 +1438,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA-GO e CRA-RJ podem ser aplicáveis.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração) em alguns estados (GO, RJ). Após a abertura, pode ser necessário o registro no CRA.'
   },
   {
     code: '6201-5/02',
@@ -1455,7 +1455,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA-GO pode ser aplicável.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração) em alguns estados (GO). Após a abertura, pode ser necessário o registro no CRA.'
   },
   {
     code: '6203-1/00',
@@ -1480,7 +1480,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '6311-9/00',
@@ -1552,7 +1552,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: SUSEP. É obrigatório indicar RT no Contrato Social.'
+    notes: 'Essas atividades são regulamentadas pela SUSEP (Superintendência de Seguros Privados), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela na SUSEP. É obrigatório indicar RT no Contrato Social.'
   },
   {
     code: '6629-1/00',
@@ -1568,7 +1568,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRECI. É obrigatório indicar RT no Contrato Social. Regras específicas sobre sociedade e administração podem se aplicar dependendo do estado.'
+    notes: 'Essas atividades são regulamentadas pelo CRECI (Conselho Regional de Corretores de Imóveis), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRECI. É obrigatório indicar RT no Contrato Social. Regras específicas sobre sociedade e administração podem se aplicar dependendo do estado.'
   },
   {
     code: '6821-8/02',
@@ -1576,7 +1576,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRECI. É obrigatório indicar RT no Contrato Social. Regras específicas sobre sociedade e administração podem se aplicar dependendo do estado.'
+    notes: 'Essas atividades são regulamentadas pelo CRECI (Conselho Regional de Corretores de Imóveis), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRECI. É obrigatório indicar RT no Contrato Social. Regras específicas sobre sociedade e administração podem se aplicar dependendo do estado.'
   },
   {
     code: '6822-6/00',
@@ -1584,7 +1584,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRECI/CRA. É obrigatório indicar RT no Contrato Social. Regras específicas sobre sociedade e administração podem se aplicar dependendo do estado.'
+    notes: 'Essas atividades são regulamentadas pelo CRECI/CRA. É obrigatório indicar RT no Contrato Social. Regras específicas sobre sociedade e administração podem se aplicar dependendo do estado.'
   },
   {
     code: '6911-7/01',
@@ -1592,7 +1592,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: OAB. Obrigatório utilizar o Contrato Padrão da OAB.'
+    notes: 'Essas atividades são regulamentadas pela OAB. Obrigatório utilizar o Contrato Padrão da OAB.'
   },
   {
     code: '6911-7/02',
@@ -1632,7 +1632,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA/CONEP. Não é obrigatório indicar RT. CONEP é exigido para pesquisas médicas e biológicas em seres humanos.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Para pesquisas médicas e biológicas em seres humanos, registro no CONEP é exigido. Não é obrigatório indicar RT.'
   },
   {
     code: '7111-1/00',
@@ -1641,7 +1641,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CAU. A utilização do termo "Arquitetura" na razão social possui regras específicas do conselho.'
+    notes: 'Essas atividades são regulamentadas pelo CAU (Conselho de Arquitetura e Urbanismo). A utilização do termo "Arquitetura" na razão social possui regras específicas do conselho.'
   },
   {
     code: '7112-0/00',
@@ -1650,7 +1650,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7119-7/01',
@@ -1659,7 +1659,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA/CRT. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA/CRT. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7119-7/02',
@@ -1668,7 +1668,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7119-7/03',
@@ -1677,7 +1677,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA/CAU/CRT. A utilização dos termos "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
+    notes: 'Essas atividades são regulamentadas pelo CREA/CAU/CRT. A utilização dos termos "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
   },
   {
     code: '7119-7/04',
@@ -1686,7 +1686,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA/CRM. Não é obrigatório indicar RT (CREA), porém o uso do termo "Engenharia" tem regras. Se houver perícia médica, pode ser necessário RQE no CRM.'
+    notes: 'Essas atividades são regulamentadas pelo CREA/CRM. Não é obrigatório indicar RT (CREA), porém o uso do termo "Engenharia" tem regras. Se houver perícia médica, pode ser necessário RQE no CRM.'
   },
   {
     code: '7119-7/99',
@@ -1695,7 +1695,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7120-1/00',
@@ -1704,7 +1704,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7210-0/00',
@@ -1713,7 +1713,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CONEP/CREA. Para área médica, é obrigatório registro no CONEP. Para área de engenharia, será exigido RT.'
+    notes: 'Regulamentado por CONEP/CREA. Para área médica, é obrigatório registro no CONEP. Para área de engenharia, será exigido RT.'
   },
   {
     code: '7220-7/00',
@@ -1751,7 +1751,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. Não é obrigatório indicar RT.'
   },
   {
     code: '7319-0/03',
@@ -1759,7 +1759,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. Não é obrigatório indicar RT.'
   },
   {
     code: '7319-0/04',
@@ -1784,7 +1784,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. Não é obrigatório indicar RT.'
   },
   {
     code: '7410-2/02',
@@ -1793,7 +1793,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA/CAU. A utilização dos termos "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
+    notes: 'Essas atividades são regulamentadas pelo CREA/CAU. A utilização dos termos "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
   },
   {
     code: '7410-2/03',
@@ -1826,7 +1826,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7420-0/03',
@@ -1871,7 +1871,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '7490-1/04',
@@ -1880,7 +1880,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA/CORE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA/CORE. Não é obrigatório indicar RT.'
   },
   {
     code: '7490-1/05',
@@ -1897,7 +1897,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CONEP (se aplicável). Não é obrigatório indicar RT.'
+    notes: 'Para pesquisas médicas e biológicas em seres humanos, o registro no CONEP é exigido. Não é obrigatório indicar RT.'
   },
   {
     code: '7500-1/00',
@@ -1906,7 +1906,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRMV. Não é obrigatório indicar RT. Em algumas cidades (ex: Vitória/ES) há restrições para endereço residencial.'
+    notes: 'Essas atividades são regulamentadas pelo CRMV (Conselho Regional de Medicina Veterinária). Não é obrigatório indicar RT. Em algumas cidades (ex: Vitória/ES) há restrições para endereço residencial.'
   },
   {
     code: '7711-0/00',
@@ -2030,7 +2030,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. Não é obrigatório indicar RT.'
   },
   {
     code: '7911-2/00',
@@ -2038,7 +2038,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CADASTUR. Não é obrigatório indicar RT.'
+    notes: 'É necessário o registro no CADASTUR. Este CNAE possui restrições de combinação com outros CNAEs. Consulte a documentação específica.'
   },
   {
     code: '7912-1/00',
@@ -2046,7 +2046,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CADASTUR. Não é obrigatório indicar RT.'
+    notes: 'É necessário o registro no CADASTUR. Não é obrigatório indicar RT.'
   },
   {
     code: '7990-2/00',
@@ -2054,7 +2054,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CADASTUR. Não é obrigatório indicar RT.'
+    notes: 'É necessário o registro no CADASTUR. Não é obrigatório indicar RT.'
   },
   {
     code: '8011-1/02',
@@ -2083,7 +2083,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT. Atenção: Cessão de mão de obra é vedada.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '8122-2/00',
@@ -2091,7 +2091,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '8129-0/00',
@@ -2099,7 +2099,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT. Atenção: Cessão de mão de obra é vedada. Necessário confirmar Objeto Social.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT. Atenção: Cessão de mão de obra é vedada. Necessário confirmar Objeto Social.'
   },
   {
     code: '8130-3/00',
@@ -2107,7 +2107,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '8211-3/00',
@@ -2115,7 +2115,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT.'
   },
   {
     code: '8219-9/01',
@@ -2145,7 +2145,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT.'
   },
   {
     code: '8230-0/02',
@@ -2342,7 +2342,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRA/CREA. Para CREA, não é obrigatório RT, mas o uso do termo "Engenharia" possui regras.'
+    notes: 'Atividade regulamentada pelo CRA/CREA. Para CREA, não é obrigatório RT, mas o uso do termo "Engenharia" possui regras.'
   },
   {
     code: '8599-6/05',
@@ -2366,7 +2366,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8610-1/02',
@@ -2375,7 +2375,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8621-6/01',
@@ -2408,7 +2408,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8630-5/02',
@@ -2417,7 +2417,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8630-5/03',
@@ -2426,7 +2426,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8630-5/04',
@@ -2434,7 +2434,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRO. Não é obrigatório indicar RT. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pelo CRO (Conselho Regional de Odontologia). Não é obrigatório indicar RT. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8630-5/06',
@@ -2443,7 +2443,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE (Alergia e Imunologia). Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE (Alergia e Imunologia). Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8630-5/07',
@@ -2452,7 +2452,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT.'
   },
   {
     code: '8630-5/99',
@@ -2461,7 +2461,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. Necessário confirmar Objeto Social.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. Necessário confirmar Objeto Social.'
   },
   {
     code: '8640-2/01',
@@ -2470,7 +2470,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/02',
@@ -2479,7 +2479,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/03',
@@ -2488,7 +2488,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE (Nefrologia). Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE (Nefrologia). Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/04',
@@ -2497,7 +2497,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/05',
@@ -2506,7 +2506,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/06',
@@ -2515,7 +2515,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/07',
@@ -2524,7 +2524,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/08',
@@ -2533,7 +2533,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/09',
@@ -2542,7 +2542,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE (Endoscopia). Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE (Endoscopia). Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/10',
@@ -2551,7 +2551,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/11',
@@ -2560,7 +2560,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/12',
@@ -2569,7 +2569,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/13',
@@ -2578,7 +2578,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Validar endereço e se a atividade é realizada no local.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8640-2/14',
@@ -2587,7 +2587,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE.'
   },
   {
     code: '8640-2/99',
@@ -2596,7 +2596,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Necessário confirmar Objeto Social.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Necessário confirmar Objeto Social.'
   },
   {
     code: '8650-0/01',
@@ -2604,7 +2604,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: COREN. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo COREN (Conselho Regional de Enfermagem). Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/02',
@@ -2612,7 +2612,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRN. Se exercido por médico, necessário RQE no CRM. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRN (Conselho Regional de Nutrição). Se exercido por médico, necessário RQE no CRM. Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/03',
@@ -2620,7 +2620,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CFP/CRP. Se exercido por psiquiatra, necessário RQE no CRM. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CRP (Conselho Regional de Psicologia). Se exercido por psiquiatra, necessário RQE no CRM. Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/04',
@@ -2628,7 +2628,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREFITO. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/05',
@@ -2636,7 +2636,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREFITO. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/06',
@@ -2644,7 +2644,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREFONO. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CREFONO (Conselho Regional de Fonoaudiologia). Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/07',
@@ -2652,7 +2652,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRN. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRN (Conselho Regional de Nutrição). Não é obrigatório indicar RT.'
   },
   {
     code: '8650-0/99',
@@ -2660,7 +2660,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: Pode variar (CRM, COFEN, CRF, etc). Necessário RT conforme a área. Necessário confirmar Objeto Social.'
+    notes: 'Conselho pode variar (CRM, COFEN, CRF, etc). Necessário RT conforme a área. Necessário confirmar Objeto Social.'
   },
   {
     code: '8660-7/00',
@@ -2685,7 +2685,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT.'
   },
   {
     code: '8690-9/03',
@@ -2717,7 +2717,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Não é obrigatório indicar RT.'
   },
   {
     code: '8711-5/02',
@@ -2726,7 +2726,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Necessário RQE. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Não é obrigatório indicar RT.'
   },
   {
     code: '8712-3/00',
@@ -2735,7 +2735,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CRM. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT.'
   },
   {
     code: '9001-9/01',
@@ -2778,7 +2778,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: false,
-    notes: 'Conselho: CREA (se aplicável). Não é obrigatório RT, mas o uso do termo "Engenharia" tem regras.'
+    notes: 'Atividade regulamentada pela CREA (se aplicável). Não é obrigatório RT, mas o uso do termo "Engenharia" tem regras.'
   },
   {
     code: '9001-9/99',
@@ -2845,7 +2845,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREF ou CREFITO. Não é obrigatório indicar RT.'
+    notes: 'Essas atividades são regulamentadas pelo CREF ou CREFITO. Não é obrigatório indicar RT.'
   },
   {
     code: '9319-1/01',
@@ -2901,7 +2901,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '9512-6/00',
@@ -2909,7 +2909,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '9521-5/00',
@@ -2917,7 +2917,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho: CREA. Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). Não é obrigatório indicar RT, porém se o cliente quiser utilizar o termo "Engenharia" na razão social é obrigatório.'
   },
   {
     code: '9529-1/01',
