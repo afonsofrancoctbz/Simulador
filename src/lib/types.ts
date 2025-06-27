@@ -36,6 +36,7 @@ export interface CnaeData {
   code: string;
   description: string;
   annex: Annex;
-  requiresFatorR?: boolean; // For Annex V activities that can be taxed under Annex III
-  presumedProfitRate: number; // For Lucro Presumido calculation
+  requiresFatorR?: boolean;
+  presumedProfitRate: number;
+  isRegulated?: boolean;
 }

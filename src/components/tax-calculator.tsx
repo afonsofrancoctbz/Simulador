@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { DollarSign, Globe, Users, Briefcase, Landmark, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw } from 'lucide-react';
+import { DollarSign, Globe, Users, Briefcase, Landmark, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw, AlertCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -376,33 +376,50 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
   };
   const placeholderText = isExport ? `${currencySymbols[exportCurrency] ?? 'R$'} 1.000,00` : "R$ 10.000,00";
 
+  const cnaeCode = form.watch(`${fieldName}.${index}.code`);
+  const selectedCnaeData = useMemo(() => {
+    if (!cnaeCode) return null;
+    return CNAE_DATA.find((cnae) => cnae.code === cnaeCode);
+  }, [cnaeCode]);
+
   return (
-    <div className="flex items-end gap-2 p-3 border rounded-md bg-background">
-        <FormField
-            control={form.control}
-            name={`${fieldName}.${index}.code`}
-            render={({ field }) => (
-                <FormItem className="flex-1">
-                    <FormLabel>CNAE</FormLabel>
-                    <CnaeCombobox value={field.value} onChange={field.onChange} />
-                    <FormMessage />
-                </FormItem>
-            )}
-        />
-        <FormField
-            control={form.control}
-            name={`${fieldName}.${index}.revenue`}
-            render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Faturamento Mensal</FormLabel>
-                    <FormControl><Input type="number" step="0.01" placeholder={placeholderText} {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )}
-        />
-        <Button type="button" variant="ghost" size="icon" onClick={() => removeFn(index)} className="shrink-0">
-            <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+    <div className="flex flex-col gap-3 p-3 border rounded-md bg-background">
+      <div className="flex items-end gap-2">
+          <FormField
+              control={form.control}
+              name={`${fieldName}.${index}.code`}
+              render={({ field }) => (
+                  <FormItem className="flex-1">
+                      <FormLabel>CNAE</FormLabel>
+                      <CnaeCombobox value={field.value} onChange={field.onChange} />
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+          <FormField
+              control={form.control}
+              name={`${fieldName}.${index}.revenue`}
+              render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Faturamento Mensal</FormLabel>
+                      <FormControl><Input type="number" step="0.01" placeholder={placeholderText} {...field} /></FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+          <Button type="button" variant="ghost" size="icon" onClick={() => removeFn(index)} className="shrink-0 mb-1">
+              <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+      </div>
+      {selectedCnaeData?.isRegulated && (
+        <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-900">
+            <AlertCircle className="h-4 w-4 text-amber-700" />
+            <AlertTitle className="font-semibold text-amber-800">Atividade Regulamentada</AlertTitle>
+            <AlertDescription className="text-amber-700">
+                Esta atividade pode exigir registro em um conselho de classe profissional (ex: CREA, OAB, CRM). Verifique as exigências para sua área de atuação.
+            </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };
@@ -476,7 +493,7 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
           </TableHeader>
           <TableBody>
             {details.breakdown.map((item) => (
-              <TableRow key={item.name}><TableCell>{item.name}</TableCell><TableCell className="text-right">{formatCurrencyBRL(item.value)}</TableCell></TableRow>
+              <TableRow key={item.name}><TableCell>{item.name}</TableCell><TableCell className="text-right font-mono">{formatCurrencyBRL(item.value)}</TableCell></TableRow>
             ))}
           </TableBody>
         </Table>
