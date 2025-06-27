@@ -411,12 +411,12 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
               <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
       </div>
-      {selectedCnaeData?.isRegulated && (
+      {selectedCnaeData?.notes && (
         <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-900">
             <AlertCircle className="h-4 w-4 text-amber-700" />
-            <AlertTitle className="font-semibold text-amber-800">Atividade Regulamentada</AlertTitle>
+            <AlertTitle className="font-semibold text-amber-800">Ponto de Atenção</AlertTitle>
             <AlertDescription className="text-amber-700">
-                Esta atividade pode exigir registro em um conselho de classe profissional (ex: CREA, OAB, CRM). Verifique as exigências para sua área de atuação.
+                {selectedCnaeData.notes}
             </AlertDescription>
         </Alert>
       )}

@@ -39,4 +39,5 @@ export interface CnaeData {
   requiresFatorR?: boolean;
   presumedProfitRate: number;
   isRegulated?: boolean;
+  notes?: string;
 }
