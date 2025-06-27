@@ -23,6 +23,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import FaqSection from './faq-section';
 
 const formatCurrencyBRL = (value: number) => {
   if (typeof value !== 'number') return 'N/A';
@@ -356,7 +357,8 @@ export default function TaxCalculator() {
         </Form>
       </div>
       {renderResults()}
-       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
+      <FaqSection />
+      <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
         <p>TributaSimples | Saúde © {new Date().getFullYear()}.</p>
         <p className="text-xs mt-2">Aviso: Esta ferramenta destina-se apenas a fins de estimativa. Consulte um contador para aconselhamento preciso.</p>
       </footer>
