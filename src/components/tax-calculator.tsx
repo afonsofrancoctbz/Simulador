@@ -29,13 +29,6 @@ const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
-const formatNumber = (value: number) => {
-  return new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-};
-
 const cnaeItemSchema = z.object({
   code: z.string().min(1, "Selecione um CNAE."),
   revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
@@ -376,16 +369,16 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
           {isCheapest && <Badge variant="default" className="bg-accent text-accent-foreground">Mais vantajoso</Badge>}
         </CardTitle>
         <CardDescription>Custo total mensal estimado</CardDescription>
-        <p className="text-3xl font-bold text-primary">R$ {formatNumber(details.totalMonthlyCost)}</p>
+        <p className="text-3xl font-bold text-primary">{formatCurrency(details.totalMonthlyCost)}</p>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow><TableHead>Tributo</TableHead><TableHead className="text-right">Valor (R$)</TableHead></TableRow>
+            <TableRow><TableHead>Tributo</TableHead><TableHead className="text-right">Valor</TableHead></TableRow>
           </TableHeader>
           <TableBody>
             {details.breakdown.map((item) => (
-              <TableRow key={item.name}><TableCell>{item.name}</TableCell><TableCell className="text-right">{formatNumber(item.value)}</TableCell></TableRow>
+              <TableRow key={item.name}><TableCell>{item.name}</TableCell><TableCell className="text-right">{formatCurrency(item.value)}</TableCell></TableRow>
             ))}
           </TableBody>
         </Table>
