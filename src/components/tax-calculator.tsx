@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { Bot, BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw, AlertCircle, HeartPulse } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw, AlertCircle, HeartPulse } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -73,10 +72,10 @@ export default function TaxCalculator() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      domesticActivities: [{ code: '6201-5/01', revenue: 10000 }],
+      domesticActivities: [{ code: '8630-5/03', revenue: 15000 }], // Default to medical activity
       exportActivities: [],
       exportCurrency: 'BRL',
-      totalSalaryExpense: 1500,
+      totalSalaryExpense: 0,
       proLaborePartners: MINIMUM_WAGE,
       numberOfPartners: 1,
       municipalISSRate: 2,
@@ -196,15 +195,15 @@ export default function TaxCalculator() {
           <ResultCard regime="Lucro Presumido" details={results.lucroPresumido} isCheapest={cheapestRegime === 'Lucro Presumido'} />
         </div>
         
-        <Card className="mt-8 border-primary/50 bg-card">
+        <Card className="mt-8 border-primary/50 bg-card shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-primary">
-              <Lightbulb />
+            <CardTitle className="flex items-center gap-3 text-primary-foreground">
+              <Lightbulb className="text-primary" />
               Recomendação da IA
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {isAdviceLoading ? <Skeleton className="h-12 w-full" /> : <p className="text-foreground/90 font-medium text-lg">{advice}</p>}
+            {isAdviceLoading ? <Skeleton className="h-12 w-full" /> : <p className="text-foreground/90 font-medium text-lg font-serif">{advice}</p>}
           </CardContent>
         </Card>
       </div>
@@ -215,24 +214,24 @@ export default function TaxCalculator() {
     <>
       <div className="w-full max-w-6xl mx-auto">
         <header className="text-center mb-12">
-            <div className="inline-block bg-primary/10 p-3 rounded-lg mb-4">
-              <Bot className="h-8 w-8 text-primary" />
+            <div className="inline-block bg-primary/20 p-3 rounded-lg mb-4">
+              <HeartPulse className="h-8 w-8 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold">Simulador Tributário Inteligente</h1>
-            <p className="text-muted-foreground mt-4 text-lg max-w-2xl mx-auto">Análise Comparativa de Regimes Tributários com IA para otimizar suas finanças.</p>
+            <h1 className="text-4xl sm:text-5xl font-bold">Calculadora de Impostos para Profissionais da Saúde</h1>
+            <p className="text-muted-foreground mt-4 text-lg max-w-3xl mx-auto font-serif">Descubra o regime tributário ideal para sua clínica ou consultório e otimize suas finanças.</p>
         </header>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <Card className="shadow-lg lg:col-span-1">
+                <Card className="shadow-lg lg:col-span-1 bg-card/80">
                     <CardHeader>
-                        <CardTitle className="text-2xl flex items-center gap-3"><Building2 className="text-primary" />Dados da Empresa</CardTitle>
+                        <CardTitle className="text-2xl flex items-center gap-3"><Building2 className="text-primary-foreground" />Dados da Empresa</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                <FormControl><Input type="number" step="0.01" placeholder="R$ 1.500,00" {...field} /></FormControl>
+                                <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
@@ -267,10 +266,10 @@ export default function TaxCalculator() {
                     </CardContent>
                 </Card>
                 <div className="lg:col-span-2 space-y-8">
-                    <Card className="shadow-lg">
+                    <Card className="shadow-lg bg-card/80">
                         <CardHeader>
-                            <CardTitle className="text-2xl flex items-center gap-3"><BarChartBig className="text-primary" />Receitas Nacionais</CardTitle>
-                            <CardDescription>Adicione as atividades que geram faturamento no Brasil.</CardDescription>
+                            <CardTitle className="text-2xl flex items-center gap-3"><BarChartBig className="text-primary-foreground" />Receitas Nacionais</CardTitle>
+                            <CardDescription className="font-serif">Adicione as atividades que geram faturamento no Brasil.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {domesticFields.map((field, index) => (
@@ -283,10 +282,10 @@ export default function TaxCalculator() {
                         </CardContent>
                     </Card>
 
-                    <Card className="shadow-lg">
+                    <Card className="shadow-lg bg-card/80">
                         <CardHeader>
-                            <CardTitle className="text-2xl flex items-center gap-3"><Rocket className="text-primary" />Receitas de Exportação</CardTitle>
-                            <CardDescription>Adicione as atividades de exportação de serviços ou produtos.</CardDescription>
+                            <CardTitle className="text-2xl flex items-center gap-3"><Rocket className="text-primary-foreground" />Receitas de Exportação</CardTitle>
+                            <CardDescription className="font-serif">Adicione as atividades de exportação de serviços ou produtos.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -345,7 +344,7 @@ export default function TaxCalculator() {
                 </div>
             </div>
             <div className="flex justify-center pt-4">
-              <Button type="submit" size="lg" disabled={isLoading} className="w-full max-w-md">
+              <Button type="submit" size="lg" disabled={isLoading} className="w-full max-w-md bg-accent text-accent-foreground hover:bg-accent/90">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
                 Analisar e Otimizar Impostos
               </Button>
@@ -354,8 +353,8 @@ export default function TaxCalculator() {
         </Form>
       </div>
       {renderResults()}
-       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground">
-        <p>IntelliTax © {new Date().getFullYear()}.</p>
+       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
+        <p>TributaSimples | Saúde © {new Date().getFullYear()}.</p>
         <p className="text-xs mt-2">Aviso: Esta ferramenta destina-se apenas a fins de estimativa. Consulte um contador para aconselhamento preciso.</p>
       </footer>
     </>
@@ -391,10 +390,10 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
           </Button>
       </div>
       {selectedCnaeData?.notes && (
-        <Alert variant="default" className="bg-yellow-900/20 border-yellow-700/50 text-yellow-300 mt-2">
-            <AlertCircle className="h-4 w-4 text-yellow-500" />
-            <AlertTitle className="font-semibold text-yellow-400">Ponto de Atenção</AlertTitle>
-            <AlertDescription className="text-yellow-400/90">{selectedCnaeData.notes}</AlertDescription>
+        <Alert variant="default" className="bg-amber-100 border-amber-300 text-amber-800 mt-2">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertTitle className="font-semibold text-amber-700">Ponto de Atenção</AlertTitle>
+            <AlertDescription className="text-amber-700/90 font-serif">{selectedCnaeData.notes}</AlertDescription>
         </Alert>
       )}
     </div>
@@ -422,7 +421,7 @@ const CnaeCombobox = ({ value, onChange }: { value: string, onChange: (value: st
                         <Check className={cn("mr-2 h-4 w-4", value === cnae.code ? "opacity-100" : "opacity-0")} />
                         <div>
                             <p className="font-semibold">{cnae.code}</p>
-                            <p className="text-xs text-muted-foreground">{cnae.description}</p>
+                            <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
                         </div>
                     </CommandItem>
                 ))}
@@ -435,33 +434,33 @@ const CnaeCombobox = ({ value, onChange }: { value: string, onChange: (value: st
 };
 
 const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: CalculationResults['simplesNacional'], isCheapest: boolean }) => (
-    <Card className={cn("flex flex-col", isCheapest ? 'border-accent shadow-accent/20 shadow-lg' : 'border-border')}>
+    <Card className={cn("flex flex-col shadow-lg", isCheapest ? 'border-accent shadow-accent/20' : 'border-border')}>
       <CardHeader>
         <CardTitle className="text-2xl flex items-center justify-between">
           {regime}
           {isCheapest && <Badge variant="default" className="bg-accent text-accent-foreground">Mais Vantajoso</Badge>}
         </CardTitle>
-        <CardDescription>Custo total mensal estimado</CardDescription>
-        <p className="text-4xl font-bold text-primary">{formatCurrencyBRL(details.totalMonthlyCost)}</p>
+        <CardDescription className="font-serif">Custo total mensal estimado</CardDescription>
+        <p className="text-4xl font-bold text-primary-foreground">{formatCurrencyBRL(details.totalMonthlyCost)}</p>
       </CardHeader>
       <CardContent className="flex-grow">
         <h4 className="font-semibold mb-2 text-foreground/90">Detalhamento dos Impostos:</h4>
-        <div className="space-y-2">
+        <div className="space-y-2 font-serif">
             {details.breakdown.map((item) => (
-              <div key={item.name} className="flex justify-between items-center text-sm p-2 rounded-md bg-card-foreground/5">
+              <div key={item.name} className="flex justify-between items-center text-sm p-2 rounded-md bg-foreground/5">
                 <span className="text-muted-foreground">{item.name}</span>
-                <span className="font-mono font-medium">{formatCurrencyBRL(item.value)}</span>
+                <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
               </div>
             ))}
         </div>
       </CardContent>
       {details.notes && details.notes.length > 0 && (
           <CardFooter>
-            <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground/80 w-full">
+            <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground/90 w-full">
                 <AlertCircle className="h-4 w-4 text-primary" />
-                <AlertTitle className="text-primary/90">Observações Importantes</AlertTitle>
+                <AlertTitle className="text-primary-foreground/95 font-semibold">Observações Importantes</AlertTitle>
                 <AlertDescription>
-                    <ul className="list-disc pl-4 space-y-1 mt-2">
+                    <ul className="list-disc pl-4 space-y-1 mt-2 font-serif">
                         {details.notes.map((note, i) => <li key={i}>{note}</li>)}
                     </ul>
                 </AlertDescription>

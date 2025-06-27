@@ -1,13 +1,14 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import { Inter } from "next/font/google";
+import { Inter, Literata } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const literata = Literata({ subsets: ["latin"], variable: "--font-serif"});
 
 export const metadata: Metadata = {
-  title: 'IntelliTax',
-  description: 'Análise Comparativa de Regimes Tributários com IA',
+  title: 'TributaSimples | Saúde',
+  description: 'Calculadora de Impostos para Profissionais da Saúde',
 };
 
 export default function RootLayout({
@@ -16,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`font-sans antialiased ${inter.variable}`}>
+    <html lang="en">
+      <body className={`font-sans antialiased ${inter.variable} ${literata.variable}`}>
         {children}
         <Toaster />
       </body>
