@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { DollarSign, Globe, Users, UserCheck, Briefcase, Landmark, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown } from 'lucide-react';
+import { DollarSign, Globe, Users, Briefcase, Landmark, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -24,8 +24,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-
-const formatCurrency = (value: number) => {
+const formatCurrencyBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
@@ -40,8 +39,17 @@ const formSchema = z.object({
   exportInUSD: z.boolean().default(false),
   exchangeRate: z.coerce.number().optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Campo obrigatório" }).min(0, "O valor deve ser positivo."),
-  proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(MINIMUM_WAGE, `O valor deve ser no mínimo ${formatCurrency(MINIMUM_WAGE)}.`),
+  proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(MINIMUM_WAGE, `O valor deve ser no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`),
+  numberOfPartners: z.coerce.number({ required_error: "Campo obrigatório" }).int("Deve ser um número inteiro.").min(1, "Mínimo de 1 sócio."),
   municipalISSRate: z.coerce.number({ required_error: "Campo obrigatório" }).min(2, "A alíquota mínima é 2%.").max(5, "A alíquota máxima é 5%."),
+}).refine(data => {
+    if (data.domesticActivities.length === 0 && data.exportActivities.length === 0) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Adicione pelo menos uma atividade de faturamento.",
+    path: ["domesticActivities"],
 }).refine(data => {
     if (data.exportInUSD) {
         return data.exchangeRate && data.exchangeRate > 0;
@@ -66,6 +74,7 @@ export default function TaxCalculator() {
       exportInUSD: false,
       totalSalaryExpense: 1500,
       proLaborePartners: MINIMUM_WAGE,
+      numberOfPartners: 1,
       municipalISSRate: 2,
     },
   });
@@ -87,7 +96,6 @@ export default function TaxCalculator() {
     setResults(null);
     setAdvice(null);
 
-    // Ensure exchangeRate is a number if exportInUSD is true
     const submissionValues: TaxFormValues = {
         ...values,
         exchangeRate: values.exportInUSD ? values.exchangeRate! : 1,
@@ -117,6 +125,7 @@ export default function TaxCalculator() {
         totalExportRevenue,
         totalSalaryExpense: values.totalSalaryExpense,
         proLaborePartners: values.proLaborePartners,
+        numberOfPartners: values.numberOfPartners,
         municipalISSRate: values.municipalISSRate,
         simplesNacionalTaxBurden: simplesTax,
         lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalTax,
@@ -184,7 +193,7 @@ export default function TaxCalculator() {
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl flex items-center gap-2"><Users className="text-primary" />Dados de Despesas</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Despesa com Salários (CLT)</FormLabel>
@@ -194,8 +203,15 @@ export default function TaxCalculator() {
                     )} />
                     <FormField control={form.control} name="proLaborePartners" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Pró-labore dos Sócios</FormLabel>
-                            <FormControl><Input type="number" step="0.01" placeholder={formatCurrency(MINIMUM_WAGE)} {...field} /></FormControl>
+                            <FormLabel>Pró-labore Total dos Sócios</FormLabel>
+                            <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Número de Sócios</FormLabel>
+                            <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -369,7 +385,7 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
           {isCheapest && <Badge variant="default" className="bg-accent text-accent-foreground">Mais vantajoso</Badge>}
         </CardTitle>
         <CardDescription>Custo total mensal estimado</CardDescription>
-        <p className="text-3xl font-bold text-primary">{formatCurrency(details.totalMonthlyCost)}</p>
+        <p className="text-3xl font-bold text-primary">{formatCurrencyBRL(details.totalMonthlyCost)}</p>
       </CardHeader>
       <CardContent>
         <Table>
@@ -378,7 +394,7 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
           </TableHeader>
           <TableBody>
             {details.breakdown.map((item) => (
-              <TableRow key={item.name}><TableCell>{item.name}</TableCell><TableCell className="text-right">{formatCurrency(item.value)}</TableCell></TableRow>
+              <TableRow key={item.name}><TableCell>{item.name}</TableCell><TableCell className="text-right">{formatCurrencyBRL(item.value)}</TableCell></TableRow>
             ))}
           </TableBody>
         </Table>

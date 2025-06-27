@@ -27,6 +27,7 @@ const TaxOptimizationInputSchema = z.object({
   proLaborePartners: z
     .number()
     .describe('Monthly pro-labore amount for partners.'),
+  numberOfPartners: z.number().describe('The number of partners in the business.'),
   municipalISSRate: z.number().describe('The municipal ISS rate.'),
   simplesNacionalTaxBurden: z
     .number()
@@ -65,6 +66,7 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   Total Monthly Revenue (Export): {{totalExportRevenue}}
   Total Salary Expense: {{totalSalaryExpense}}
   Pro-labore for Partners: {{proLaborePartners}}
+  Number of Partners: {{numberOfPartners}}
   Municipal ISS Rate: {{municipalISSRate}}
   Tax Burden (Simples Nacional): {{simplesNacionalTaxBurden}}
   Tax Burden (Lucro Presumido): {{lucroPresumidoTaxBurden}}

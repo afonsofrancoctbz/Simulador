@@ -24,6 +24,9 @@ const ANNEX_TABLES = {
 };
 
 function findBracket(table: { max: number }[], value: number) {
+  if (value === 0) {
+    return table[0];
+  }
   for (const bracket of table) {
     if (value <= bracket.max) {
       return bracket;
@@ -49,7 +52,7 @@ function calculateProLaboreTaxes(proLabore: number) {
 }
 
 function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners, municipalISSRate } = values;
 
   const notes: string[] = [];
 
@@ -58,13 +61,13 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' })),
   ];
 
-  if (allActivities.length === 0) {
+  if (allActivities.length === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
     return {
       regime: 'Simples Nacional',
       totalTax: 0,
-      totalMonthlyCost: totalSalaryExpense + proLaborePartners,
+      totalMonthlyCost: 0,
       breakdown: [],
-      notes: ["Nenhuma atividade de faturamento foi adicionada."]
+      notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."]
     };
   }
 
@@ -135,9 +138,14 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     }
   }
 
-  const proLaboreTaxes = calculateProLaboreTaxes(proLaborePartners);
+  const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
+  const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner);
+  const totalProLaboreTaxes = {
+    inssOnProLabore: proLaboreTaxesPerPartner.inssOnProLabore * numberOfPartners,
+    irrf: proLaboreTaxesPerPartner.irrf * numberOfPartners
+  };
 
-  const totalTax = totalDas + cppFromAnnexIV + proLaboreTaxes.inssOnProLabore + proLaboreTaxes.irrf;
+  const totalTax = totalDas + cppFromAnnexIV + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners;
 
   return {
@@ -147,26 +155,26 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     breakdown: [
       { name: "DAS (Imposto Unificado)", value: totalDas },
       ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
-      { name: "INSS sobre Pró-labore", value: proLaboreTaxes.inssOnProLabore },
-      { name: "IRRF sobre Pró-labore", value: proLaboreTaxes.irrf },
+      { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
+      { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
     ],
     notes,
   };
 }
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, municipalISSRate } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners, municipalISSRate } = values;
 
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
   const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
   
-  if (allActivities.length === 0) {
+  if (allActivities.length === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
     return {
       regime: 'Lucro Presumido',
       totalTax: 0,
-      totalMonthlyCost: totalSalaryExpense + proLaborePartners,
+      totalMonthlyCost: 0,
       breakdown: []
     };
   }
@@ -203,9 +211,15 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const totalPayroll = totalSalaryExpense + proLaborePartners;
   const inssPatronal = totalPayroll * (INSS_PATRONAL_RATE + RAT_RATE + TERCEIROS_RATE);
 
-  const proLaboreTaxes = calculateProLaboreTaxes(proLaborePartners);
+  const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
+  const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner);
+  const totalProLaboreTaxes = {
+    inssOnProLabore: proLaboreTaxesPerPartner.inssOnProLabore * numberOfPartners,
+    irrf: proLaboreTaxesPerPartner.irrf * numberOfPartners
+  };
 
-  const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + proLaboreTaxes.inssOnProLabore + proLaboreTaxes.irrf;
+
+  const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners;
 
   return {
@@ -219,8 +233,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       { name: "IRPJ", value: irpj },
       { name: "CSLL", value: csll },
       { name: "INSS Patronal (Folha)", value: inssPatronal },
-      { name: "INSS sobre Pró-labore", value: proLaboreTaxes.inssOnProLabore },
-      { name: "IRRF sobre Pró-labore", value: proLaboreTaxes.irrf },
+      { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
+      { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
     ],
   };
 }

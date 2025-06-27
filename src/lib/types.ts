@@ -10,6 +10,7 @@ export interface TaxFormValues {
   exchangeRate: number;
   totalSalaryExpense: number;
   proLaborePartners: number;
+  numberOfPartners: number;
   municipalISSRate: number;
 }
 
