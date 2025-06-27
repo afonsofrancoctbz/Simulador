@@ -460,3 +460,5 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
       )}
     </Card>
 );
+
+    
