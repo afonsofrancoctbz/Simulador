@@ -25,6 +25,10 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+};
+
 const cnaeItemSchema = z.object({
   code: z.string().min(1, "Selecione um CNAE."),
   revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
@@ -47,10 +51,6 @@ const formSchema = z.object({
     message: "A taxa de câmbio é obrigatória para faturamento em USD.",
     path: ["exchangeRate"],
 });
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-};
 
 export default function TaxCalculator() {
   const [results, setResults] = useState<CalculationResults | null>(null);
