@@ -36,6 +36,19 @@ function findBracket(table: { max: number }[], value: number) {
   return table[table.length - 1]; // Fallback for values over the max limit
 }
 
+function findBracketIndex(table: { max: number }[], value: number): number {
+    if (value === 0) {
+      return 0;
+    }
+    for (let i = 0; i < table.length; i++) {
+        if (value <= table[i].max) {
+            return i;
+        }
+    }
+    return table.length - 1; // Fallback for values over the max limit
+}
+
+
 function getCnaeData(code: string): CnaeData | undefined {
   return CNAE_DATA.find(c => c.code === code);
 }
@@ -108,7 +121,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     }
     
     if (!acc[effectiveAnnex]) {
-      acc[effectiveAnnex] = { domestic: 0, export: 0, rbt12: 0 };
+      acc[effectiveAnnex] = { domestic: 0, export: 0 };
     }
 
     if (activity.type === 'domestic') {
@@ -118,17 +131,20 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     }
     
     return acc;
-  }, {} as Record<Annex, { domestic: number; export: number, rbt12: number }>);
+  }, {} as Record<Annex, { domestic: number; export: number }>);
   
   let totalDas = 0;
   let cppFromAnnexIV = 0;
+  let totalIssSeparado = 0;
 
   for (const annexStr in revenueByAnnex) {
     const annex = annexStr as Annex;
     const annexInfo = revenueByAnnex[annex];
     const annexTable = ANNEX_TABLES[annex];
     
-    const bracket = findBracket(annexTable, rbt12); // Use total RBT12 to find the bracket
+    const bracketIndex = findBracketIndex(annexTable, rbt12);
+    const bracket = annexTable[bracketIndex];
+    
     const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
 
     // Calculate tax on domestic revenue
@@ -136,7 +152,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
     // Calculate tax on export revenue (with exemptions)
     const { PIS = 0, COFINS = 0, ISS = 0, IPI = 0, ICMS = 0 } = bracket.distribution;
-    const exportExemptionRate = PIS + COFINS + ISS + IPI + ICMS;
+    const exportExemptionRate = PIS + COFINS + (ISS ?? 0) + (IPI ?? 0) + (ICMS ?? 0);
     const effectiveRateForExport = Math.max(0, effectiveRate * (1 - exportExemptionRate));
     totalDas += annexInfo.export * effectiveRateForExport;
 
@@ -145,6 +161,18 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         const cppRate = 0.20 + 0.03 + 0.058; // Simplified INSS Patronal + RAT + Terceiros
         cppFromAnnexIV += (totalPayroll) * cppRate;
         notes.push("Atividades do Anexo IV pagam a Contribuição Previdenciária Patronal (CPP) fora do DAS, similar ao Lucro Presumido.");
+    }
+
+     // Check for last bracket taxes ("por fora")
+     if (bracketIndex === annexTable.length - 1) {
+      if (['III', 'IV', 'V'].includes(annex) && annexInfo.domestic > 0) {
+        const issSeparado = annexInfo.domestic * (municipalISSRate / 100);
+        totalIssSeparado += issSeparado;
+        notes.push(`Para faturamento na última faixa do Anexo ${annex}, o ISS (${municipalISSRate}%) é recolhido separadamente do DAS.`);
+      }
+      if (['I', 'II'].includes(annex) && annexInfo.domestic > 0) {
+        notes.push(`Para faturamento na última faixa do Anexo ${annex}, o ICMS deve ser recolhido separadamente, conforme as regras do seu estado.`);
+      }
     }
   }
 
@@ -155,19 +183,22 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     irrf: proLaboreTaxesPerPartner.irrf * numberOfPartners
   };
 
-  const totalTax = totalDas + cppFromAnnexIV + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
+  const totalTax = totalDas + cppFromAnnexIV + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf + totalIssSeparado;
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners;
+
+  const breakdown = [
+    { name: "DAS (Imposto Unificado)", value: totalDas },
+    ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
+    ...(totalIssSeparado > 0 ? [{ name: "ISS (Recolhido à parte)", value: totalIssSeparado }] : []),
+    { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
+    { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
+  ];
 
   return {
     regime: 'Simples Nacional',
     totalTax,
     totalMonthlyCost,
-    breakdown: [
-      { name: "DAS (Imposto Unificado)", value: totalDas },
-      ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
-      { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
-      { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
-    ],
+    breakdown: breakdown.filter(item => item.value > 0),
     notes,
   };
 }
@@ -232,20 +263,22 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners;
 
+  const breakdown = [
+    { name: "PIS", value: pis },
+    { name: "COFINS", value: cofins },
+    { name: "ISS", value: iss },
+    { name: "IRPJ", value: irpj },
+    { name: "CSLL", value: csll },
+    { name: "INSS Patronal (Folha)", value: inssPatronal },
+    { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
+    { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
+  ];
+
   return {
     regime: 'Lucro Presumido',
     totalTax,
     totalMonthlyCost,
-    breakdown: [
-      { name: "PIS", value: pis },
-      { name: "COFINS", value: cofins },
-      { name: "ISS", value: iss },
-      { name: "IRPJ", value: irpj },
-      { name: "CSLL", value: csll },
-      { name: "INSS Patronal (Folha)", value: inssPatronal },
-      { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
-      { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
-    ],
+    breakdown: breakdown.filter(item => item.value > 0),
   };
 }
 
