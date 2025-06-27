@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { Bot, BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw, AlertCircle } from 'lucide-react';
+import { Bot, BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw, AlertCircle, HeartPulse } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -43,6 +43,7 @@ const formSchema = z.object({
   proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(MINIMUM_WAGE, `O valor deve ser no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`),
   numberOfPartners: z.coerce.number({ required_error: "Campo obrigatório" }).int("Deve ser um número inteiro.").min(1, "Mínimo de 1 sócio."),
   municipalISSRate: z.coerce.number({ required_error: "Campo obrigatório" }).min(2, "A alíquota mínima é 2%.").max(5, "A alíquota máxima é 5%."),
+  healthPlanCost: z.coerce.number().min(0, "O valor deve ser positivo.").optional(),
 }).refine(data => {
     if (data.domesticActivities.length === 0 && data.exportActivities.length === 0) {
         return false;
@@ -79,6 +80,7 @@ export default function TaxCalculator() {
       proLaborePartners: MINIMUM_WAGE,
       numberOfPartners: 1,
       municipalISSRate: 2,
+      healthPlanCost: 0,
     },
   });
 
@@ -157,6 +159,7 @@ export default function TaxCalculator() {
         municipalISSRate: values.municipalISSRate,
         simplesNacionalTaxBurden: simplesTax,
         lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalTax,
+        healthPlanCost: values.healthPlanCost ?? 0,
       };
       const aiResult = await getTaxOptimizationAdvice(aiInput);
       setAdvice(aiResult.advice);
@@ -237,6 +240,13 @@ export default function TaxCalculator() {
                             <FormItem>
                                 <FormLabel>Pró-labore Total dos Sócios</FormLabel>
                                 <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                         <FormField control={form.control} name="healthPlanCost" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Plano de Saúde (Pago pela Empresa)</FormLabel>
+                                <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
@@ -460,5 +470,3 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
       )}
     </Card>
 );
-
-    

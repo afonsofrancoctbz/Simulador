@@ -35,6 +35,7 @@ const TaxOptimizationInputSchema = z.object({
   lucroPresumidoTaxBurden: z
     .number()
     .describe('The tax burden under Lucro Presumido.'),
+  healthPlanCost: z.number().describe('Total monthly cost of health plan paid by the company for partners.'),
 });
 export type TaxOptimizationInput = z.infer<typeof TaxOptimizationInputSchema>;
 
@@ -68,10 +69,11 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   Pro-labore for Partners: {{proLaborePartners}}
   Number of Partners: {{numberOfPartners}}
   Municipal ISS Rate: {{municipalISSRate}}
+  Custo do Plano de Saúde: {{healthPlanCost}}
   Tax Burden (Simples Nacional): {{simplesNacionalTaxBurden}}
   Tax Burden (Lucro Presumido): {{lucroPresumidoTaxBurden}}
 
-  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries, such as adjusting pro-labore to optimize for "Fator R" if applicable. Analise o impacto das receitas de exportação, que possuem isenção de PIS, COFINS e ISS, e considere se o aumento das exportações pode ser uma estratégia de otimização.
+  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries, such as adjusting pro-labore to optimize for "Fator R" if applicable. Analise o impacto das receitas de exportação, que possuem isenção de PIS, COFINS e ISS, e considere se o aumento das exportações pode ser uma estratégia de otimização. Analise também o impacto do plano de saúde, que é um benefício para os sócios mas aumenta a base de cálculo do IRRF.
   The advice should be concise and no more than 3-4 sentences.`,
 });
 
