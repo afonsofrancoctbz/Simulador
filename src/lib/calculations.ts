@@ -23,11 +23,13 @@ const ANNEX_TABLES = {
   V: SIMPLES_NACIONAL_ANNEX_V,
 };
 
-function findBracket(table: any[], value: number) {
-  return (
-    table.find(bracket => value > bracket.min && value <= bracket.max) ||
-    table[table.length - 1]
-  );
+function findBracket(table: { max: number }[], value: number) {
+  for (const bracket of table) {
+    if (value <= bracket.max) {
+      return bracket;
+    }
+  }
+  return table[table.length - 1]; // Fallback for values over the max limit
 }
 
 function getCnaeData(code: string): CnaeData | undefined {
@@ -67,13 +69,13 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   }
 
   const totalRevenue = allActivities.reduce((sum, act) => sum + act.revenue, 0);
-  const totalPayroll = totalSalaryExpense + proLaborePartners;
   const rbt12 = totalRevenue * 12;
 
   const revenueAnnexV = allActivities
     .filter(a => getCnaeData(a.code)?.annex === 'V')
     .reduce((sum, act) => sum + act.revenue, 0);
   
+  const totalPayroll = totalSalaryExpense + proLaborePartners;
   const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : 0;
   const isFatorRApplicable = revenueAnnexV > 0;
   const useAnnexIIIForV = fatorR >= 0.28;
@@ -111,8 +113,6 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   for (const annexStr in revenueByAnnex) {
     const annex = annexStr as Annex;
     const annexInfo = revenueByAnnex[annex];
-    const annexTotalRevenue = annexInfo.domestic + annexInfo.export;
-    const annexRbt12 = annexTotalRevenue * 12; // RBT12 specific to this group of activities
     const annexTable = ANNEX_TABLES[annex];
     
     const bracket = findBracket(annexTable, rbt12); // Use total RBT12 to find the bracket
