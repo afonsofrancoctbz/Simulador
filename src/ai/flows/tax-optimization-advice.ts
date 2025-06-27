@@ -71,7 +71,7 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   Tax Burden (Simples Nacional): {{simplesNacionalTaxBurden}}
   Tax Burden (Lucro Presumido): {{lucroPresumidoTaxBurden}}
 
-  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries, such as adjusting pro-labore to optimize for "Fator R" if applicable.
+  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries, such as adjusting pro-labore to optimize for "Fator R" if applicable. Analise o impacto das receitas de exportação, que possuem isenção de PIS, COFINS e ISS, e considere se o aumento das exportações pode ser uma estratégia de otimização.
   The advice should be concise and no more than 3-4 sentences.`,
 });
 

@@ -80,9 +80,11 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   const notes: string[] = [];
 
   const allActivities = [
-    ...domesticActivities.map(a => ({ ...a, type: 'domestic' })),
-    ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' })),
+    ...domesticActivities.map(a => ({ ...a, type: 'domestic' as const })),
+    ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const })),
   ];
+  
+  const hasExportRevenue = allActivities.some(act => act.type === 'export' && act.revenue > 0);
 
   if (allActivities.length === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
     return {
@@ -108,6 +110,10 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
   if (isFatorRApplicable) {
     notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
+  }
+
+  if (hasExportRevenue) {
+    notes.push("As receitas de exportação têm isenção de PIS, COFINS e ISS no Simples Nacional, resultando em uma alíquota efetiva menor sobre estes valores.");
   }
 
   // Group revenue by effective annex
@@ -206,8 +212,14 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners, municipalISSRate } = values;
 
+  const notes: string[] = [];
+  const hasExportRevenue = exportActivities.some(act => act.revenue > 0);
+  if (hasExportRevenue) {
+    notes.push("As receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
+  }
+
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-  const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+  const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
   
@@ -216,7 +228,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       regime: 'Lucro Presumido',
       totalTax: 0,
       totalMonthlyCost: 0,
-      breakdown: []
+      breakdown: [],
+      notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."]
     };
   }
 
@@ -279,6 +292,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     totalTax,
     totalMonthlyCost,
     breakdown: breakdown.filter(item => item.value > 0),
+    notes,
   };
 }
 
