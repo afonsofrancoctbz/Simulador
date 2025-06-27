@@ -1,5 +1,6 @@
 import {
   IRRF_TABLE,
+  SIMPLIFIED_DEDUCTION_IRRF,
   SIMPLES_NACIONAL_ANNEX_I,
   SIMPLES_NACIONAL_ANNEX_II,
   SIMPLES_NACIONAL_ANNEX_III,
@@ -43,10 +44,19 @@ function calculateProLaboreTaxes(proLabore: number) {
   const INSS_RATE = 0.11;
   const INSS_CEILING = 7786.02;
 
+  // 1. Calculate INSS on pro-labore (this is a tax, not just a deduction for IRRF)
   const inssOnProLabore = Math.min(proLabore, INSS_CEILING) * INSS_RATE;
-  const irrfCalculationBase = proLabore - inssOnProLabore;
+
+  // 2. Calculate IRRF
+  // The law allows choosing between standard deductions (like INSS) and a simplified deduction.
+  // We should choose the option that results in the lowest tax, which means choosing the largest deduction.
+  const applicableDeduction = Math.max(inssOnProLabore, SIMPLIFIED_DEDUCTION_IRRF);
+  
+  const irrfCalculationBase = proLabore - applicableDeduction;
+
   const irrfBracket = findBracket(IRRF_TABLE, irrfCalculationBase);
-  const irrf = irrfCalculationBase * irrfBracket.rate - irrfBracket.deduction;
+  // Ensure IRRF is not negative
+  const irrf = Math.max(0, irrfCalculationBase * irrfBracket.rate - irrfBracket.deduction);
 
   return { inssOnProLabore, irrf };
 }
@@ -119,7 +129,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const annexTable = ANNEX_TABLES[annex];
     
     const bracket = findBracket(annexTable, rbt12); // Use total RBT12 to find the bracket
-    const effectiveRate = rbt12 > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
+    const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
 
     // Calculate tax on domestic revenue
     totalDas += annexInfo.domestic * effectiveRate;

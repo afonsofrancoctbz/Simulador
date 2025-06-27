@@ -1,6 +1,7 @@
 import { CnaeData } from "./types";
 
 export const MINIMUM_WAGE = 1518.00;
+export const SIMPLIFIED_DEDUCTION_IRRF = 564.80;
 
 // Tabela Progressiva para o IRPF
 export const IRRF_TABLE = [
