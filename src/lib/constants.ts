@@ -1,9 +1,11 @@
 import { CnaeData } from "./types";
 
-export const MINIMUM_WAGE = 1518.00;
+export const MINIMUM_WAGE = 1412.00;
+export const INSS_CEILING = 7786.02;
+export const PRO_LABORE_INSS_RATE = 0.11;
 export const SIMPLIFIED_DEDUCTION_IRRF = 564.80;
 
-// Tabela Progressiva para o IRPF
+// Tabela Progressiva para o IRPF (Vigente a partir de Fev/2024)
 export const IRRF_TABLE = [
     { min: 0, max: 2259.20, rate: 0, deduction: 0 },
     { min: 2259.21, max: 2826.65, rate: 0.075, deduction: 169.44 },
@@ -37,7 +39,7 @@ export const SIMPLES_NACIONAL_ANNEX_III = [ // Serviços
     { min: 360000.01, max: 720000, rate: 0.135, deduction: 17640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
     { min: 720000.01, max: 1800000, rate: 0.16, deduction: 35640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
     { min: 1800000.01, max: 3600000, rate: 0.21, deduction: 125640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
-    { min: 3600000.01, max: 4800000, rate: 0.33, deduction: 648000, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.141, PIS: 0.0305, CPP: 0.295, ISS: 0 } },
+    { min: 3600000.01, max: 4800000, rate: 0.33, deduction: 648000, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.141, PIS: 0.0305, CPP: 0.3285, ISS: 0 } },
 ];
 
 export const SIMPLES_NACIONAL_ANNEX_IV = [ // Serviços

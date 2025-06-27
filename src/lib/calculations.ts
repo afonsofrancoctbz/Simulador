@@ -1,6 +1,8 @@
 import {
   IRRF_TABLE,
   SIMPLIFIED_DEDUCTION_IRRF,
+  PRO_LABORE_INSS_RATE,
+  INSS_CEILING,
   SIMPLES_NACIONAL_ANNEX_I,
   SIMPLES_NACIONAL_ANNEX_II,
   SIMPLES_NACIONAL_ANNEX_III,
@@ -54,11 +56,8 @@ function getCnaeData(code: string): CnaeData | undefined {
 }
 
 function calculateProLaboreTaxes(proLabore: number, healthPlanCost: number = 0) {
-  const INSS_RATE = 0.11;
-  const INSS_CEILING = 7786.02;
-
   // 1. Calculate INSS on pro-labore (this is a tax, not just a deduction for IRRF)
-  const inssOnProLabore = Math.min(proLabore, INSS_CEILING) * INSS_RATE;
+  const inssOnProLabore = Math.min(proLabore, INSS_CEILING) * PRO_LABORE_INSS_RATE;
 
   // 2. Calculate IRRF
   // The IRRF base includes the health plan cost paid by the company.
