@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { DollarSign, Globe, Users, Briefcase, Landmark, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown } from 'lucide-react';
+import { DollarSign, Globe, Users, Briefcase, Landmark, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -28,14 +28,19 @@ const formatCurrencyBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
-const cnaeItemSchema = z.object({
-  code: z.string().min(1, "Selecione um CNAE."),
-  revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
-});
+const formatNumberBRL = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+};
 
 const formSchema = z.object({
-  domesticActivities: z.array(cnaeItemSchema).min(1, "Adicione pelo menos uma atividade nacional."),
-  exportActivities: z.array(cnaeItemSchema),
+  domesticActivities: z.array(z.object({
+    code: z.string().min(1, "Selecione um CNAE."),
+    revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
+  })).min(1, "Adicione pelo menos uma atividade nacional."),
+  exportActivities: z.array(z.object({
+    code: z.string().min(1, "Selecione um CNAE."),
+    revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
+  })),
   exportCurrency: z.string().default('BRL'),
   exchangeRate: z.coerce.number().optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Campo obrigatório" }).min(0, "O valor deve ser positivo."),
@@ -51,7 +56,7 @@ const formSchema = z.object({
     message: "Adicione pelo menos uma atividade de faturamento.",
     path: ["domesticActivities"],
 }).refine(data => {
-    if (data.exportCurrency !== 'BRL') {
+    if (data.exportCurrency !== 'BRL' && data.exportActivities.length > 0) {
         return data.exchangeRate && data.exchangeRate > 0;
     }
     return true;
@@ -65,6 +70,8 @@ export default function TaxCalculator() {
   const [advice, setAdvice] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdviceLoading, setIsAdviceLoading] = useState(false);
+  const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
+  const [isFetchingRate, setIsFetchingRate] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -91,6 +98,31 @@ export default function TaxCalculator() {
 
   const exportCurrency = form.watch("exportCurrency");
 
+  const fetchRates = async () => {
+    setIsFetchingRate(true);
+    try {
+      const response = await fetch('/api/exchange-rate');
+      if (response.ok) {
+        const data = await response.json();
+        setExchangeRates(data);
+        const currentCurrency = form.getValues('exportCurrency');
+        if (data[currentCurrency]) {
+          form.setValue('exchangeRate', data[currentCurrency], { shouldValidate: true });
+        }
+        return data;
+      }
+    } catch (error) {
+      console.error("Falha ao buscar taxas de câmbio", error);
+    } finally {
+      setIsFetchingRate(false);
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    fetchRates();
+  }, []);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResults(null);
@@ -98,7 +130,7 @@ export default function TaxCalculator() {
 
     const submissionValues: TaxFormValues = {
         ...values,
-        exchangeRate: values.exportCurrency !== 'BRL' ? values.exchangeRate! : 1,
+        exchangeRate: values.exportCurrency !== 'BRL' && values.exportActivities.length > 0 ? values.exchangeRate! : 1,
     };
 
     const calculatedResults = calculateTaxes(submissionValues);
@@ -191,7 +223,7 @@ export default function TaxCalculator() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle className="font-headline text-2xl flex items-center gap-2"><Users className="text-primary" />Dados de Despesas</CardTitle>
+                    <CardTitle className="font-headline text-2xl flex items-center gap-2"><Users className="text-primary" />Dados da Empresa e Despesas</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
@@ -208,7 +240,7 @@ export default function TaxCalculator() {
                             <FormMessage />
                         </FormItem>
                     )} />
-                    <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                     <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Número de Sócios</FormLabel>
                             <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
@@ -254,7 +286,16 @@ export default function TaxCalculator() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Moeda do Faturamento</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select 
+                                        onValueChange={(value) => {
+                                            field.onChange(value);
+                                            if (value !== 'BRL' && exchangeRates[value]) {
+                                                form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true });
+                                            } else if (value === 'BRL') {
+                                                form.setValue('exchangeRate', undefined);
+                                            }
+                                        }} 
+                                        defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Selecione a moeda" />
@@ -270,11 +311,34 @@ export default function TaxCalculator() {
                                 </FormItem>
                             )}
                         />
-                        {exportCurrency !== 'BRL' && (
+                        {exportCurrency !== 'BRL' && exportFields.length > 0 && (
                             <FormField control={form.control} name="exchangeRate" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
-                                    <FormControl><Input type="number" step="0.0001" placeholder="Ex: 5.25" {...field} value={field.value ?? ''} /></FormControl>
+                                    <div className="relative flex items-center">
+                                        <FormControl>
+                                            <Input 
+                                                type="number" 
+                                                step="0.0001" 
+                                                placeholder={isFetchingRate ? "Buscando..." : "Cotação atual"} 
+                                                {...field} 
+                                                value={field.value ?? ''} 
+                                                disabled={isFetchingRate}
+                                                className="pr-10"
+                                            />
+                                        </FormControl>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="absolute right-0 h-10 w-10 text-muted-foreground"
+                                            onClick={fetchRates}
+                                            disabled={isFetchingRate}
+                                            aria-label="Atualizar cotação"
+                                        >
+                                            <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
+                                        </Button>
+                                    </div>
                                     <FormMessage />
                                 </FormItem>
                             )} />
