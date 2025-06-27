@@ -19,6 +19,7 @@ export interface TaxDetails {
   regime: 'Simples Nacional' | 'Lucro Presumido';
   totalTax: number;
   totalMonthlyCost: number;
+  contabilizeiFee: number;
   breakdown: {
     name: string;
     value: number;
@@ -41,4 +42,17 @@ export interface CnaeData {
   presumedProfitRate: number;
   isRegulated?: boolean;
   notes?: string;
+}
+
+export interface FeeBracket {
+    label: string;
+    min: number;
+    max: number;
+    plans: {
+        basico: number;
+        padrao: number;
+        multibeneficios: number;
+        expertsEssencial: number;
+        expertsPro: number;
+    }
 }

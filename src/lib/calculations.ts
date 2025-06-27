@@ -9,6 +9,8 @@ import {
   SIMPLES_NACIONAL_ANNEX_IV,
   SIMPLES_NACIONAL_ANNEX_V,
   CNAE_DATA,
+  CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
+  CONTABILIZEI_FEES_SIMPLES_NACIONAL,
 } from './constants';
 import {
   type CalculationResults,
@@ -16,6 +18,7 @@ import {
   type TaxDetails,
   type CnaeData,
   type Annex,
+  type FeeBracket,
 } from './types';
 
 const ANNEX_TABLES = {
@@ -36,6 +39,10 @@ function findBracket(table: { max: number }[], value: number) {
     }
   }
   return table[table.length - 1]; // Fallback for values over the max limit
+}
+
+function findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
+    return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
 }
 
 function findBracketIndex(table: { max: number }[], value: number): number {
@@ -93,6 +100,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
       regime: 'Simples Nacional',
       totalTax: 0,
       totalMonthlyCost: 0,
+      contabilizeiFee: 0,
       breakdown: [],
       notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."]
     };
@@ -195,6 +203,9 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   const totalTax = totalDas + cppFromAnnexIV + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf + totalIssSeparado;
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners + healthPlanCost;
 
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+  const contabilizeiFee = feeBracket?.plans.padrao ?? 0;
+
   const breakdown = [
     { name: "DAS (Imposto Unificado)", value: totalDas },
     ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
@@ -208,6 +219,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     regime: 'Simples Nacional',
     totalTax,
     totalMonthlyCost,
+    contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
   };
@@ -224,6 +236,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
   const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+  const totalRevenue = domesticRevenue + exportRevenueBRL;
   
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
   
@@ -232,6 +245,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       regime: 'Lucro Presumido',
       totalTax: 0,
       totalMonthlyCost: 0,
+      contabilizeiFee: 0,
       breakdown: [],
       notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."]
     };
@@ -285,6 +299,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners + healthPlanCost;
 
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+  const contabilizeiFee = feeBracket?.plans.padrao ?? 0;
+
   const breakdown = [
     { name: "PIS", value: pis },
     { name: "COFINS", value: cofins },
@@ -301,6 +318,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     regime: 'Lucro Presumido',
     totalTax,
     totalMonthlyCost,
+    contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
   };

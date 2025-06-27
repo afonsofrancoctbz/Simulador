@@ -8,8 +8,8 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2,
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
-import { type CalculationResults, type CnaeItem, type TaxFormValues } from '@/lib/types';
-import { MINIMUM_WAGE, CNAE_DATA } from '@/lib/constants';
+import { type CalculationResults, type CnaeItem, type TaxFormValues, type TaxDetails } from '@/lib/types';
+import { MINIMUM_WAGE, CNAE_DATA, CONTABILIZEI_FEES_SIMPLES_NACIONAL, CONTABILIZEI_FEES_LUCRO_PRESUMIDO } from '@/lib/constants';
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const formatCurrencyBRL = (value: number) => {
+  if (typeof value !== 'number') return 'N/A';
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
@@ -206,6 +208,7 @@ export default function TaxCalculator() {
             {isAdviceLoading ? <Skeleton className="h-12 w-full" /> : <p className="text-foreground/90 font-medium text-lg font-serif">{advice}</p>}
           </CardContent>
         </Card>
+        <PricingTables />
       </div>
     );
   };
@@ -433,7 +436,7 @@ const CnaeCombobox = ({ value, onChange }: { value: string, onChange: (value: st
     );
 };
 
-const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: CalculationResults['simplesNacional'], isCheapest: boolean }) => (
+const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: TaxDetails, isCheapest: boolean }) => (
     <Card className={cn("flex flex-col shadow-lg", isCheapest ? 'border-accent shadow-accent/20' : 'border-border')}>
       <CardHeader>
         <CardTitle className="text-2xl flex items-center justify-between">
@@ -454,8 +457,17 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
             ))}
         </div>
       </CardContent>
-      {details.notes && details.notes.length > 0 && (
-          <CardFooter>
+      <CardFooter className="flex-col items-start gap-4">
+        {details.contabilizeiFee > 0 && (
+            <div className="w-full border-t pt-4">
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Mensalidade Contabilizei (Plano Padrão)</span>
+                    <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.contabilizeiFee)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 font-serif">Valor estimado, não incluso no custo total acima. Consulte os planos.</p>
+            </div>
+        )}
+        {details.notes && details.notes.length > 0 && (
             <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground/90 w-full">
                 <AlertCircle className="h-4 w-4 text-primary" />
                 <AlertTitle className="text-primary-foreground/95 font-semibold">Observações Importantes</AlertTitle>
@@ -465,7 +477,63 @@ const ResultCard = ({ regime, details, isCheapest }: { regime: string, details: 
                     </ul>
                 </AlertDescription>
             </Alert>
-          </CardFooter>
-      )}
+        )}
+      </CardFooter>
     </Card>
 );
+
+const PricingTables = () => {
+  const feeTables = [
+    {
+      title: 'Empresas de Serviço – Simples Nacional',
+      description: 'Na Contabilizei, nós prezamos por transparência. Por isso, é importante que você saiba que o seu faturamento mensal influencia no valor da sua mensalidade. Confira abaixo os valores de mensalidade para empresas enquadradas no Simples Nacional.',
+      data: CONTABILIZEI_FEES_SIMPLES_NACIONAL,
+    },
+    {
+      title: 'Empresas de Serviço – Lucro Presumido',
+      description: 'Na Contabilizei, nós prezamos por transparência. Por isso, é importante que você saiba que o seu faturamento mensal influencia no valor da sua mensalidade. Confira abaixo os valores de mensalidade para empresas enquadradas no Lucro Presumido.',
+      data: CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
+    }
+  ];
+
+  return (
+    <div className="mt-12 w-full max-w-6xl space-y-8">
+      {feeTables.map(tableInfo => (
+        <Card key={tableInfo.title}>
+          <CardHeader>
+            <CardTitle>{tableInfo.title}</CardTitle>
+            <CardDescription className="font-serif">{tableInfo.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-semibold">Faixa de faturamento mensal</TableHead>
+                    <TableHead className="font-semibold text-center">Básico</TableHead>
+                    <TableHead className="font-semibold text-center">Padrão</TableHead>
+                    <TableHead className="font-semibold text-center">Multibenefícios</TableHead>
+                    <TableHead className="font-semibold text-center">Experts Essencial</TableHead>
+                    <TableHead className="font-semibold text-center">Experts Pro</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tableInfo.data.map((row) => (
+                    <TableRow key={row.label}>
+                      <TableCell className="whitespace-nowrap">{row.label}</TableCell>
+                      <TableCell className="text-center">{formatCurrencyBRL(row.plans.basico)}</TableCell>
+                      <TableCell className="text-center">{formatCurrencyBRL(row.plans.padrao)}</TableCell>
+                      <TableCell className="text-center">{formatCurrencyBRL(row.plans.multibeneficios)}</TableCell>
+                      <TableCell className="text-center">{formatCurrencyBRL(row.plans.expertsEssencial)}</TableCell>
+                      <TableCell className="text-center">{formatCurrencyBRL(row.plans.expertsPro)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+};
