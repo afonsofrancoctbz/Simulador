@@ -6,7 +6,7 @@ export interface CnaeItem {
 export interface TaxFormValues {
   domesticActivities: CnaeItem[];
   exportActivities: CnaeItem[];
-  exportInUSD: boolean;
+  exportCurrency: string;
   exchangeRate: number;
   totalSalaryExpense: number;
   proLaborePartners: number;

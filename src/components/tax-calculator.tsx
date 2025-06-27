@@ -19,10 +19,10 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formatCurrencyBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -36,7 +36,7 @@ const cnaeItemSchema = z.object({
 const formSchema = z.object({
   domesticActivities: z.array(cnaeItemSchema).min(1, "Adicione pelo menos uma atividade nacional."),
   exportActivities: z.array(cnaeItemSchema),
-  exportInUSD: z.boolean().default(false),
+  exportCurrency: z.string().default('BRL'),
   exchangeRate: z.coerce.number().optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Campo obrigatório" }).min(0, "O valor deve ser positivo."),
   proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(MINIMUM_WAGE, `O valor deve ser no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`),
@@ -51,12 +51,12 @@ const formSchema = z.object({
     message: "Adicione pelo menos uma atividade de faturamento.",
     path: ["domesticActivities"],
 }).refine(data => {
-    if (data.exportInUSD) {
+    if (data.exportCurrency !== 'BRL') {
         return data.exchangeRate && data.exchangeRate > 0;
     }
     return true;
 }, {
-    message: "A taxa de câmbio é obrigatória para faturamento em USD.",
+    message: "A taxa de câmbio é obrigatória para faturamento em moeda estrangeira.",
     path: ["exchangeRate"],
 });
 
@@ -71,7 +71,7 @@ export default function TaxCalculator() {
     defaultValues: {
       domesticActivities: [{ code: '6201-5/01', revenue: 10000 }],
       exportActivities: [],
-      exportInUSD: false,
+      exportCurrency: 'BRL',
       totalSalaryExpense: 1500,
       proLaborePartners: MINIMUM_WAGE,
       numberOfPartners: 1,
@@ -89,7 +89,7 @@ export default function TaxCalculator() {
     name: "exportActivities"
   });
 
-  const exportInUSD = form.watch("exportInUSD");
+  const exportCurrency = form.watch("exportCurrency");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -98,7 +98,7 @@ export default function TaxCalculator() {
 
     const submissionValues: TaxFormValues = {
         ...values,
-        exchangeRate: values.exportInUSD ? values.exchangeRate! : 1,
+        exchangeRate: values.exportCurrency !== 'BRL' ? values.exchangeRate! : 1,
     };
 
     const calculatedResults = calculateTaxes(submissionValues);
@@ -109,7 +109,7 @@ export default function TaxCalculator() {
     try {
         const totalDomesticRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
         let totalExportRevenue = values.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
-        if (values.exportInUSD && values.exchangeRate) {
+        if (values.exportCurrency !== 'BRL' && values.exchangeRate) {
             totalExportRevenue *= values.exchangeRate;
         }
 
@@ -247,31 +247,42 @@ export default function TaxCalculator() {
                     <CardDescription>Adicione as atividades de exportação de serviços ou produtos.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="exportInUSD"
-                        render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                <div className="space-y-0.5">
-                                    <FormLabel>Faturamento em Dólar (USD)?</FormLabel>
-                                </div>
-                                <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                </FormControl>
-                            </FormItem>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                            control={form.control}
+                            name="exportCurrency"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Moeda do Faturamento</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecione a moeda" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="BRL">Real (BRL)</SelectItem>
+                                            <SelectItem value="USD">Dólar Americano (USD)</SelectItem>
+                                            <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        {exportCurrency !== 'BRL' && (
+                            <FormField control={form.control} name="exchangeRate" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
+                                    <FormControl><Input type="number" step="0.0001" placeholder="Ex: 5.25" {...field} value={field.value ?? ''} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
                         )}
-                    />
-                    {exportInUSD && (
-                         <FormField control={form.control} name="exchangeRate" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Taxa de Câmbio (USD para BRL)</FormLabel>
-                                <FormControl><Input type="number" step="0.0001" placeholder="Ex: 5.25" {...field} value={field.value ?? ''} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    )}
+                    </div>
+
                     {exportFields.map((field, index) => (
-                        <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport />
+                        <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
                     ))}
                     <Button type="button" variant="outline" size="sm" onClick={() => appendExport({ code: '', revenue: 0 })}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
@@ -293,7 +304,14 @@ export default function TaxCalculator() {
   );
 }
 
-const ActivityField = ({ form, fieldName, index, removeFn, isExport = false }: { form: any, fieldName: "domesticActivities" | "exportActivities", index: number, removeFn: (index: number) => void, isExport?: boolean }) => {
+const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exportCurrency = 'BRL' }: { form: any, fieldName: "domesticActivities" | "exportActivities", index: number, removeFn: (index: number) => void, isExport?: boolean, exportCurrency?: string }) => {
+  const currencySymbols: { [key: string]: string } = {
+    'BRL': 'R$',
+    'USD': '$',
+    'EUR': '€',
+  };
+  const placeholderText = isExport ? `${currencySymbols[exportCurrency] ?? 'R$'} 1.000,00` : "R$ 10.000,00";
+
   return (
     <div className="flex items-end gap-2 p-3 border rounded-md bg-background">
         <FormField
@@ -313,7 +331,7 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false }: {
             render={({ field }) => (
                 <FormItem>
                     <FormLabel>Faturamento Mensal</FormLabel>
-                    <FormControl><Input type="number" step="0.01" placeholder={isExport ? "$ 1.000,00" : "R$ 10.000,00"} {...field} /></FormControl>
+                    <FormControl><Input type="number" step="0.01" placeholder={placeholderText} {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )}
