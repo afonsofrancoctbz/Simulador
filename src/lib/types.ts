@@ -14,8 +14,8 @@ export const TaxFormValuesSchema = z.object({
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
   totalSalaryExpense: z.coerce.number(),
-  proLaborePartners: z.coerce.number(),
-  numberOfPartners: z.coerce.number(),
+  proLaborePerPartner: z.coerce.number(),
+  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1."),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
@@ -24,7 +24,6 @@ export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 export const TaxBreakdownItemSchema = z.object({
     name: z.string(),
     value: z.number(),
-    rate: z.number().optional(),
 });
 export type TaxBreakdownItem = z.infer<typeof TaxBreakdownItemSchema>;
 

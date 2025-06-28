@@ -24,9 +24,9 @@ const TaxOptimizationInputSchema = z.object({
     .number()
     .describe('Total monthly revenue from export sales.'),
   totalSalaryExpense: z.number().describe('Total monthly salary expense.'),
-  proLaborePartners: z
+  totalProLabore: z
     .number()
-    .describe('Monthly pro-labore amount for partners.'),
+    .describe('Total monthly pro-labore amount for all partners combined.'),
   numberOfPartners: z.number().describe('The number of partners in the business.'),
   simplesNacionalSemFatorRBurden: z
     .number()
@@ -75,7 +75,7 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   - Faturamento Mensal (Nacional): {{totalDomesticRevenue}}
   - Faturamento Mensal (Exportação): {{totalExportRevenue}}
   - Despesa com Salários (CLT): {{totalSalaryExpense}}
-  - Pró-labore dos Sócios (Informado): {{proLaborePartners}}
+  - Pró-labore Total dos Sócios: {{totalProLabore}}
   - Número de Sócios: {{numberOfPartners}}
   - Custo Total (Simples Nacional sem Fator R): {{simplesNacionalSemFatorRBurden}}
   - Custo Total (Simples Nacional com Fator R): {{simplesNacionalComFatorRBurden}}

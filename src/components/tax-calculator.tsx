@@ -32,22 +32,19 @@ const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
 const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
-    if (data.proLaborePartners > 0 && data.numberOfPartners > 0) {
-        const proLaborePerPartner = data.proLaborePartners / data.numberOfPartners;
-        if (proLaborePerPartner < MINIMUM_WAGE) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `O pró-labore por sócio não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
-                path: ["proLaborePartners"],
-            });
-        }
+    if (data.proLaborePerPartner > 0 && data.proLaborePerPartner < MINIMUM_WAGE) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `O pró-labore por sócio não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+            path: ["proLaborePerPartner"],
+        });
     }
 }).refine(data => {
     const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
-    return totalRevenue > 0 || data.proLaborePartners > 0;
+    return totalRevenue > 0 || data.proLaborePerPartner > 0;
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
-    path: ["proLaborePartners"],
+    path: ["proLaborePerPartner"],
 }).refine(data => {
     if (data.exportCurrency !== 'BRL' && data.exportActivities.length > 0 && data.exportActivities.some(a => a.revenue > 0)) {
         return data.exchangeRate && data.exchangeRate > 0;
@@ -75,7 +72,7 @@ export default function TaxCalculator() {
       exportCurrency: 'BRL',
       exchangeRate: 1,
       totalSalaryExpense: 0,
-      proLaborePartners: MINIMUM_WAGE,
+      proLaborePerPartner: MINIMUM_WAGE,
       numberOfPartners: 1,
     },
   });
@@ -146,7 +143,7 @@ export default function TaxCalculator() {
     setIsLoading(false);
     
     const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + (values.exportActivities.reduce((acc, act) => acc + act.revenue, 0) * (submissionValues.exchangeRate ?? 1));
-    if (totalRevenue === 0 && values.proLaborePartners === 0) {
+    if (totalRevenue === 0 && values.proLaborePerPartner === 0) {
       return; // No need to call AI if there's no financial activity
     }
 
@@ -167,7 +164,7 @@ export default function TaxCalculator() {
         totalDomesticRevenue,
         totalExportRevenue,
         totalSalaryExpense: values.totalSalaryExpense,
-        proLaborePartners: values.proLaborePartners,
+        totalProLabore: values.proLaborePerPartner * values.numberOfPartners,
         numberOfPartners: values.numberOfPartners,
         simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalSemFatorR.totalMonthlyCost,
         simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalComFatorR.totalMonthlyCost,
@@ -192,7 +189,7 @@ export default function TaxCalculator() {
     if (allActivities.length === 0) return [];
     
     const revenueSum = allActivities.reduce((sum, act) => sum + (act.revenue || 0), 0);
-    if(revenueSum === 0 && form.getValues('proLaborePartners') === 0) return [];
+    if(revenueSum === 0 && form.getValues('proLaborePerPartner') === 0) return [];
 
     const mainActivity = allActivities.reduce((max, act) => (act.revenue || 0) > (max.revenue || 0) ? act : max, { revenue: -1, code: '' });
     if (!mainActivity.code) return [];
@@ -200,7 +197,6 @@ export default function TaxCalculator() {
     const mainCnaeInfo = getCnaeData(mainActivity.code);
     if (!mainCnaeInfo) return [];
 
-    const mainAnnex = mainCnaeInfo.annex;
     const scenarios = [];
 
     const lucroPresumidoScenario = {
@@ -210,17 +206,15 @@ export default function TaxCalculator() {
     };
 
     if (mainCnaeInfo.requiresFatorR) {
-        // Scenario 1: Actual situation with user's input
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
             regime: 'Simples Nacional sem Fator R',
             annex: 'Anexo V - Sem Otimizar Fator R'
         });
 
-        // Scenario 2: Optimized situation
         const cenarioOtimizado = results.simplesNacionalComFatorR;
         const proLaboreOtimizado = cenarioOtimizado.proLabore;
-        const optimizationNote = `Para alcançar este cenário, seu pró-labore foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
+        const optimizationNote = `Para alcançar este cenário, seu pró-labore foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado / (form.getValues().numberOfPartners || 1))} por sócio, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
         
         scenarios.push({
             ...cenarioOtimizado,
@@ -229,10 +223,10 @@ export default function TaxCalculator() {
             optimizationNote: optimizationNote
         });
         
-        // Scenario 3: Lucro Presumido
         scenarios.push(lucroPresumidoScenario);
 
     } else { // Annex III, IV, or others
+        const mainAnnex = mainCnaeInfo.annex;
         const situacaoAtual = {
             ...results.simplesNacionalSemFatorR,
             regime: `Simples Nacional`,
@@ -275,12 +269,13 @@ export default function TaxCalculator() {
     const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
     const fatorR = results.simplesNacionalSemFatorR.fatorR;
     if (fatorR !== undefined && fatorR < 0.28) {
-      const requiredProLabore = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense') * 1.08));
+      const requiredProLaboreTotal = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense') * 1.08));
       const minProLaboreTotal = MINIMUM_WAGE * form.getValues('numberOfPartners');
+      const requiredProLaborePerPartner = Math.max(requiredProLaboreTotal, minProLaboreTotal) / form.getValues('numberOfPartners');
       intelligentAlerts.push({
         type: 'warning',
         title: 'Pró-labore pode ser otimizado',
-        description: `Seu Fator R está abaixo de 28%. Aumentando seu pró-labore para aproximadamente ${formatCurrencyBRL(Math.max(requiredProLabore, minProLaboreTotal))}, você pode reduzir sua alíquota no Simples Nacional.`
+        description: `Seu Fator R está abaixo de 28%. Aumentando seu pró-labore para aproximadamente ${formatCurrencyBRL(requiredProLaborePerPartner)} por sócio, você pode reduzir sua alíquota no Simples Nacional.`
       });
     }
 
@@ -363,9 +358,9 @@ export default function TaxCalculator() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="proLaborePartners" render={({ field }) => (
+                            <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Pró-labore Total dos Sócios</FormLabel>
+                                    <FormLabel>Pró-labore por Sócio</FormLabel>
                                     <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
