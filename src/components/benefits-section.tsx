@@ -3,19 +3,6 @@
 import { Star } from "lucide-react";
 import Image from 'next/image';
 
-const AwardIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L10 8H4L9 12L7 18L12 14L17 18L15 12L20 8H14L12 2Z" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 2L13.895 6.8375H19.25L14.6775 9.875L16.5725 14.7125L12 11.675L7.4275 14.7125L9.3225 9.875L4.75 6.8375H10.105L12 2Z" fill="hsl(var(--primary))" fillOpacity="0.1"/>
-        <path d="M6 20C6 18.8954 6.89543 18 8 18H16C17.1046 18 18 18.8954 18 20" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-)
-
-const TotalPassTextLogo = () => (
-    // This is an approximation of the text logo for styling purposes
-    <span className="text-2xl font-bold text-gray-700 tracking-wider">TOTAL PASS</span>
-)
-
 export default function BenefitsSection() {
     return (
         <div className="mt-12 w-full max-w-6xl mx-auto space-y-8 py-12 px-4 sm:px-6 lg:px-8">
@@ -25,12 +12,10 @@ export default function BenefitsSection() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 {/* Text Content */}
-                <div className="border border-primary rounded-2xl p-8 shadow-lg bg-card">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="bg-primary/10 p-2 rounded-full flex items-center justify-center">
-                           <AwardIcon />
-                        </div>
-                        <TotalPassTextLogo />
+                <div className="border border-primary/40 rounded-2xl p-8 shadow-lg bg-card">
+                    <div className="flex items-center gap-3 mb-6">
+                        <Star className="h-6 w-6 text-primary" strokeWidth="1.5" style={{ fill: 'hsl(var(--primary))', fillOpacity: '0.1' }} />
+                        <span className="text-xl font-bold text-foreground tracking-wide">TOTAL PASS</span>
                     </div>
 
                     <p className="text-muted-foreground font-serif text-lg mb-6">
@@ -39,11 +24,11 @@ export default function BenefitsSection() {
 
                     <ul className="space-y-4 mb-8">
                         <li className="flex items-start gap-3">
-                            <Star className="h-6 w-6 text-primary mt-1 shrink-0" />
+                            <Star className="h-5 w-5 text-primary mt-1 shrink-0" strokeWidth="1.5" style={{ fill: 'hsl(var(--primary))', fillOpacity: '0.1' }} />
                             <span className="font-serif text-lg text-foreground">Mais de 15 mil academias</span>
                         </li>
                         <li className="flex items-start gap-3">
-                            <Star className="h-6 w-6 text-primary mt-1 shrink-0" />
+                            <Star className="h-5 w-5 text-primary mt-1 shrink-0" strokeWidth="1.5" style={{ fill: 'hsl(var(--primary))', fillOpacity: '0.1' }} />
                             <span className="font-serif text-lg text-foreground">Mais de 5 mil psicólogos</span>
                         </li>
                     </ul>
