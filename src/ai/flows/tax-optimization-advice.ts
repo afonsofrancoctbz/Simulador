@@ -43,7 +43,7 @@ const TaxOptimizationOutputSchema = z.object({
   advice: z
     .string()
     .describe(
-      'Context-aware advice on tax optimization based on the input data.'
+      'Context-aware advice on tax optimization based on the input data, in Portuguese.'
     ),
 });
 export type TaxOptimizationOutput = z.infer<typeof TaxOptimizationOutputSchema>;
@@ -58,23 +58,31 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   name: 'taxOptimizationAdvicePrompt',
   input: {schema: TaxOptimizationInputSchema},
   output: {schema: TaxOptimizationOutputSchema},
-  prompt: `You are a tax advisor specializing in Simples Nacional and Lucro Presumido tax regimes in Brazil.
+  prompt: `Você é um consultor tributário especialista nos regimes Simples Nacional e Lucro Presumido no Brasil.
 
-  Based on the following financial data, provide advice to the business owner on how to optimize their tax liability. Consider factors such as revenue mix (domestic vs. export), partner pro-labore, and the most suitable tax regime.
+  **Instruções:**
+  Com base nos dados financeiros fornecidos, elabore uma recomendação concisa (3-4 frases) e acionável para o empresário otimizar sua carga tributária. A resposta deve ser em português.
 
-  Activities: {{activities}}
-  Total Monthly Revenue (Domestic): {{totalDomesticRevenue}}
-  Total Monthly Revenue (Export): {{totalExportRevenue}}
-  Total Salary Expense: {{totalSalaryExpense}}
-  Pro-labore for Partners: {{proLaborePartners}}
-  Number of Partners: {{numberOfPartners}}
-  Municipal ISS Rate: {{municipalISSRate}}
-  Custo do Plano de Saúde: {{healthPlanCost}}
-  Tax Burden (Simples Nacional): {{simplesNacionalTaxBurden}}
-  Tax Burden (Lucro Presumido): {{lucroPresumidoTaxBurden}}
+  **Análise Mandatória:**
+  1.  **Regime Tributário:** Analise os custos totais e recomende o regime mais vantajoso (Simples Nacional ou Lucro Presumido).
+  2.  **Fator R:** Se houver atividades do Anexo V, analise o "Fator R". Se for inferior a 28%, sugira o ajuste do pró-labore para se enquadrar no Anexo III, se for benéfico.
+  3.  **Receitas de Exportação:** Analise o impacto das receitas de exportação, destacando as isenções de PIS, COFINS e ISS e como isso beneficia a empresa.
+  4.  **Plano de Saúde:** Comente o impacto do custo do plano de saúde, explicando que é um benefício para os sócios, mas que o valor pago pela empresa aumenta a base de cálculo para o IRRF.
 
-  Provide specific and actionable recommendations to reduce the overall tax burden. Focus on strategies within the legal and ethical boundaries, such as adjusting pro-labore to optimize for "Fator R" if applicable. Analise o impacto das receitas de exportação, que possuem isenção de PIS, COFINS e ISS, e considere se o aumento das exportações pode ser uma estratégia de otimização. Analise também o impacto do plano de saúde, que é um benefício para os sócios mas aumenta a base de cálculo do IRRF.
-  The advice should be concise and no more than 3-4 sentences.`,
+  **Dados Financeiros:**
+  - Atividades (CNAEs): {{activities}}
+  - Faturamento Mensal (Nacional): {{totalDomesticRevenue}}
+  - Faturamento Mensal (Exportação): {{totalExportRevenue}}
+  - Despesa com Salários (CLT): {{totalSalaryExpense}}
+  - Pró-labore dos Sócios: {{proLaborePartners}}
+  - Número de Sócios: {{numberOfPartners}}
+  - Alíquota ISS Municipal: {{municipalISSRate}}%
+  - Custo do Plano de Saúde: {{healthPlanCost}}
+  - Carga Tributária (Simples Nacional): {{simplesNacionalTaxBurden}}
+  - Carga Tributária (Lucro Presumido): {{lucroPresumidoTaxBurden}}
+
+  **Formato da Resposta:**
+  Gere apenas a recomendação em texto, sem cabeçalhos ou formatação extra.`,
 });
 
 const taxOptimizationAdviceFlow = ai.defineFlow(

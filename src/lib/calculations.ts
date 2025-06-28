@@ -226,7 +226,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners + healthPlanCost;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-  const contabilizeiFee = feeBracket?.plans.padrao ?? 0;
+  const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? 0;
 
   const breakdown = [
     ...dasBreakdownByAnnex,
@@ -322,7 +322,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners + healthPlanCost;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-  const contabilizeiFee = feeBracket?.plans.padrao ?? 0;
+  const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? 0;
 
   const breakdown = [
     { name: "PIS", value: pis },
