@@ -42,18 +42,10 @@ const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
     }
 }).refine(data => {
     const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
-    return totalRevenue > 0 || (data.proLaborePerPartner * data.numberOfPartners > 0);
+    return totalRevenue > 0 || (data.proLaborePerPartner > 0);
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
-    path: ["proLaborePerPartner"],
-}).refine(data => {
-    if (data.exportCurrency !== 'BRL' && data.exportActivities.length > 0 && data.exportActivities.some(a => a.revenue > 0)) {
-        return data.exchangeRate && data.exchangeRate > 0;
-    }
-    return true;
-}, {
-    message: "A taxa de câmbio é obrigatória para faturamento em moeda estrangeira.",
-    path: ["exchangeRate"],
+    path: ["domesticActivities"],
 });
 
 export default function TaxCalculator() {
@@ -74,7 +66,6 @@ export default function TaxCalculator() {
       exchangeRate: 1,
       totalSalaryExpense: 0,
       proLaborePerPartner: MINIMUM_WAGE,
-      otherINSSSourcesPerPartner: 0,
       numberOfPartners: 1,
     },
   });
@@ -228,7 +219,6 @@ export default function TaxCalculator() {
         scenarios.push(lucroPresumidoScenario);
 
     } else { // Annex III, IV, or others
-        const mainAnnex = mainCnaeInfo.annex;
         const situacaoAtual = {
             ...results.simplesNacionalSemFatorR,
             regime: `Simples Nacional`,
@@ -271,7 +261,7 @@ export default function TaxCalculator() {
     const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
     const fatorR = results.simplesNacionalSemFatorR.fatorR;
     if (fatorR !== undefined && fatorR < 0.28) {
-      const requiredProLaboreTotal = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense') * 1.08));
+      const requiredProLaboreTotal = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense')));
       const minProLaboreTotal = MINIMUM_WAGE * form.getValues('numberOfPartners');
       const requiredProLaborePerPartner = Math.max(requiredProLaboreTotal, minProLaboreTotal) / form.getValues('numberOfPartners');
       intelligentAlerts.push({
@@ -357,6 +347,9 @@ export default function TaxCalculator() {
                                 <FormItem>
                                     <FormLabel>Despesa com Salários (CLT)</FormLabel>
                                     <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
+                                    <FormDescription>
+                                        Informe a despesa total com a folha de pagamento de funcionários (se houver).
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
@@ -371,16 +364,6 @@ export default function TaxCalculator() {
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
                                     <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                             <FormField control={form.control} name="otherINSSSourcesPerPartner" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="flex items-center gap-1.5">Outras Fontes de Renda p/ INSS (por Sócio) <Info className="w-3 h-3 text-muted-foreground"/></FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
-                                    <FormDescription>
-                                        Informe a soma de outras rendas que já contribuem para o teto do INSS (ex: salário CLT) para cada sócio.
-                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />

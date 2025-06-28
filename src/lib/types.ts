@@ -15,8 +15,7 @@ export const TaxFormValuesSchema = z.object({
   exchangeRate: z.coerce.number(),
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
   proLaborePerPartner: z.coerce.number().min(0, "O valor deve ser positivo."),
-  otherINSSSourcesPerPartner: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
-  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1."),
+  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
@@ -86,7 +85,6 @@ export interface FeeBracket {
 
 export interface ProLaboreInput {
   valorProLaboreBruto: number;
-  outrasFontesRendaINSS?: number; // Soma de outras remunerações (ex: salário CLT)
   configuracaoFiscal: any; // Objeto com os parâmetros do ano (tabelas, tetos)
 }
 
