@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, Calculator, Info, BadgeCheck, Coins, Briefcase } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, Briefcase } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -78,7 +78,7 @@ export default function TaxCalculator() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      domesticActivities: [{ code: '7020-4/00', revenue: 15000 }], // Default to consultancy
+      domesticActivities: [{ code: '7020-4/00', revenue: 15000 }],
       exportActivities: [],
       exportCurrency: 'BRL',
       totalSalaryExpense: 0,
@@ -136,7 +136,6 @@ export default function TaxCalculator() {
     setResults(null);
     setAdvice(null);
     
-    // Scroll to results section smoothly
     setTimeout(() => {
         const resultsElement = document.getElementById('results-section');
         if (resultsElement) {
@@ -281,7 +280,7 @@ export default function TaxCalculator() {
   };
   
   return (
-    <div>
+    <FormProvider {...form}>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="shadow-lg overflow-hidden">
@@ -293,7 +292,6 @@ export default function TaxCalculator() {
                 </CardHeader>
                 <CardContent className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Coluna da Esquerda */}
                         <div className="lg:col-span-1 space-y-6">
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
                                 <Building2 className="h-5 w-5 text-primary" />
@@ -322,14 +320,12 @@ export default function TaxCalculator() {
                             )} />
                         </div>
 
-                        {/* Coluna da Direita */}
                         <div className="lg:col-span-2 space-y-6">
                              <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
                                 <Briefcase className="h-5 w-5 text-primary" />
                                 Atividades e Faturamento
                             </h3>
                            
-                            {/* Receitas Nacionais */}
                             <div>
                                 <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receitas Nacionais</h4>
                                 {domesticFields.map((field, index) => (
@@ -343,7 +339,6 @@ export default function TaxCalculator() {
                             
                             <Separator />
 
-                            {/* Receitas de Exportação */}
                             <div>
                                 <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receitas de Exportação</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
@@ -395,14 +390,14 @@ export default function TaxCalculator() {
             </form>
         </Form>
       
-      <CnaeSelector
-        open={cnaeSelectorState.open}
-        onOpenChange={(open) => setCnaeSelectorState(s => ({ ...s, open }))}
-        onConfirm={handleAddActivities}
-      />
+        <CnaeSelector
+            open={cnaeSelectorState.open}
+            onOpenChange={(open) => setCnaeSelectorState(s => ({ ...s, open }))}
+            onConfirm={handleAddActivities}
+        />
 
-      {renderResults()}
-    </div>
+        {renderResults()}
+    </FormProvider>
   );
 }
 
@@ -452,60 +447,87 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
 };
 
 const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => {
-    const hasFatorR = details.fatorR !== undefined;
+    const { getValues } = useForm<z.infer<typeof formSchema>>();
+    const numSocios = getValues('numberOfPartners') || 1;
+    const proLaboreTaxes = details.breakdown.filter(item => item.name.includes("s/ Pró-labore")).reduce((acc, item) => acc + item.value, 0);
+    const custoPrevidenciarioSocio = proLaboreTaxes / numSocios;
 
     return (
         <Card className={cn("flex flex-col shadow-lg transition-all duration-300 relative", isCheapest ? 'border-2 border-accent shadow-accent/20' : 'border-border')}>
-            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground font-bold text-sm px-3 py-1">🏆 MELHOR OPÇÃO</Badge>}
+            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground font-bold text-sm px-3 py-1">🏆 RECOMENDADO</Badge>}
             
-            <CardHeader className={cn(isCheapest ? 'bg-accent/10' : 'bg-muted/30', 'pt-8 pb-4')}>
-                <CardTitle className="text-2xl text-center font-bold text-primary">{details.regime}</CardTitle>
-                {details.annex && <CardDescription className='text-center font-semibold'>{details.annex}</CardDescription>}
+            <CardHeader className={cn(isCheapest ? 'bg-accent/10' : 'bg-muted/30', 'pt-8 pb-4 text-center')}>
+                <CardTitle className="text-2xl font-bold text-primary">{details.regime}</CardTitle>
+                {details.annex && <CardDescription className='font-semibold'>{details.annex}</CardDescription>}
             </CardHeader>
 
             <CardContent className="flex-grow p-4 space-y-4 flex flex-col">
-                <div className="text-center">
-                    <span className="text-2xl text-muted-foreground">R$</span>
-                    <span className="text-5xl font-bold text-foreground">{Math.floor(details.totalMonthlyCost).toLocaleString('pt-BR')}</span>
-                    <span className="text-2xl text-muted-foreground">/mês</span>
-                </div>
-                
-                <div className="bg-primary/5 rounded-md p-4 space-y-2 flex-grow font-serif">
-                    {details.breakdown.map((item) => (
-                        <div key={item.name} className="flex justify-between items-center text-sm">
-                            <span className="text-muted-foreground">{item.name}</span>
-                            <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                        </div>
-                    ))}
-                    <div className="border-t border-border/50 my-2 !mt-3 !mb-2"></div>
-                    <div className="flex justify-between items-center font-bold">
-                        <span className="text-foreground">Total mensal</span>
-                        <span className="font-mono text-foreground">{formatCurrencyBRL(details.totalMonthlyCost)}</span>
+                <div className="text-center p-4 bg-slate-50 rounded-lg">
+                    <div className="text-sm text-muted-foreground">Custo Total Mensal Estimado</div>
+                    <div className="text-4xl font-bold text-foreground my-1">
+                        {formatCurrencyBRL(details.totalMonthlyCost)}
+                    </div>
+                    <div className="text-base font-semibold text-primary">
+                        {formatPercent(details.effectiveRate)} do faturamento
                     </div>
                 </div>
+
+                <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">📊 Detalhamento dos Impostos</h4>
+                    <div className="p-3 border rounded-lg bg-background space-y-2 font-serif text-sm">
+                        {details.breakdown.map((item, index) => (
+                            <div key={index} className="flex justify-between items-center border-b border-dashed pb-1 last:border-none last:pb-0">
+                                <span className="text-muted-foreground">{item.name}</span>
+                                <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                            </div>
+                        ))}
+                        <div className="flex justify-between items-center font-bold pt-1 text-base">
+                            <span className="text-foreground">Total de Impostos</span>
+                            <span className="font-mono text-primary">{formatCurrencyBRL(details.totalTax)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                     <h4 className="font-semibold text-foreground">👥 Gestão de Sócios</h4>
+                     <div className="p-3 border rounded-lg bg-background space-y-2 text-sm font-serif">
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Custo previdenciário (INSS+IRRF) por sócio:</span>
+                            <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(custoPrevidenciarioSocio)}</span>
+                        </div>
+                         <div className="flex justify-between font-semibold">
+                            <span className="text-muted-foreground">Total para {numSocios} sócio(s):</span>
+                            <span className="font-mono text-foreground">{formatCurrencyBRL(proLaboreTaxes)}</span>
+                        </div>
+                     </div>
+                </div>
                 
-                {hasFatorR && (
+                {details.fatorR !== undefined && (
                     <div className={cn(
-                        "text-center rounded-md p-2 mt-2", 
-                        details.fatorR! >= 0.28 
+                        "text-center rounded-md p-2", 
+                        details.fatorR >= 0.28 
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-amber-100 text-amber-800'
                     )}>
-                        <span className="font-semibold">Fator R: {formatPercent(details.fatorR!)}</span>
-                        <p className="text-xs">{details.fatorR! >= 0.28 ? '✅ Alíquota reduzida aplicada' : '⚠️ Considere aumentar para otimizar'}</p>
+                        <span className="font-semibold">Fator R: {formatPercent(details.fatorR)}</span>
+                        <p className="text-xs">{details.fatorR >= 0.28 ? '✅ Alíquota reduzida aplicada' : '⚠️ Considere aumentar pró-labore para otimizar'}</p>
                     </div>
                 )}
+                
+                <div className="space-y-2 flex-grow flex flex-col">
+                     <h4 className="font-semibold text-foreground">💡 Como funciona</h4>
+                     <div className="p-3 border rounded-lg bg-blue-50 text-blue-800 text-sm font-serif flex-grow">
+                         {details.explanation}
+                     </div>
+                </div>
             </CardContent>
 
-            <CardFooter className="flex-col items-center gap-2 p-4 border-t bg-muted/20 rounded-b-lg">
-                {details.annualSavings && details.annualSavings > 0 && (
-                <div className="font-bold text-lg text-green-700">
-                    💰 Economia anual: {formatCurrencyBRL(details.annualSavings)}
-                </div>
-                )}
-                <div className="w-full text-center text-xs text-muted-foreground mt-1 font-serif">
-                Alíquota Efetiva: <span className="font-semibold text-foreground">{formatPercent(details.effectiveRate)}</span>
-                </div>
+            <CardFooter className="p-4 border-t bg-muted/20">
+                 {details.annualSavings && details.annualSavings > 0 && (
+                    <div className="font-bold text-lg text-green-700 w-full text-center">
+                        💰 Economia anual: {formatCurrencyBRL(details.annualSavings)}
+                    </div>
+                 )}
             </CardFooter>
         </Card>
     );
