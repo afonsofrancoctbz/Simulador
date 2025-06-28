@@ -4,8 +4,8 @@
 export const FISCAL_CONFIG_2025 = {
   ano_vigencia: 2025,
   salario_minimo: 1518.00,
-  teto_inss: 7786.02,
-  aliquota_inss_prolabore: 0.11,
+  teto_inss: 8157.41,
+  aliquota_inss_prolabore: 0.11, // Alíquota fixa de 11% para pró-labore de sócios
   aliquota_iss_padrao: 0.05, // 5%
   aliquotas_cpp_patronal: {
     base: 0.20,
@@ -15,6 +15,13 @@ export const FISCAL_CONFIG_2025 = {
         return this.base + this.rat + this.terceiros;
     }
   },
+  // Tabela progressiva para funcionários CLT, não se aplica ao pró-labore dos sócios
+  tabela_inss_clt_progressiva: [
+    { min: 0, max: 1518.00, rate: 0.075, deduction: 0 },
+    { min: 1518.01, max: 2793.88, rate: 0.09, deduction: 22.77 },
+    { min: 2793.89, max: 4190.83, rate: 0.12, deduction: 106.59 },
+    { min: 4190.84, max: 8157.41, rate: 0.14, deduction: 190.40 },
+  ],
   tabela_irrf: [
     { min: 0, max: 2259.20, rate: 0, deduction: 0 },
     { min: 2259.21, max: 2826.65, rate: 0.075, deduction: 169.44 },
