@@ -428,21 +428,7 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
 
 const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
   const [open, setOpen] = useState(false);
-
-  const groupedCnaes = useMemo(() => {
-    return CNAE_DATA.reduce((acc, cnae) => {
-      const category = cnae.category || 'Outras Categorias';
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(cnae);
-      return acc;
-    }, {} as Record<string, typeof CNAE_DATA>);
-  }, []);
-
-  const sortedGroupedCnaes = useMemo(() => {
-    return Object.entries(groupedCnaes).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [groupedCnaes]);
+  const [search, setSearch] = useState("");
 
   const selectedCnaeText = useMemo(() => {
     if (!value) return "Selecione o CNAE...";
@@ -450,6 +436,28 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
     if (!cnae) return "Selecione o CNAE...";
     return `${cnae.code} - ${cnae.description}`;
   }, [value]);
+
+  const filteredAndGroupedCnaes = useMemo(() => {
+    if (search.length < 2) {
+      return [];
+    }
+    const lowercasedSearch = search.toLowerCase();
+    const filtered = CNAE_DATA.filter(cnae => 
+      cnae.code.includes(lowercasedSearch) || 
+      cnae.description.toLowerCase().includes(lowercasedSearch)
+    ).slice(0, 50);
+
+    const grouped = filtered.reduce((acc, cnae) => {
+      const category = cnae.category || 'Outras Categorias';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(cnae);
+      return acc;
+    }, {} as Record<string, typeof CNAE_DATA>);
+    
+    return Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [search]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -465,19 +473,26 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0 md:w-[550px]">
-        <Command>
-          <CommandInput placeholder="Buscar CNAE por código ou descrição..." />
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Busque por código ou descrição..."
+            value={search}
+            onValueChange={setSearch}
+          />
           <CommandList>
-            <CommandEmpty>Nenhum CNAE encontrado.</CommandEmpty>
-            {sortedGroupedCnaes.map(([category, cnaes]) => (
+            {search.length < 2 && <CommandEmpty>Digite ao menos 2 caracteres para buscar.</CommandEmpty>}
+            {search.length >= 2 && filteredAndGroupedCnaes.length === 0 && <CommandEmpty>Nenhum CNAE encontrado.</CommandEmpty>}
+            
+            {filteredAndGroupedCnaes.map(([category, cnaes]) => (
               <CommandGroup key={category} heading={category}>
                 {cnaes.map((cnae) => (
                   <CommandItem
                     key={cnae.code}
-                    value={cnae.code}
+                    value={cnae.code} // Use a simple value for cmdk
                     onSelect={() => {
                       onChange(cnae.code);
                       setOpen(false);
+                      setSearch(""); // Reset search on select
                     }}
                   >
                     <Check
@@ -486,7 +501,7 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
                         value === cnae.code ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    <div>
+                    <div className="flex flex-col">
                       <p className="font-semibold">{cnae.code}</p>
                       <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
                     </div>
@@ -500,6 +515,7 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
     </Popover>
   );
 };
+
 
 const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => (
     <Card className={cn("flex flex-col shadow-lg transition-all duration-300", isCheapest ? 'border-2 border-accent shadow-accent/20' : 'border-border')}>
