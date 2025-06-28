@@ -127,7 +127,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     }
     
     const companyTaxes = cppFromAnnexIV;
-    const totalTax = companyTaxes + totalINSSRetido + totalIRRFRetido;
+    const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
+    const totalTax = companyTaxes + totalWithheldTaxes;
     const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     
     const totalMonthlyCost = totalTax;
@@ -233,7 +234,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   // --- 5. Assemble Final Results ---
   const companyTaxes = totalDas + cppFromAnnexIV + totalIssSeparado;
-  const totalTax = companyTaxes + totalINSSRetido + totalIRRFRetido;
+  const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
+  const totalTax = companyTaxes + totalWithheldTaxes;
   
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
@@ -250,11 +252,11 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     : 'III';
 
   const breakdown = [
-    ...(totalDas > 0 ? [{ name: 'DAS (Guia Unificada)', value: totalDas }] : []),
-    ...(cppFromAnnexIV > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: cppFromAnnexIV }] : []),
-    ...(totalIssSeparado > 0 ? [{ name: "ISS (Fora do DAS)", value: totalIssSeparado }] : []),
-    ...(totalINSSRetido > 0 ? [{ name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido }] : []),
-    ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
+    { name: 'DAS (Guia Unificada)', value: totalDas },
+    { name: "CPP (INSS Patronal - 20%)", value: cppFromAnnexIV },
+    { name: "ISS (Fora do DAS)", value: totalIssSeparado },
+    { name: 'INSS s/ Pró-labore (11%)', value: totalINSSRetido },
+    { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
   const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
@@ -272,7 +274,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     contabilizeiFee: contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
-    partnerTaxes: { inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFRetido }
+    partnerTaxes: { inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFCalculado }
   };
 }
 
@@ -299,7 +301,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
       const companyPayrollTaxes = inssPatronal;
-      const totalTax = companyPayrollTaxes + totalINSSRetido + totalIRRFRetido;
+      const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
+      const totalTax = companyPayrollTaxes + totalWithheldTaxes;
       const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
       const totalMonthlyCost = totalTax;
 
@@ -345,7 +348,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const companyPayrollTaxes = inssPatronal;
   const totalCompanyTaxes = companyRevenueTaxes + companyPayrollTaxes;
-  const totalTax = totalCompanyTaxes + totalINSSRetido + totalIRRFRetido;
+  const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
+  const totalTax = totalCompanyTaxes + totalWithheldTaxes;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
@@ -370,7 +374,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
-    partnerTaxes: { inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFRetido }
+    partnerTaxes: { inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFCalculado }
   };
 }
 
