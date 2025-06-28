@@ -9,8 +9,8 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
 import { type CalculationResults, type TaxFormValues } from '@/lib/types';
-import { MINIMUM_WAGE } from '@/lib/constants';
 import { cn, formatCurrencyBRL } from "@/lib/utils";
+import { getFiscalParameters } from '@/config/fiscal';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -23,6 +23,9 @@ import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { ActivityField } from './activity-field';
+
+const fiscalConfig = getFiscalParameters();
+const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
 const formSchema = z.object({
   domesticActivities: z.array(z.object({

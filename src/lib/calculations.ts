@@ -1,14 +1,6 @@
 
+import { getFiscalParameters } from '@/config/fiscal';
 import {
-  IRRF_TABLE,
-  SIMPLIFIED_DEDUCTION_IRRF,
-  PRO_LABORE_INSS_RATE,
-  INSS_CEILING,
-  SIMPLES_NACIONAL_ANNEX_I,
-  SIMPLES_NACIONAL_ANNEX_II,
-  SIMPLES_NACIONAL_ANNEX_III,
-  SIMPLES_NACIONAL_ANNEX_IV,
-  SIMPLES_NACIONAL_ANNEX_V,
   CNAE_DATA,
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -22,12 +14,14 @@ import {
   type FeeBracket,
 } from './types';
 
+const fiscalConfig = getFiscalParameters();
+
 const ANNEX_TABLES = {
-  I: SIMPLES_NACIONAL_ANNEX_I,
-  II: SIMPLES_NACIONAL_ANNEX_II,
-  III: SIMPLES_NACIONAL_ANNEX_III,
-  IV: SIMPLES_NACIONAL_ANNEX_IV,
-  V: SIMPLES_NACIONAL_ANNEX_V,
+  I: fiscalConfig.simples_nacional.anexoI,
+  II: fiscalConfig.simples_nacional.anexoII,
+  III: fiscalConfig.simples_nacional.anexoIII,
+  IV: fiscalConfig.simples_nacional.anexoIV,
+  V: fiscalConfig.simples_nacional.anexoV,
 };
 
 // --- INTERNAL HELPERS ---
@@ -66,10 +60,10 @@ function _getCnaeData(code: string): CnaeData | undefined {
 }
 
 function _calculateProLaboreTaxes(proLabore: number) {
-  const inssOnProLabore = Math.min(proLabore, INSS_CEILING) * PRO_LABORE_INSS_RATE;
-  const applicableDeduction = Math.max(inssOnProLabore, SIMPLIFIED_DEDUCTION_IRRF);
+  const inssOnProLabore = Math.min(proLabore, fiscalConfig.teto_inss) * fiscalConfig.aliquota_inss_prolabore;
+  const applicableDeduction = Math.max(inssOnProLabore, fiscalConfig.deducao_simplificada_irrf);
   const irrfCalculationBase = proLabore - applicableDeduction;
-  const irrfBracket = _findBracket(IRRF_TABLE, irrfCalculationBase);
+  const irrfBracket = _findBracket(fiscalConfig.tabela_irrf, irrfCalculationBase);
   const irrf = Math.max(0, irrfCalculationBase * irrfBracket.rate - irrfBracket.deduction);
   return { inssOnProLabore, irrf };
 }
@@ -77,7 +71,7 @@ function _calculateProLaboreTaxes(proLabore: number) {
 function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, regimeName: string): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners } = values;
   const notes: string[] = [];
-  const municipalISSRate = 5; 
+  const municipalISSRate = fiscalConfig.aliquota_iss_padrao * 100;
 
   // --- 1. Revenue Calculation ---
   const allDomesticActivities = domesticActivities.map(a => ({ ...a, type: 'domestic' as const }));
@@ -168,7 +162,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     totalDas += dasForDomestic + dasForExport;
     
     if (annex === 'IV') {
-      const cppRate = 0.20 + 0.03 + 0.058;
+      const cppRate = fiscalConfig.aliquotas_cpp_patronal.total;
       cppFromAnnexIV += (totalSalaryExpense + proLabore) * cppRate;
       notes.push("Anexo IV paga a CPP (INSS Patronal) fora do DAS.");
     }
@@ -218,7 +212,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners } = values;
   const notes: string[] = [];
-  const municipalISSRate = 5;
+  const municipalISSRate = fiscalConfig.aliquota_iss_padrao * 100;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -240,9 +234,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const cofins = domesticRevenue * 0.03; // COFINS incide apenas sobre receita nacional
   
   // --- 3. Municipal and Payroll Taxes ---
-  const iss = domesticRevenue * (municipalISSRate / 100); // ISS incide apenas sobre receita nacional
+  const iss = domesticRevenue * fiscalConfig.aliquota_iss_padrao; // ISS incide apenas sobre receita nacional
   const totalPayroll = totalSalaryExpense + proLaborePartners;
-  const inssPatronal = totalPayroll * (0.20 + 0.03 + 0.058); // CPP
+  const inssPatronal = totalPayroll * fiscalConfig.aliquotas_cpp_patronal.total; // CPP
   if (totalPayroll > 0) notes.push("No Lucro Presumido, a CPP (INSS Patronal) é paga sobre a folha de pagamento.");
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
