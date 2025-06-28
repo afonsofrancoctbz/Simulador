@@ -8,10 +8,12 @@ import { z } from "zod";
 import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
-import { calculateTaxes, getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type TaxFormValues } from '@/lib/types';
+import { getCnaeData } from '@/lib/calculations';
+import { type CalculationResults, type TaxFormValues, TaxFormValuesSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
+import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
+
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -29,21 +31,7 @@ import { ActivityField } from './activity-field';
 const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
-const formSchema = z.object({
-  domesticActivities: z.array(z.object({
-    code: z.string().min(1, "Selecione um CNAE."),
-    revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
-  })),
-  exportActivities: z.array(z.object({
-    code: z.string().min(1, "Selecione um CNAE."),
-    revenue: z.coerce.number().min(0, "O valor deve ser positivo."),
-  })),
-  exportCurrency: z.string().default('BRL'),
-  exchangeRate: z.coerce.number().optional(),
-  totalSalaryExpense: z.coerce.number({ required_error: "Campo obrigatório" }).min(0, "O valor deve ser positivo."),
-  proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(0),
-  numberOfPartners: z.coerce.number({ required_error: "Campo obrigatório" }).int("Deve ser um número inteiro.").min(1, "Mínimo de 1 sócio."),
-}).refine(data => {
+const formSchema = TaxFormValuesSchema.refine(data => {
     if (data.proLaborePartners > 0 && data.proLaborePartners < MINIMUM_WAGE) {
       return false;
     }
@@ -82,6 +70,7 @@ export default function TaxCalculator() {
       domesticActivities: [{ code: '7020-4/00', revenue: 15000 }],
       exportActivities: [],
       exportCurrency: 'BRL',
+      exchangeRate: 1,
       totalSalaryExpense: 0,
       proLaborePartners: MINIMUM_WAGE,
       numberOfPartners: 1,
@@ -149,7 +138,7 @@ export default function TaxCalculator() {
         exchangeRate: values.exportCurrency !== 'BRL' && values.exportActivities.length > 0 ? (values.exchangeRate ?? 1) : 1,
     };
 
-    const calculatedResults = calculateTaxes(submissionValues);
+    const calculatedResults = await calculateTaxesOnServer(submissionValues);
     setResults(calculatedResults);
     setIsLoading(false);
     
@@ -200,7 +189,7 @@ export default function TaxCalculator() {
     if (allActivities.length === 0) return [];
     
     const revenueSum = allActivities.reduce((sum, act) => sum + (act.revenue || 0), 0);
-    if(revenueSum === 0) return [];
+    if(revenueSum === 0 && form.getValues('proLaborePartners') === 0) return [];
 
     const mainActivity = allActivities.reduce((max, act) => (act.revenue || 0) > (max.revenue || 0) ? act : max, { revenue: -1, code: '' });
     if (!mainActivity.code) return [];
