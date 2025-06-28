@@ -57,7 +57,7 @@ function _findBracketIndex(table: { max: number }[], value: number): number {
 }
 
 
-function _getCnaeData(code: string): CnaeData | undefined {
+export function getCnaeData(code: string): CnaeData | undefined {
   return CNAE_DATA.find(c => c.code === code);
 }
 
@@ -147,7 +147,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   const fatorR = totalRevenue > 0 ? totalPayrollForFatorR / totalRevenue : 0;
   
   const revenueAnnexV = allActivities
-    .filter(a => _getCnaeData(a.code)?.requiresFatorR)
+    .filter(a => getCnaeData(a.code)?.requiresFatorR)
     .reduce((sum, act) => sum + act.revenue, 0);
   
   const isFatorRApplicable = revenueAnnexV > 0;
@@ -161,7 +161,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
   // --- 3. Group Revenue & Calculate DAS ---
   const revenueByAnnex = allActivities.reduce((acc, activity) => {
-    const cnaeInfo = _getCnaeData(activity.code);
+    const cnaeInfo = getCnaeData(activity.code);
     if (!cnaeInfo) return acc;
     let effectiveAnnex: Annex = cnaeInfo.annex;
     if (cnaeInfo.annex === 'V' && isFatorRApplicable) {
@@ -282,7 +282,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- 2. Federal Taxes Calculation ---
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
   let presumedProfitBase = allActivities.reduce((sum, activity) => {
-    const cnaeInfo = _getCnaeData(activity.code);
+    const cnaeInfo = getCnaeData(activity.code);
     return sum + (activity.revenue * (cnaeInfo?.presumedProfitRate ?? 0.32));
   }, 0);
 
@@ -341,7 +341,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
   let simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional (Otimizado)' };
 
-  const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => _getCnaeData(a.code)?.requiresFatorR);
+  const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
   
   if (hasAnnexVActivity && (simplesNacionalBase.fatorR ?? 0) < 0.28) {
       const totalRevenue = simplesNacionalBase.totalRevenue;

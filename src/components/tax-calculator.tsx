@@ -7,7 +7,7 @@ import { z } from "zod";
 import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
-import { calculateTaxes } from '@/lib/calculations';
+import { calculateTaxes, getCnaeData } from '@/lib/calculations';
 import { type CalculationResults, type TaxFormValues } from '@/lib/types';
 import { cn, formatCurrencyBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
@@ -178,23 +178,63 @@ export default function TaxCalculator() {
     }
   }
 
-  const sortedScenarios = useMemo(() => {
+  const displayedScenarios = useMemo(() => {
     if (!results) return [];
 
-    const allScenarios = [
-      results.lucroPresumido,
-      results.simplesNacionalSemFatorR,
-      results.simplesNacionalComFatorR
-    ];
-
-    const uniqueScenarios = allScenarios.filter((scenario, index, self) =>
-        index === self.findIndex((s) => (
-            s.regime === scenario.regime && s.totalMonthlyCost === scenario.totalMonthlyCost
-        ))
-    );
+    const { domesticActivities, exportActivities } = form.getValues();
+    const allActivities = [...domesticActivities, ...exportActivities];
     
-    return uniqueScenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-  }, [results]);
+    if (allActivities.length === 0) return [];
+
+    // Find main activity (highest revenue)
+    const mainActivity = allActivities.reduce((max, act) => act.revenue > max.revenue ? act : max, allActivities[0]);
+    const mainCnaeInfo = getCnaeData(mainActivity.code);
+    
+    if (!mainCnaeInfo) return [];
+
+    const mainAnnex = mainCnaeInfo.annex;
+    const scenarios = [];
+
+    const lucroPresumidoScenario = {
+        ...results.lucroPresumido,
+        regime: 'Alternativa: Lucro Presumido'
+    };
+
+    if (mainAnnex === 'V' && mainCnaeInfo.requiresFatorR) {
+        const situacaoAtual = {
+            ...results.simplesNacionalSemFatorR,
+            regime: 'Situação Atual: Anexo V'
+        };
+        scenarios.push(situacaoAtual);
+        
+        const cenarioOtimizado = results.simplesNacionalComFatorR;
+        
+        if (cenarioOtimizado.totalMonthlyCost < situacaoAtual.totalMonthlyCost) {
+            const proLaboreOtimizado = cenarioOtimizado.proLabore;
+            const optimizationNote = `Para alcançar este cenário, seu pró-labore precisa ser ajustado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
+            
+            scenarios.push({
+                ...cenarioOtimizado,
+                regime: 'Cenário Otimizado: Anexo III',
+                annex: 'Anexo III', // Override the annex display
+                optimizationNote: optimizationNote
+            });
+        }
+        
+        scenarios.push(lucroPresumidoScenario);
+
+    } else { // Annex III, IV, or others
+        const situacaoAtual = {
+            ...results.simplesNacionalSemFatorR,
+            regime: `Situação Atual: Anexo ${mainAnnex}`
+        };
+        scenarios.push(situacaoAtual);
+        scenarios.push(lucroPresumidoScenario);
+    }
+    
+    return scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+
+  }, [results, form]);
 
   const renderResults = () => {
     if (isLoading) {
@@ -207,11 +247,11 @@ export default function TaxCalculator() {
       );
     }
 
-    if (!results || sortedScenarios.length === 0) {
+    if (!results || displayedScenarios.length === 0) {
       return null;
     }
 
-    const cheapestScenario = sortedScenarios[0];
+    const cheapestScenario = displayedScenarios[0];
 
     const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
     const fatorR = results.simplesNacionalSemFatorR.fatorR;
@@ -255,12 +295,12 @@ export default function TaxCalculator() {
                 </div>
             )}
 
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${sortedScenarios.length > 2 ? '3' : '2'} gap-8`}>
-                {sortedScenarios.map(scenario => (
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${displayedScenarios.length > 2 ? '3' : '2'} gap-8`}>
+                {displayedScenarios.map(scenario => (
                      <ResultCard 
                         key={scenario.regime} 
                         details={scenario} 
-                        isCheapest={scenario.regime === cheapestScenario.regime && sortedScenarios.length > 1}
+                        isCheapest={scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && displayedScenarios.length > 1}
                         formValues={form.getValues()}
                     />
                 ))}

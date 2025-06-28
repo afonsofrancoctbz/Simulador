@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails, TaxFormValues } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
+import { Lightbulb } from 'lucide-react';
 
 const ResultCardComponent = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
     const numSocios = formValues.numberOfPartners || 1;
@@ -29,6 +30,13 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                         {formatPercent(details.effectiveRate)} do faturamento
                     </div>
                 </div>
+
+                {details.optimizationNote && (
+                    <div className="p-3 border rounded-lg bg-emerald-50 text-emerald-900 border-emerald-200 text-sm font-serif flex items-start gap-3">
+                         <Lightbulb className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                         <p>{details.optimizationNote}</p>
+                     </div>
+                )}
 
                 <div className="space-y-2">
                     <h4 className="font-semibold text-foreground">📊 Detalhamento dos Impostos</h4>
