@@ -3,7 +3,7 @@ import { z } from "zod";
 // Schema for an individual CNAE item
 export const CnaeItemSchema = z.object({
   code: z.string(),
-  revenue: z.number(),
+  revenue: z.coerce.number().positive({ message: "O faturamento deve ser maior que zero." }).or(z.literal(0)),
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
@@ -12,10 +12,10 @@ export const TaxFormValuesSchema = z.object({
   domesticActivities: z.array(CnaeItemSchema),
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
-  exchangeRate: z.number(),
-  totalSalaryExpense: z.number(),
-  proLaborePartners: z.number(),
-  numberOfPartners: z.number(),
+  exchangeRate: z.coerce.number(),
+  totalSalaryExpense: z.coerce.number(),
+  proLaborePartners: z.coerce.number(),
+  numberOfPartners: z.coerce.number(),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
@@ -43,6 +43,7 @@ export const TaxDetailsSchema = z.object({
     annex: z.string().optional(),
     annualSavings: z.number().optional(),
     optimizationNote: z.string().optional(),
+    partnerTaxes: z.object({ inss: z.number(), irrf: z.number() })
 });
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
