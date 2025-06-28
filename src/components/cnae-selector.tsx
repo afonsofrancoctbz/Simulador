@@ -49,7 +49,7 @@ const categoryToInternalMap: Record<string, string[]> = {
   "Corretagem de imóveis": ["Serviços Financeiros e Imobiliários"],
 }
 
-const MAX_SELECTION = 10;
+const MAX_SELECTION = 20;
 
 export function CnaeSelector({
   open,
@@ -113,16 +113,33 @@ export function CnaeSelector({
     setSelectedCategory(category);
   }
 
+  const handleSelectAllVisible = () => {
+    const visibleCodes = filteredCnaes.map(c => c.code);
+    const newSelected = new Set(selectedCodes);
+    visibleCodes.forEach(code => {
+        if (newSelected.size < MAX_SELECTION) {
+            newSelected.add(code);
+        }
+    });
+    setSelectedCodes(Array.from(newSelected));
+  };
+
+  const handleDeselectAllVisible = () => {
+    const visibleCodes = new Set(filteredCnaes.map(c => c.code));
+    setSelectedCodes(selectedCodes.filter(code => !visibleCodes.has(code)));
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-2">
+        <DialogHeader className="p-6 pb-2 shrink-0">
           <DialogTitle className="text-2xl font-bold text-center">Selecionar Atividades (CNAE)</DialogTitle>
           <DialogDescription className="text-center">
             Busque ou filtre por categoria. Você pode adicionar até {MAX_SELECTION} atividades.
           </DialogDescription>
         </DialogHeader>
-        <div className="px-6 space-y-4">
+
+        <div className="px-6 space-y-4 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -143,7 +160,27 @@ export function CnaeSelector({
             </TabsList>
           </Tabs>
         </div>
-        <ScrollArea className="flex-grow border-t mt-4">
+        
+        <div className="px-6 pt-4 flex items-center justify-between border-t mt-4 shrink-0">
+            <p className="text-sm text-muted-foreground">
+                {filteredCnaes.length > 0
+                    ? `${filteredCnaes.length} resultados na visão atual.`
+                    : "Nenhum CNAE encontrado."}
+            </p>
+            {filteredCnaes.length > 0 && (
+            <div className="flex items-center gap-2">
+                <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
+                    Selecionar todos
+                </Button>
+                <span className="text-muted-foreground/50">/</span>
+                <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
+                    Limpar todos
+                </Button>
+            </div>
+            )}
+        </div>
+
+        <ScrollArea className="flex-grow min-h-0 border-t">
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-2">
             {filteredCnaes.length > 0 ? (
               filteredCnaes.map((cnae) => (
@@ -173,21 +210,21 @@ export function CnaeSelector({
               <div className="text-center text-muted-foreground py-16 col-span-2">
                 <p>
                   {search.length > 1 || selectedCategory
-                    ? "Nenhum CNAE encontrado."
+                    ? "Nenhum CNAE encontrado com os filtros atuais."
                     : "Busque por um termo ou selecione uma categoria para ver os CNAEs."}
                 </p>
               </div>
             )}
           </div>
         </ScrollArea>
-        <DialogFooter className="p-4 border-t bg-background/80 sticky bottom-0 items-center justify-between flex-row">
+        <DialogFooter className="p-4 border-t bg-background items-center justify-between flex-row shrink-0">
             <div className="text-sm text-muted-foreground">
                 {selectedCodes.length} de {MAX_SELECTION} selecionados
             </div>
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
                 <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Confirmar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : 'atividades'}
+                    Confirmar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : ''}
                 </Button>
             </div>
         </DialogFooter>
