@@ -214,7 +214,7 @@ export default function TaxCalculator() {
     const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
     const fatorR = results.simplesNacionalSemFatorR.fatorR;
     if (fatorR !== undefined && fatorR < 0.28) {
-      const requiredProLabore = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - form.getValues('totalSalaryExpense'));
+      const requiredProLabore = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense') * 1.08));
       intelligentAlerts.push({
         type: 'warning',
         title: 'Pró-labore pode ser otimizado',
@@ -277,127 +277,136 @@ export default function TaxCalculator() {
   
   return (
     <TooltipProvider>
-      <div className="w-full max-w-6xl mx-auto">
-        <header className="text-center mb-12">
+      <div className="w-full max-w-6xl mx-auto space-y-12">
+        <header className="text-center">
             <div className="inline-block bg-primary/20 p-3 rounded-lg mb-4">
               <Calculator className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold">Calculadora de Impostos para Prestadores de Serviço</h1>
             <p className="text-muted-foreground mt-4 text-lg max-w-3xl mx-auto font-serif">Descubra o regime tributário ideal para sua empresa de serviços e otimize suas finanças.</p>
         </header>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <Card className="shadow-lg lg:col-span-1 bg-card/80">
-                    <CardHeader>
-                        <CardTitle className="text-2xl flex items-center gap-3"><Briefcase className="text-primary" />Atividades e Faturamento</CardTitle>
-                        <CardDescription className="font-serif">Informe todas as suas fontes de receita, sejam elas nacionais ou do exterior.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <h3 className="font-semibold text-lg text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary-foreground" />Receitas Nacionais</h3>
-                        {domesticFields.map((field, index) => (
-                            <ActivityField key={field.id} form={form} fieldName="domesticActivities" index={index} removeFn={removeDomestic} />
-                        ))}
-                        <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
-                            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
-                        </Button>
-                        <FormMessage>{form.formState.errors.domesticActivities?.root?.message}</FormMessage>
-                        
-                        <Separator className="my-6" />
 
-                        <h3 className="font-semibold text-lg text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary-foreground" />Receitas de Exportação</h3>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField control={form.control} name="exportCurrency" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Moeda do Faturamento</FormLabel>
-                                    <Select 
-                                        onValueChange={(value) => {
-                                            field.onChange(value);
-                                            if (value !== 'BRL' && exchangeRates[value]) {
-                                                form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true });
-                                            } else if (value === 'BRL') {
-                                                form.setValue('exchangeRate', undefined);
-                                            }
-                                        }} 
-                                        defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Selecione a moeda" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="BRL">Real (BRL)</SelectItem>
-                                            <SelectItem value="USD">Dólar Americano (USD)</SelectItem>
-                                            <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                            {exportCurrency !== 'BRL' && exportFields.length > 0 && (
-                                <FormField control={form.control} name="exchangeRate" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
-                                        <div className="relative flex items-center">
-                                            <FormControl>
-                                                <Input type="number" step="0.0001" placeholder={isFetchingRate ? "Buscando..." : "Cotação atual"} {...field} value={field.value ?? ''} disabled={isFetchingRate} className="pr-10" />
-                                            </FormControl>
-                                            <Button type="button" variant="ghost" size="icon" className="absolute right-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate} aria-label="Atualizar cotação">
-                                                <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
-                                            </Button>
-                                        </div>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                            )}
-                        </div>
-                        {exportFields.map((field, index) => (
-                            <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
-                        ))}
-                         <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'export' })}>
-                            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
-                        </Button>
-                    </CardContent>
-                </Card>
+        <FaqSection />
+        <BenefitsSection />
 
-                <Card className="shadow-lg lg:col-span-1 bg-card/80">
-                    <CardHeader>
-                        <CardTitle className="text-2xl flex items-center gap-3"><Building2 className="text-primary" />Dados da Empresa</CardTitle>
-                        <CardDescription>Informações sobre a folha de pagamento e estrutura societária.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="proLaborePartners" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Pró-labore Total dos Sócios</FormLabel>
-                                <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Número de Sócios</FormLabel>
-                                <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    </CardContent>
-                </Card>
-            </div>
-            <div className="flex justify-center pt-8">
-              <Button type="submit" size="lg" disabled={isLoading} className="w-full max-w-md bg-accent text-accent-foreground hover:bg-accent/90">
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
-                Analisar e Otimizar Impostos
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <Separator />
+
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">Simule Seus Impostos</h2>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                  <Card className="shadow-lg lg:col-span-1 bg-card/80">
+                      <CardHeader>
+                          <CardTitle className="text-2xl flex items-center gap-3"><Briefcase className="text-primary" />Atividades e Faturamento</CardTitle>
+                          <CardDescription className="font-serif">Informe todas as suas fontes de receita, sejam elas nacionais ou do exterior.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary-foreground" />Receitas Nacionais</h3>
+                          {domesticFields.map((field, index) => (
+                              <ActivityField key={field.id} form={form} fieldName="domesticActivities" index={index} removeFn={removeDomestic} />
+                          ))}
+                          <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
+                              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
+                          </Button>
+                          <FormMessage>{form.formState.errors.domesticActivities?.root?.message}</FormMessage>
+                          
+                          <Separator className="my-6" />
+
+                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary-foreground" />Receitas de Exportação</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <FormField control={form.control} name="exportCurrency" render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Moeda do Faturamento</FormLabel>
+                                      <Select 
+                                          onValueChange={(value) => {
+                                              field.onChange(value);
+                                              if (value !== 'BRL' && exchangeRates[value]) {
+                                                  form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true });
+                                              } else if (value === 'BRL') {
+                                                  form.setValue('exchangeRate', undefined);
+                                              }
+                                          }} 
+                                          defaultValue={field.value}>
+                                          <FormControl>
+                                              <SelectTrigger>
+                                                  <SelectValue placeholder="Selecione a moeda" />
+                                              </SelectTrigger>
+                                          </FormControl>
+                                          <SelectContent>
+                                              <SelectItem value="BRL">Real (BRL)</SelectItem>
+                                              <SelectItem value="USD">Dólar Americano (USD)</SelectItem>
+                                              <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                                          </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                  </FormItem>
+                              )} />
+                              {exportCurrency !== 'BRL' && exportFields.length > 0 && (
+                                  <FormField control={form.control} name="exchangeRate" render={({ field }) => (
+                                      <FormItem>
+                                          <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
+                                          <div className="relative flex items-center">
+                                              <FormControl>
+                                                  <Input type="number" step="0.0001" placeholder={isFetchingRate ? "Buscando..." : "Cotação atual"} {...field} value={field.value ?? ''} disabled={isFetchingRate} className="pr-10" />
+                                              </FormControl>
+                                              <Button type="button" variant="ghost" size="icon" className="absolute right-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate} aria-label="Atualizar cotação">
+                                                  <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
+                                              </Button>
+                                          </div>
+                                          <FormMessage />
+                                      </FormItem>
+                                  )} />
+                              )}
+                          </div>
+                          {exportFields.map((field, index) => (
+                              <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
+                          ))}
+                          <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'export' })}>
+                              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
+                          </Button>
+                      </CardContent>
+                  </Card>
+
+                  <Card className="shadow-lg lg:col-span-1 bg-card/80">
+                      <CardHeader>
+                          <CardTitle className="text-2xl flex items-center gap-3"><Building2 className="text-primary" />Dados da Empresa</CardTitle>
+                          <CardDescription>Informações sobre a folha de pagamento e estrutura societária.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                          <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>Despesa com Salários (CLT)</FormLabel>
+                                  <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )} />
+                          <FormField control={form.control} name="proLaborePartners" render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>Pró-labore Total dos Sócios</FormLabel>
+                                  <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )} />
+                          <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>Número de Sócios</FormLabel>
+                                  <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )} />
+                      </CardContent>
+                  </Card>
+              </div>
+              <div className="flex justify-center pt-8">
+                <Button type="submit" size="lg" disabled={isLoading} className="w-full max-w-md bg-accent text-accent-foreground hover:bg-accent/90">
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
+                  Analisar e Otimizar Impostos
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </div>
 
       <CnaeSelector
@@ -407,8 +416,7 @@ export default function TaxCalculator() {
       />
 
       {renderResults()}
-      <BenefitsSection />
-      <FaqSection />
+
       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
         <p>TributaSimples © {new Date().getFullYear()}.</p>
         <p className="text-xs mt-2">Aviso: Esta ferramenta destina-se apenas a fins de estimativa. Consulte um contador para aconselhamento preciso.</p>

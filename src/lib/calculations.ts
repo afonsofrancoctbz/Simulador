@@ -120,8 +120,10 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     .filter(a => getCnaeData(a.code)?.requiresFatorR)
     .reduce((sum, act) => sum + act.revenue, 0);
   
-  const totalPayroll = totalSalaryExpense + proLabore;
-  const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : 0;
+  const fgtsOnSalary = totalSalaryExpense * 0.08;
+  const totalPayrollForFatorR = totalSalaryExpense + proLabore + fgtsOnSalary;
+  const fatorR = totalRevenue > 0 ? totalPayrollForFatorR / totalRevenue : 0;
+  
   const isFatorRApplicable = revenueAnnexV > 0;
   let effectiveAnnexForV: Annex = 'V';
   
@@ -132,7 +134,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
     if (!useAnnexIIIForV && regimeName.includes('Sem Otimização')) { // Add suggestion only for the non-optimized scenario
         const requiredPayroll = totalRevenue * 0.28;
-        const payrollShortfall = requiredPayroll - totalPayroll;
+        const payrollShortfall = requiredPayroll - totalPayrollForFatorR;
         if (payrollShortfall > 0) {
             notes.push(`SUGESTÃO: Para se beneficiar das alíquotas do Anexo III, você pode aumentar seu pró-labore ou folha de pagamento em ${formatCurrencyBRL(payrollShortfall)}.`);
         }
@@ -200,8 +202,9 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
     if (annex === 'IV') {
         const cppRate = 0.20 + 0.03 + 0.058;
-        cppFromAnnexIV += (totalPayroll) * cppRate;
-        notes.push("Anexo IV paga a CPP (INSS Patronal de 20% + adicionais) fora do DAS, sobre a folha de pagamento total.");
+        const payrollForCPP = totalSalaryExpense + proLabore;
+        cppFromAnnexIV += (payrollForCPP) * cppRate;
+        notes.push("Anexo IV paga a CPP (INSS Patronal de 20% + adicionais) fora do DAS, sobre a folha de pagamento (salários + pró-labore).");
     }
      if (bracketIndex === annexTable.length - 1) {
       if (['III', 'IV', 'V'].includes(annex) && annexInfo.domestic > 0) {
@@ -362,8 +365,9 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
   if (hasAnnexVActivity && (simplesNacionalSemFatorR.fatorR ?? 0) < 0.28) {
       const totalRevenue = simplesNacionalSemFatorR.totalRevenue;
+      const fgtsOnSalary = values.totalSalaryExpense * 0.08;
       const requiredPayroll = totalRevenue * 0.28;
-      const currentPayroll = values.totalSalaryExpense + values.proLaborePartners;
+      const currentPayroll = values.totalSalaryExpense + values.proLaborePartners + fgtsOnSalary;
       
       if (requiredPayroll > currentPayroll) {
           const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayroll);

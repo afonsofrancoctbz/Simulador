@@ -1,9 +1,10 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import { Inter } from "next/font/google";
+import { Inter, Literata } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const literata = Literata({ subsets: ["latin"], style: 'normal', variable: "--font-serif" });
 
 export const metadata: Metadata = {
   title: 'TributaSimples | Calculadora de Impostos',
@@ -17,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased ${inter.variable}`}>
+      <body className={`font-sans antialiased ${inter.variable} ${literata.variable}`}>
         {children}
         <Toaster />
       </body>
