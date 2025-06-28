@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -71,8 +70,8 @@ export default function TaxCalculator() {
   const form = useForm<CalculatorFormValues>({
     resolver: zodResolver(calculatorFormSchema),
     defaultValues: {
-      selectedCnaes: ['7020-4/00'],
-      revenues: { 'domestic_V': 15000 },
+      selectedCnaes: [],
+      revenues: {},
       exportCurrency: 'BRL',
       exchangeRate: 1,
       totalSalaryExpense: 0,
