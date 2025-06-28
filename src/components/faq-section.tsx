@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { CIDADES_ATENDIDAS } from "@/lib/cities";
-import { Banknote, Building, Check, ChevronsUpDown, CreditCard, FileText, Link, Send, TrendingUp, Wallet } from "lucide-react";
+import { Banknote, Building, Check, ChevronsUpDown, Link, TrendingUp, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,9 +11,6 @@ import { cn } from "@/lib/utils";
 
 const bankFeatures = [
     { icon: Wallet, title: "Conta PJ Gratuita", description: "Abertura e manutenção da sua conta, sem mensalidade ou taxas escondidas." },
-    { icon: CreditCard, title: "Cartão Visa sem Anuidade", description: "Cartão de crédito físico e virtual para sua empresa, sem taxas anuais." },
-    { icon: Send, title: "Pix e TEDs Gratuitos", description: "Realize transferências via Pix ilimitadas e 10 TEDs por mês, sem custos." },
-    { icon: FileText, title: "10 Boletos de Cobrança Grátis", description: "Emita e compense até 10 boletos por mês para receber de seus clientes." },
     { icon: Link, title: "Integrada à Contabilidade", description: "Sua rotina financeira integrada automaticamente, sem envio manual de extratos." },
     { icon: TrendingUp, title: "Débito Automático de Impostos", description: "Evite multas com o pagamento automático das suas guias de impostos (DAS)." },
 ];
