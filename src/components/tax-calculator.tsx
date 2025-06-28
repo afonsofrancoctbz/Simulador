@@ -475,8 +475,8 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
                   <CommandItem
                     key={cnae.code}
                     value={cnae.code}
-                    onSelect={() => {
-                      onChange(cnae.code);
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
                       setOpen(false);
                     }}
                   >
@@ -568,3 +568,5 @@ const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: 
       </CardFooter>
     </Card>
 );
+
+    
