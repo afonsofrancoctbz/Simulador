@@ -3,20 +3,22 @@ import BenefitsSection from '@/components/benefits-section';
 import FaqSection from '@/components/faq-section';
 import TaxCalculator from '@/components/tax-calculator';
 import AppFooter from '@/components/app-footer';
+import AppHeader from '@/components/app-header';
 
 export default function Home() {
   return (
     <>
-      <div className="bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Simule Seus Impostos</h1>
-            <p className="mt-4 text-lg md:text-xl text-primary-foreground/80 max-w-3xl mx-auto">
-              Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
-            </p>
+      <AppHeader />
+      <main>
+        <div className="bg-primary text-primary-foreground">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Simule Seus Impostos</h1>
+              <p className="mt-4 text-lg md:text-xl text-primary-foreground/80 max-w-3xl mx-auto">
+                Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
+              </p>
+          </div>
         </div>
-      </div>
 
-      <main className="flex flex-col">
         <section id="calculator" className="py-16 lg:py-24 bg-slate-50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <TaxCalculator />
@@ -36,8 +38,7 @@ export default function Home() {
         </section>
 
       </main>
-
-       <AppFooter />
+      <AppFooter />
     </>
   );
 }

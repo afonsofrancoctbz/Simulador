@@ -73,11 +73,11 @@ const CityCombobox = () => {
 export default function FaqSection() {
     return (
         <div className="w-full max-w-6xl space-y-8">
-            <Card>
+            <Card className="bg-card shadow-lg">
                 <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-3">
-                        <Banknote className="text-primary-foreground" />
-                        Contabilizei Bank: A Conta PJ Integrada à sua Contabilidade
+                        <Banknote className="text-primary" />
+                        Conta PJ Integrada à sua Contabilidade
                     </CardTitle>
                     <CardDescription className="font-serif !mt-2">
                         Uma conta PJ gratuita e inteligente, que separa suas finanças e automatiza sua contabilidade.
@@ -113,10 +113,10 @@ export default function FaqSection() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-card shadow-lg">
                 <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-3">
-                        <Building className="text-primary-foreground" />
+                        <Building className="text-primary" />
                         Cidades Atendidas pela Contabilizei
                     </CardTitle>
                     <CardDescription className="font-serif !mt-2">
