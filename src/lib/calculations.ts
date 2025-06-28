@@ -67,13 +67,12 @@ function getCnaeData(code: string): CnaeData | undefined {
   return CNAE_DATA.find(c => c.code === code);
 }
 
-function calculateProLaboreTaxes(proLabore: number, healthPlanCost: number = 0) {
+function calculateProLaboreTaxes(proLabore: number) {
   // 1. Calculate INSS on pro-labore (this is a tax, not just a deduction for IRRF)
   const inssOnProLabore = Math.min(proLabore, INSS_CEILING) * PRO_LABORE_INSS_RATE;
 
   // 2. Calculate IRRF
-  // The IRRF base includes the health plan cost paid by the company.
-  const irrfBase = proLabore + healthPlanCost;
+  const irrfBase = proLabore;
 
   // The law allows choosing between standard deductions (like INSS) and a simplified deduction.
   // We should choose the option that results in the lowest tax, which means choosing the largest deduction.
@@ -89,8 +88,8 @@ function calculateProLaboreTaxes(proLabore: number, healthPlanCost: number = 0) 
 }
 
 function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners, municipalISSRate, healthPlanCost = 0 } = values;
-
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners } = values;
+  const municipalISSRate = 5; // Using a default value for simplicity
   const notes: string[] = [];
 
   const allActivities = [
@@ -214,15 +213,14 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   }
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLabore / numberOfPartners : 0;
-  const healthPlanCostPerPartner = numberOfPartners > 0 ? healthPlanCost / numberOfPartners : 0;
-  const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner, healthPlanCostPerPartner);
+  const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner);
   const totalProLaboreTaxes = {
     inssOnProLabore: proLaboreTaxesPerPartner.inssOnProLabore * numberOfPartners,
     irrf: proLaboreTaxesPerPartner.irrf * numberOfPartners
   };
 
   const totalTax = totalDas + cppFromAnnexIV + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf + totalIssSeparado;
-  const totalMonthlyCost = totalTax + totalSalaryExpense + proLabore + healthPlanCost;
+  const totalMonthlyCost = totalTax + totalSalaryExpense + proLabore;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? 0;
@@ -252,8 +250,8 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners, municipalISSRate, healthPlanCost = 0 } = values;
-
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners } = values;
+  const municipalISSRate = 5; // Using a default value for simplicity
   const notes: string[] = [];
   const hasExportRevenue = exportActivities.some(act => act.revenue > 0);
   if (hasExportRevenue) {
@@ -317,8 +315,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
-  const healthPlanCostPerPartner = numberOfPartners > 0 ? healthPlanCost / numberOfPartners : 0;
-  const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner, healthPlanCostPerPartner);
+  const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner);
   const totalProLaboreTaxes = {
     inssOnProLabore: proLaboreTaxesPerPartner.inssOnProLabore * numberOfPartners,
     irrf: proLaboreTaxesPerPartner.irrf * numberOfPartners
@@ -326,7 +323,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
 
   const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
-  const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners + healthPlanCost;
+  const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? 0;

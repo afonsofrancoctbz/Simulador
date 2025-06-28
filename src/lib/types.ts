@@ -11,8 +11,6 @@ export interface TaxFormValues {
   totalSalaryExpense: number;
   proLaborePartners: number;
   numberOfPartners: number;
-  municipalISSRate: number;
-  healthPlanCost?: number;
 }
 
 export interface TaxDetails {

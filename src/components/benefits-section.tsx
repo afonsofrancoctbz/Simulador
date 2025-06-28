@@ -30,10 +30,10 @@ export default function BenefitsSection() {
                     </CardHeader>
                     <CardContent className="flex-grow flex flex-col justify-end">
                        <Image
-                            src="https://placehold.co/600x400.png"
+                            src="https://placehold.co/500x300.png"
                             alt="Mulher sorrindo durante uma consulta de telemedicina"
-                            width={600}
-                            height={400}
+                            width={500}
+                            height={300}
                             className="w-full h-auto object-cover rounded-md mt-auto"
                             data-ai-hint="woman telemedicine"
                         />
@@ -55,10 +55,10 @@ export default function BenefitsSection() {
                     </CardHeader>
                     <CardContent className="flex-grow flex flex-col justify-end">
                         <Image
-                            src="https://placehold.co/600x400.png"
+                            src="https://placehold.co/500x300.png"
                             alt="Pessoa se exercitando em uma academia moderna"
-                            width={600}
-                            height={400}
+                            width={500}
+                            height={300}
                             className="w-full h-auto object-cover rounded-md mt-auto"
                             data-ai-hint="gym workout"
                         />
@@ -85,10 +85,10 @@ export default function BenefitsSection() {
                     </div>
                     <div className="hidden md:block">
                          <Image
-                            src="https://placehold.co/600x400.png"
+                            src="https://placehold.co/500x350.png"
                             alt="Médico e paciente conversando"
-                            width={600}
-                            height={400}
+                            width={500}
+                            height={350}
                             className="w-full h-full object-cover rounded-r-lg"
                             data-ai-hint="doctor patient"
                         />
