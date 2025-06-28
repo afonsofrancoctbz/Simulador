@@ -82,7 +82,7 @@ export default function TaxCalculator() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      domesticActivities: [{ code: '8630-5/03', revenue: 15000 }], // Default to medical activity
+      domesticActivities: [{ code: '7020-4/00', revenue: 15000 }], // Default to consultancy
       exportActivities: [],
       exportCurrency: 'BRL',
       totalSalaryExpense: 0,
@@ -251,8 +251,8 @@ export default function TaxCalculator() {
             <div className="inline-block bg-primary/20 p-3 rounded-lg mb-4">
               <Calculator className="h-8 w-8 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold">Calculadora de Impostos para Profissionais da Saúde</h1>
-            <p className="text-muted-foreground mt-4 text-lg max-w-3xl mx-auto font-serif">Descubra o regime tributário ideal para sua clínica ou consultório e otimize suas finanças.</p>
+            <h1 className="text-4xl sm:text-5xl font-bold">Calculadora de Impostos para Prestadores de Serviço</h1>
+            <p className="text-muted-foreground mt-4 text-lg max-w-3xl mx-auto font-serif">Descubra o regime tributário ideal para sua empresa de serviços e otimize suas finanças.</p>
         </header>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -397,7 +397,7 @@ export default function TaxCalculator() {
       <BenefitsSection />
       <FaqSection />
       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
-        <p>TributaSimples | Saúde © {new Date().getFullYear()}.</p>
+        <p>TributaSimples © {new Date().getFullYear()}.</p>
         <p className="text-xs mt-2">Aviso: Esta ferramenta destina-se apenas a fins de estimativa. Consulte um contador para aconselhamento preciso.</p>
       </footer>
     </TooltipProvider>

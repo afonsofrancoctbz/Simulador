@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const literata = Literata({ subsets: ["latin"], variable: "--font-serif"});
 
 export const metadata: Metadata = {
-  title: 'TributaSimples | Saúde',
-  description: 'Calculadora de Impostos para Profissionais da Saúde',
+  title: 'TributaSimples | Calculadora de Impostos',
+  description: 'Calculadora de Impostos para Prestadores de Serviço',
 };
 
 export default function RootLayout({
