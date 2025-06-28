@@ -24,6 +24,7 @@ import FaqSection from './faq-section';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { CnaeSelector } from './cnae-selector';
 import { Label } from './ui/label';
+import BenefitsSection from './benefits-section';
 
 const formatCurrencyBRL = (value: number) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
@@ -393,6 +394,7 @@ export default function TaxCalculator() {
       />
 
       {renderResults()}
+      <BenefitsSection />
       <FaqSection />
       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
         <p>TributaSimples | Saúde © {new Date().getFullYear()}.</p>
