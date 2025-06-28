@@ -426,55 +426,79 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
   );
 };
 
-const CnaeCombobox = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
-    const [open, setOpen] = useState(false);
-    
-    const groupedCnaes = useMemo(() => {
-        return CNAE_DATA.reduce((acc, cnae) => {
-            const category = cnae.category || 'Outras Categorias';
-            if (!acc[category]) {
-                acc[category] = [];
-            }
-            acc[category].push(cnae);
-            return acc;
-        }, {} as Record<string, typeof CNAE_DATA>);
-    }, []);
+const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+  const [open, setOpen] = useState(false);
 
-    const sortedGroupedCnaes = useMemo(() => {
-      return Object.entries(groupedCnaes).sort((a, b) => a[0].localeCompare(b[0]));
-    }, [groupedCnaes]);
+  const groupedCnaes = useMemo(() => {
+    return CNAE_DATA.reduce((acc, cnae) => {
+      const category = cnae.category || 'Outras Categorias';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(cnae);
+      return acc;
+    }, {} as Record<string, typeof CNAE_DATA>);
+  }, []);
 
-    return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between text-muted-foreground font-normal">
-            {value ? CNAE_DATA.find((cnae) => cnae.code === value)?.code : "Selecione o CNAE..."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-          <Command>
-            <CommandInput placeholder="Buscar CNAE por código ou descrição..." />
-            <CommandList>
-                <CommandEmpty>Nenhum CNAE encontrado.</CommandEmpty>
-                {sortedGroupedCnaes.map(([category, cnaes]) => (
-                  <CommandGroup key={category} heading={category}>
-                    {cnaes.map((cnae) => (
-                        <CommandItem key={cnae.code} value={`${cnae.code} - ${cnae.description}`} onSelect={() => { onChange(cnae.code); setOpen(false); }}>
-                            <Check className={cn("mr-2 h-4 w-4", value === cnae.code ? "opacity-100" : "opacity-0")} />
-                            <div>
-                                <p className="font-semibold">{cnae.code}</p>
-                                <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
-                            </div>
-                        </CommandItem>
-                    ))}
-                  </CommandGroup>
+  const sortedGroupedCnaes = useMemo(() => {
+    return Object.entries(groupedCnaes).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [groupedCnaes]);
+
+  const selectedCnaeText = useMemo(() => {
+    if (!value) return "Selecione o CNAE...";
+    const cnae = CNAE_DATA.find((c) => c.code === value);
+    if (!cnae) return "Selecione o CNAE...";
+    return `${cnae.code} - ${cnae.description}`;
+  }, [value]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between text-muted-foreground font-normal"
+        >
+          <span className="truncate">{selectedCnaeText}</span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0 md:w-[550px]">
+        <Command>
+          <CommandInput placeholder="Buscar CNAE por código ou descrição..." />
+          <CommandList>
+            <CommandEmpty>Nenhum CNAE encontrado.</CommandEmpty>
+            {sortedGroupedCnaes.map(([category, cnaes]) => (
+              <CommandGroup key={category} heading={category}>
+                {cnaes.map((cnae) => (
+                  <CommandItem
+                    key={cnae.code}
+                    value={`${cnae.code} - ${cnae.description}`}
+                    onSelect={() => {
+                      onChange(cnae.code);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === cnae.code ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <div>
+                      <p className="font-semibold">{cnae.code}</p>
+                      <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
+                    </div>
+                  </CommandItem>
                 ))}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    );
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
 };
 
 const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => (
