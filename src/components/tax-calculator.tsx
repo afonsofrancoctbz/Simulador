@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes, getCnaeData } from '@/lib/calculations';
@@ -23,6 +24,8 @@ import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { ActivityField } from './activity-field';
+import { PlusCircle } from 'lucide-react';
+
 
 const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
@@ -39,18 +42,27 @@ const formSchema = z.object({
   exportCurrency: z.string().default('BRL'),
   exchangeRate: z.coerce.number().optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Campo obrigatório" }).min(0, "O valor deve ser positivo."),
-  proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(MINIMUM_WAGE, `O valor deve ser no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`),
+  proLaborePartners: z.coerce.number({ required_error: "Campo obrigatório" }).min(0),
   numberOfPartners: z.coerce.number({ required_error: "Campo obrigatório" }).int("Deve ser um número inteiro.").min(1, "Mínimo de 1 sócio."),
 }).refine(data => {
-    if (data.domesticActivities.length === 0 && data.exportActivities.length === 0) {
-        return false;
+    if (data.proLaborePartners > 0 && data.proLaborePartners < MINIMUM_WAGE) {
+      return false;
     }
     return true;
 }, {
-    message: "Adicione pelo menos uma atividade de faturamento.",
+    message: `O valor deve ser 0 ou no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+    path: ["proLaborePartners"],
+}).refine(data => {
+    const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
+    if (totalRevenue === 0 && data.proLaborePartners === 0) {
+      return false;
+    }
+    return true;
+}, {
+    message: "Informe ao menos um valor de faturamento ou pró-labore.",
     path: ["domesticActivities"],
 }).refine(data => {
-    if (data.exportCurrency !== 'BRL' && data.exportActivities.length > 0) {
+    if (data.exportCurrency !== 'BRL' && data.exportActivities.length > 0 && data.exportActivities.some(a => a.revenue > 0)) {
         return data.exchangeRate && data.exchangeRate > 0;
     }
     return true;
@@ -138,13 +150,18 @@ export default function TaxCalculator() {
 
     const submissionValues: TaxFormValues = {
         ...values,
-        exchangeRate: values.exportCurrency !== 'BRL' && values.exportActivities.length > 0 ? values.exchangeRate! : 1,
+        exchangeRate: values.exportCurrency !== 'BRL' && values.exportActivities.length > 0 ? (values.exchangeRate ?? 1) : 1,
     };
 
     const calculatedResults = calculateTaxes(submissionValues);
     setResults(calculatedResults);
     setIsLoading(false);
     
+    const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + (values.exportActivities.reduce((acc, act) => acc + act.revenue, 0) * (submissionValues.exchangeRate ?? 1));
+    if (totalRevenue === 0 && values.proLaborePartners === 0) {
+      return; // No need to call AI if there's no financial activity
+    }
+
     setIsAdviceLoading(true);
     try {
         const totalDomesticRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
@@ -186,10 +203,10 @@ export default function TaxCalculator() {
     
     if (allActivities.length === 0) return [];
 
-    // Find main activity (highest revenue)
-    const mainActivity = allActivities.reduce((max, act) => act.revenue > max.revenue ? act : max, allActivities[0]);
+    const mainActivity = allActivities.reduce((max, act) => act.revenue > max.revenue ? act : max, { revenue: -1, code: '' });
+    if (!mainActivity.code) return [];
+
     const mainCnaeInfo = getCnaeData(mainActivity.code);
-    
     if (!mainCnaeInfo) return [];
 
     const mainAnnex = mainCnaeInfo.annex;
@@ -300,7 +317,7 @@ export default function TaxCalculator() {
                      <ResultCard 
                         key={scenario.regime} 
                         details={scenario} 
-                        isCheapest={scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && displayedScenarios.length > 1}
+                        isCheapest={scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && displayedScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0}
                         formValues={form.getValues()}
                     />
                 ))}
