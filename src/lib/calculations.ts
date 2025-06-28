@@ -82,12 +82,14 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   const municipalISSRate = 5; 
   const notes: string[] = [];
 
-  const allActivities = [
-    ...domesticActivities.map(a => ({ ...a, type: 'domestic' as const })),
-    ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const })),
-  ];
+  const allDomesticActivities = domesticActivities.map(a => ({ ...a, type: 'domestic' as const }));
+  const allExportActivities = exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const }));
+
+  const domesticRevenue = allDomesticActivities.reduce((sum, act) => sum + act.revenue, 0);
+  const exportRevenue = allExportActivities.reduce((sum, act) => sum + act.revenue, 0);
+  const totalRevenue = domesticRevenue + exportRevenue;
   
-  const hasExportRevenue = allActivities.some(act => act.type === 'export' && act.revenue > 0);
+  const allActivities = [...allDomesticActivities, ...allExportActivities];
 
   if (allActivities.length === 0 && proLabore === 0 && totalSalaryExpense === 0) {
     return {
@@ -104,7 +106,6 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     };
   }
 
-  const totalRevenue = allActivities.reduce((sum, act) => sum + act.revenue, 0);
   const rbt12 = totalRevenue * 12;
 
   const revenueAnnexV = allActivities
@@ -124,7 +125,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
   }
 
-  if (hasExportRevenue) {
+  if (exportRevenue > 0) {
     notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS, resultando em uma alíquota efetiva menor.");
   }
 
@@ -258,14 +259,14 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners } = values;
   const municipalISSRate = 5;
   const notes: string[] = [];
-  const hasExportRevenue = exportActivities.some(act => act.revenue > 0);
-  if (hasExportRevenue) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
-
+  
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
   const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   const totalRevenue = domesticRevenue + exportRevenueBRL;
   
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
+
+  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
   
   if (allActivities.length === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
     return {

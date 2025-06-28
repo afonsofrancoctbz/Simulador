@@ -22,17 +22,18 @@ export default function Home() {
           </div>
         </section>
 
-         <section className="py-16 lg:py-24 bg-background">
+        <section className="py-16 lg:py-24 bg-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <BenefitsSection />
+          </div>
+        </section>
+
+         <section className="py-16 lg:py-24 bg-slate-50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
             <FaqSection />
           </div>
         </section>
 
-        <section className="py-16 lg:py-24 bg-slate-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <BenefitsSection />
-          </div>
-        </section>
       </main>
 
        <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
