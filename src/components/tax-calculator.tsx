@@ -428,6 +428,22 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
 
 const CnaeCombobox = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
     const [open, setOpen] = useState(false);
+    
+    const groupedCnaes = useMemo(() => {
+        return CNAE_DATA.reduce((acc, cnae) => {
+            const category = cnae.category || 'Outras Categorias';
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(cnae);
+            return acc;
+        }, {} as Record<string, typeof CNAE_DATA>);
+    }, []);
+
+    const sortedGroupedCnaes = useMemo(() => {
+      return Object.entries(groupedCnaes).sort((a, b) => a[0].localeCompare(b[0]));
+    }, [groupedCnaes]);
+
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -441,17 +457,19 @@ const CnaeCombobox = ({ value, onChange }: { value: string, onChange: (value: st
             <CommandInput placeholder="Buscar CNAE por código ou descrição..." />
             <CommandList>
                 <CommandEmpty>Nenhum CNAE encontrado.</CommandEmpty>
-                <CommandGroup>
-                {CNAE_DATA.map((cnae) => (
-                    <CommandItem key={cnae.code} value={`${cnae.code} - ${cnae.description}`} onSelect={() => { onChange(cnae.code); setOpen(false); }}>
-                        <Check className={cn("mr-2 h-4 w-4", value === cnae.code ? "opacity-100" : "opacity-0")} />
-                        <div>
-                            <p className="font-semibold">{cnae.code}</p>
-                            <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
-                        </div>
-                    </CommandItem>
+                {sortedGroupedCnaes.map(([category, cnaes]) => (
+                  <CommandGroup key={category} heading={category}>
+                    {cnaes.map((cnae) => (
+                        <CommandItem key={cnae.code} value={`${cnae.code} - ${cnae.description}`} onSelect={() => { onChange(cnae.code); setOpen(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", value === cnae.code ? "opacity-100" : "opacity-0")} />
+                            <div>
+                                <p className="font-semibold">{cnae.code}</p>
+                                <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
+                            </div>
+                        </CommandItem>
+                    ))}
+                  </CommandGroup>
                 ))}
-                </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>

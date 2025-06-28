@@ -46,6 +46,7 @@ export interface CnaeData {
   code: string;
   description: string;
   annex: Annex;
+  category?: string;
   requiresFatorR?: boolean;
   presumedProfitRate: number;
   isRegulated?: boolean;
