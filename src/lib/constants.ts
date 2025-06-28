@@ -1,6 +1,6 @@
 import { CnaeData, FeeBracket } from "./types";
 
-export const MINIMUM_WAGE = 1412.00;
+export const MINIMUM_WAGE = 1518.00;
 export const INSS_CEILING = 7786.02;
 export const PRO_LABORE_INSS_RATE = 0.11;
 export const SIMPLIFIED_DEDUCTION_IRRF = 564.80;

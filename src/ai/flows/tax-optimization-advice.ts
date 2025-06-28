@@ -71,6 +71,7 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   2.  **Fator R:** Se a otimização do "Fator R" for benéfica, explique o porquê, mencionando a economia gerada ao aumentar o pró-labore para atingir 28% do faturamento, o que permite a tributação pelo Anexo III.
   3.  **Receitas de Exportação:** Se houver receitas de exportação, comente sobre o impacto positivo das isenções de PIS, COFINS e ISS.
   4.  **Plano de Saúde:** Comente o impacto do custo do plano de saúde, explicando que é um benefício para os sócios, mas que o valor pago pela empresa aumenta a base de cálculo para o IRRF.
+  5.  **Pró-labore vs. Distribuição de Lucros:** Diferencie o pró-labore (remuneração com impostos como INSS e IRRF) da distribuição de lucros (geralmente isenta de IR na fonte para o sócio). Se a otimização do Fator R não for o principal fator, sugira manter um pró-labore estratégico (pelo menos um salário mínimo) e retirar o restante como lucros para maior eficiência tributária.
 
   **Dados Financeiros:**
   - Atividades (CNAEs): {{activities}}
