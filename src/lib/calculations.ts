@@ -132,6 +132,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     }
     
     const totalTax = cppFromAnnexIV + totalINSSProLabore + totalIRRFProLabore;
+    const fee = CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     const breakdown = [
         ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Fora do DAS)", value: cppFromAnnexIV }] : []),
         ...(totalINSSProLabore > 0 ? [{ name: "INSS s/ Pró-labore", value: totalINSSProLabore }] : []),
@@ -141,12 +142,12 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     return {
       regime: regimeName,
       totalTax,
-      totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse,
+      totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse + fee,
       totalRevenue: 0,
       proLabore: proLaboreToUse,
       effectiveRate: 0,
-      contabilizeiFee: CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial,
-      breakdown,
+      contabilizeiFee: fee,
+      breakdown: breakdown.filter(item => item.value > 0),
     };
   }
   
@@ -250,6 +251,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   // --- 5. Assemble Final Results ---
   const totalTax = totalDas + cppFromAnnexIV + totalIssSeparado + totalINSSProLabore + totalIRRFProLabore;
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+  const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
   
   const annexKeys = Object.keys(revenueByAnnex) as Annex[];
   const mainAnnex: Annex = annexKeys.length > 0
@@ -271,13 +273,13 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   return {
     regime: regimeName,
     totalTax,
-    totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse,
+    totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse + contabilizeiFee,
     totalRevenue,
     proLabore: proLaboreToUse,
     fatorR: isFatorRApplicable ? fatorR : undefined,
     annex: `Anexo ${mainAnnex}`,
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
-    contabilizeiFee: feeBracket?.plans.expertsEssencial ?? 0,
+    contabilizeiFee: contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
   };
@@ -310,6 +312,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
       const totalTax = inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
+      const fee = CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
       const breakdown = [
         ...(inssPatronal > 0 ? [{ name: "CPP (INSS Patronal)", value: inssPatronal }] : []),
         ...(totalProLaboreTaxes.inssOnProLabore > 0 ? [{ name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore }] : []),
@@ -319,12 +322,12 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       return {
           regime: 'Lucro Presumido',
           totalTax,
-          totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse,
+          totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse + fee,
           totalRevenue: 0,
           proLabore: proLaboreToUse,
           effectiveRate: 0,
-          contabilizeiFee: CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial,
-          breakdown,
+          contabilizeiFee: fee,
+          breakdown: breakdown.filter(item => item.value > 0),
       };
   }
 
@@ -352,6 +355,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Assemble Final Results ---
   const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+  const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
 
   const breakdown = [
     { name: "PIS", value: pis, rate: 0.0065 }, { name: "COFINS", value: cofins, rate: 0.03 },
@@ -364,11 +368,11 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   return {
     regime: 'Lucro Presumido',
     totalTax,
-    totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse,
+    totalMonthlyCost: totalTax + totalSalaryExpense + proLaboreToUse + contabilizeiFee,
     totalRevenue,
     proLabore: proLaboreToUse,
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
-    contabilizeiFee: feeBracket?.plans.expertsEssencial ?? 0,
+    contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
   };

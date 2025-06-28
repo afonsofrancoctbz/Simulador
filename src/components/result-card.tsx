@@ -39,17 +39,28 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                 )}
 
                 <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">📊 Detalhamento dos Impostos</h4>
+                    <h4 className="font-semibold text-foreground">📊 Detalhamento dos Impostos e Custos</h4>
                     <div className="p-3 border rounded-lg bg-background space-y-2 font-serif text-sm">
                         {details.breakdown.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center border-b border-dashed pb-1 last:border-none last:pb-0">
+                            <div key={index} className="flex justify-between items-center border-b border-dashed pb-1 last:border-b-0">
                                 <span className="text-muted-foreground">{item.name}</span>
-                                <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                <div className="text-right">
+                                  <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                  {details.totalTax > 0 && item.value > 0 && (
+                                    <span className="font-mono text-xs text-muted-foreground/80 ml-2">
+                                      ({formatPercent(item.value / details.totalTax)})
+                                    </span>
+                                  )}
+                                </div>
                             </div>
                         ))}
-                        <div className="flex justify-between items-center font-bold pt-1 text-base">
+                         <div className="flex justify-between items-center font-bold pt-1 text-base border-t">
                             <span className="text-foreground">Total de Impostos</span>
                             <span className="font-mono text-accent">{formatCurrencyBRL(details.totalTax)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm pt-1 border-t border-dashed">
+                            <span className="text-muted-foreground">Mensalidade Contabilizei</span>
+                            <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.contabilizeiFee)}</span>
                         </div>
                     </div>
                 </div>
