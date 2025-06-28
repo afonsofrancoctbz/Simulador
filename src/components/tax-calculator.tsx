@@ -202,7 +202,7 @@ export default function TaxCalculator() {
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
             regime: 'Simples Nacional sem Fator R',
-            annex: 'Anexo V - Sem Otimizar Fator R'
+            annex: 'Anexo V - Sem Utilizar o Fator R'
         });
 
         const cenarioOtimizado = results.simplesNacionalComFatorR;

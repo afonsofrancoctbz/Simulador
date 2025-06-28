@@ -13,6 +13,8 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
     const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'].includes(item.name));
     const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
 
+    const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado p/ 28%)' : 'Pró-labore por Sócio';
+
     return (
         <Card className={cn(
             "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2", 
@@ -30,8 +32,18 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
             <CardContent className="flex-grow p-4 space-y-4 flex flex-col">
                 
+                <div className="p-3 border rounded-lg bg-background/80 space-y-2 font-serif text-sm">
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Faturamento Mensal</span>
+                        <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
+                    </div>
+                     <div className="flex justify-between">
+                        <span className="text-muted-foreground">{proLaboreLabel}</span>
+                        <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.proLabore / numSocios)}</span>
+                    </div>
+                </div>
+                
                 <div className="space-y-3">
-                     <h4 className="font-semibold text-center text-muted-foreground text-xs uppercase tracking-wider">Detalhamento de Custos</h4>
                      <div className="p-3 border rounded-lg bg-background/80 space-y-2 font-serif text-sm">
                         
                         {faturamentoTaxes.length > 0 && (
@@ -39,7 +51,12 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                                 <p className="font-semibold text-foreground/80">Impostos s/ Faturamento</p>
                                 {faturamentoTaxes.map((item, index) => (
                                     <div key={index} className="flex justify-between items-center border-b border-dashed pb-1 last:border-b-0">
-                                        <span className="text-muted-foreground">{item.name}</span>
+                                        <span className="text-muted-foreground">
+                                            {item.name}
+                                            {item.name === 'DAS (Guia Unificada)' && details.effectiveDasRate !== undefined && (
+                                                <span className='ml-1 text-primary/80'>({formatPercent(details.effectiveDasRate)})</span>
+                                            )}
+                                        </span>
                                         <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                     </div>
                                 ))}
@@ -69,19 +86,6 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                      </div>
                 </div>
 
-                <div className="p-3 border rounded-lg bg-background/80 space-y-2 text-sm">
-                    <div className="flex justify-between font-semibold">
-                        <span>Pró-labore por sócio</span>
-                        <span className="font-mono">{formatCurrencyBRL(details.proLabore / numSocios)}</span>
-                    </div>
-                     {details.effectiveDasRate !== undefined && (
-                        <div className="flex justify-between text-xs">
-                            <span className="text-muted-foreground">Alíquota Efetiva do Simples</span>
-                            <span className="font-mono font-medium text-foreground">{formatPercent(details.effectiveDasRate)}</span>
-                        </div>
-                    )}
-                </div>
-
                  {details.fatorR !== undefined && (
                     <div className={cn(
                         "text-center rounded-lg p-2 text-xs", 
@@ -105,7 +109,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
             <CardFooter className="p-4 bg-muted/30 mt-auto border-t">
                 <div className="text-center w-full space-y-1">
                     <div className="text-sm text-muted-foreground">Custo Total Mensal Estimado</div>
-                    <div className="text-3xl font-bold text-accent">
+                    <div className="text-2xl font-bold text-accent">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
                      <div className="text-xs text-muted-foreground">
