@@ -2963,7 +2963,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Atividade regulamentada pelo CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Exige registro da empresa no conselho e a indicação de um fisioterapeuta como responsável técnico. Não pode ser constituída como Empresário Individual.'
   },
   {
     code: '8650-0/05',
@@ -2972,7 +2972,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Atividade regulamentada pelo CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Exige registro da empresa no conselho e a indicação de um responsável técnico. Não pode ser constituída como Empresário Individual. Se for uma clínica, é necessário um endereço comercial.'
   },
   {
     code: '8650-0/06',
