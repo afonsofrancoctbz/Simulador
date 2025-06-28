@@ -10,18 +10,16 @@ export default function Home() {
     <>
       <AppHeader />
       <main>
-        <div className="bg-primary text-primary-foreground">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Simule Seus Impostos</h1>
-              <p className="mt-4 text-lg md:text-xl text-primary-foreground/80 max-w-3xl mx-auto">
-                Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
-              </p>
-          </div>
-        </div>
+        <section id="calculator" className="bg-slate-50/70">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
+            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-serif">
+              Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
+            </p>
 
-        <section id="calculator" className="py-16 lg:py-24 bg-slate-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <TaxCalculator />
+            <div className="mt-12">
+              <TaxCalculator />
+            </div>
           </div>
         </section>
 
@@ -31,7 +29,7 @@ export default function Home() {
           </div>
         </section>
 
-         <section className="py-16 lg:py-24 bg-slate-50">
+         <section className="py-16 lg:py-24 bg-slate-50/70">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
             <FaqSection />
           </div>
