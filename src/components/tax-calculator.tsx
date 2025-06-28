@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, Calculator, Info } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, Calculator, Info, BadgeCheck, Coins } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FaqSection from './faq-section';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { CnaeSelector } from './cnae-selector';
 import { Label } from './ui/label';
 import BenefitsSection from './benefits-section';
@@ -201,23 +201,59 @@ export default function TaxCalculator() {
       return null;
     }
 
-    const scenarios = [
-      results.simplesNacionalComFatorR,
-      results.simplesNacionalSemFatorR,
-      results.lucroPresumido,
-    ].sort((a,b) => a.totalMonthlyCost - b.totalMonthlyCost);
-    
-    const cheapestScenario = scenarios[0];
+    const allScenarios = [
+        results.lucroPresumido,
+        results.simplesNacionalSemFatorR,
+        results.simplesNacionalComFatorR
+    ];
 
-    const showFatorRComparison = results.simplesNacionalComFatorR.totalMonthlyCost < results.simplesNacionalSemFatorR.totalMonthlyCost;
-    
-    const displayedScenarios = showFatorRComparison 
-      ? [results.simplesNacionalComFatorR, results.simplesNacionalSemFatorR, results.lucroPresumido]
-      : [results.simplesNacionalSemFatorR, results.lucroPresumido];
+    const uniqueScenarios = allScenarios.filter((scenario, index, self) =>
+        index === self.findIndex((s) => (
+            s.regime === scenario.regime && s.totalMonthlyCost === scenario.totalMonthlyCost
+        ))
+    );
+
+    const sortedScenarios = uniqueScenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+    const cheapestScenario = sortedScenarios[0];
+
+    const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
+    const fatorR = results.simplesNacionalSemFatorR.fatorR;
+    if (fatorR !== undefined && fatorR < 0.28) {
+      const requiredProLabore = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - form.getValues('totalSalaryExpense'));
+      intelligentAlerts.push({
+        type: 'warning',
+        title: 'Pró-labore pode ser otimizado',
+        description: `Seu Fator R está abaixo de 28%. Aumentando seu pró-labore para aproximadamente ${formatCurrencyBRL(Math.max(requiredProLabore, MINIMUM_WAGE))}, você pode reduzir sua alíquota no Simples Nacional.`
+      });
+    }
+
+    const totalRevenue = results.lucroPresumido.totalRevenue;
+    if (totalRevenue > 150000 && cheapestScenario.regime.includes('Simples')) {
+      intelligentAlerts.push({
+        type: 'info',
+        title: 'Considere o Lucro Presumido',
+        description: 'Para este nível de faturamento, o regime de Lucro Presumido pode se tornar mais vantajoso. Analise os cenários com atenção.'
+      });
+    }
 
     return (
         <div className="mt-12 w-full max-w-7xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-4">Resultados da Análise</h2>
+
+            {intelligentAlerts.length > 0 && (
+                <div className="space-y-4 mb-8">
+                    {intelligentAlerts.map((alert, index) => (
+                        <Alert key={index} variant={alert.type === 'warning' ? 'destructive' : 'default'} className={cn(
+                            alert.type === 'warning' && 'bg-amber-100 border-amber-300 text-amber-800 [&>svg]:text-amber-600',
+                            alert.type === 'info' && 'bg-blue-100 border-blue-300 text-blue-800 [&>svg]:text-blue-600'
+                        )}>
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle className="font-bold">{alert.title}</AlertTitle>
+                            <AlertDescription>{alert.description}</AlertDescription>
+                        </Alert>
+                    ))}
+                </div>
+            )}
 
             <Card className="mb-8 border-primary/50 bg-card shadow-lg">
                 <CardHeader>
@@ -231,8 +267,8 @@ export default function TaxCalculator() {
                 </CardContent>
             </Card>
 
-            <div className={`grid grid-cols-1 lg:grid-cols-${displayedScenarios.length} gap-8`}>
-                {displayedScenarios.map(scenario => (
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${sortedScenarios.length > 2 ? '3' : '2'} gap-8`}>
+                {sortedScenarios.map(scenario => (
                      <ResultCard 
                         key={scenario.regime} 
                         details={scenario} 
@@ -449,70 +485,62 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
   );
 };
 
-const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => (
-    <Card className={cn("flex flex-col shadow-lg transition-all duration-300", isCheapest ? 'border-2 border-accent shadow-accent/20' : 'border-border')}>
-      <CardHeader className={cn("rounded-t-lg", isCheapest ? 'bg-accent/10' : 'bg-muted/30')}>
-        {isCheapest && <Badge variant="default" className="bg-accent text-accent-foreground absolute -top-3 left-4">Recomendado</Badge>}
-        <CardTitle className="text-xl text-center font-bold text-primary-foreground pt-2">{details.regime}</CardTitle>
-        {details.annex && <CardDescription className='text-center font-semibold'>{details.annex}</CardDescription>}
-      </CardHeader>
+const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => {
+    const hasFatorR = details.fatorR !== undefined;
 
-      <CardContent className="flex-grow p-4 space-y-4">
-        <div className='space-y-2'>
-            <div className="flex justify-between text-sm"><span className='text-muted-foreground'>Faturamento Mensal</span> <span className='font-medium'>{formatCurrencyBRL(details.totalRevenue)}</span></div>
-            <div className="flex justify-between text-sm"><span className='text-muted-foreground'>Pró-labore</span> <span className='font-medium'>{formatCurrencyBRL(details.proLabore)}</span></div>
-            {details.fatorR !== undefined && <div className="flex justify-between text-sm"><span className='text-muted-foreground'>Fator R</span> <span className='font-medium'>{formatPercent(details.fatorR)}</span></div>}
-        </div>
-        
-        <div className="bg-primary/10 rounded-md p-3">
-            <h4 className="font-semibold mb-2 text-center text-primary-foreground/90">Resumo dos Impostos</h4>
-            <div className="space-y-2 font-serif">
-                {details.breakdown.map((item) => (
-                    <div key={item.name} className="flex justify-between items-center text-sm">
-                        <div className='flex items-center gap-1.5'>
-                            <span className="text-muted-foreground">{item.name}</span>
-                            {item.rate && <Badge variant="outline" className='text-xs'>{formatPercent(item.rate)}</Badge>}
-                        </div>
-                        <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                    </div>
-                ))}
-            </div>
-        </div>
-      </CardContent>
+    return (
+        <Card className={cn("flex flex-col shadow-lg transition-all duration-300 relative", isCheapest ? 'border-2 border-accent shadow-accent/20' : 'border-border')}>
+            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground font-bold text-sm px-3 py-1">🏆 MELHOR OPÇÃO</Badge>}
+            
+            <CardHeader className={cn(isCheapest ? 'bg-accent/10' : 'bg-muted/30', 'pt-8 pb-4')}>
+                <CardTitle className="text-2xl text-center font-bold text-primary-foreground">{details.regime}</CardTitle>
+                {details.annex && <CardDescription className='text-center font-semibold'>{details.annex}</CardDescription>}
+            </CardHeader>
 
-      <CardFooter className="flex-col items-start gap-4 p-4 border-t bg-muted/20 rounded-b-lg">
-         <div className="w-full space-y-2">
-            <div className="flex justify-between items-baseline font-bold text-lg">
-                <span className="text-muted-foreground">CUSTO TOTAL</span>
-                <span className="text-primary-foreground">{formatCurrencyBRL(details.totalMonthlyCost)}</span>
-            </div>
-             <div className="flex justify-between items-baseline font-semibold text-base">
-                <span className="text-muted-foreground">Alíquota Efetiva</span>
-                <span className="text-primary-foreground">{formatPercent(details.effectiveRate)}</span>
-            </div>
-        </div>
-
-        {details.contabilizeiFee > 0 && (
-            <div className="w-full border-t pt-4">
-                <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Mensalidade Contabilizei</span>
-                    <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.contabilizeiFee)}</span>
+            <CardContent className="flex-grow p-4 space-y-4 flex flex-col">
+                <div className="text-center">
+                    <span className="text-2xl text-muted-foreground">R$</span>
+                    <span className="text-5xl font-bold text-foreground">{Math.floor(details.totalMonthlyCost).toLocaleString('pt-BR')}</span>
+                    <span className="text-2xl text-muted-foreground">/mês</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 font-serif">Estimativa para o plano Experts Essencial.</p>
-            </div>
-        )}
-        {details.notes && details.notes.length > 0 && (
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className='mt-2 text-primary gap-2'><Info className='h-4 w-4'/> Ver Observações</Button>
-                </TooltipTrigger>
-                <TooltipContent align="start" className='max-w-xs md:max-w-sm'>
-                     <ul className="list-disc pl-4 space-y-1 font-serif text-sm">
-                        {details.notes.map((note, i) => <li key={i}>{note}</li>)}
-                    </ul>
-                </TooltipContent>
-            </Tooltip>
-        )}
-      </CardFooter>
-    </Card>
-);
+                
+                <div className="bg-primary/5 rounded-md p-4 space-y-2 flex-grow font-serif">
+                    {details.breakdown.map((item) => (
+                        <div key={item.name} className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground">{item.name}</span>
+                            <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                        </div>
+                    ))}
+                    <div className="border-t border-border/50 my-2 !mt-3 !mb-2"></div>
+                    <div className="flex justify-between items-center font-bold">
+                        <span className="text-foreground">Total mensal</span>
+                        <span className="font-mono text-foreground">{formatCurrencyBRL(details.totalMonthlyCost)}</span>
+                    </div>
+                </div>
+                
+                {hasFatorR && (
+                    <div className={cn(
+                        "text-center rounded-md p-2 mt-2", 
+                        details.fatorR! >= 0.28 
+                            ? 'bg-accent/20 text-accent-foreground' 
+                            : 'bg-amber-100 text-amber-800'
+                    )}>
+                        <span className="font-semibold">Fator R: {formatPercent(details.fatorR!)}</span>
+                        <p className="text-xs">{details.fatorR! >= 0.28 ? '✅ Alíquota reduzida aplicada' : '⚠️ Considere aumentar para otimizar'}</p>
+                    </div>
+                )}
+            </CardContent>
+
+            <CardFooter className="flex-col items-center gap-2 p-4 border-t bg-muted/20 rounded-b-lg">
+                {details.annualSavings && details.annualSavings > 0 && (
+                <div className="font-bold text-lg text-green-700">
+                    💰 Economia anual: {formatCurrencyBRL(details.annualSavings)}
+                </div>
+                )}
+                <div className="w-full text-center text-xs text-muted-foreground mt-1 font-serif">
+                Alíquota Efetiva: <span className="font-semibold text-foreground">{formatPercent(details.effectiveRate)}</span>
+                </div>
+            </CardFooter>
+        </Card>
+    );
+};

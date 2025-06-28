@@ -10,7 +10,7 @@ export default function BenefitsSection() {
         <div className="mt-12 w-full max-w-6xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
              <div className="text-center mb-4">
                  <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Multibenefícios Contabilizei</h2>
-                 <p className="text-muted-foreground mt-2 text-lg font-serif">Vantagens exclusivas para sua empresa e bem-estar.</p>
+                 <p className="text-muted-foreground mt-2 text-lg font-serif">Vantagens exclusivas para sua empresa e bem-estar, inclusos no plano Multibenefícios e disponíveis no plano Experts.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
@@ -25,7 +25,7 @@ export default function BenefitsSection() {
                             <CardTitle>Parceria Starbem</CardTitle>
                         </div>
                         <CardDescription className="font-serif">
-                            Cuidado completo com sua saúde: consultas online com psicólogos, nutricionistas e descontos em exames e medicamentos.
+                           Cuide da sua saúde com o pacote de telemedicina que inclui mensalmente, 4 consultas online com psicólogos e 1 com nutricionista, além de descontos em exames e medicamentos.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow flex flex-col justify-end">
@@ -50,7 +50,7 @@ export default function BenefitsSection() {
                             <CardTitle>Parceria TotalPass</CardTitle>
                         </div>
                          <CardDescription className="font-serif">
-                            Acesso a mais de 20 mil academias e 250 modalidades esportivas em todo o Brasil, com planos flexíveis e descontos exclusivos.
+                            Acesso a mais de 20 mil academias e 250 modalidades esportivas. Contrate o plano que mais se adapta à sua rotina por um valor com desconto, com um adicional de R$30 na mensalidade para acesso ao app.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow flex flex-col justify-end">

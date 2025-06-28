@@ -131,7 +131,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     effectiveAnnexForV = useAnnexIIIForV ? 'III' : 'V';
     
     notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
-    if (!useAnnexIIIForV && regimeName.includes('Sem Fator R')) { // Add suggestion only for the non-optimized scenario
+    if (!useAnnexIIIForV && regimeName.includes('Sem Otimização')) { // Add suggestion only for the non-optimized scenario
         const requiredPayroll = totalRevenue * 0.28;
         const payrollShortfall = requiredPayroll - totalPayroll;
         if (payrollShortfall > 0) {
@@ -358,35 +358,47 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const lucroPresumido = calculateLucroPresumido(values);
   
-  const simplesNacionalSemFatorR = _calculateSimplesNacional(values, values.proLaborePartners, 'Simples Nacional Sem Fator R');
-
-  let simplesNacionalComFatorR = simplesNacionalSemFatorR;
+  let simplesNacionalSemFatorR = _calculateSimplesNacional(values, values.proLaborePartners, 'Simples Nacional (Sem Otimização)');
+  let simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional (Otimizado)' };
 
   const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
 
   if (hasAnnexVActivity && (simplesNacionalSemFatorR.fatorR ?? 0) < 0.28) {
-    const totalRevenue = simplesNacionalSemFatorR.totalRevenue;
-    const requiredPayroll = totalRevenue * 0.28;
-    const currentPayroll = values.totalSalaryExpense + values.proLaborePartners;
-    
-    if (requiredPayroll > currentPayroll) {
-        const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayroll);
-        const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
-        const optimizedResult = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional Com Fator R');
-        
-        // Only consider the optimized result if it's actually cheaper
-        if (optimizedResult.totalMonthlyCost < simplesNacionalSemFatorR.totalMonthlyCost) {
-            simplesNacionalComFatorR = optimizedResult;
-        } else {
-             simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional Com Fator R' };
-        }
-    } else {
-       simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional Com Fator R' };
-    }
-  } else {
-     simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional Com Fator R' };
+      const totalRevenue = simplesNacionalSemFatorR.totalRevenue;
+      const requiredPayroll = totalRevenue * 0.28;
+      const currentPayroll = values.totalSalaryExpense + values.proLaborePartners;
+      
+      if (requiredPayroll > currentPayroll) {
+          const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayroll);
+          const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
+          const optimizedResult = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional (Otimizado)');
+          
+          if (optimizedResult.totalMonthlyCost < simplesNacionalSemFatorR.totalMonthlyCost) {
+              simplesNacionalComFatorR = optimizedResult;
+          }
+      }
   }
 
+  if (simplesNacionalComFatorR.totalMonthlyCost >= simplesNacionalSemFatorR.totalMonthlyCost) {
+      simplesNacionalSemFatorR.regime = 'Simples Nacional';
+      simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional (Otimizado)' };
+  }
+  
+  const scenarios = [
+    simplesNacionalComFatorR,
+    simplesNacionalSemFatorR,
+    lucroPresumido
+  ].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+  
+  const best = scenarios[0];
+  const secondBest = scenarios[1];
+
+  if (best && secondBest) {
+    const annualSavings = (secondBest.totalMonthlyCost - best.totalMonthlyCost) * 12;
+    if (annualSavings > 0) {
+      best.annualSavings = annualSavings;
+    }
+  }
 
   return {
     simplesNacionalComFatorR,

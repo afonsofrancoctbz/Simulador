@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { CIDADES_ATENDIDAS } from "@/lib/cities";
-import { Banknote, Building, Check, ChevronsUpDown, Link, TrendingUp, Wallet, CreditCard, ShieldCheck, Zap } from "lucide-react";
+import { Banknote, Building, Check, ChevronsUpDown, Link, TrendingUp, Wallet, CreditCard, ShieldCheck, Zap, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,9 +16,9 @@ const mainBankFeatures = [
 ];
 
 const otherBankFeatures = [
-    { icon: Zap, title: "PIX Gratuito e Ilimitado", description: "Realize transferências e pagamentos via PIX a qualquer momento, sem custo." },
+    { icon: Zap, title: "PIX e TEDs Gratuitos", description: "Realize transferências e pagamentos a qualquer momento, sem custo." },
     { icon: CreditCard, title: "Cartão de Débito Visa", description: "Use seu cartão para compras e saques em toda a rede Visa." },
-    { icon: ShieldCheck, title: "Segurança e Confiança", description: "Conte com a segurança de uma instituição de pagamento autorizada pelo Banco Central." },
+    { icon: Globe, title: "Recebimento do Exterior", description: "Receba pagamentos internacionais com uma taxa de apenas 1% por operação." },
 ];
 
 const CityCombobox = () => {
