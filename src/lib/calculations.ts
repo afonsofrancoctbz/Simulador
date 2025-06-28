@@ -251,7 +251,15 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   // --- 5. Assemble Final Results ---
   const totalTax = totalDas + cppFromAnnexIV + totalIssSeparado + totalINSSProLabore + totalIRRFProLabore;
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-  const mainAnnex = Object.keys(revenueByAnnex).reduce((a, b) => revenueByAnnex[a as Annex].domestic + revenueByAnnex[a as Annex].export > revenueByAnnex[b as Annex].domestic + revenueByAnnex[b as Annex].export ? a : b, 'III') as Annex;
+  
+  const annexKeys = Object.keys(revenueByAnnex) as Annex[];
+  const mainAnnex: Annex = annexKeys.length > 0
+    ? annexKeys.reduce((a, b) => {
+        const revenueA = (revenueByAnnex[a]?.domestic || 0) + (revenueByAnnex[a]?.export || 0);
+        const revenueB = (revenueByAnnex[b]?.domestic || 0) + (revenueByAnnex[b]?.export || 0);
+        return revenueA >= revenueB ? a : b;
+      })
+    : 'III';
 
   const breakdown = [
     ...Array.from(dasComponents.entries()).map(([name, value]) => ({ name: `DAS - ${name}`, value })),
