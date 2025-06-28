@@ -4,12 +4,12 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, Briefcase } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
-import { type CalculationResults, type CnaeItem, type TaxFormValues, type TaxDetails } from '@/lib/types';
-import { MINIMUM_WAGE, CNAE_DATA } from '@/lib/constants';
+import { type CalculationResults, type TaxFormValues } from '@/lib/types';
+import { MINIMUM_WAGE } from '@/lib/constants';
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -17,22 +17,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CnaeSelector } from './cnae-selector';
-import { Label } from './ui/label';
 import { Separator } from './ui/separator';
+import { ResultCard } from './result-card';
+import { ActivityField } from './activity-field';
 
 const formatCurrencyBRL = (value: number) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
-
-const formatPercent = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-    return `${(value * 100).toFixed(2)}%`.replace('.', ',');
-}
 
 const formSchema = z.object({
   domesticActivities: z.array(z.object({
@@ -185,6 +180,24 @@ export default function TaxCalculator() {
     }
   }
 
+  const sortedScenarios = useMemo(() => {
+    if (!results) return [];
+
+    const allScenarios = [
+      results.lucroPresumido,
+      results.simplesNacionalSemFatorR,
+      results.simplesNacionalComFatorR
+    ];
+
+    const uniqueScenarios = allScenarios.filter((scenario, index, self) =>
+        index === self.findIndex((s) => (
+            s.regime === scenario.regime && s.totalMonthlyCost === scenario.totalMonthlyCost
+        ))
+    );
+    
+    return uniqueScenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+  }, [results]);
+
   const renderResults = () => {
     if (isLoading) {
       return (
@@ -196,23 +209,10 @@ export default function TaxCalculator() {
       );
     }
 
-    if (!results) {
+    if (!results || sortedScenarios.length === 0) {
       return null;
     }
 
-    const allScenarios = [
-        results.lucroPresumido,
-        results.simplesNacionalSemFatorR,
-        results.simplesNacionalComFatorR
-    ];
-
-    const uniqueScenarios = allScenarios.filter((scenario, index, self) =>
-        index === self.findIndex((s) => (
-            s.regime === scenario.regime && s.totalMonthlyCost === scenario.totalMonthlyCost
-        ))
-    );
-
-    const sortedScenarios = uniqueScenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
     const cheapestScenario = sortedScenarios[0];
 
     const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
@@ -242,7 +242,6 @@ export default function TaxCalculator() {
                 Apresentamos uma comparação detalhada dos regimes tributários. A recomendação destaca a opção com o menor custo total mensal.
             </p>
 
-
             {intelligentAlerts.length > 0 && (
                 <div className="space-y-4 mb-8">
                     {intelligentAlerts.map((alert, index) => (
@@ -264,22 +263,18 @@ export default function TaxCalculator() {
                         key={scenario.regime} 
                         details={scenario} 
                         isCheapest={scenario.regime === cheapestScenario.regime && sortedScenarios.length > 1}
+                        formValues={form.getValues()}
                     />
                 ))}
             </div>
 
-            <Card className="mt-8 border-blue-200 bg-blue-50/50">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-blue-800 text-lg">
-                        <Lightbulb className="h-5 w-5" />
-                        Recomendação da IA
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {isAdviceLoading ? <Skeleton className="h-10 w-full" /> : <p className="text-blue-900/90 text-base font-serif">{advice}</p>}
-                </CardContent>
-            </Card>
-
+            <Alert className="mt-8 border-primary/20 bg-primary/5">
+                <Lightbulb className="h-4 w-4 text-primary" />
+                <AlertTitle className="font-bold text-primary">Recomendação da IA</AlertTitle>
+                <AlertDescription className="text-primary/90">
+                    {isAdviceLoading ? <Skeleton className="h-5 w-full mt-2" /> : <p className="font-serif">{advice}</p>}
+                </AlertDescription>
+            </Alert>
       </div>
     );
   };
@@ -290,14 +285,15 @@ export default function TaxCalculator() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="shadow-lg overflow-hidden">
                 <CardHeader className="bg-slate-50 border-b">
-                    <CardTitle className="text-2xl">Perfil da Empresa</CardTitle>
+                    <CardTitle className="text-2xl">Simule Seus Impostos</CardTitle>
                     <CardDescription>
-                        Com essas informações, calcularemos o regime tributário ideal para o seu negócio.
+                       Preencha os campos abaixo para descobrir o regime tributário ideal para sua empresa de serviços e otimizar suas finanças.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
+                        {/* Coluna Dados da Empresa */}
+                        <div className="space-y-6">
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
                                 <Building2 className="h-5 w-5 text-primary" />
                                 Dados da Empresa
@@ -325,8 +321,9 @@ export default function TaxCalculator() {
                             )} />
                         </div>
 
-                        <div className="lg:col-span-2 space-y-6">
-                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
+                        {/* Coluna Atividades e Faturamento */}
+                        <div className="space-y-6">
+                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
                                 <Briefcase className="h-5 w-5 text-primary" />
                                 Atividades e Faturamento
                             </h3>
@@ -405,135 +402,3 @@ export default function TaxCalculator() {
     </FormProvider>
   );
 }
-
-const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exportCurrency = 'BRL' }: { form: any, fieldName: "domesticActivities" | "exportActivities", index: number, removeFn: (index: number) => void, isExport?: boolean, exportCurrency?: string }) => {
-  const currencySymbols: { [key: string]: string } = { 'BRL': 'R$', 'USD': '$', 'EUR': '€' };
-  const placeholderText = isExport ? `${currencySymbols[exportCurrency] ?? 'R$'} 1.000,00` : "R$ 10.000,00";
-
-  const cnaeCode = form.watch(`${fieldName}.${index}.code`);
-  const selectedCnaeData = useMemo(() => CNAE_DATA.find((cnae) => cnae.code === cnaeCode), [cnaeCode]);
-
-  return (
-    <div className="flex flex-col gap-3 p-3 border rounded-lg bg-background/50 mb-2">
-      <div className="flex flex-col sm:flex-row items-end gap-2">
-          <div className="flex-1 w-full space-y-2">
-              <Label>CNAE</Label>
-              <div className="w-full justify-start text-left font-normal h-auto min-h-10 py-2 px-3 border rounded-md bg-muted/30">
-                  {selectedCnaeData ? (
-                      <div className="flex w-full flex-col items-start text-sm">
-                          <span className="font-medium text-foreground">{selectedCnaeData.code}</span>
-                          <span className="text-muted-foreground whitespace-normal">{selectedCnaeData.description}</span>
-                      </div>
-                  ) : (
-                      <span className="text-destructive">CNAE não encontrado. Por favor, remova e adicione novamente.</span>
-                  )}
-              </div>
-          </div>
-          <FormField control={form.control} name={`${fieldName}.${index}.revenue`} render={({ field }) => (
-              <FormItem className="w-full sm:w-48">
-                  <FormLabel>Faturamento Mensal</FormLabel>
-                  <FormControl><Input type="number" step="0.01" placeholder={placeholderText} {...field} /></FormControl>
-                  <FormMessage />
-              </FormItem>
-          )} />
-          <Button type="button" variant="ghost" size="icon" onClick={() => removeFn(index)} className="shrink-0 mb-1">
-              <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-      </div>
-      {selectedCnaeData?.notes && (
-        <Alert variant="default" className="bg-amber-100 border-amber-300 text-amber-800 mt-2">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertTitle className="font-semibold text-amber-700">Ponto de Atenção</AlertTitle>
-            <AlertDescription className="text-amber-700/90 font-serif">{selectedCnaeData.notes}</AlertDescription>
-        </Alert>
-      )}
-    </div>
-  );
-};
-
-const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => {
-    const { getValues } = useForm<z.infer<typeof formSchema>>();
-    const numSocios = getValues('numberOfPartners') || 1;
-    const proLaboreTaxes = details.breakdown.filter(item => item.name.includes("s/ Pró-labore")).reduce((acc, item) => acc + item.value, 0);
-    const custoPrevidenciarioSocio = proLaboreTaxes / numSocios;
-
-    return (
-        <Card className={cn("flex flex-col shadow-lg transition-all duration-300 relative", isCheapest ? 'border-2 border-primary shadow-primary/20' : 'border-border')}>
-            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-3 py-1">🏆 RECOMENDADO</Badge>}
-            
-            <CardHeader className={cn(isCheapest ? 'bg-primary/10' : 'bg-muted/30', 'pt-8 pb-4 text-center')}>
-                <CardTitle className="text-2xl font-bold text-accent">{details.regime}</CardTitle>
-                {details.annex && <CardDescription className='font-semibold'>{details.annex}</CardDescription>}
-            </CardHeader>
-
-            <CardContent className="flex-grow p-4 space-y-4 flex flex-col">
-                <div className="text-center p-4 bg-slate-50 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Custo Total Mensal Estimado</div>
-                    <div className="text-4xl font-bold text-foreground my-1">
-                        {formatCurrencyBRL(details.totalMonthlyCost)}
-                    </div>
-                    <div className="text-base font-semibold text-accent">
-                        {formatPercent(details.effectiveRate)} do faturamento
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">📊 Detalhamento dos Impostos</h4>
-                    <div className="p-3 border rounded-lg bg-background space-y-2 font-serif text-sm">
-                        {details.breakdown.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center border-b border-dashed pb-1 last:border-none last:pb-0">
-                                <span className="text-muted-foreground">{item.name}</span>
-                                <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                            </div>
-                        ))}
-                        <div className="flex justify-between items-center font-bold pt-1 text-base">
-                            <span className="text-foreground">Total de Impostos</span>
-                            <span className="font-mono text-accent">{formatCurrencyBRL(details.totalTax)}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                     <h4 className="font-semibold text-foreground">👥 Gestão de Sócios</h4>
-                     <div className="p-3 border rounded-lg bg-background space-y-2 text-sm font-serif">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Custo previdenciário (INSS+IRRF) por sócio:</span>
-                            <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(custoPrevidenciarioSocio)}</span>
-                        </div>
-                         <div className="flex justify-between font-semibold">
-                            <span className="text-muted-foreground">Total para {numSocios} sócio(s):</span>
-                            <span className="font-mono text-foreground">{formatCurrencyBRL(proLaboreTaxes)}</span>
-                        </div>
-                     </div>
-                </div>
-                
-                {details.fatorR !== undefined && (
-                    <div className={cn(
-                        "text-center rounded-md p-2", 
-                        details.fatorR >= 0.28 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-amber-100 text-amber-800'
-                    )}>
-                        <span className="font-semibold">Fator R: {formatPercent(details.fatorR)}</span>
-                        <p className="text-xs">{details.fatorR >= 0.28 ? '✅ Alíquota reduzida aplicada' : '⚠️ Considere aumentar pró-labore para otimizar'}</p>
-                    </div>
-                )}
-                
-                <div className="space-y-2 flex-grow flex flex-col">
-                     <h4 className="font-semibold text-foreground">💡 Como funciona</h4>
-                     <div className="p-3 border rounded-lg bg-blue-50 text-blue-800 text-sm font-serif flex-grow">
-                         {details.explanation}
-                     </div>
-                </div>
-            </CardContent>
-
-            <CardFooter className="p-4 border-t bg-muted/20">
-                 {details.annualSavings && details.annualSavings > 0 && (
-                    <div className="font-bold text-lg text-green-700 w-full text-center">
-                        💰 Economia anual: {formatCurrencyBRL(details.annualSavings)}
-                    </div>
-                 )}
-            </CardFooter>
-        </Card>
-    );
-};

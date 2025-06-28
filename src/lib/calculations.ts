@@ -30,11 +30,6 @@ const ANNEX_TABLES = {
   V: SIMPLES_NACIONAL_ANNEX_V,
 };
 
-const formatCurrencyBRL = (value: number) => {
-  if (typeof value !== 'number') return 'N/A';
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-};
-
 function findBracket(table: { max: number }[], value: number) {
   if (value === 0) {
     return table[0];
@@ -91,8 +86,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   
   const allActivities = [...allDomesticActivities, ...allExportActivities];
 
-  if (allActivities.length === 0 && proLabore === 0 && totalSalaryExpense === 0) {
-    return {
+  const emptyResult = {
       regime: regimeName,
       totalTax: 0,
       totalMonthlyCost: 0,
@@ -102,8 +96,11 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
       totalRevenue: 0,
       proLabore: 0,
       effectiveRate: 0,
-      explanation: "",
-    };
+      explanation: "Regime unificado que recolhe os principais tributos em uma única guia (DAS). A alíquota é progressiva e baseada no seu faturamento anual. O 'Fator R' (relação entre folha de pagamento e faturamento) pode reduzir sua alíquota.",
+  }
+
+  if (totalRevenue === 0 && proLabore === 0 && totalSalaryExpense === 0) {
+    return emptyResult;
   }
 
   const rbt12 = totalRevenue * 12;
@@ -145,6 +142,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   let totalDas = 0;
   let cppFromAnnexIV = 0;
   let totalIssSeparado = 0;
+
   if(Object.keys(revenueByAnnex).length === 0) {
     // Handle case with no revenue activities but possibly pro-labore/salary expenses
     const proLaborePerPartner = numberOfPartners > 0 ? proLabore / numberOfPartners : 0;
@@ -155,14 +153,16 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     };
     const totalTax = totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
     return {
-        regime: regimeName, totalTax, totalMonthlyCost: totalTax + totalSalaryExpense + proLabore,
-        totalRevenue: 0, proLabore, fatorR: 0, effectiveRate: 0, contabilizeiFee: 0,
+        ...emptyResult,
+        totalTax,
+        totalMonthlyCost: totalTax + totalSalaryExpense + proLabore,
+        proLabore,
+        fatorR: 0,
         breakdown: [
             { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
             { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
         ].filter(i => i.value > 0),
-        notes, annex: undefined,
-        explanation: "Regime unificado que recolhe os principais tributos em uma única guia (DAS). A alíquota é progressiva e baseada no seu faturamento anual. O 'Fator R' (relação entre folha de pagamento e faturamento) pode reduzir sua alíquota.",
+        notes,
     }
   }
 
@@ -266,15 +266,17 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
 
-  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
-  
-  if (allActivities.length === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
-    return {
+  const emptyResult = {
       regime: 'Lucro Presumido', totalTax: 0, totalMonthlyCost: 0, contabilizeiFee: 0,
       breakdown: [], notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."],
       totalRevenue: 0, proLabore: 0, effectiveRate: 0,
       explanation: "Neste regime, os impostos são calculados sobre uma presunção de lucro (32% para serviços). Cada tributo (IRPJ, CSLL, PIS, COFINS, ISS) é pago em uma guia separada, oferecendo mais previsibilidade.",
-    };
+  };
+
+  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
+  
+  if (totalRevenue === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
+    return emptyResult;
   }
 
   let presumedProfitBase = allActivities.reduce((sum, activity) => {
@@ -308,53 +310,54 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   ];
 
   return {
-    regime: 'Lucro Presumido', totalTax, totalMonthlyCost: totalTax + totalSalaryExpense + proLaborePartners,
+    ...emptyResult,
+    totalTax, totalMonthlyCost: totalTax + totalSalaryExpense + proLaborePartners,
     totalRevenue, proLabore: proLaborePartners,
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
     contabilizeiFee: feeBracket?.plans.expertsEssencial ?? 0,
     breakdown: breakdown.filter(item => item.value > 0), notes,
-    explanation: "Neste regime, os impostos são calculados sobre uma presunção de lucro (normalmente 32% para serviços). Cada tributo (IRPJ, CSLL, PIS, COFINS, ISS) é pago em uma guia separada, oferecendo mais previsibilidade."
   };
 }
 
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const lucroPresumido = calculateLucroPresumido(values);
-  
-  let simplesNacionalSemFatorR = _calculateSimplesNacional(values, values.proLaborePartners, 'Simples Nacional (Sem Otimização)');
-  let simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional (Otimizado)' };
+  const simplesNacionalBase = _calculateSimplesNacional(values, values.proLaborePartners, 'Simples Nacional');
+
+  let simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional (Otimizado)' };
 
   const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
-
-  if (hasAnnexVActivity && (simplesNacionalSemFatorR.fatorR ?? 0) < 0.28) {
-      const totalRevenue = simplesNacionalSemFatorR.totalRevenue;
-      const fgtsOnSalary = values.totalSalaryExpense * 0.08;
-      const requiredPayroll = totalRevenue * 0.28;
-      const currentPayrollForFatorR = values.totalSalaryExpense * 1.08 + values.proLaborePartners;
-      
-      if (requiredPayroll > currentPayrollForFatorR) {
-          const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayrollForFatorR);
-          const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
-          const optimizedResult = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional (Otimizado)');
+  
+  if (hasAnnexVActivity && (simplesNacionalBase.fatorR ?? 0) < 0.28) {
+      const totalRevenue = simplesNacionalBase.totalRevenue;
+      if (totalRevenue > 0) {
+          const fgtsOnSalary = values.totalSalaryExpense * 0.08;
+          const requiredPayroll = totalRevenue * 0.28;
+          const currentPayrollForFatorR = values.totalSalaryExpense + values.proLaborePartners + fgtsOnSalary;
           
-          if (optimizedResult.totalMonthlyCost < simplesNacionalSemFatorR.totalMonthlyCost) {
-              simplesNacionalComFatorR = optimizedResult;
+          if (requiredPayroll > currentPayrollForFatorR) {
+              const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayrollForFatorR);
+              const optimizedResult = _calculateSimplesNacional(values, adjustedProLabore, 'Simples Nacional (Otimizado)');
+              
+              if (optimizedResult.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
+                  simplesNacionalOtimizado = optimizedResult;
+              }
           }
       }
   }
 
-  if (simplesNacionalComFatorR.totalMonthlyCost >= simplesNacionalSemFatorR.totalMonthlyCost) {
-      simplesNacionalSemFatorR.regime = 'Simples Nacional';
-      simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional (Otimizado)' };
+  const simplesNacionalSemFatorR = { ...simplesNacionalBase };
+  if (simplesNacionalOtimizado.totalMonthlyCost >= simplesNacionalBase.totalMonthlyCost) {
+      simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional (Otimizado)' }; // Redefine para não mostrar otimização se não for vantajosa
   }
   
   const scenarios = [
-    simplesNacionalComFatorR,
+    simplesNacionalOtimizado,
     simplesNacionalSemFatorR,
     lucroPresumido
   ].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
   
   const best = scenarios[0];
-  const secondBest = scenarios.find(s => s.totalMonthlyCost > best.totalMonthlyCost);
+  const secondBest = scenarios.find(s => s.totalMonthlyCost > best.totalMonthlyCost && s.regime !== best.regime);
 
   if (best && secondBest) {
     const annualSavings = (secondBest.totalMonthlyCost - best.totalMonthlyCost) * 12;
@@ -364,8 +367,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   }
 
   return {
-    simplesNacionalComFatorR,
-    simplesNacionalSemFatorR,
+    simplesNacionalComFatorR: simplesNacionalOtimizado,
+    simplesNacionalSemFatorR: simplesNacionalSemFatorR,
     lucroPresumido,
   };
 }
