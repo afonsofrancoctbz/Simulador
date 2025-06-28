@@ -31,14 +31,17 @@ import { ActivityField } from './activity-field';
 const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
-const formSchema = TaxFormValuesSchema.refine(data => {
-    if (data.proLaborePartners > 0 && data.proLaborePartners < MINIMUM_WAGE) {
-      return false;
+const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
+    if (data.proLaborePartners > 0 && data.numberOfPartners > 0) {
+        const proLaborePerPartner = data.proLaborePartners / data.numberOfPartners;
+        if (proLaborePerPartner < MINIMUM_WAGE) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `O pró-labore por sócio não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+                path: ["proLaborePartners"],
+            });
+        }
     }
-    return true;
-}, {
-    message: `O valor deve ser R$ 0,00 ou no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
-    path: ["proLaborePartners"],
 }).refine(data => {
     const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
     return totalRevenue > 0 || data.proLaborePartners > 0;
@@ -206,7 +209,7 @@ export default function TaxCalculator() {
         annex: 'Alternativa de Regime'
     };
 
-    if (mainAnnex === 'V' && mainCnaeInfo.requiresFatorR) {
+    if (mainCnaeInfo.requiresFatorR) {
         // Scenario 1: Actual situation with user's input
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
@@ -273,10 +276,11 @@ export default function TaxCalculator() {
     const fatorR = results.simplesNacionalSemFatorR.fatorR;
     if (fatorR !== undefined && fatorR < 0.28) {
       const requiredProLabore = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense') * 1.08));
+      const minProLaboreTotal = MINIMUM_WAGE * form.getValues('numberOfPartners');
       intelligentAlerts.push({
         type: 'warning',
         title: 'Pró-labore pode ser otimizado',
-        description: `Seu Fator R está abaixo de 28%. Aumentando seu pró-labore para aproximadamente ${formatCurrencyBRL(Math.max(requiredProLabore, MINIMUM_WAGE))}, você pode reduzir sua alíquota no Simples Nacional.`
+        description: `Seu Fator R está abaixo de 28%. Aumentando seu pró-labore para aproximadamente ${formatCurrencyBRL(Math.max(requiredProLabore, minProLaboreTotal))}, você pode reduzir sua alíquota no Simples Nacional.`
       });
     }
 

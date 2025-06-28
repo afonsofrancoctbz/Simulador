@@ -121,8 +121,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   });
   const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
   const totalIRRFProLabore = proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners;
-  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
-
+  
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
     let cppFromAnnexIV = 0;
@@ -133,10 +132,10 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     }
     
     const companyTaxes = cppFromAnnexIV;
-    const totalTax = companyTaxes + totalWithheldTaxes;
+    const totalTax = companyTaxes + totalINSSProLabore + totalIRRFProLabore;
     const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     
-    // Custo para a empresa é o que ela desembolsa: impostos da empresa + salários + mensalidade.
+    // Custo para a empresa é o que ela desembolsa: impostos + salários + mensalidade.
     const totalMonthlyCost = totalTax + totalSalaryExpense + fee;
 
     const breakdown = [
@@ -241,7 +240,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
   // --- 5. Assemble Final Results ---
   const companyTaxes = totalDas + cppFromAnnexIV + totalIssSeparado;
-  const totalTax = companyTaxes + totalWithheldTaxes;
+  const totalTax = companyTaxes + totalINSSProLabore + totalIRRFProLabore;
   
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
@@ -302,7 +301,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
   const totalIRRFProLabore = proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners;
-  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
 
   const totalPayroll = totalSalaryExpense + proLaboreToUse;
   const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
@@ -310,7 +308,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
       const companyPayrollTaxes = inssPatronal;
-      const totalTax = companyPayrollTaxes + totalWithheldTaxes;
+      const totalTax = companyPayrollTaxes + totalINSSProLabore + totalIRRFProLabore;
       const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
       const totalMonthlyCost = totalTax + totalSalaryExpense + fee;
 
@@ -355,7 +353,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Assemble Final Results ---
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const companyPayrollTaxes = inssPatronal;
-  const totalTax = companyRevenueTaxes + companyPayrollTaxes + totalWithheldTaxes;
+  const totalTax = companyRevenueTaxes + companyPayrollTaxes + totalINSSProLabore + totalIRRFProLabore;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
@@ -404,7 +402,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
           const requiredProLabore = requiredPayroll - currentPayrollForFatorR;
           
           if (requiredProLabore > proLaboreToUse) {
-              const adjustedProLabore = Math.max(requiredProLabore, fiscalConfig.salario_minimo);
+              const adjustedProLabore = Math.max(requiredProLabore, fiscalConfig.salario_minimo * values.numberOfPartners);
               const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
               simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional (Otimizado)');
           }
