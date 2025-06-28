@@ -1,3 +1,5 @@
+import BenefitsSection from '@/components/benefits-section';
+import FaqSection from '@/components/faq-section';
 import TaxCalculator from '@/components/tax-calculator';
 
 export default function Home() {
@@ -12,8 +14,24 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-16">
-        <TaxCalculator />
+      <main className="flex flex-col">
+         <section className="py-16 lg:py-24 bg-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+            <FaqSection />
+          </div>
+        </section>
+
+        <section className="py-16 lg:py-24 bg-slate-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <BenefitsSection />
+          </div>
+        </section>
+
+        <section id="calculator" className="py-16 lg:py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <TaxCalculator />
+          </div>
+        </section>
       </main>
 
        <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">

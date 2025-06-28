@@ -238,6 +238,10 @@ export default function TaxCalculator() {
     return (
         <div id="results-section" className="mt-12 w-full">
             <h2 className="text-3xl font-bold text-center mb-4">Resultados da Análise</h2>
+            <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Apresentamos uma comparação detalhada dos regimes tributários. A recomendação destaca a opção com o menor custo total mensal.
+            </p>
+
 
             {intelligentAlerts.length > 0 && (
                 <div className="space-y-4 mb-8">
@@ -254,18 +258,6 @@ export default function TaxCalculator() {
                 </div>
             )}
 
-            <Card className="mb-8 border-primary/50 bg-card shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-primary">
-                        <Lightbulb />
-                        Recomendação da IA
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {isAdviceLoading ? <Skeleton className="h-12 w-full" /> : <p className="text-foreground/90 font-medium text-lg font-serif">{advice}</p>}
-                </CardContent>
-            </Card>
-
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${sortedScenarios.length > 2 ? '3' : '2'} gap-8`}>
                 {sortedScenarios.map(scenario => (
                      <ResultCard 
@@ -275,6 +267,19 @@ export default function TaxCalculator() {
                     />
                 ))}
             </div>
+
+            <Card className="mt-8 border-blue-200 bg-blue-50/50">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-blue-800 text-lg">
+                        <Lightbulb className="h-5 w-5" />
+                        Recomendação da IA
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {isAdviceLoading ? <Skeleton className="h-10 w-full" /> : <p className="text-blue-900/90 text-base font-serif">{advice}</p>}
+                </CardContent>
+            </Card>
+
       </div>
     );
   };
@@ -453,11 +458,11 @@ const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: 
     const custoPrevidenciarioSocio = proLaboreTaxes / numSocios;
 
     return (
-        <Card className={cn("flex flex-col shadow-lg transition-all duration-300 relative", isCheapest ? 'border-2 border-accent shadow-accent/20' : 'border-border')}>
-            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground font-bold text-sm px-3 py-1">🏆 RECOMENDADO</Badge>}
+        <Card className={cn("flex flex-col shadow-lg transition-all duration-300 relative", isCheapest ? 'border-2 border-primary shadow-primary/20' : 'border-border')}>
+            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-3 py-1">🏆 RECOMENDADO</Badge>}
             
-            <CardHeader className={cn(isCheapest ? 'bg-accent/10' : 'bg-muted/30', 'pt-8 pb-4 text-center')}>
-                <CardTitle className="text-2xl font-bold text-primary">{details.regime}</CardTitle>
+            <CardHeader className={cn(isCheapest ? 'bg-primary/10' : 'bg-muted/30', 'pt-8 pb-4 text-center')}>
+                <CardTitle className="text-2xl font-bold text-accent">{details.regime}</CardTitle>
                 {details.annex && <CardDescription className='font-semibold'>{details.annex}</CardDescription>}
             </CardHeader>
 
@@ -467,7 +472,7 @@ const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: 
                     <div className="text-4xl font-bold text-foreground my-1">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
-                    <div className="text-base font-semibold text-primary">
+                    <div className="text-base font-semibold text-accent">
                         {formatPercent(details.effectiveRate)} do faturamento
                     </div>
                 </div>
@@ -483,7 +488,7 @@ const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: 
                         ))}
                         <div className="flex justify-between items-center font-bold pt-1 text-base">
                             <span className="text-foreground">Total de Impostos</span>
-                            <span className="font-mono text-primary">{formatCurrencyBRL(details.totalTax)}</span>
+                            <span className="font-mono text-accent">{formatCurrencyBRL(details.totalTax)}</span>
                         </div>
                     </div>
                 </div>
