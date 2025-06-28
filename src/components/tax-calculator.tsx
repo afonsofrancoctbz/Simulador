@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle, Info } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
@@ -219,23 +219,17 @@ export default function TaxCalculator() {
         scenarios.push(lucroPresumidoScenario);
 
     } else { // Annex III, IV, or others
+        const mainAnnex = results.simplesNacionalSemFatorR.annex || 'Padrão';
         const situacaoAtual = {
             ...results.simplesNacionalSemFatorR,
             regime: `Simples Nacional`,
-            annex: `Anexo ${mainAnnex}`
+            annex: mainAnnex
         };
         scenarios.push(situacaoAtual);
         scenarios.push(lucroPresumidoScenario);
     }
     
     const sortedScenarios = scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-    const cheapest = sortedScenarios[0];
-    if (cheapest && cheapest.totalMonthlyCost > 0) {
-        const secondCheapest = sortedScenarios.find(s => s.totalMonthlyCost > cheapest.totalMonthlyCost);
-        if (secondCheapest) {
-            cheapest.annualSavings = (secondCheapest.totalMonthlyCost - cheapest.totalMonthlyCost) * 12;
-        }
-    }
     
     return sortedScenarios;
 
@@ -281,14 +275,16 @@ export default function TaxCalculator() {
     }
 
     return (
-        <div id="results-section" className="mt-12 w-full">
-            <h2 className="text-3xl font-bold text-center mb-4">Resultados da Análise</h2>
-            <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Apresentamos uma comparação detalhada dos regimes tributários. A recomendação destaca a opção com o menor custo total mensal.
-            </p>
+        <div id="results-section" className="mt-16 w-full">
+            <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
+                <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto font-serif">
+                    Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
+                </p>
+            </div>
 
             {intelligentAlerts.length > 0 && (
-                <div className="space-y-4 mb-8">
+                <div className="space-y-4 mb-8 max-w-4xl mx-auto">
                     {intelligentAlerts.map((alert, index) => (
                         <Alert key={index} variant={alert.type === 'warning' ? 'destructive' : 'default'} className={cn(
                             alert.type === 'warning' && 'bg-amber-100 border-amber-300 text-amber-800 [&>svg]:text-amber-600',
@@ -301,8 +297,8 @@ export default function TaxCalculator() {
                     ))}
                 </div>
             )}
-
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${displayedScenarios.length > 2 ? '3' : '2'} gap-8`}>
+            
+            <div className="flex flex-wrap justify-center items-stretch gap-8">
                 {displayedScenarios.map(scenario => (
                      <ResultCard 
                         key={scenario.regime} 
@@ -313,13 +309,20 @@ export default function TaxCalculator() {
                 ))}
             </div>
 
-            <Alert className="mt-8 border-primary/20 bg-primary/5">
-                <Lightbulb className="h-4 w-4 text-primary" />
-                <AlertTitle className="font-bold text-primary">Recomendação da IA</AlertTitle>
-                <AlertDescription className="text-primary/90">
-                    {isAdviceLoading ? <Skeleton className="h-5 w-full mt-2" /> : <p className="font-serif">{advice}</p>}
-                </AlertDescription>
-            </Alert>
+            {advice && (
+                <Card className="mt-12 max-w-4xl mx-auto border-primary/20 bg-primary/5 shadow-lg">
+                    <CardHeader className="flex-row items-center gap-4">
+                        <Lightbulb className="h-8 w-8 text-primary" />
+                        <div>
+                            <CardTitle className="text-primary">Recomendação da IA</CardTitle>
+                            <CardDescription className="text-primary/90">Análise e conselhos para otimizar seus impostos.</CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {isAdviceLoading ? <Skeleton className="h-5 w-full mt-2" /> : <p className="font-serif text-primary/90">{advice}</p>}
+                    </CardContent>
+                </Card>
+            )}
       </div>
     );
   };
@@ -356,7 +359,7 @@ export default function TaxCalculator() {
                              <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Número de Sócios</FormLabel>
-                                    <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
+                                    <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
