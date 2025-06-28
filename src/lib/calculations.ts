@@ -121,6 +121,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   });
   const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
   const totalIRRFProLabore = proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners;
+  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
 
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
@@ -132,12 +133,11 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     }
     
     const companyTaxes = cppFromAnnexIV;
-    const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
     const totalTax = companyTaxes + totalWithheldTaxes;
     const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     
     // Custo para a empresa é o que ela desembolsa: impostos da empresa + salários + mensalidade.
-    const totalMonthlyCost = companyTaxes + totalSalaryExpense + fee;
+    const totalMonthlyCost = totalTax + totalSalaryExpense + fee;
 
     const breakdown = [
         ...(cppFromAnnexIV > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: cppFromAnnexIV }] : []),
@@ -241,13 +241,12 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
   // --- 5. Assemble Final Results ---
   const companyTaxes = totalDas + cppFromAnnexIV + totalIssSeparado;
-  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
   const totalTax = companyTaxes + totalWithheldTaxes;
   
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
 
-  const totalMonthlyCost = companyTaxes + totalSalaryExpense + contabilizeiFee;
+  const totalMonthlyCost = totalTax + totalSalaryExpense + contabilizeiFee;
   
   const annexKeys = Object.keys(revenueByAnnex) as Annex[];
   const mainAnnex: Annex = annexKeys.length > 0
@@ -266,6 +265,8 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     ...(totalIRRFProLabore > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFProLabore }] : []),
   ];
 
+  const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
+
   return {
     regime: regimeName,
     totalTax,
@@ -275,6 +276,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     fatorR: isFatorRApplicable ? fatorR : undefined,
     annex: `Anexo ${mainAnnex}`,
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
+    effectiveDasRate,
     contabilizeiFee: contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
@@ -300,17 +302,17 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
   const totalIRRFProLabore = proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners;
-  
+  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
+
   const totalPayroll = totalSalaryExpense + proLaboreToUse;
   const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
 
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
       const companyPayrollTaxes = inssPatronal;
-      const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
       const totalTax = companyPayrollTaxes + totalWithheldTaxes;
       const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
-      const totalMonthlyCost = companyPayrollTaxes + totalSalaryExpense + fee;
+      const totalMonthlyCost = totalTax + totalSalaryExpense + fee;
 
       const breakdown = [
         ...(inssPatronal > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: inssPatronal }] : []),
@@ -353,13 +355,12 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Assemble Final Results ---
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const companyPayrollTaxes = inssPatronal;
-  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
   const totalTax = companyRevenueTaxes + companyPayrollTaxes + totalWithheldTaxes;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
 
-  const totalMonthlyCost = companyRevenueTaxes + companyPayrollTaxes + totalSalaryExpense + contabilizeiFee;
+  const totalMonthlyCost = totalTax + totalSalaryExpense + contabilizeiFee;
 
   const breakdown = [
     { name: "PIS", value: pis }, { name: "COFINS", value: cofins },

@@ -202,25 +202,27 @@ export default function TaxCalculator() {
 
     const lucroPresumidoScenario = {
         ...results.lucroPresumido,
-        regime: 'Alternativa: Lucro Presumido'
+        regime: 'Lucro Presumido',
+        annex: 'Alternativa de Regime'
     };
 
     if (mainAnnex === 'V' && mainCnaeInfo.requiresFatorR) {
         // Scenario 1: Actual situation with user's input
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
-            regime: 'Situação Atual: Anexo V'
+            regime: 'Simples Nacional sem Fator R',
+            annex: 'Anexo V - Sem Otimizar Fator R'
         });
 
         // Scenario 2: Optimized situation
         const cenarioOtimizado = results.simplesNacionalComFatorR;
         const proLaboreOtimizado = cenarioOtimizado.proLabore;
-        const optimizationNote = `Para alcançar este cenário, seu pró-labore precisa ser ajustado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
+        const optimizationNote = `Para alcançar este cenário, seu pró-labore foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
         
         scenarios.push({
             ...cenarioOtimizado,
-            regime: 'Cenário Otimizado: Anexo III',
-            annex: 'Anexo III', // Override the annex display
+            regime: 'Simples Nacional com Fator R',
+            annex: 'Anexo III - Usando Fator R',
             optimizationNote: optimizationNote
         });
         
@@ -230,7 +232,8 @@ export default function TaxCalculator() {
     } else { // Annex III, IV, or others
         const situacaoAtual = {
             ...results.simplesNacionalSemFatorR,
-            regime: `Situação Atual: Anexo ${mainAnnex}`
+            regime: `Simples Nacional`,
+            annex: `Anexo ${mainAnnex}`
         };
         scenarios.push(situacaoAtual);
         scenarios.push(lucroPresumidoScenario);

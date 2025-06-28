@@ -37,6 +37,7 @@ export const TaxDetailsSchema = z.object({
     proLabore: z.number(),
     fatorR: z.number().optional(),
     effectiveRate: z.number(),
+    effectiveDasRate: z.number().optional(),
     contabilizeiFee: z.number(),
     breakdown: z.array(TaxBreakdownItemSchema),
     notes: z.array(z.string()).optional(),

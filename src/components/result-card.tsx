@@ -27,6 +27,22 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                          <p>{details.optimizationNote}</p>
                      </div>
                 )}
+                
+                <div className="space-y-2">
+                     <h4 className="font-semibold text-foreground">💰 Pró-labore & Alíquotas</h4>
+                     <div className="p-3 border rounded-lg bg-background space-y-2 font-serif text-sm">
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Pró-labore Base</span>
+                            <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.proLabore)}</span>
+                        </div>
+                        {details.effectiveDasRate !== undefined && (
+                            <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Alíquota Efetiva do Simples</span>
+                                <span className="font-mono font-medium text-foreground">{formatPercent(details.effectiveDasRate)}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 <div className="space-y-2 flex-grow">
                     <h4 className="font-semibold text-foreground">📊 Detalhamento dos Impostos e Custos</h4>
@@ -54,7 +70,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                      <h4 className="font-semibold text-foreground">👥 Gestão de Sócios</h4>
                      <div className="p-3 border rounded-lg bg-background space-y-2 text-sm font-serif">
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">INSS retido por sócio:</span>
+                            <span className="text-muted-foreground">INSS retido por sócio (11%):</span>
                             <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.partnerTaxes.inss)}</span>
                         </div>
                         <div className="flex justify-between">
