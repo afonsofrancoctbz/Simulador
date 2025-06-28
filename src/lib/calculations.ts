@@ -152,7 +152,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   }
   
   const notes: string[] = [];
-  const municipalISSRate = fiscalConfig.aliquota_iss_padrao * 100;
+  const municipalISSRate = fiscalConfig.aliquota_iss_padrao;
 
   if (exportRevenue > 0) {
     notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS, resultando em uma alíquota efetiva menor.");
@@ -198,7 +198,6 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   let totalDas = 0;
   let cppFromAnnexIV = 0;
   let totalIssSeparado = 0;
-  const dasComponents = new Map<string, number>();
   
   for (const annexStr in revenueByAnnex) {
     const annex = annexStr as Annex;
@@ -208,7 +207,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     const bracket = annexTable[bracketIndex];
     const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
     
-    const { PIS = 0, COFINS = 0, ISS = 0, IPI = 0, ICMS = 0 } = bracket.distribution;
+    const { PIS = 0, COFINS = 0, ISS = 0 } = bracket.distribution;
     
     // Revenue-based taxes are only on domestic revenue
     const dasForDomestic = annexInfo.domestic * effectiveRate;
@@ -216,24 +215,9 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     // For export revenue, recalculate rate excluding exempt taxes
     const exportExemptionProportion = PIS + COFINS + ISS;
     const taxProportionOnDomestic = 1;
-    const taxProportionOnExport = taxProportionOnDomestic - exportExemptionProportion;
+    const taxProportionOnExport = taxProportionOnDomestic > 0 ? (taxProportionOnDomestic - exportExemptionProportion) : 0;
     const effectiveRateForExport = effectiveRate * taxProportionOnExport;
     const dasForExport = annexInfo.export * effectiveRateForExport;
-    
-    if (dasForDomestic > 0) {
-      Object.entries(bracket.distribution).forEach(([tax, percent]) => {
-        dasComponents.set(tax, (dasComponents.get(tax) || 0) + dasForDomestic * percent);
-      });
-    }
-
-    if (dasForExport > 0) {
-       Object.entries(bracket.distribution).forEach(([taxName, proportion]) => {
-          if (!['PIS', 'COFINS', 'ISS'].includes(taxName)) {
-            const adjustedProportion = proportion / taxProportionOnExport;
-            dasComponents.set(taxName, (dasComponents.get(taxName) || 0) + dasForExport * adjustedProportion);
-          }
-        });
-    }
 
     totalDas += dasForDomestic + dasForExport;
     
@@ -243,7 +227,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
       notes.push("Anexo IV paga a CPP (INSS Patronal) de 20% fora do DAS.");
     }
     if (bracketIndex === annexTable.length - 1 && ['III', 'IV', 'V'].includes(annex) && annexInfo.domestic > 0) {
-      totalIssSeparado += annexInfo.domestic * (municipalISSRate / 100);
+      totalIssSeparado += annexInfo.domestic * municipalISSRate;
       notes.push(`Na última faixa do Anexo ${annex}, o ISS é recolhido à parte.`);
     }
   }
@@ -256,18 +240,18 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
   const annexKeys = Object.keys(revenueByAnnex) as Annex[];
   const mainAnnex: Annex = annexKeys.length > 0
     ? annexKeys.reduce((a, b) => {
-        const revenueA = (revenueByAnnex[a]?.domestic || 0) + (revenueByAnnex[a]?.export || 0);
-        const revenueB = (revenueByAnnex[b]?.domestic || 0) + (revenueByAnnex[b]?.export || 0);
+        const revenueA = (revenueByAnnex[a as Annex]?.domestic || 0) + (revenueByAnnex[a as Annex]?.export || 0);
+        const revenueB = (revenueByAnnex[b as Annex]?.domestic || 0) + (revenueByAnnex[b as Annex]?.export || 0);
         return revenueA >= revenueB ? a : b;
-      })
+      }, annexKeys[0] as Annex)
     : 'III';
 
   const breakdown = [
-    ...Array.from(dasComponents.entries()).map(([name, value]) => ({ name: `DAS - ${name}`, value })),
+    ...(totalDas > 0 ? [{ name: 'DAS (Guia Unificada)', value: totalDas }] : []),
     ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Fora do DAS)", value: cppFromAnnexIV }] : []),
     ...(totalIssSeparado > 0 ? [{ name: "ISS (Fora do DAS)", value: totalIssSeparado }] : []),
-    { name: "INSS s/ Pró-labore", value: totalINSSProLabore },
-    { name: "IRRF s/ Pró-labore", value: totalIRRFProLabore },
+    ...(totalINSSProLabore > 0 ? [{ name: "INSS s/ Pró-labore", value: totalINSSProLabore }] : []),
+    ...(totalIRRFProLabore > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFProLabore }] : []),
   ];
 
   return {
@@ -332,7 +316,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const notes: string[] = [];
-  const municipalISSRate = fiscalConfig.aliquota_iss_padrao * 100;
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
   if (totalPayroll > 0) notes.push("No Lucro Presumido, a CPP (INSS Patronal) de 20% é paga sobre a folha de pagamento.");
   
@@ -344,8 +327,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }, 0);
   
   const IRPJ_ADDITIONAL_THRESHOLD = 20000;
-  const monthlyProportionalThreshold = IRPJ_ADDITIONAL_THRESHOLD * 3; // Trimestral
-
+  
   let irpj = presumedProfitBase * 0.15 + Math.max(0, presumedProfitBase - IRPJ_ADDITIONAL_THRESHOLD) * 0.10;
   const csll = presumedProfitBase * 0.09;
   const pis = domesticRevenue * 0.0065; 
@@ -358,8 +340,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
 
   const breakdown = [
-    { name: "PIS", value: pis, rate: 0.0065 }, { name: "COFINS", value: cofins, rate: 0.03 },
-    { name: "ISS", value: iss, rate: municipalISSRate / 100 }, { name: "IRPJ", value: irpj },
+    { name: "PIS", value: pis }, { name: "COFINS", value: cofins },
+    { name: "ISS", value: iss }, { name: "IRPJ", value: irpj },
     { name: "CSLL", value: csll }, { name: "CPP (INSS Patronal)", value: inssPatronal },
     { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
     { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
