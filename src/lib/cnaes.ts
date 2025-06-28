@@ -8,7 +8,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '0162-8/03',
@@ -17,7 +17,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '0322-1/07',
@@ -26,7 +26,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '1099-6/04',
@@ -43,7 +43,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRO (Conselho Regional de Odontologia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRO. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa'
+    notes: 'Essas atividades são regulamentadas pelo CRO (Conselho Regional de Odontologia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRO.'
   },
   {
     code: '3250-7/09',
@@ -52,7 +52,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CBOO. Não é obrigatório indicar RT.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '3312-1/02',
@@ -61,7 +61,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3312-1/03',
@@ -70,7 +70,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3312-1/04',
@@ -79,7 +79,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3313-9/01',
@@ -88,7 +88,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3313-9/02',
@@ -97,7 +97,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3313-9/99',
@@ -106,7 +106,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/01',
@@ -115,7 +115,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/02',
@@ -124,7 +124,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/03',
@@ -133,7 +133,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/04',
@@ -142,7 +142,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/05',
@@ -151,7 +151,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/06',
@@ -160,7 +160,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/07',
@@ -169,7 +169,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/08',
@@ -178,7 +178,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/09',
@@ -187,7 +187,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/10',
@@ -196,7 +196,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/11',
@@ -205,7 +205,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/12',
@@ -214,7 +214,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/13',
@@ -223,7 +223,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/14',
@@ -232,7 +232,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/15',
@@ -241,7 +241,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/16',
@@ -250,7 +250,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/17',
@@ -259,7 +259,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/18',
@@ -268,7 +268,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/19',
@@ -277,7 +277,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/20',
@@ -286,7 +286,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/21',
@@ -295,7 +295,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/22',
@@ -304,7 +304,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3314-7/99',
@@ -313,7 +313,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3315-5/00',
@@ -322,7 +322,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3316-3/01',
@@ -331,7 +331,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3316-3/02',
@@ -340,7 +340,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3317-1/01',
@@ -349,7 +349,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3317-1/02',
@@ -358,7 +358,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3319-8/00',
@@ -367,7 +367,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '3321-0/00',
@@ -376,7 +376,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4211-1/02',
@@ -385,7 +385,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4221-9/03',
@@ -394,7 +394,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4221-9/05',
@@ -403,7 +403,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4313-4/00',
@@ -412,7 +412,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4321-5/00',
@@ -421,7 +421,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Atenção: Cessão de mão de obra é vedada. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '4322-3/01',
@@ -430,7 +430,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Atenção: Cessão de mão de obra é vedada. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '4322-3/02',
@@ -439,7 +439,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Atenção: Cessão de mão de obra é vedada. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '4322-3/03',
@@ -448,7 +448,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4329-1/01',
@@ -457,7 +457,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4329-1/02',
@@ -466,7 +466,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4329-1/03',
@@ -475,7 +475,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4329-1/04',
@@ -484,7 +484,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4329-1/05',
@@ -493,7 +493,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4399-1/01',
@@ -511,7 +511,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4511-1/01',
@@ -529,7 +529,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4520-0/01',
@@ -538,7 +538,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4520-0/02',
@@ -555,7 +555,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4520-0/04',
@@ -588,7 +588,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4520-0/08',
@@ -631,7 +631,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4541-2/03',
@@ -674,7 +674,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4543-9/00',
@@ -683,7 +683,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '4611-7/00',
@@ -693,7 +693,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4612-5/00',
@@ -703,7 +703,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE. Não compreende as atividades de representantes comerciais e agentes do comércio de produtos farmacêuticos e veterinários e produtos siderúrgicos e metalúrgicos para construção.'
   },
   {
     code: '4613-3/00',
@@ -713,7 +713,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE. Esse CNAE não compreende a representação comercial de lustres, luminárias e abajures, tapetes, carpetes e artigos de tapeçaria, papel de parede, produtos siderúrgicos e metalúrgicos que não sejam ara construção.'
   },
   {
     code: '4614-1/00',
@@ -723,7 +723,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4615-0/00',
@@ -733,7 +733,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4616-8/00',
@@ -743,7 +743,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4617-6/00',
@@ -753,7 +753,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE. Esse CNAE não compreende a representação comercial de ração e produtos alimentícios para animais, e fumo não beneficiado.'
   },
   {
     code: '4618-4/01',
@@ -763,7 +763,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4618-4/02',
@@ -773,7 +773,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4618-4/03',
@@ -783,7 +783,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4618-4/99',
@@ -793,7 +793,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4619-2/00',
@@ -803,7 +803,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CORE (Conselho Regional de Representantes Comerciais), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CORE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '4711-3/01',
@@ -1625,7 +1625,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração) em alguns estados (GO, RJ). Após a abertura, pode ser necessário o registro no CRA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração) em alguns estados (GO, RJ). Após a abertura, pode ser necessário o registro no CRA.'
   },
   {
     code: '6201-5/02',
@@ -1644,7 +1644,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração) em alguns estados (GO). Após a abertura, pode ser necessário o registro no CRA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração) em alguns estados (GO). Após a abertura, pode ser necessário o registro no CRA.'
   },
   {
     code: '6203-1/00',
@@ -1672,7 +1672,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CREA.'
   },
   {
     code: '6311-9/00',
@@ -1717,7 +1717,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: false,
-    notes: 'Atividade passível de registro na CVM.'
+    notes: 'Esta atividade é impedida no Simples Nacional. A empresa deve ser registrada na CVM e constituída como Sociedade Simples. Existem restrições de atividades e sociedades conflitantes.'
   },
   {
     code: '6619-3/02',
@@ -1753,7 +1753,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela SUSEP (Superintendência de Seguros Privados), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela na SUSEP. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada na SUSEP e apresentar um responsável técnico com inscrição de PF. A Razão Social deve conter "Corretor(a) de Seguros" ou "Corretagem de Seguros".'
   },
   {
     code: '6629-1/00',
@@ -1771,7 +1771,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRECI (Conselho Regional de Corretores de Imóveis), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRECI. Regras específicas sobre sociedade e administração podem se aplicar. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRECI e apresentar um responsável técnico.'
   },
   {
     code: '6821-8/02',
@@ -1780,7 +1780,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRECI (Conselho Regional de Corretores de Imóveis), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRECI. Regras específicas sobre sociedade e administração podem se aplicar. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRECI e apresentar um responsável técnico.'
   },
   {
     code: '6822-6/00',
@@ -1798,7 +1798,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela OAB. Obrigatório utilizar o Contrato Padrão da OAB.'
+    notes: 'Atividade regulamentada pela OAB. Natureza jurídica deve ser Sociedade Simples Pura ou Unipessoal de Advocacia. Não pode usar LTDA na razão social nem ser combinada com outros CNAEs.'
   },
   {
     code: '6911-7/02',
@@ -1843,7 +1843,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Para pesquisas médicas e biológicas em seres humanos, registro no CONEP é exigido. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRA e apresentar um responsável técnico. Não pode ser usado para consultorias técnicas específicas (arquitetura, engenharia, etc).'
   },
   {
     code: '7111-1/00',
@@ -1853,7 +1853,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CAU (Conselho de Arquitetura e Urbanismo). A utilização do termo "Arquitetura" na razão social possui regras específicas do conselho. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CAU e apresentar um responsável técnico arquiteto. Se usar a palavra "ARQUITETURA" na razão social, é preciso apresentar um responsável técnico no contrato.'
   },
   {
     code: '7112-0/00',
@@ -1863,7 +1863,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREA e apresentar um responsável técnico engenheiro. Se usar a palavra "ENGENHARIA" na razão social, é preciso apresentar um responsável técnico engenheiro no contrato.'
   },
   {
     code: '7119-7/01',
@@ -1873,7 +1873,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA/CRT. A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREA e apresentar um responsável técnico engenheiro.'
   },
   {
     code: '7119-7/02',
@@ -1883,7 +1883,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREA e apresentar um responsável técnico engenheiro.'
   },
   {
     code: '7119-7/03',
@@ -1893,7 +1893,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CREA/CAU/CRT. A utilização dos termos "Engenharia" ou "Arquitetura" na razão social possui regras específicas de cada conselho.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CAU/CREA e apresentar um responsável técnico. Se usar "ARQUITETURA/ENGENHARIA" na razão social, é preciso apresentar um responsável técnico no contrato. Não compreende computação gráfica para publicidade, design e decoração de interiores.'
   },
   {
     code: '7119-7/04',
@@ -1903,7 +1903,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CREA/CRM. Se houver perícia médica, pode ser necessário RQE no CRM.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREA e apresentar um responsável técnico engenheiro.'
   },
   {
     code: '7119-7/99',
@@ -1913,7 +1913,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CAU/CREA e apresentar um responsável técnico. Se usar "ARQUITETURA/ENGENHARIA" na razão social, é preciso apresentar um responsável técnico no contrato. Não pode ser usado para produção de fotografias aéreas, previsão meteorológica e pesquisa e desenvolvimento.'
   },
   {
     code: '7120-1/00',
@@ -1923,7 +1923,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '7210-0/00',
@@ -1959,7 +1959,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '7319-0/01',
@@ -1976,7 +1977,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA.'
   },
   {
     code: '7319-0/03',
@@ -1985,7 +1986,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA.'
   },
   {
     code: '7319-0/04',
@@ -2013,7 +2014,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA.'
   },
   {
     code: '7410-2/02',
@@ -2060,7 +2061,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '7420-0/03',
@@ -2111,7 +2112,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '7490-1/04',
@@ -2121,7 +2122,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA/CORE. Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA/CORE. Intermediação sempre será de serviços e não de produtos. Identificar bem o tipo de serviço a ser intermediado.'
   },
   {
     code: '7490-1/05',
@@ -2130,7 +2131,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CORE.'
   },
   {
     code: '7490-1/99',
@@ -2150,7 +2152,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRMV (Conselho Regional de Medicina Veterinária). Em algumas cidades (ex: Vitória/ES) há restrições para endereço residencial. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Se for uma clínica precisa informar um endereço comercial. A empresa precisa ser registrada no CRMV e apresentar um responsável técnico médico veterinário.'
   },
   {
     code: '7711-0/00',
@@ -2291,7 +2293,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração), por isso, depois que sua empresa estiver aberta será necessário fazer o registro dela no CRA.'
   },
   {
     code: '7911-2/00',
@@ -2351,7 +2353,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Atenção: Cessão de mão de obra é vedada. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Atenção: Cessão de mão de obra é vedada.'
   },
   {
     code: '8122-2/00',
@@ -2360,7 +2362,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '8129-0/00',
@@ -2369,7 +2371,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Atenção: Cessão de mão de obra é vedada. Necessário confirmar Objeto Social. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Atenção: Cessão de mão de obra é vedada. Necessário confirmar Objeto Social.'
   },
   {
     code: '8130-3/00',
@@ -2378,7 +2380,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '8211-3/00',
@@ -2387,7 +2389,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT.'
   },
   {
     code: '8219-9/01',
@@ -2421,7 +2423,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pelo CRA (Conselho Regional de Administração). Não é obrigatório indicar RT.'
   },
   {
     code: '8230-0/02',
@@ -2644,7 +2646,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRA/CREA. Para CREA, a utilização do termo "Engenharia" possui regras.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRA e apresentar um responsável técnico. Este CNAE não compreende atividades de ensino.'
   },
   {
     code: '8599-6/05',
@@ -2671,7 +2673,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8610-1/02',
@@ -2681,7 +2683,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local.'
   },
   {
     code: '8621-6/01',
@@ -2718,7 +2720,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Se for uma clínica, precisa informar um endereço comercial.'
   },
   {
     code: '8630-5/02',
@@ -2728,7 +2730,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Se for uma clínica, precisa informar um endereço comercial.'
   },
   {
     code: '8630-5/03',
@@ -2738,7 +2740,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Se for uma clínica, precisa informar um endereço comercial.'
   },
   {
     code: '8630-5/04',
@@ -2747,7 +2749,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRO (Conselho Regional de Odontologia). Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa'
+    notes: 'A empresa não pode ter natureza jurídica de Empresário Individual. Precisa de registro no CRO e um responsável técnico. Se for clínica, consultório ou hospital, precisa de endereço comercial. Não pode ser usado para serviços de prótese dentária (fabricação).'
   },
   {
     code: '8630-5/06',
@@ -2757,7 +2759,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE (Alergia e Imunologia). Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8630-5/07',
@@ -2767,7 +2769,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8630-5/99',
@@ -2777,7 +2779,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE conforme especialização. Validar endereço e se a atividade é realizada no local. Necessário confirmar Objeto Social. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM.'
   },
   {
     code: '8640-2/01',
@@ -2787,7 +2789,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/02',
@@ -2797,7 +2799,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/03',
@@ -2807,7 +2809,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE (Nefrologia). Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM.'
   },
   {
     code: '8640-2/04',
@@ -2817,7 +2819,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/05',
@@ -2827,7 +2829,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/06',
@@ -2837,7 +2839,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/07',
@@ -2847,7 +2849,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/08',
@@ -2857,7 +2859,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/09',
@@ -2867,7 +2869,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE (Endoscopia). Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/10',
@@ -2877,7 +2879,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/11',
@@ -2887,7 +2889,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/12',
@@ -2897,7 +2899,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/13',
@@ -2907,7 +2909,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Validar endereço e se a atividade é realizada no local. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/14',
@@ -2917,7 +2919,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8640-2/99',
@@ -2927,7 +2929,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Necessário confirmar Objeto Social. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no CRM e apresentar um responsável técnico médico ao CRM. Precisa informar um endereço comercial para a empresa.'
   },
   {
     code: '8650-0/01',
@@ -2936,7 +2938,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo COREN (Conselho Regional de Enfermagem). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Como se trata de uma atividade regulamentada, a empresa precisa ser registrada no COREN e apresentar um responsável técnico ao COREN.'
   },
   {
     code: '8650-0/02',
@@ -2945,7 +2947,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRN (Conselho Regional de Nutrição). Se exercido por médico, necessário RQE no CRM. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRN e apresentar um responsável técnico nutricionista ao CRN.'
   },
   {
     code: '8650-0/03',
@@ -2954,7 +2956,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CRP (Conselho Regional de Psicologia). Se exercido por psiquiatra, necessário RQE no CRM. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRP e apresentar um responsável técnico. Caso o cliente seja psicanalista, o cliente não precisa registrar a empresa no CRP, e o objeto social deve constar essa informação.'
   },
   {
     code: '8650-0/04',
@@ -2963,7 +2965,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Exige registro da empresa no conselho e a indicação de um fisioterapeuta como responsável técnico. Não pode ser constituída como Empresário Individual.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREFITO e apresentar um responsável técnico fisioterapeuta.'
   },
   {
     code: '8650-0/05',
@@ -2972,7 +2974,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Exige registro da empresa no conselho e a indicação de um responsável técnico. Não pode ser constituída como Empresário Individual. Se for uma clínica, é necessário um endereço comercial.'
+    notes: 'Essa atividade é regulamentada e não pode ser aberta como EMPRESÁRIO INDIVIDUAL. Se for uma clínica, precisa informar um endereço comercial. A empresa precisa ser registrada no CREFITO e apresentar um responsável técnico inscrito no CREFITO.'
   },
   {
     code: '8650-0/06',
@@ -2981,7 +2983,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CREFONO (Conselho Regional de Fonoaudiologia). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREFONO e apresentar um responsável técnico fonoaudiólogo.'
   },
   {
     code: '8650-0/07',
@@ -2990,7 +2992,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRN (Conselho Regional de Nutrição). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CRN e apresentar um responsável técnico nutricionista ao CRN.'
   },
   {
     code: '8650-0/99',
@@ -2999,7 +3001,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Conselho pode variar (CRM, COFEN, CRF, etc). Necessário RT conforme a área. Necessário confirmar Objeto Social.'
+    notes: 'Esse CNAE não compreende as terapias alternativas. Conselho pode variar (CRM, COFEN, CRF, etc). Necessário RT conforme a área. Necessário confirmar Objeto Social.'
   },
   {
     code: '8660-7/00',
@@ -3027,7 +3029,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT.'
   },
   {
     code: '8690-9/03',
@@ -3063,7 +3065,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Não é obrigatório indicar RT.'
   },
   {
     code: '8711-5/02',
@@ -3073,7 +3075,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Necessário RQE. Não é obrigatório indicar RT.'
   },
   {
     code: '8712-3/00',
@@ -3083,7 +3085,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CRM (Conselho Regional de Medicina). Não é obrigatório indicar RT.'
   },
   {
     code: '9001-9/01',
@@ -3208,7 +3210,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pelo CREF ou CREFITO. Não é obrigatório indicar RT. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Como se trata de uma atividade regulamentada, a natureza jurídica não pode ser Empresário Individual. A empresa precisa ser registrada no CREF e apresentar um responsável técnico ao CREF.'
   },
   {
     code: '9319-1/01',
@@ -3271,7 +3273,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '9512-6/00',
@@ -3280,7 +3282,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '9521-5/00',
@@ -3289,7 +3291,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas. 🗹 Entendo que preciso registrar minha empresa depois de aberta no conselho/órgão de classe que regulamenta as atividades da empresa.'
+    notes: 'Essas atividades são regulamentadas pela CREA (Conselho Regional de Engenharia e Agronomia). A utilização do termo "Engenharia" na razão social possui regras específicas.'
   },
   {
     code: '9529-1/01',
