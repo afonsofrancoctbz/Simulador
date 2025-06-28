@@ -3,16 +3,22 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { CIDADES_ATENDIDAS } from "@/lib/cities";
-import { Banknote, Building, Check, ChevronsUpDown, Link, TrendingUp, Wallet } from "lucide-react";
+import { Banknote, Building, Check, ChevronsUpDown, Link, TrendingUp, Wallet, CreditCard, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-const bankFeatures = [
-    { icon: Wallet, title: "Conta PJ Gratuita", description: "Abertura e manutenção da sua conta, sem mensalidade ou taxas escondidas." },
-    { icon: Link, title: "Integrada à Contabilidade", description: "Sua rotina financeira integrada automaticamente, sem envio manual de extratos." },
-    { icon: TrendingUp, title: "Débito Automático de Impostos", description: "Evite multas com o pagamento automático das suas guias de impostos (DAS)." },
+const mainBankFeatures = [
+    { icon: Wallet, title: "Conta PJ 100% Gratuita", description: "Abra e mantenha sua conta sem mensalidade, anuidade ou taxas escondidas." },
+    { icon: Link, title: "Contabilidade Integrada", description: "Sua rotina financeira é automatizada com extratos integrados, eliminando o envio manual." },
+    { icon: TrendingUp, title: "Débito Automático de Impostos", description: "Pague sua guia de impostos (DAS) automaticamente e evite multas por atraso." },
+];
+
+const otherBankFeatures = [
+    { icon: Zap, title: "PIX Gratuito e Ilimitado", description: "Realize transferências e pagamentos via PIX a qualquer momento, sem custo." },
+    { icon: CreditCard, title: "Cartão de Débito Visa", description: "Use seu cartão para compras e saques em toda a rede Visa." },
+    { icon: ShieldCheck, title: "Segurança e Confiança", description: "Conte com a segurança de uma instituição de pagamento autorizada pelo Banco Central." },
 ];
 
 const CityCombobox = () => {
@@ -79,15 +85,30 @@ export default function FaqSection() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {bankFeatures.map((feature, index) => (
-                            <div key={index} className="flex items-start gap-4 p-4 rounded-lg bg-background/50">
-                                <feature.icon className="h-8 w-8 text-accent shrink-0 mt-1" />
+                        {mainBankFeatures.map((feature, index) => (
+                            <div key={index} className="flex flex-col text-left gap-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+                                <feature.icon className="h-8 w-8 text-primary shrink-0" />
                                 <div>
                                     <h3 className="font-semibold text-foreground">{feature.title}</h3>
                                     <p className="text-sm text-muted-foreground font-serif">{feature.description}</p>
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t">
+                         <h4 className="text-lg font-semibold text-center mb-6 text-foreground/90">E ainda mais vantagens para o seu negócio:</h4>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {otherBankFeatures.map((feature, index) => (
+                                 <div key={index} className="flex items-start gap-4 p-4 rounded-lg bg-background/50 text-left">
+                                    <feature.icon className="h-8 w-8 text-accent shrink-0 mt-1" />
+                                    <div>
+                                        <h3 className="font-semibold text-foreground">{feature.title}</h3>
+                                        <p className="text-sm text-muted-foreground font-serif">{feature.description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                         </div>
                     </div>
                 </CardContent>
             </Card>
