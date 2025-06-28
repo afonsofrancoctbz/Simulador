@@ -1,3 +1,4 @@
+
 import {
   IRRF_TABLE,
   SIMPLIFIED_DEDUCTION_IRRF,
@@ -175,22 +176,35 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     const bracketIndex = findBracketIndex(annexTable, rbt12);
     const bracket = annexTable[bracketIndex];
     const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
+    
+    // Calculate effective rate for export, considering exemptions
     const { PIS = 0, COFINS = 0, ISS = 0, IPI = 0, ICMS = 0 } = bracket.distribution;
-    const exportExemptionRate = PIS + COFINS + (ISS ?? 0) + (IPI ?? 0) + (ICMS ?? 0);
-    const effectiveRateForExport = Math.max(0, effectiveRate * (1 - exportExemptionRate));
+    const exportExemptionProportion = PIS + COFINS + (ISS ?? 0) + (IPI ?? 0) + (ICMS ?? 0);
+    const effectiveRateForExport = Math.max(0, effectiveRate * (1 - exportExemptionProportion));
     
     const dasForDomestic = annexInfo.domestic * effectiveRate;
     const dasForExport = annexInfo.export * effectiveRateForExport;
     
+    // Breakdown for domestic revenue
     if (dasForDomestic > 0) {
-      Object.entries(bracket.distribution).forEach(([tax, percent]) => dasComponents.set(tax, (dasComponents.get(tax) || 0) + dasForDomestic * percent));
-    }
-    if (dasForExport > 0) {
       Object.entries(bracket.distribution).forEach(([tax, percent]) => {
-        if (!['PIS', 'COFINS', 'ISS', 'ICMS', 'IPI'].includes(tax)) {
-          dasComponents.set(tax, (dasComponents.get(tax) || 0) + dasForExport * percent);
-        }
+        dasComponents.set(tax, (dasComponents.get(tax) || 0) + dasForDomestic * percent);
       });
+    }
+
+    // Breakdown for export revenue (re-normalized for remaining taxes)
+    if (dasForExport > 0) {
+      const remainingTaxes = Object.entries(bracket.distribution).filter(([taxName]) => 
+          !['PIS', 'COFINS', 'ISS', 'ICMS', 'IPI'].includes(taxName)
+      );
+      const totalProportionOfRemainingTaxes = remainingTaxes.reduce((sum, [, proportion]) => sum + proportion, 0);
+      
+      if (totalProportionOfRemainingTaxes > 0) {
+        remainingTaxes.forEach(([taxName, proportion]) => {
+            const adjustedProportion = proportion / totalProportionOfRemainingTaxes;
+            dasComponents.set(taxName, (dasComponents.get(taxName) || 0) + dasForExport * adjustedProportion);
+        });
+      }
     }
 
     totalDas += dasForDomestic + dasForExport;
@@ -236,7 +250,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     contabilizeiFee: feeBracket?.plans.expertsEssencial ?? 0,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
-    explanation: "Regime unificado que recolhe os principais tributos em uma única guia (DAS). A alíquota é progressiva e baseada no faturamento anual. O 'Fator R' (relação entre folha de pagamento e faturamento) pode reduzir sua alíquota."
+    explanation: "Regime unificado que recolhe os principais tributos em uma única guia (DAS). A alíquota é progressiva e baseada no seu faturamento anual. O 'Fator R' (relação entre folha de pagamento e faturamento) pode reduzir sua alíquota."
   };
 }
 
