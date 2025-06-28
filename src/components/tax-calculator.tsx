@@ -474,7 +474,7 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
                 {cnaes.map((cnae) => (
                   <CommandItem
                     key={cnae.code}
-                    value={`${cnae.code} - ${cnae.description}`}
+                    value={cnae.code}
                     onSelect={() => {
                       onChange(cnae.code);
                       setOpen(false);
