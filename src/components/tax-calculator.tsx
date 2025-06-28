@@ -10,7 +10,7 @@ import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/
 import { calculateTaxes } from '@/lib/calculations';
 import { type CalculationResults, type TaxFormValues } from '@/lib/types';
 import { MINIMUM_WAGE } from '@/lib/constants';
-import { cn } from "@/lib/utils";
+import { cn, formatCurrencyBRL } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -23,11 +23,6 @@ import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { ActivityField } from './activity-field';
-
-const formatCurrencyBRL = (value: number) => {
-  if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-};
 
 const formSchema = z.object({
   domesticActivities: z.array(z.object({

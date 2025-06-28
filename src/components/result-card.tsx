@@ -1,19 +1,11 @@
+import { memo } from 'react';
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails, TaxFormValues } from "@/lib/types";
+import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
 
-const formatCurrencyBRL = (value: number) => {
-  if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-};
-
-const formatPercent = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-    return `${(value * 100).toFixed(2)}%`.replace('.', ',');
-}
-
-export const ResultCard = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
+const ResultCardComponent = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
     const numSocios = formValues.numberOfPartners || 1;
     const proLaboreTaxes = details.breakdown.filter(item => item.name.includes("s/ Pró-labore")).reduce((acc, item) => acc + item.value, 0);
     const custoPrevidenciarioSocio = proLaboreTaxes / numSocios;
@@ -98,3 +90,7 @@ export const ResultCard = ({ details, isCheapest, formValues }: { details: TaxDe
         </Card>
     );
 };
+
+ResultCardComponent.displayName = 'ResultCard';
+
+export const ResultCard = memo(ResultCardComponent);
