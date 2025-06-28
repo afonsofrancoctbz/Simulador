@@ -2,6 +2,7 @@
 import BenefitsSection from '@/components/benefits-section';
 import FaqSection from '@/components/faq-section';
 import TaxCalculator from '@/components/tax-calculator';
+import AppFooter from '@/components/app-footer';
 
 export default function Home() {
   return (
@@ -36,10 +37,7 @@ export default function Home() {
 
       </main>
 
-       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
-          <p>TributaSimples © {new Date().getFullYear()}.</p>
-          <p className="text-xs mt-2">Aviso: Esta ferramenta destina-se apenas a fins de estimativa. Consulte um contador para aconselhamento preciso.</p>
-        </footer>
+       <AppFooter />
     </>
   );
 }
