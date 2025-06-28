@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -164,6 +165,7 @@ export default function TaxCalculator() {
     return {
         domesticActivities,
         exportActivities,
+        exportCurrency: values.exportCurrency,
         exchangeRate: values.exportCurrency !== 'BRL' ? (values.exchangeRate ?? 1) : 1,
         totalSalaryExpense: values.totalSalaryExpense,
         proLaborePerPartner: values.proLaborePerPartner,
@@ -248,7 +250,7 @@ export default function TaxCalculator() {
     if (hasAnnexVActivity) {
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
-            regime: 'Simples Nacional sem Fator R',
+            regime: 'Simples Nacional',
             annex: 'Anexo V - Sem Utilizar o Fator R'
         });
 
@@ -419,7 +421,7 @@ export default function TaxCalculator() {
                                         render={({ field }) => (
                                         <FormItem className='mb-2'>
                                             <FormLabel>Faturamento Nacional (Anexo {annex})</FormLabel>
-                                            <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                            <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
@@ -433,7 +435,14 @@ export default function TaxCalculator() {
                                     <FormField control={form.control} name="exportCurrency" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Moeda</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={(value) => {
+                                                field.onChange(value)
+                                                if (exchangeRates[value]) {
+                                                    form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true })
+                                                } else if (value === 'BRL') {
+                                                    form.setValue('exchangeRate', 1, { shouldValidate: true })
+                                                }
+                                            }} defaultValue={field.value}>
                                                 <FormControl><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger></FormControl>
                                                 <SelectContent>
                                                     <SelectItem value="BRL">Real (BRL)</SelectItem>
@@ -448,7 +457,7 @@ export default function TaxCalculator() {
                                             <FormItem>
                                                 <FormLabel>Taxa de Câmbio ({exportCurrency})</FormLabel>
                                                 <div className="relative">
-                                                    <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} disabled={isFetchingRate} /></FormControl>
+                                                    <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} disabled={isFetchingRate} /></FormControl>
                                                      <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate}>
                                                         <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
                                                     </Button>
@@ -466,7 +475,7 @@ export default function TaxCalculator() {
                                         render={({ field }) => (
                                         <FormItem className='mb-2'>
                                             <FormLabel>Faturamento Exportação (Anexo {annex})</FormLabel>
-                                            <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                            <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
