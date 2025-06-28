@@ -29,9 +29,12 @@ const TaxOptimizationInputSchema = z.object({
     .describe('Monthly pro-labore amount for partners.'),
   numberOfPartners: z.number().describe('The number of partners in the business.'),
   municipalISSRate: z.number().describe('The municipal ISS rate.'),
-  simplesNacionalTaxBurden: z
+  simplesNacionalSemFatorRBurden: z
     .number()
-    .describe('The tax burden under Simples Nacional.'),
+    .describe('The tax burden under Simples Nacional without Fator R optimization.'),
+  simplesNacionalComFatorRBurden: z
+    .number()
+    .describe('The tax burden under Simples Nacional with Fator R optimization.'),
   lucroPresumidoTaxBurden: z
     .number()
     .describe('The tax burden under Lucro Presumido.'),
@@ -64,9 +67,9 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   Com base nos dados financeiros fornecidos, elabore uma recomendação concisa (3-4 frases) e acionável para o empresário otimizar sua carga tributária. A resposta deve ser em português.
 
   **Análise Mandatória:**
-  1.  **Regime Tributário:** Analise os custos totais e recomende o regime mais vantajoso (Simples Nacional ou Lucro Presumido).
-  2.  **Fator R:** Se houver atividades do Anexo V, analise o "Fator R". Se for inferior a 28%, sugira o ajuste do pró-labore para se enquadrar no Anexo III, se for benéfico.
-  3.  **Receitas de Exportação:** Analise o impacto das receitas de exportação, destacando as isenções de PIS, COFINS e ISS e como isso beneficia a empresa.
+  1.  **Comparação de Regimes:** Compare os três cenários: Simples Nacional sem otimização, Simples Nacional com otimização do Fator R, e Lucro Presumido. Recomende o mais vantajoso em termos de custo total.
+  2.  **Fator R:** Se a otimização do "Fator R" for benéfica, explique o porquê, mencionando a economia gerada ao aumentar o pró-labore para atingir 28% do faturamento, o que permite a tributação pelo Anexo III.
+  3.  **Receitas de Exportação:** Se houver receitas de exportação, comente sobre o impacto positivo das isenções de PIS, COFINS e ISS.
   4.  **Plano de Saúde:** Comente o impacto do custo do plano de saúde, explicando que é um benefício para os sócios, mas que o valor pago pela empresa aumenta a base de cálculo para o IRRF.
 
   **Dados Financeiros:**
@@ -74,12 +77,13 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   - Faturamento Mensal (Nacional): {{totalDomesticRevenue}}
   - Faturamento Mensal (Exportação): {{totalExportRevenue}}
   - Despesa com Salários (CLT): {{totalSalaryExpense}}
-  - Pró-labore dos Sócios: {{proLaborePartners}}
+  - Pró-labore dos Sócios (Informado): {{proLaborePartners}}
   - Número de Sócios: {{numberOfPartners}}
   - Alíquota ISS Municipal: {{municipalISSRate}}%
   - Custo do Plano de Saúde: {{healthPlanCost}}
-  - Carga Tributária (Simples Nacional): {{simplesNacionalTaxBurden}}
-  - Carga Tributária (Lucro Presumido): {{lucroPresumidoTaxBurden}}
+  - Custo Total (Simples Nacional sem Fator R): {{simplesNacionalSemFatorRBurden}}
+  - Custo Total (Simples Nacional com Fator R): {{simplesNacionalComFatorRBurden}}
+  - Custo Total (Lucro Presumido): {{lucroPresumidoTaxBurden}}
 
   **Formato da Resposta:**
   Gere apenas a recomendação em texto, sem cabeçalhos ou formatação extra.`,

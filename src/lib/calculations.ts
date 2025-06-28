@@ -88,8 +88,8 @@ function calculateProLaboreTaxes(proLabore: number, healthPlanCost: number = 0) 
   return { inssOnProLabore, irrf };
 }
 
-function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners, municipalISSRate, healthPlanCost = 0 } = values;
+function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, regimeName: string): TaxDetails {
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners, municipalISSRate, healthPlanCost = 0 } = values;
 
   const notes: string[] = [];
 
@@ -100,14 +100,17 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   
   const hasExportRevenue = allActivities.some(act => act.type === 'export' && act.revenue > 0);
 
-  if (allActivities.length === 0 && proLaborePartners === 0 && totalSalaryExpense === 0) {
+  if (allActivities.length === 0 && proLabore === 0 && totalSalaryExpense === 0) {
     return {
-      regime: 'Simples Nacional',
+      regime: regimeName,
       totalTax: 0,
       totalMonthlyCost: 0,
       contabilizeiFee: 0,
       breakdown: [],
-      notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."]
+      notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."],
+      totalRevenue: 0,
+      proLabore: 0,
+      effectiveRate: 0,
     };
   }
 
@@ -118,14 +121,17 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     .filter(a => getCnaeData(a.code)?.requiresFatorR)
     .reduce((sum, act) => sum + act.revenue, 0);
   
-  const totalPayroll = totalSalaryExpense + proLaborePartners;
+  const totalPayroll = totalSalaryExpense + proLabore;
   const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : 0;
   const isFatorRApplicable = revenueAnnexV > 0;
+  let effectiveAnnexForV: Annex = 'V';
   
   if (isFatorRApplicable) {
     const useAnnexIIIForV = fatorR >= 0.28;
+    effectiveAnnexForV = useAnnexIIIForV ? 'III' : 'V';
+    
     notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
-    if (!useAnnexIIIForV) {
+    if (!useAnnexIIIForV && regimeName.includes('Sem Fator R')) { // Add suggestion only for the non-optimized scenario
         const requiredPayroll = totalRevenue * 0.28;
         const payrollShortfall = requiredPayroll - totalPayroll;
         if (payrollShortfall > 0) {
@@ -134,20 +140,17 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     }
   }
 
-  const useAnnexIIIForV = isFatorRApplicable && fatorR >= 0.28;
-
   if (hasExportRevenue) {
-    notes.push("As receitas de exportação têm isenção de PIS, COFINS e ISS no Simples Nacional, resultando em uma alíquota efetiva menor sobre estes valores.");
+    notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS, resultando em uma alíquota efetiva menor.");
   }
 
-  // Group revenue by effective annex
   const revenueByAnnex = allActivities.reduce((acc, activity) => {
     const cnaeInfo = getCnaeData(activity.code);
     if (!cnaeInfo) return acc;
 
     let effectiveAnnex: Annex = cnaeInfo.annex;
-    if (cnaeInfo.annex === 'V' && useAnnexIIIForV) {
-      effectiveAnnex = 'III';
+    if (cnaeInfo.annex === 'V' && isFatorRApplicable) {
+      effectiveAnnex = effectiveAnnexForV;
     }
     
     if (!acc[effectiveAnnex]) {
@@ -167,6 +170,11 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   let totalDas = 0;
   let cppFromAnnexIV = 0;
   let totalIssSeparado = 0;
+  let mainAnnex: Annex | undefined;
+  if(Object.keys(revenueByAnnex).length > 0) {
+    mainAnnex = Object.keys(revenueByAnnex).reduce((a, b) => revenueByAnnex[a as Annex].domestic + revenueByAnnex[a as Annex].export > revenueByAnnex[b as Annex].domestic + revenueByAnnex[b as Annex].export ? a : b) as Annex;
+  }
+  
 
   for (const annexStr in revenueByAnnex) {
     const annex = annexStr as Annex;
@@ -179,11 +187,8 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
     
     let annexDas = 0;
-
-    // Calculate tax on domestic revenue
     annexDas += annexInfo.domestic * effectiveRate;
 
-    // Calculate tax on export revenue (with exemptions)
     const { PIS = 0, COFINS = 0, ISS = 0, IPI = 0, ICMS = 0 } = bracket.distribution;
     const exportExemptionRate = PIS + COFINS + (ISS ?? 0) + (IPI ?? 0) + (ICMS ?? 0);
     const effectiveRateForExport = Math.max(0, effectiveRate * (1 - exportExemptionRate));
@@ -194,27 +199,21 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     }
     totalDas += annexDas;
 
-    // Annex IV has CPP paid separately
     if (annex === 'IV') {
-        const cppRate = 0.20 + 0.03 + 0.058; // Simplified INSS Patronal + RAT + Terceiros
+        const cppRate = 0.20 + 0.03 + 0.058;
         cppFromAnnexIV += (totalPayroll) * cppRate;
-        notes.push("Atividades do Anexo IV pagam a Contribuição Previdenciária Patronal (CPP) fora do DAS, de forma similar ao Lucro Presumido, incidindo sobre o total da folha de pagamento.");
+        notes.push("Anexo IV paga a CPP (28.8%) fora do DAS, sobre a folha de pagamento.");
     }
-
-     // Check for last bracket taxes ("por fora")
      if (bracketIndex === annexTable.length - 1) {
       if (['III', 'IV', 'V'].includes(annex) && annexInfo.domestic > 0) {
         const issSeparado = annexInfo.domestic * (municipalISSRate / 100);
         totalIssSeparado += issSeparado;
-        notes.push(`Para faturamento na última faixa do Anexo ${annex}, o ISS (${municipalISSRate}%) é recolhido separadamente do DAS.`);
-      }
-      if (['I', 'II'].includes(annex) && annexInfo.domestic > 0) {
-        notes.push(`Para faturamento na última faixa do Anexo ${annex}, o ICMS deve ser recolhido separadamente, conforme as regras do seu estado.`);
+        notes.push(`Na última faixa do Anexo ${annex}, o ISS (${municipalISSRate}%) é recolhido à parte.`);
       }
     }
   }
 
-  const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
+  const proLaborePerPartner = numberOfPartners > 0 ? proLabore / numberOfPartners : 0;
   const healthPlanCostPerPartner = numberOfPartners > 0 ? healthPlanCost / numberOfPartners : 0;
   const proLaboreTaxesPerPartner = calculateProLaboreTaxes(proLaborePerPartner, healthPlanCostPerPartner);
   const totalProLaboreTaxes = {
@@ -223,29 +222,34 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   };
 
   const totalTax = totalDas + cppFromAnnexIV + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf + totalIssSeparado;
-  const totalMonthlyCost = totalTax + totalSalaryExpense + proLaborePartners + healthPlanCost;
+  const totalMonthlyCost = totalTax + totalSalaryExpense + proLabore + healthPlanCost;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? 0;
 
   const breakdown = [
-    ...dasBreakdownByAnnex,
+    { name: "DAS", value: totalDas },
     ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
-    ...(totalIssSeparado > 0 ? [{ name: "ISS (Recolhido à parte)", value: totalIssSeparado }] : []),
-    { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
-    { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
-    ...(healthPlanCost > 0 ? [{ name: "Plano de Saúde (Empresa)", value: healthPlanCost }] : []),
+    ...(totalIssSeparado > 0 ? [{ name: "ISS (À parte)", value: totalIssSeparado }] : []),
+    { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
+    { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
   ];
 
   return {
-    regime: 'Simples Nacional',
+    regime: regimeName,
     totalTax,
     totalMonthlyCost,
+    totalRevenue,
+    proLabore,
+    fatorR: isFatorRApplicable ? fatorR : undefined,
+    annex: mainAnnex ? `Anexo ${mainAnnex}`: undefined,
+    effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
     contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
   };
 }
+
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePartners, numberOfPartners, municipalISSRate, healthPlanCost = 0 } = values;
@@ -253,7 +257,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const notes: string[] = [];
   const hasExportRevenue = exportActivities.some(act => act.revenue > 0);
   if (hasExportRevenue) {
-    notes.push("As receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
+    notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
   }
 
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -269,7 +273,10 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       totalMonthlyCost: 0,
       contabilizeiFee: 0,
       breakdown: [],
-      notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."]
+      notes: ["Nenhuma informação de faturamento ou despesa foi adicionada."],
+      totalRevenue: 0,
+      proLabore: 0,
+      effectiveRate: 0,
     };
   }
 
@@ -306,7 +313,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const inssPatronal = totalPayroll * (INSS_PATRONAL_RATE + RAT_RATE + TERCEIROS_RATE);
   
   if (totalPayroll > 0) {
-    notes.push("A Contribuição Previdenciária Patronal (CPP) de 20% (+ RAT e Terceiros) incide sobre o total da folha de pagamento (salários + pró-labore).");
+    notes.push("A CPP (28.8%) incide sobre o total da folha de pagamento (salários + pró-labore).");
   }
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
@@ -325,21 +332,23 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? 0;
 
   const breakdown = [
-    { name: "PIS", value: pis },
-    { name: "COFINS", value: cofins },
-    { name: "ISS", value: iss },
+    { name: "PIS", value: pis, rate: PIS_RATE },
+    { name: "COFINS", value: cofins, rate: COFINS_RATE },
+    { name: "ISS", value: iss, rate: municipalISSRate / 100 },
     { name: "IRPJ", value: irpj },
     { name: "CSLL", value: csll },
-    { name: "INSS Patronal (Folha)", value: inssPatronal },
-    { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
-    { name: "IRRF sobre Pró-labore", value: totalProLaboreTaxes.irrf },
-    ...(healthPlanCost > 0 ? [{ name: "Plano de Saúde (Empresa)", value: healthPlanCost }] : []),
+    { name: "INSS Patronal", value: inssPatronal },
+    { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
+    { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
   ];
 
   return {
     regime: 'Lucro Presumido',
     totalTax,
     totalMonthlyCost,
+    totalRevenue,
+    proLabore: proLaborePartners,
+    effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
     contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
@@ -347,11 +356,41 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 }
 
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
-  const simplesNacional = calculateSimplesNacional(values);
   const lucroPresumido = calculateLucroPresumido(values);
+  
+  const simplesNacionalSemFatorR = _calculateSimplesNacional(values, values.proLaborePartners, 'Simples Nacional Sem Fator R');
+
+  let simplesNacionalComFatorR = simplesNacionalSemFatorR;
+
+  const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
+
+  if (hasAnnexVActivity && (simplesNacionalSemFatorR.fatorR ?? 0) < 0.28) {
+    const totalRevenue = simplesNacionalSemFatorR.totalRevenue;
+    const requiredPayroll = totalRevenue * 0.28;
+    const currentPayroll = values.totalSalaryExpense + values.proLaborePartners;
+    
+    if (requiredPayroll > currentPayroll) {
+        const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayroll);
+        const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
+        const optimizedResult = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional Com Fator R');
+        
+        // Only consider the optimized result if it's actually cheaper
+        if (optimizedResult.totalMonthlyCost < simplesNacionalSemFatorR.totalMonthlyCost) {
+            simplesNacionalComFatorR = optimizedResult;
+        } else {
+             simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional Com Fator R' };
+        }
+    } else {
+       simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional Com Fator R' };
+    }
+  } else {
+     simplesNacionalComFatorR = { ...simplesNacionalSemFatorR, regime: 'Simples Nacional Com Fator R' };
+  }
+
 
   return {
-    simplesNacional,
+    simplesNacionalComFatorR,
+    simplesNacionalSemFatorR,
     lucroPresumido,
   };
 }

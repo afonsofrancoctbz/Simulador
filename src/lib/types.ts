@@ -16,21 +16,29 @@ export interface TaxFormValues {
 }
 
 export interface TaxDetails {
-  regime: 'Simples Nacional' | 'Lucro Presumido';
+  regime: string;
   totalTax: number;
   totalMonthlyCost: number;
+  totalRevenue: number;
+  proLabore: number;
+  fatorR?: number;
+  effectiveRate: number;
   contabilizeiFee: number;
   breakdown: {
     name: string;
     value: number;
+    rate?: number;
   }[];
   notes?: string[];
+  annex?: string;
 }
 
 export interface CalculationResults {
-  simplesNacional: TaxDetails;
+  simplesNacionalComFatorR: TaxDetails;
+  simplesNacionalSemFatorR: TaxDetails;
   lucroPresumido: TaxDetails;
 }
+
 
 export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
 
