@@ -29,6 +29,11 @@ const ANNEX_TABLES = {
   V: SIMPLES_NACIONAL_ANNEX_V,
 };
 
+const formatCurrencyBRL = (value: number) => {
+  if (typeof value !== 'number') return 'N/A';
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+};
+
 function findBracket(table: { max: number }[], value: number) {
   if (value === 0) {
     return table[0];
@@ -110,17 +115,26 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   const rbt12 = totalRevenue * 12;
 
   const revenueAnnexV = allActivities
-    .filter(a => getCnaeData(a.code)?.annex === 'V')
+    .filter(a => getCnaeData(a.code)?.requiresFatorR)
     .reduce((sum, act) => sum + act.revenue, 0);
   
   const totalPayroll = totalSalaryExpense + proLaborePartners;
   const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : 0;
   const isFatorRApplicable = revenueAnnexV > 0;
-  const useAnnexIIIForV = fatorR >= 0.28;
-
+  
   if (isFatorRApplicable) {
+    const useAnnexIIIForV = fatorR >= 0.28;
     notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
+    if (!useAnnexIIIForV) {
+        const requiredPayroll = totalRevenue * 0.28;
+        const payrollShortfall = requiredPayroll - totalPayroll;
+        if (payrollShortfall > 0) {
+            notes.push(`SUGESTÃO: Para se beneficiar das alíquotas do Anexo III, você pode aumentar seu pró-labore ou folha de pagamento em ${formatCurrencyBRL(payrollShortfall)}.`);
+        }
+    }
   }
+
+  const useAnnexIIIForV = isFatorRApplicable && fatorR >= 0.28;
 
   if (hasExportRevenue) {
     notes.push("As receitas de exportação têm isenção de PIS, COFINS e ISS no Simples Nacional, resultando em uma alíquota efetiva menor sobre estes valores.");
@@ -149,6 +163,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     return acc;
   }, {} as Record<Annex, { domestic: number; export: number }>);
   
+  const dasBreakdownByAnnex: { name: string; value: number }[] = [];
   let totalDas = 0;
   let cppFromAnnexIV = 0;
   let totalIssSeparado = 0;
@@ -162,15 +177,22 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const bracket = annexTable[bracketIndex];
     
     const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
+    
+    let annexDas = 0;
 
     // Calculate tax on domestic revenue
-    totalDas += annexInfo.domestic * effectiveRate;
+    annexDas += annexInfo.domestic * effectiveRate;
 
     // Calculate tax on export revenue (with exemptions)
     const { PIS = 0, COFINS = 0, ISS = 0, IPI = 0, ICMS = 0 } = bracket.distribution;
     const exportExemptionRate = PIS + COFINS + (ISS ?? 0) + (IPI ?? 0) + (ICMS ?? 0);
     const effectiveRateForExport = Math.max(0, effectiveRate * (1 - exportExemptionRate));
-    totalDas += annexInfo.export * effectiveRateForExport;
+    annexDas += annexInfo.export * effectiveRateForExport;
+
+    if (annexDas > 0) {
+        dasBreakdownByAnnex.push({ name: `DAS (Anexo ${annex})`, value: annexDas });
+    }
+    totalDas += annexDas;
 
     // Annex IV has CPP paid separately
     if (annex === 'IV') {
@@ -207,7 +229,7 @@ function calculateSimplesNacional(values: TaxFormValues): TaxDetails {
   const contabilizeiFee = feeBracket?.plans.padrao ?? 0;
 
   const breakdown = [
-    { name: "DAS (Imposto Unificado)", value: totalDas },
+    ...dasBreakdownByAnnex,
     ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
     ...(totalIssSeparado > 0 ? [{ name: "ISS (Recolhido à parte)", value: totalIssSeparado }] : []),
     { name: "INSS sobre Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
