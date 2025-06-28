@@ -31,7 +31,6 @@ export interface TaxDetails {
   notes?: string[];
   annex?: string;
   annualSavings?: number;
-  explanation: string;
   optimizationNote?: string;
 }
 

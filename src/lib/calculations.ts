@@ -147,7 +147,6 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
       effectiveRate: 0,
       contabilizeiFee: CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial,
       breakdown,
-      explanation: "Regime unificado que recolhe os principais tributos em uma única guia (DAS). A alíquota é progressiva e baseada no seu faturamento anual. O 'Fator R' (relação entre folha de pagamento e faturamento) pode reduzir sua alíquota."
     };
   }
   
@@ -281,7 +280,6 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     contabilizeiFee: feeBracket?.plans.expertsEssencial ?? 0,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
-    explanation: "Regime unificado que recolhe os principais tributos em uma única guia (DAS). A alíquota é progressiva e baseada no seu faturamento anual. O 'Fator R' (relação entre folha de pagamento e faturamento) pode reduzir sua alíquota."
   };
 }
 
@@ -327,7 +325,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
           effectiveRate: 0,
           contabilizeiFee: CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial,
           breakdown,
-          explanation: "Neste regime, os impostos são calculados sobre uma presunção de lucro (32% para serviços). Cada tributo (IRPJ, CSLL, PIS, COFINS, ISS) é pago em uma guia separada, oferecendo mais previsibilidade.",
       };
   }
 
@@ -374,7 +371,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     contabilizeiFee: feeBracket?.plans.expertsEssencial ?? 0,
     breakdown: breakdown.filter(item => item.value > 0),
     notes,
-    explanation: "Neste regime, os impostos são calculados sobre uma presunção de lucro (32% para serviços). Cada tributo (IRPJ, CSLL, PIS, COFINS, ISS) é pago em uma guia separada, oferecendo mais previsibilidade.",
   };
 }
 

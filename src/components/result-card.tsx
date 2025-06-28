@@ -54,7 +54,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex-grow">
                      <h4 className="font-semibold text-foreground">👥 Gestão de Sócios</h4>
                      <div className="p-3 border rounded-lg bg-background space-y-2 text-sm font-serif">
                         <div className="flex justify-between">
@@ -79,13 +79,6 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                         <p className="text-xs">{details.fatorR >= 0.28 ? '✅ Alíquota reduzida aplicada' : '⚠️ Considere aumentar pró-labore para otimizar'}</p>
                     </div>
                 )}
-                
-                <div className="space-y-2 flex-grow flex flex-col">
-                     <h4 className="font-semibold text-foreground">💡 Como funciona</h4>
-                     <div className="p-3 border rounded-lg bg-blue-50 text-blue-800 text-sm font-serif flex-grow">
-                         {details.explanation}
-                     </div>
-                </div>
             </CardContent>
 
             <CardFooter className="p-4 border-t bg-muted/20">
