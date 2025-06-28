@@ -488,11 +488,11 @@ const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: st
                 {cnaes.map((cnae) => (
                   <CommandItem
                     key={cnae.code}
-                    value={cnae.code} // Use a simple value for cmdk
-                    onSelect={() => {
-                      onChange(cnae.code);
+                    value={cnae.code}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
                       setOpen(false);
-                      setSearch(""); // Reset search on select
+                      setSearch("");
                     }}
                   >
                     <Check
