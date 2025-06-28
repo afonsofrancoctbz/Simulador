@@ -1,3 +1,4 @@
+
 export interface CnaeItem {
   code: string;
   revenue: number;
@@ -64,4 +65,20 @@ export interface FeeBracket {
         expertsEssencial: number;
         expertsPro: number;
     }
+}
+
+export interface ProLaboreInput {
+  valorProLaboreBruto: number;
+  outrasFontesRendaINSS?: number; // Soma de outras remunerações (ex: salário CLT)
+  configuracaoFiscal: any; // Objeto com os parâmetros do ano (tabelas, tetos)
+}
+
+export interface ProLaboreOutput {
+  valorBruto: number;
+  baseCalculoINSS: number;
+  aliquotaEfetivaINSS: number;
+  valorINSSCalculado: number;
+  baseCalculoIRRF: number;
+  valorIRRFCalculado: number;
+  valorLiquido: number; // Bruto - INSS - IRRF
 }

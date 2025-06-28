@@ -12,6 +12,8 @@ import {
   type CnaeData,
   type Annex,
   type FeeBracket,
+  type ProLaboreInput,
+  type ProLaboreOutput,
 } from './types';
 
 const fiscalConfig = getFiscalParameters();
@@ -59,14 +61,66 @@ function _getCnaeData(code: string): CnaeData | undefined {
   return CNAE_DATA.find(c => c.code === code);
 }
 
-function _calculateProLaboreTaxes(proLabore: number) {
-  const inssOnProLabore = Math.min(proLabore, fiscalConfig.teto_inss) * fiscalConfig.aliquota_inss_prolabore;
-  const applicableDeduction = Math.max(inssOnProLabore, fiscalConfig.deducao_simplificada_irrf);
-  const irrfCalculationBase = proLabore - applicableDeduction;
-  const irrfBracket = _findBracket(fiscalConfig.tabela_irrf, irrfCalculationBase);
-  const irrf = Math.max(0, irrfCalculationBase * irrfBracket.rate - irrfBracket.deduction);
-  return { inssOnProLabore, irrf };
+/**
+ * Encapsulates the tax calculation logic for a partner's pro-labore.
+ * This function calculates INSS and IRRF based on the provided gross value,
+ * considering the INSS ceiling and other potential income sources.
+ * @param input The necessary data for the calculation, including gross pro-labore, other income, and fiscal configuration.
+ * @returns A detailed breakdown of the calculated taxes and net value.
+ */
+export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutput {
+  const { valorProLaboreBruto, outrasFontesRendaINSS, configuracaoFiscal } = input;
+
+  if (valorProLaboreBruto <= 0) {
+    return {
+      valorBruto: 0,
+      baseCalculoINSS: 0,
+      aliquotaEfetivaINSS: 0,
+      valorINSSCalculado: 0,
+      baseCalculoIRRF: 0,
+      valorIRRFCalculado: 0,
+      valorLiquido: 0,
+    };
+  }
+
+  // --- Passo 1: Calcular a Contribuição ao INSS ---
+  // 1.1. Determinar o Salário de Contribuição, considerando o teto do INSS e outras fontes de renda.
+  // A contribuição sobre o pró-labore é limitada pela diferença entre o teto e o que já foi contribuído por outras fontes.
+  const tetoINSS = configuracaoFiscal.teto_inss;
+  const espacoContribuicaoRestante = Math.max(0, tetoINSS - (outrasFontesRendaINSS ?? 0));
+  const baseCalculoINSS = Math.min(valorProLaboreBruto, espacoContribuicaoRestante);
+
+  // 1.2. Aplicar a alíquota de 11% sobre a base de cálculo.
+  // Nota: A regra da tabela progressiva (CLT) não se aplica ao pró-labore de sócios, que segue a alíquota fixa.
+  const valorINSSCalculado = baseCalculoINSS * configuracaoFiscal.aliquota_inss_prolabore;
+
+  // --- Passo 2: Calcular o Imposto de Renda Retido na Fonte (IRRF) ---
+  // 2.1. Determinar a Base de Cálculo do IRRF.
+  // A dedução do INSS é um dos principais benefícios para reduzir a base do IRRF.
+  // A dedução simplificada também é uma opção. Usamos a maior das duas.
+  const applicableDeduction = Math.max(valorINSSCalculado, configuracaoFiscal.deducao_simplificada_irrf);
+  const baseCalculoIRRF = valorProLaboreBruto - applicableDeduction;
+
+  // 2.2. Aplicar a Tabela Progressiva do IRRF.
+  const irrfBracket = _findBracket(configuracaoFiscal.tabela_irrf, baseCalculoIRRF);
+  const valorIRRFCalculado = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
+
+  // --- Passo 3: Calcular o Valor Líquido ---
+  const valorLiquido = valorProLaboreBruto - valorINSSCalculado - valorIRRFCalculado;
+  
+  const aliquotaEfetivaINSS = valorProLaboreBruto > 0 ? valorINSSCalculado / valorProLaboreBruto : 0;
+
+  return {
+    valorBruto: valorProLaboreBruto,
+    baseCalculoINSS,
+    aliquotaEfetivaINSS,
+    valorINSSCalculado,
+    baseCalculoIRRF,
+    valorIRRFCalculado,
+    valorLiquido,
+  };
 }
+
 
 function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, regimeName: string): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners } = values;
@@ -174,14 +228,18 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
   // --- 4. Pro-labore Taxes ---
   const proLaborePerPartner = numberOfPartners > 0 ? proLabore / numberOfPartners : 0;
-  const proLaboreTaxesPerPartner = _calculateProLaboreTaxes(proLaborePerPartner);
-  const totalProLaboreTaxes = {
-    inssOnProLabore: proLaboreTaxesPerPartner.inssOnProLabore * numberOfPartners,
-    irrf: proLaboreTaxesPerPartner.irrf * numberOfPartners
-  };
+  const proLaboreTaxesPerPartner = calcularEncargosProLabore({
+    valorProLaboreBruto: proLaborePerPartner,
+    outrasFontesRendaINSS: 0, // Campo não disponível na UI atual
+    configuracaoFiscal: fiscalConfig,
+  });
+
+  const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
+  const totalIRRFProLabore = proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners;
+
 
   // --- 5. Assemble Final Results ---
-  const totalTax = totalDas + cppFromAnnexIV + totalIssSeparado + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
+  const totalTax = totalDas + cppFromAnnexIV + totalIssSeparado + totalINSSProLabore + totalIRRFProLabore;
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const mainAnnex = Object.keys(revenueByAnnex).reduce((a, b) => revenueByAnnex[a as Annex].domestic + revenueByAnnex[a as Annex].export > revenueByAnnex[b as Annex].domestic + revenueByAnnex[b as Annex].export ? a : b) as Annex;
 
@@ -189,8 +247,8 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     ...Array.from(dasComponents.entries()).map(([name, value]) => ({ name: `DAS - ${name}`, value })),
     ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Fora do DAS)", value: cppFromAnnexIV }] : []),
     ...(totalIssSeparado > 0 ? [{ name: "ISS (Fora do DAS)", value: totalIssSeparado }] : []),
-    { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
-    { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
+    { name: "INSS s/ Pró-labore", value: totalINSSProLabore },
+    { name: "IRRF s/ Pró-labore", value: totalIRRFProLabore },
   ];
 
   return {
@@ -240,8 +298,16 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   if (totalPayroll > 0) notes.push("No Lucro Presumido, a CPP (INSS Patronal) é paga sobre a folha de pagamento.");
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
-  const { inssOnProLabore, irrf } = _calculateProLaboreTaxes(proLaborePerPartner);
-  const totalProLaboreTaxes = { inssOnProLabore: inssOnProLabore * numberOfPartners, irrf: irrf * numberOfPartners };
+  const proLaboreTaxesPerPartner = calcularEncargosProLabore({
+    valorProLaboreBruto: proLaborePerPartner,
+    outrasFontesRendaINSS: 0, // Campo não disponível na UI atual
+    configuracaoFiscal: fiscalConfig,
+  });
+
+  const totalProLaboreTaxes = { 
+      inssOnProLabore: proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners, 
+      irrf: proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners 
+  };
 
   // --- 4. Assemble Final Results ---
   const totalTax = irpj + csll + pis + cofins + iss + inssPatronal + totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
