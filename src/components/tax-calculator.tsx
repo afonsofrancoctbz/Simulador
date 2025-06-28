@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import FaqSection from './faq-section';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { CnaeSelector } from './cnae-selector';
+import { Label } from './ui/label';
 
 const formatCurrencyBRL = (value: number) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
@@ -75,6 +76,7 @@ export default function TaxCalculator() {
   const [isAdviceLoading, setIsAdviceLoading] = useState(false);
   const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
   const [isFetchingRate, setIsFetchingRate] = useState(false);
+  const [cnaeSelectorState, setCnaeSelectorState] = useState({ open: false, target: 'domestic' as 'domestic' | 'export' });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,6 +128,13 @@ export default function TaxCalculator() {
   useEffect(() => {
     fetchRates();
   }, []);
+
+  const handleAddActivities = (codes: string[]) => {
+    const targetFunction = cnaeSelectorState.target === 'domestic' ? appendDomestic : appendExport;
+    codes.forEach(code => {
+      targetFunction({ code: code, revenue: 0 });
+    });
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -299,7 +308,7 @@ export default function TaxCalculator() {
                             {domesticFields.map((field, index) => (
                                 <ActivityField key={field.id} form={form} fieldName="domesticActivities" index={index} removeFn={removeDomestic} />
                             ))}
-                            <Button type="button" variant="outline" size="sm" onClick={() => appendDomestic({ code: '', revenue: 0 })}>
+                            <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
                             </Button>
                             <FormMessage>{form.formState.errors.domesticActivities?.root?.message}</FormMessage>
@@ -360,7 +369,7 @@ export default function TaxCalculator() {
                             {exportFields.map((field, index) => (
                                 <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
                             ))}
-                            <Button type="button" variant="outline" size="sm" onClick={() => appendExport({ code: '', revenue: 0 })}>
+                             <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'export' })}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
                             </Button>
                         </CardContent>
@@ -376,6 +385,13 @@ export default function TaxCalculator() {
           </form>
         </Form>
       </div>
+
+      <CnaeSelector
+        open={cnaeSelectorState.open}
+        onOpenChange={(open) => setCnaeSelectorState(s => ({ ...s, open }))}
+        onConfirm={handleAddActivities}
+      />
+
       {renderResults()}
       <FaqSection />
       <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
@@ -396,15 +412,21 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
   return (
     <div className="flex flex-col gap-3 p-3 border rounded-lg bg-background/50">
       <div className="flex flex-col sm:flex-row items-end gap-2">
-          <FormField control={form.control} name={`${fieldName}.${index}.code`} render={({ field }) => (
-              <FormItem className="flex-1 w-full">
-                  <FormLabel>CNAE</FormLabel>
-                  <CnaeSelector value={field.value} onChange={field.onChange} />
-                  <FormMessage />
-              </FormItem>
-          )} />
+          <div className="flex-1 w-full space-y-2">
+              <Label>CNAE</Label>
+              <div className="w-full justify-start text-left font-normal h-auto min-h-10 py-2 px-3 border rounded-md bg-muted/30">
+                  {selectedCnaeData ? (
+                      <div className="flex w-full flex-col items-start text-sm">
+                          <span className="font-medium text-foreground">{selectedCnaeData.code}</span>
+                          <span className="text-muted-foreground whitespace-normal">{selectedCnaeData.description}</span>
+                      </div>
+                  ) : (
+                      <span className="text-destructive">CNAE não encontrado. Por favor, remova e adicione novamente.</span>
+                  )}
+              </div>
+          </div>
           <FormField control={form.control} name={`${fieldName}.${index}.revenue`} render={({ field }) => (
-              <FormItem className="flex-1 w-full sm:w-auto">
+              <FormItem className="w-full sm:w-48">
                   <FormLabel>Faturamento Mensal</FormLabel>
                   <FormControl><Input type="number" step="0.01" placeholder={placeholderText} {...field} /></FormControl>
                   <FormMessage />
