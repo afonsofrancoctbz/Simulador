@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes, getCnaeData } from '@/lib/calculations';
@@ -24,7 +24,6 @@ import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { ActivityField } from './activity-field';
-import { PlusCircle } from 'lucide-react';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -50,7 +49,7 @@ const formSchema = z.object({
     }
     return true;
 }, {
-    message: `O valor deve ser 0 ou no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+    message: `O valor deve ser R$ 0,00 ou no mínimo ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
     path: ["proLaborePartners"],
 }).refine(data => {
     const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
@@ -60,7 +59,7 @@ const formSchema = z.object({
     return true;
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
-    path: ["domesticActivities"],
+    path: ["proLaborePartners"],
 }).refine(data => {
     if (data.exportCurrency !== 'BRL' && data.exportActivities.length > 0 && data.exportActivities.some(a => a.revenue > 0)) {
         return data.exchangeRate && data.exchangeRate > 0;
@@ -391,7 +390,6 @@ export default function TaxCalculator() {
                                 <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
                                     <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
                                 </Button>
-                                <FormMessage>{form.formState.errors.domesticActivities?.root?.message}</FormMessage>
                             </div>
                             
                             <Separator />
