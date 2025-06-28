@@ -6,7 +6,6 @@ export const FISCAL_CONFIG_2025 = {
   salario_minimo: 1412.00,
   teto_inss: 7786.02,
   aliquota_inss_prolabore: 0.11,
-  deducao_simplificada_irrf: 564.80,
   aliquota_iss_padrao: 0.05, // 5%
   aliquotas_cpp_patronal: {
     base: 0.20,

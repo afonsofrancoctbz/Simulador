@@ -53,10 +53,7 @@ const formSchema = z.object({
     path: ["proLaborePartners"],
 }).refine(data => {
     const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
-    if (totalRevenue === 0 && data.proLaborePartners === 0) {
-      return false;
-    }
-    return true;
+    return totalRevenue > 0 || data.proLaborePartners > 0;
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
     path: ["proLaborePartners"],
@@ -201,8 +198,11 @@ export default function TaxCalculator() {
     const allActivities = [...domesticActivities, ...exportActivities];
     
     if (allActivities.length === 0) return [];
+    
+    const revenueSum = allActivities.reduce((sum, act) => sum + (act.revenue || 0), 0);
+    if(revenueSum === 0) return [];
 
-    const mainActivity = allActivities.reduce((max, act) => act.revenue > max.revenue ? act : max, { revenue: -1, code: '' });
+    const mainActivity = allActivities.reduce((max, act) => (act.revenue || 0) > (max.revenue || 0) ? act : max, { revenue: -1, code: '' });
     if (!mainActivity.code) return [];
 
     const mainCnaeInfo = getCnaeData(mainActivity.code);
@@ -217,26 +217,25 @@ export default function TaxCalculator() {
     };
 
     if (mainAnnex === 'V' && mainCnaeInfo.requiresFatorR) {
-        const situacaoAtual = {
+        // Scenario 1: Actual situation with user's input
+        scenarios.push({
             ...results.simplesNacionalSemFatorR,
             regime: 'Situação Atual: Anexo V'
-        };
-        scenarios.push(situacaoAtual);
-        
+        });
+
+        // Scenario 2: Optimized situation
         const cenarioOtimizado = results.simplesNacionalComFatorR;
+        const proLaboreOtimizado = cenarioOtimizado.proLabore;
+        const optimizationNote = `Para alcançar este cenário, seu pró-labore precisa ser ajustado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
         
-        if (cenarioOtimizado.totalMonthlyCost < situacaoAtual.totalMonthlyCost) {
-            const proLaboreOtimizado = cenarioOtimizado.proLabore;
-            const optimizationNote = `Para alcançar este cenário, seu pró-labore precisa ser ajustado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
-            
-            scenarios.push({
-                ...cenarioOtimizado,
-                regime: 'Cenário Otimizado: Anexo III',
-                annex: 'Anexo III', // Override the annex display
-                optimizationNote: optimizationNote
-            });
-        }
+        scenarios.push({
+            ...cenarioOtimizado,
+            regime: 'Cenário Otimizado: Anexo III',
+            annex: 'Anexo III', // Override the annex display
+            optimizationNote: optimizationNote
+        });
         
+        // Scenario 3: Lucro Presumido
         scenarios.push(lucroPresumidoScenario);
 
     } else { // Annex III, IV, or others
@@ -248,7 +247,16 @@ export default function TaxCalculator() {
         scenarios.push(lucroPresumidoScenario);
     }
     
-    return scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+    const sortedScenarios = scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+    const cheapest = sortedScenarios[0];
+    if (cheapest && cheapest.totalMonthlyCost > 0) {
+        const secondCheapest = sortedScenarios.find(s => s.totalMonthlyCost > cheapest.totalMonthlyCost);
+        if (secondCheapest) {
+            cheapest.annualSavings = (secondCheapest.totalMonthlyCost - cheapest.totalMonthlyCost) * 12;
+        }
+    }
+    
+    return sortedScenarios;
 
   }, [results, form]);
 

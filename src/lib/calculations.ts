@@ -81,9 +81,9 @@ export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutpu
   const baseCalculoINSS = Math.min(valorProLaboreBruto, espacoContribuicaoRestante);
 
   const valorINSSCalculado = baseCalculoINSS * configuracaoFiscal.aliquota_inss_prolabore;
-
-  const applicableDeduction = Math.max(valorINSSCalculado, configuracaoFiscal.deducao_simplificada_irrf);
-  const baseCalculoIRRF = valorProLaboreBruto - applicableDeduction;
+  
+  // Base para IRRF é o bruto MENOS o INSS efetivamente descontado.
+  const baseCalculoIRRF = valorProLaboreBruto - valorINSSCalculado;
 
   const irrfBracket = _findBracket(configuracaoFiscal.tabela_irrf, baseCalculoIRRF);
   const valorIRRFCalculado = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
@@ -132,9 +132,9 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     }
     
     const companyTaxes = cppFromAnnexIV;
-    const withheldTaxes = totalINSSProLabore + totalIRRFProLabore;
-    const totalTax = companyTaxes + withheldTaxes;
-    const fee = CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
+    const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
+    const totalTax = companyTaxes + totalWithheldTaxes;
+    const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     const totalMonthlyCost = companyTaxes + totalSalaryExpense + proLaboreToUse + fee;
 
     const breakdown = [
@@ -238,8 +238,8 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
   // --- 5. Assemble Final Results ---
   const companyTaxes = totalDas + cppFromAnnexIV + totalIssSeparado;
-  const withheldTaxes = totalINSSProLabore + totalIRRFProLabore;
-  const totalTax = companyTaxes + withheldTaxes; // For display in breakdown
+  const totalWithheldTaxes = totalINSSProLabore + totalIRRFProLabore;
+  const totalTax = companyTaxes + totalWithheldTaxes;
   
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
@@ -305,9 +305,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
       const companyTaxes = inssPatronal;
-      const withheldTaxes = totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
-      const totalTax = companyTaxes + withheldTaxes;
-      const fee = CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
+      const totalWithheldTaxes = totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
+      const totalTax = companyTaxes + totalWithheldTaxes;
+      const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
       const totalMonthlyCost = companyTaxes + totalSalaryExpense + proLaboreToUse + fee;
 
       const breakdown = [
@@ -350,8 +350,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   // --- Assemble Final Results ---
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const companyPayrollTaxes = inssPatronal;
-  const withheldTaxes = totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
-  const totalTax = companyRevenueTaxes + companyPayrollTaxes + withheldTaxes; // For display
+  const totalWithheldTaxes = totalProLaboreTaxes.inssOnProLabore + totalProLaboreTaxes.irrf;
+  const totalTax = companyRevenueTaxes + companyPayrollTaxes + totalWithheldTaxes;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
@@ -400,40 +400,14 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
           if (requiredPayroll > currentPayrollForFatorR) {
               const adjustedProLabore = proLaboreToUse + (requiredPayroll - currentPayrollForFatorR);
               const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
-              const optimizedResult = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional (Otimizado)');
-              
-              if (optimizedResult.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
-                  simplesNacionalOtimizado = optimizedResult;
-              }
+              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional (Otimizado)');
           }
       }
   }
-
-  const simplesNacionalSemFatorR = { ...simplesNacionalBase };
-  if (simplesNacionalOtimizado.totalMonthlyCost >= simplesNacionalBase.totalMonthlyCost) {
-      simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional (Otimizado)' };
-  }
   
-  const scenarios = [
-    simplesNacionalOtimizado,
-    simplesNacionalSemFatorR,
-    lucroPresumido
-  ].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-  
-  const best = scenarios[0];
-  if (best) {
-      const secondBest = scenarios.find(s => s.regime !== best.regime && s.totalMonthlyCost > best.totalMonthlyCost);
-      if (secondBest) {
-          const annualSavings = (secondBest.totalMonthlyCost - best.totalMonthlyCost) * 12;
-          if (annualSavings > 0) {
-              best.annualSavings = annualSavings;
-          }
-      }
-  }
-
   return {
     simplesNacionalComFatorR: simplesNacionalOtimizado,
-    simplesNacionalSemFatorR: simplesNacionalSemFatorR,
+    simplesNacionalSemFatorR: simplesNacionalBase,
     lucroPresumido,
   };
 }
