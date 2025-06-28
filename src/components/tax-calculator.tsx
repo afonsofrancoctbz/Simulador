@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, Check, ChevronsUpDown, RefreshCw, AlertCircle, HeartPulse, Info } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, HeartPulse, Info } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -18,12 +18,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FaqSection from './faq-section';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { CnaeSelector } from './cnae-selector';
 
 const formatCurrencyBRL = (value: number) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
@@ -400,7 +399,7 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
           <FormField control={form.control} name={`${fieldName}.${index}.code`} render={({ field }) => (
               <FormItem className="flex-1 w-full">
                   <FormLabel>CNAE</FormLabel>
-                  <CnaeCombobox value={field.value} onChange={field.onChange} />
+                  <CnaeSelector value={field.value} onChange={field.onChange} />
                   <FormMessage />
               </FormItem>
           )} />
@@ -425,97 +424,6 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
     </div>
   );
 };
-
-const CnaeCombobox = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-
-  const selectedCnaeText = useMemo(() => {
-    if (!value) return "Selecione o CNAE...";
-    const cnae = CNAE_DATA.find((c) => c.code === value);
-    if (!cnae) return "Selecione o CNAE...";
-    return `${cnae.code} - ${cnae.description}`;
-  }, [value]);
-
-  const filteredAndGroupedCnaes = useMemo(() => {
-    if (search.length < 2) {
-      return [];
-    }
-    const lowercasedSearch = search.toLowerCase();
-    const filtered = CNAE_DATA.filter(cnae => 
-      cnae.code.includes(lowercasedSearch) || 
-      cnae.description.toLowerCase().includes(lowercasedSearch)
-    ).slice(0, 50);
-
-    const grouped = filtered.reduce((acc, cnae) => {
-      const category = cnae.category || 'Outras Categorias';
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(cnae);
-      return acc;
-    }, {} as Record<string, typeof CNAE_DATA>);
-    
-    return Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [search]);
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between text-muted-foreground font-normal"
-        >
-          <span className="truncate">{selectedCnaeText}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0 md:w-[550px]">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Busque por código ou descrição..."
-            value={search}
-            onValueChange={setSearch}
-          />
-          <CommandList>
-            {search.length < 2 && <CommandEmpty>Digite ao menos 2 caracteres para buscar.</CommandEmpty>}
-            {search.length >= 2 && filteredAndGroupedCnaes.length === 0 && <CommandEmpty>Nenhum CNAE encontrado.</CommandEmpty>}
-            
-            {filteredAndGroupedCnaes.map(([category, cnaes]) => (
-              <CommandGroup key={category} heading={category}>
-                {cnaes.map((cnae) => (
-                  <CommandItem
-                    key={cnae.code}
-                    value={cnae.code}
-                    onSelect={(currentValue) => {
-                      onChange(currentValue);
-                      setOpen(false);
-                      setSearch("");
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === cnae.code ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <div className="flex flex-col">
-                      <p className="font-semibold">{cnae.code}</p>
-                      <p className="text-xs text-muted-foreground font-serif">{cnae.description}</p>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
 
 const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => (
     <Card className={cn("flex flex-col shadow-lg transition-all duration-300", isCheapest ? 'border-2 border-accent shadow-accent/20' : 'border-border')}>
