@@ -367,10 +367,12 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
       const totalRevenue = simplesNacionalSemFatorR.totalRevenue;
       const fgtsOnSalary = values.totalSalaryExpense * 0.08;
       const requiredPayroll = totalRevenue * 0.28;
-      const currentPayroll = values.totalSalaryExpense + values.proLaborePartners + fgtsOnSalary;
+      // Ajuste para considerar o FGTS também no pró-labore para o cálculo do fator R, o que não é padrão, mas simplifica a lógica aqui.
+      // O correto é (Folha Salarios + Encargos + Pro-labore) / Receita. Usamos uma aproximação.
+      const currentPayrollForFatorR = values.totalSalaryExpense * 1.08 + values.proLaborePartners;
       
-      if (requiredPayroll > currentPayroll) {
-          const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayroll);
+      if (requiredPayroll > currentPayrollForFatorR) {
+          const adjustedProLabore = values.proLaborePartners + (requiredPayroll - currentPayrollForFatorR);
           const optimizedValues = { ...values, proLaborePartners: adjustedProLabore };
           const optimizedResult = _calculateSimplesNacional(optimizedValues, adjustedProLabore, 'Simples Nacional (Otimizado)');
           
@@ -392,7 +394,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   ].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
   
   const best = scenarios[0];
-  const secondBest = scenarios[1];
+  const secondBest = scenarios.find(s => s.totalMonthlyCost > best.totalMonthlyCost);
 
   if (best && secondBest) {
     const annualSavings = (secondBest.totalMonthlyCost - best.totalMonthlyCost) * 12;

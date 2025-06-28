@@ -151,7 +151,7 @@ export function CnaeSelector({
                   key={cnae.code}
                   className={cn(
                     "w-full text-left p-3 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
-                    selectedCodes.includes(cnae.code) && "bg-accent text-accent-foreground ring-2 ring-ring"
+                    selectedCodes.includes(cnae.code) && "bg-accent/80 text-accent-foreground ring-2 ring-ring"
                   )}
                   onClick={() => handleToggleCnae(cnae.code)}
                   disabled={!selectedCodes.includes(cnae.code) && selectedCodes.length >= MAX_SELECTION}
@@ -161,8 +161,12 @@ export function CnaeSelector({
                       <Check className="h-4 w-4" />
                     </div>
                   )}
-                  <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
-                  {cnae.category && <Badge variant="secondary" className="mt-1 text-xs">{cnae.category}</Badge>}
+                  <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
+                   <div className="flex flex-wrap gap-2 mt-2">
+                     <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
+                     <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">Anexo {cnae.annex}</Badge>
+                     {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
+                   </div>
                 </button>
               ))
             ) : (
@@ -182,7 +186,7 @@ export function CnaeSelector({
             </div>
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0}>
+                <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
                     Adicionar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : 'atividades'}
                 </Button>
             </div>

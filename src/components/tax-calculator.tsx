@@ -20,11 +20,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import FaqSection from './faq-section';
-import { Tooltip, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { CnaeSelector } from './cnae-selector';
 import { Label } from './ui/label';
-import BenefitsSection from './benefits-section';
 import { Separator } from './ui/separator';
 
 const formatCurrencyBRL = (value: number) => {
@@ -138,6 +135,14 @@ export default function TaxCalculator() {
     setIsLoading(true);
     setResults(null);
     setAdvice(null);
+    
+    // Scroll to results section smoothly
+    setTimeout(() => {
+        const resultsElement = document.getElementById('results-section');
+        if (resultsElement) {
+            resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
 
     const submissionValues: TaxFormValues = {
         ...values,
@@ -184,7 +189,7 @@ export default function TaxCalculator() {
   const renderResults = () => {
     if (isLoading) {
       return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 w-full max-w-7xl">
+        <div id="results-section" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12 w-full">
           <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
           <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
           <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
@@ -232,7 +237,7 @@ export default function TaxCalculator() {
     }
 
     return (
-        <div className="mt-12 w-full max-w-7xl mx-auto">
+        <div id="results-section" className="mt-12 w-full">
             <h2 className="text-3xl font-bold text-center mb-4">Resultados da Análise</h2>
 
             {intelligentAlerts.length > 0 && (
@@ -252,8 +257,8 @@ export default function TaxCalculator() {
 
             <Card className="mb-8 border-primary/50 bg-card shadow-lg">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-primary-foreground">
-                        <Lightbulb className="text-primary" />
+                    <CardTitle className="flex items-center gap-3 text-primary">
+                        <Lightbulb />
                         Recomendação da IA
                     </CardTitle>
                 </CardHeader>
@@ -267,7 +272,7 @@ export default function TaxCalculator() {
                      <ResultCard 
                         key={scenario.regime} 
                         details={scenario} 
-                        isCheapest={scenario.regime === cheapestScenario.regime}
+                        isCheapest={scenario.regime === cheapestScenario.regime && sortedScenarios.length > 1}
                     />
                 ))}
             </div>
@@ -276,139 +281,120 @@ export default function TaxCalculator() {
   };
   
   return (
-    <TooltipProvider>
-      <div className="w-full max-w-6xl mx-auto space-y-12">
-        <header className="text-center">
-            <div className="inline-block bg-primary/20 p-3 rounded-lg mb-4">
-              <Calculator className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold">Calculadora de Impostos para Prestadores de Serviço</h1>
-            <p className="text-muted-foreground mt-4 text-lg max-w-3xl mx-auto font-serif">Descubra o regime tributário ideal para sua empresa de serviços e otimize suas finanças.</p>
-        </header>
-
-        <FaqSection />
-        <BenefitsSection />
-
-        <Separator />
-
-        <div>
-          <h2 className="text-3xl font-bold text-center mb-8">Simule Seus Impostos</h2>
-          <Form {...form}>
+    <div>
+        <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                  <Card className="shadow-lg lg:col-span-1 bg-card/80">
-                      <CardHeader>
-                          <CardTitle className="text-2xl flex items-center gap-3"><Briefcase className="text-primary" />Atividades e Faturamento</CardTitle>
-                          <CardDescription className="font-serif">Informe todas as suas fontes de receita, sejam elas nacionais ou do exterior.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary-foreground" />Receitas Nacionais</h3>
-                          {domesticFields.map((field, index) => (
-                              <ActivityField key={field.id} form={form} fieldName="domesticActivities" index={index} removeFn={removeDomestic} />
-                          ))}
-                          <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
-                              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
-                          </Button>
-                          <FormMessage>{form.formState.errors.domesticActivities?.root?.message}</FormMessage>
-                          
-                          <Separator className="my-6" />
+            <Card className="shadow-lg overflow-hidden">
+                <CardHeader className="bg-slate-50 border-b">
+                    <CardTitle className="text-2xl">Perfil da Empresa</CardTitle>
+                    <CardDescription>
+                        Com essas informações, calcularemos o regime tributário ideal para o seu negócio.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Coluna da Esquerda */}
+                        <div className="lg:col-span-1 space-y-6">
+                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
+                                <Building2 className="h-5 w-5 text-primary" />
+                                Dados da Empresa
+                            </h3>
+                            <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Despesa com Salários (CLT)</FormLabel>
+                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="proLaborePartners" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Pró-labore Total dos Sócios</FormLabel>
+                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Número de Sócios</FormLabel>
+                                    <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        </div>
 
-                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary-foreground" />Receitas de Exportação</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <FormField control={form.control} name="exportCurrency" render={({ field }) => (
-                                  <FormItem>
-                                      <FormLabel>Moeda do Faturamento</FormLabel>
-                                      <Select 
-                                          onValueChange={(value) => {
-                                              field.onChange(value);
-                                              if (value !== 'BRL' && exchangeRates[value]) {
-                                                  form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true });
-                                              } else if (value === 'BRL') {
-                                                  form.setValue('exchangeRate', undefined);
-                                              }
-                                          }} 
-                                          defaultValue={field.value}>
-                                          <FormControl>
-                                              <SelectTrigger>
-                                                  <SelectValue placeholder="Selecione a moeda" />
-                                              </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                              <SelectItem value="BRL">Real (BRL)</SelectItem>
-                                              <SelectItem value="USD">Dólar Americano (USD)</SelectItem>
-                                              <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                                          </SelectContent>
-                                      </Select>
-                                      <FormMessage />
-                                  </FormItem>
-                              )} />
-                              {exportCurrency !== 'BRL' && exportFields.length > 0 && (
-                                  <FormField control={form.control} name="exchangeRate" render={({ field }) => (
-                                      <FormItem>
-                                          <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
-                                          <div className="relative flex items-center">
-                                              <FormControl>
-                                                  <Input type="number" step="0.0001" placeholder={isFetchingRate ? "Buscando..." : "Cotação atual"} {...field} value={field.value ?? ''} disabled={isFetchingRate} className="pr-10" />
-                                              </FormControl>
-                                              <Button type="button" variant="ghost" size="icon" className="absolute right-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate} aria-label="Atualizar cotação">
-                                                  <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
-                                              </Button>
-                                          </div>
-                                          <FormMessage />
-                                      </FormItem>
-                                  )} />
-                              )}
-                          </div>
-                          {exportFields.map((field, index) => (
-                              <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
-                          ))}
-                          <Button type="button" variant="outline" size="sm" onClick={() => setCnaeSelectorState({ open: true, target: 'export' })}>
-                              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
-                          </Button>
-                      </CardContent>
-                  </Card>
+                        {/* Coluna da Direita */}
+                        <div className="lg:col-span-2 space-y-6">
+                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
+                                <Briefcase className="h-5 w-5 text-primary" />
+                                Atividades e Faturamento
+                            </h3>
+                           
+                            {/* Receitas Nacionais */}
+                            <div>
+                                <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receitas Nacionais</h4>
+                                {domesticFields.map((field, index) => (
+                                    <ActivityField key={field.id} form={form} fieldName="domesticActivities" index={index} removeFn={removeDomestic} />
+                                ))}
+                                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
+                                </Button>
+                                <FormMessage>{form.formState.errors.domesticActivities?.root?.message}</FormMessage>
+                            </div>
+                            
+                            <Separator />
 
-                  <Card className="shadow-lg lg:col-span-1 bg-card/80">
-                      <CardHeader>
-                          <CardTitle className="text-2xl flex items-center gap-3"><Building2 className="text-primary" />Dados da Empresa</CardTitle>
-                          <CardDescription>Informações sobre a folha de pagamento e estrutura societária.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                          <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
-                              <FormItem>
-                                  <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                  <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
-                                  <FormMessage />
-                              </FormItem>
-                          )} />
-                          <FormField control={form.control} name="proLaborePartners" render={({ field }) => (
-                              <FormItem>
-                                  <FormLabel>Pró-labore Total dos Sócios</FormLabel>
-                                  <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
-                                  <FormMessage />
-                              </FormItem>
-                          )} />
-                          <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
-                              <FormItem>
-                                  <FormLabel>Número de Sócios</FormLabel>
-                                  <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
-                                  <FormMessage />
-                              </FormItem>
-                          )} />
-                      </CardContent>
-                  </Card>
-              </div>
-              <div className="flex justify-center pt-8">
-                <Button type="submit" size="lg" disabled={isLoading} className="w-full max-w-md bg-accent text-accent-foreground hover:bg-accent/90">
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
-                  Analisar e Otimizar Impostos
-                </Button>
-              </div>
+                            {/* Receitas de Exportação */}
+                            <div>
+                                <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receitas de Exportação</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                    <FormField control={form.control} name="exportCurrency" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Moeda</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger></FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="BRL">Real (BRL)</SelectItem>
+                                                    <SelectItem value="USD">Dólar (USD)</SelectItem>
+                                                    <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormItem>
+                                    )} />
+                                    {exportCurrency !== 'BRL' && (
+                                        <FormField control={form.control} name="exchangeRate" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Taxa de Câmbio ({exportCurrency})</FormLabel>
+                                                <div className="relative">
+                                                    <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} disabled={isFetchingRate} /></FormControl>
+                                                     <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate}>
+                                                        <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
+                                                    </Button>
+                                                </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    )}
+                                </div>
+                                {exportFields.map((field, index) => (
+                                    <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
+                                ))}
+                                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorState({ open: true, target: 'export' })}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter className="bg-slate-50 border-t p-6">
+                    <Button type="submit" size="lg" disabled={isLoading} className="w-full sm:w-auto ml-auto bg-primary text-primary-foreground hover:bg-primary/90">
+                      {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
+                      Analisar e Otimizar Impostos
+                    </Button>
+                </CardFooter>
+            </Card>
             </form>
-          </Form>
-        </div>
-      </div>
-
+        </Form>
+      
       <CnaeSelector
         open={cnaeSelectorState.open}
         onOpenChange={(open) => setCnaeSelectorState(s => ({ ...s, open }))}
@@ -416,12 +402,7 @@ export default function TaxCalculator() {
       />
 
       {renderResults()}
-
-      <footer className="py-6 mt-12 text-center text-sm text-muted-foreground font-serif">
-        <p>TributaSimples © {new Date().getFullYear()}.</p>
-        <p className="text-xs mt-2">Aviso: Esta ferramenta destina-se apenas a fins de estimativa. Consulte um contador para aconselhamento preciso.</p>
-      </footer>
-    </TooltipProvider>
+    </div>
   );
 }
 
@@ -433,7 +414,7 @@ const ActivityField = ({ form, fieldName, index, removeFn, isExport = false, exp
   const selectedCnaeData = useMemo(() => CNAE_DATA.find((cnae) => cnae.code === cnaeCode), [cnaeCode]);
 
   return (
-    <div className="flex flex-col gap-3 p-3 border rounded-lg bg-background/50">
+    <div className="flex flex-col gap-3 p-3 border rounded-lg bg-background/50 mb-2">
       <div className="flex flex-col sm:flex-row items-end gap-2">
           <div className="flex-1 w-full space-y-2">
               <Label>CNAE</Label>
@@ -478,7 +459,7 @@ const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: 
             {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground font-bold text-sm px-3 py-1">🏆 MELHOR OPÇÃO</Badge>}
             
             <CardHeader className={cn(isCheapest ? 'bg-accent/10' : 'bg-muted/30', 'pt-8 pb-4')}>
-                <CardTitle className="text-2xl text-center font-bold text-primary-foreground">{details.regime}</CardTitle>
+                <CardTitle className="text-2xl text-center font-bold text-primary">{details.regime}</CardTitle>
                 {details.annex && <CardDescription className='text-center font-semibold'>{details.annex}</CardDescription>}
             </CardHeader>
 
@@ -507,7 +488,7 @@ const ResultCard = ({ details, isCheapest }: { details: TaxDetails, isCheapest: 
                     <div className={cn(
                         "text-center rounded-md p-2 mt-2", 
                         details.fatorR! >= 0.28 
-                            ? 'bg-accent/20 text-accent-foreground' 
+                            ? 'bg-green-100 text-green-800' 
                             : 'bg-amber-100 text-amber-800'
                     )}>
                         <span className="font-semibold">Fator R: {formatPercent(details.fatorR!)}</span>
