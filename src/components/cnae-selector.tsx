@@ -55,22 +55,22 @@ export function CnaeSelector({
   open,
   onOpenChange,
   onConfirm,
+  initialSelectedCodes = [],
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (codes: string[]) => void
+  initialSelectedCodes?: string[]
 }) {
   const [search, setSearch] = React.useState("")
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(mainCategories[0])
-  const [selectedCodes, setSelectedCodes] = React.useState<string[]>([])
+  const [selectedCodes, setSelectedCodes] = React.useState<string[]>(initialSelectedCodes)
 
   React.useEffect(() => {
     if (open) {
-      setSearch("")
-      setSelectedCategory(mainCategories[0])
-      setSelectedCodes([])
+      setSelectedCodes(initialSelectedCodes)
     }
-  }, [open])
+  }, [open, initialSelectedCodes])
 
   const filteredCnaes = React.useMemo(() => {
     let results = CNAE_DATA
@@ -136,7 +136,7 @@ export function CnaeSelector({
             />
           </div>
           <Tabs value={selectedCategory || ''} onValueChange={handleCategoryChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <TabsList className="h-auto flex-wrap justify-center gap-1">
                 {mainCategories.map((category) => (
                     <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
                 ))}
@@ -187,7 +187,7 @@ export function CnaeSelector({
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
                 <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Adicionar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : 'atividades'}
+                    Confirmar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : 'atividades'}
                 </Button>
             </div>
         </DialogFooter>

@@ -3,13 +3,13 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle, XCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type TaxFormValues, TaxFormValuesSchema } from '@/lib/types';
+import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex } from '@/lib/types';
 import { cn, formatCurrencyBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -25,13 +25,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
-import { ActivityField } from './activity-field';
+import { CNAE_DATA } from '@/lib/cnaes';
+import { Badge } from './ui/badge';
 
 
 const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
-const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
+const calculatorFormSchema = z.object({
+  selectedCnaes: z.array(z.string()).min(1, "Selecione pelo menos um CNAE."),
+  revenues: z.record(z.string(), z.coerce.number().optional()), // e.g. revenues['domestic_V']
+  exportCurrency: z.string(),
+  exchangeRate: z.coerce.number(),
+  totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
+  proLaborePerPartner: z.coerce.number().min(0, "O valor deve ser positivo."),
+  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
+}).superRefine((data, ctx) => {
     const proLaborePerSocio = data.proLaborePerPartner;
     if (proLaborePerSocio > 0 && proLaborePerSocio < MINIMUM_WAGE) {
         ctx.addIssue({
@@ -41,12 +50,14 @@ const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
         });
     }
 }).refine(data => {
-    const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
+    const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     return totalRevenue > 0 || (data.proLaborePerPartner > 0);
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
-    path: ["domesticActivities"],
+    path: ["revenues"],
 });
+
+type CalculatorFormValues = z.infer<typeof calculatorFormSchema>;
 
 export default function TaxCalculator() {
   const [results, setResults] = useState<CalculationResults | null>(null);
@@ -55,13 +66,13 @@ export default function TaxCalculator() {
   const [isAdviceLoading, setIsAdviceLoading] = useState(false);
   const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
   const [isFetchingRate, setIsFetchingRate] = useState(false);
-  const [cnaeSelectorState, setCnaeSelectorState] = useState({ open: false, target: 'domestic' as 'domestic' | 'export' });
+  const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<CalculatorFormValues>({
+    resolver: zodResolver(calculatorFormSchema),
     defaultValues: {
-      domesticActivities: [{ code: '7020-4/00', revenue: 15000 }],
-      exportActivities: [],
+      selectedCnaes: ['7020-4/00'],
+      revenues: { 'domestic_V': 15000 },
       exportCurrency: 'BRL',
       exchangeRate: 1,
       totalSalaryExpense: 0,
@@ -70,17 +81,14 @@ export default function TaxCalculator() {
     },
   });
 
-  const { fields: domesticFields, append: appendDomestic, remove: removeDomestic } = useFieldArray({
-    control: form.control,
-    name: "domesticActivities"
-  });
-  
-  const { fields: exportFields, append: appendExport, remove: removeExport } = useFieldArray({
-    control: form.control,
-    name: "exportActivities"
-  });
-
+  const selectedCnaes = form.watch("selectedCnaes");
   const exportCurrency = form.watch("exportCurrency");
+  
+  const revenueGroups = useMemo(() => {
+    const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter(Boolean) as (typeof CNAE_DATA)[0][];
+    const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
+    return annexes;
+  }, [selectedCnaes]);
 
   const fetchRates = async () => {
     setIsFetchingRate(true);
@@ -107,14 +115,64 @@ export default function TaxCalculator() {
     fetchRates();
   }, []);
 
-  const handleAddActivities = (codes: string[]) => {
-    const targetFunction = cnaeSelectorState.target === 'domestic' ? appendDomestic : appendExport;
-    codes.forEach(code => {
-      targetFunction({ code: code, revenue: 0 });
-    });
+  const handleCnaeConfirm = (codes: string[]) => {
+    form.setValue('selectedCnaes', codes, { shouldValidate: true });
+    // Reset revenues when CNAEs change, preserving only those for still-selected annexes
+    const newRevenues: Record<string, number | undefined> = {};
+    const newAnnexes = new Set(codes.map(code => getCnaeData(code)?.annex).filter(Boolean));
+    const currentRevenues = form.getValues('revenues');
+    for (const key in currentRevenues) {
+        const annex = key.split('_')[1] as Annex;
+        if(newAnnexes.has(annex)) {
+            newRevenues[key] = currentRevenues[key];
+        }
+    }
+    form.setValue('revenues', newRevenues);
   };
+  
+  const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
+    const domesticActivities: CnaeItem[] = [];
+    const exportActivities: CnaeItem[] = [];
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const cnaesByAnnex: Record<string, string[]> = {};
+    values.selectedCnaes.forEach(code => {
+        const cnae = getCnaeData(code);
+        if (cnae) {
+            if (!cnaesByAnnex[cnae.annex]) cnaesByAnnex[cnae.annex] = [];
+            cnaesByAnnex[cnae.annex].push(code);
+        }
+    });
+
+    for (const key in values.revenues) {
+        const revenue = values.revenues[key] || 0;
+        if (revenue > 0) {
+            const [type, annex] = key.split('_'); // e.g. "domestic", "V"
+            const cnaesInGroup = cnaesByAnnex[annex] || [];
+            if (cnaesInGroup.length > 0) {
+                const revenuePerCnae = revenue / cnaesInGroup.length; // Evenly distribute revenue
+                cnaesInGroup.forEach(code => {
+                    const activity = { code, revenue: revenuePerCnae };
+                    if (type === 'domestic') {
+                        domesticActivities.push(activity);
+                    } else {
+                        exportActivities.push(activity);
+                    }
+                });
+            }
+        }
+    }
+    
+    return {
+        domesticActivities,
+        exportActivities,
+        exchangeRate: values.exportCurrency !== 'BRL' ? (values.exchangeRate ?? 1) : 1,
+        totalSalaryExpense: values.totalSalaryExpense,
+        proLaborePerPartner: values.proLaborePerPartner,
+        numberOfPartners: values.numberOfPartners,
+    };
+  }
+
+  async function onSubmit(values: CalculatorFormValues) {
     setIsLoading(true);
     setResults(null);
     setAdvice(null);
@@ -126,29 +184,23 @@ export default function TaxCalculator() {
         }
     }, 100);
 
-    const submissionValues: TaxFormValues = {
-        ...values,
-        exchangeRate: values.exportCurrency !== 'BRL' && values.exportActivities.length > 0 ? (values.exchangeRate ?? 1) : 1,
-    };
+    const submissionValues = transformFormToSubmission(values);
 
     const calculatedResults = await calculateTaxesOnServer(submissionValues);
     setResults(calculatedResults);
     setIsLoading(false);
     
-    const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + (values.exportActivities.reduce((acc, act) => acc + act.revenue, 0) * (submissionValues.exchangeRate ?? 1));
+    const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
     if (totalRevenue === 0 && values.proLaborePerPartner === 0) {
       return; // No need to call AI if there's no financial activity
     }
 
     setIsAdviceLoading(true);
     try {
-        const totalDomesticRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
-        let totalExportRevenue = values.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
-        if (values.exportCurrency !== 'BRL' && values.exchangeRate) {
-            totalExportRevenue *= values.exchangeRate;
-        }
+        const totalDomesticRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
+        const totalExportRevenue = submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
 
-        const activitiesSummary = [...values.domesticActivities, ...values.exportActivities]
+        const activitiesSummary = [...submissionValues.domesticActivities, ...submissionValues.exportActivities]
             .map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`)
             .join(', ');
       
@@ -176,19 +228,13 @@ export default function TaxCalculator() {
   const displayedScenarios = useMemo(() => {
     if (!results) return [];
 
-    const { domesticActivities, exportActivities } = form.getValues();
-    const allActivities = [...domesticActivities, ...exportActivities];
-    
-    if (allActivities.length === 0) return [];
-    
-    const revenueSum = allActivities.reduce((sum, act) => sum + (act.revenue || 0), 0);
-    if(revenueSum === 0 && form.getValues('proLaborePerPartner') === 0) return [];
+    const { selectedCnaes } = form.getValues();
+    if (selectedCnaes.length === 0) return [];
 
-    const mainActivity = allActivities.reduce((max, act) => (act.revenue || 0) > (max.revenue || 0) ? act : max, { revenue: -1, code: '' });
-    if (!mainActivity.code) return [];
+    const submissionValues = transformFormToSubmission(form.getValues());
+    const totalRevenue = submissionValues.domesticActivities.reduce((sum, act) => sum + act.revenue, 0) + submissionValues.exportActivities.reduce((sum, act) => sum + act.revenue, 0);
 
-    const mainCnaeInfo = getCnaeData(mainActivity.code);
-    if (!mainCnaeInfo) return [];
+    if (totalRevenue === 0 && form.getValues('proLaborePerPartner') === 0) return [];
 
     const scenarios = [];
 
@@ -198,7 +244,9 @@ export default function TaxCalculator() {
         annex: 'Alternativa de Regime'
     };
 
-    if (mainCnaeInfo.requiresFatorR) {
+    const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
+
+    if (hasAnnexVActivity) {
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
             regime: 'Simples Nacional sem Fator R',
@@ -251,28 +299,7 @@ export default function TaxCalculator() {
     }
 
     const cheapestScenario = displayedScenarios[0];
-
-    const intelligentAlerts: {type: 'warning' | 'info' | 'success', title: string, description: string}[] = [];
-    const fatorR = results.simplesNacionalSemFatorR.fatorR;
-    if (fatorR !== undefined && fatorR < 0.28) {
-      const requiredProLaboreTotal = (results.simplesNacionalSemFatorR.totalRevenue * 0.28 - (form.getValues('totalSalaryExpense')));
-      const minProLaboreTotal = MINIMUM_WAGE * form.getValues('numberOfPartners');
-      const requiredProLaborePerPartner = Math.max(requiredProLaboreTotal, minProLaboreTotal) / form.getValues('numberOfPartners');
-      intelligentAlerts.push({
-        type: 'warning',
-        title: 'Pró-labore pode ser otimizado',
-        description: `Seu Fator R está abaixo de 28%. Aumentando seu pró-labore para aproximadamente ${formatCurrencyBRL(requiredProLaborePerPartner)} por sócio, você pode reduzir sua alíquota no Simples Nacional.`
-      });
-    }
-
-    const totalRevenue = results.lucroPresumido.totalRevenue;
-    if (totalRevenue > 150000 && cheapestScenario.regime.includes('Simples')) {
-      intelligentAlerts.push({
-        type: 'info',
-        title: 'Considere o Lucro Presumido',
-        description: 'Para este nível de faturamento, o regime de Lucro Presumido pode se tornar mais vantajoso. Analise os cenários com atenção.'
-      });
-    }
+    const submissionValues = transformFormToSubmission(form.getValues());
 
     return (
         <div id="results-section" className="mt-16 w-full">
@@ -282,21 +309,6 @@ export default function TaxCalculator() {
                     Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
                 </p>
             </div>
-
-            {intelligentAlerts.length > 0 && (
-                <div className="space-y-4 mb-8 max-w-4xl mx-auto">
-                    {intelligentAlerts.map((alert, index) => (
-                        <Alert key={index} variant={alert.type === 'warning' ? 'destructive' : 'default'} className={cn(
-                            alert.type === 'warning' && 'bg-amber-100 border-amber-300 text-amber-800 [&>svg]:text-amber-600',
-                            alert.type === 'info' && 'bg-blue-100 border-blue-300 text-blue-800 [&>svg]:text-blue-600'
-                        )}>
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle className="font-bold">{alert.title}</AlertTitle>
-                            <AlertDescription>{alert.description}</AlertDescription>
-                        </Alert>
-                    ))}
-                </div>
-            )}
             
             <div className="flex flex-wrap justify-center items-stretch gap-8">
                 {displayedScenarios.map(scenario => (
@@ -304,7 +316,7 @@ export default function TaxCalculator() {
                         key={scenario.regime} 
                         details={scenario} 
                         isCheapest={scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && displayedScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0}
-                        formValues={form.getValues()}
+                        formValues={submissionValues}
                     />
                 ))}
             </div>
@@ -349,7 +361,7 @@ export default function TaxCalculator() {
                             <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
+                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
                                     <FormDescription>
                                         Informe a despesa total com a folha de pagamento de funcionários (se houver).
                                     </FormDescription>
@@ -359,14 +371,14 @@ export default function TaxCalculator() {
                              <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Número de Sócios</FormLabel>
-                                    <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} /></FormControl>
+                                    <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
                             <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} /></FormControl>
+                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
@@ -380,16 +392,41 @@ export default function TaxCalculator() {
                             </h3>
                            
                             <div>
-                                <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receitas Nacionais</h4>
-                                {domesticFields.map((field, index) => (
-                                    <ActivityField key={field.id} form={form} fieldName="domesticActivities" index={index} removeFn={removeDomestic} />
-                                ))}
-                                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorState({ open: true, target: 'domestic' })}>
-                                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade Nacional
+                                <FormLabel>Atividades (CNAEs) Selecionados</FormLabel>
+                                <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[40px] bg-background">
+                                    {selectedCnaes.length > 0 ? selectedCnaes.map(code => (
+                                        <Badge key={code} variant="secondary" className="text-sm">
+                                            {code}
+                                            <Button variant="ghost" size="icon" className="h-4 w-4 ml-1" onClick={() => handleCnaeConfirm(selectedCnaes.filter(c => c !== code))}>
+                                                <XCircle className="h-3 w-3" />
+                                            </Button>
+                                        </Badge>
+                                    )) : <p className="text-sm text-muted-foreground">Nenhuma atividade selecionada.</p>}
+                                </div>
+                                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorOpen(true)}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar/Editar Atividades
                                 </Button>
                             </div>
                             
                             <Separator />
+
+                             <div>
+                                <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receitas Nacionais</h4>
+                                {revenueGroups.map(annex => (
+                                    <FormField
+                                        key={`domestic_${annex}`}
+                                        control={form.control}
+                                        name={`revenues.domestic_${annex}`}
+                                        render={({ field }) => (
+                                        <FormItem className='mb-2'>
+                                            <FormLabel>Faturamento Nacional (Anexo {annex})</FormLabel>
+                                            <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                ))}
+                                {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground'>Selecione atividades para informar o faturamento.</p>}
+                            </div>
 
                             <div>
                                 <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receitas de Exportação</h4>
@@ -422,12 +459,20 @@ export default function TaxCalculator() {
                                         )} />
                                     )}
                                 </div>
-                                {exportFields.map((field, index) => (
-                                    <ActivityField key={field.id} form={form} fieldName="exportActivities" index={index} removeFn={removeExport} isExport exportCurrency={exportCurrency} />
+                                 {revenueGroups.map(annex => (
+                                    <FormField
+                                        key={`export_${annex}`}
+                                        control={form.control}
+                                        name={`revenues.export_${annex}`}
+                                        render={({ field }) => (
+                                        <FormItem className='mb-2'>
+                                            <FormLabel>Faturamento Exportação (Anexo {annex})</FormLabel>
+                                            <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
                                 ))}
-                                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorState({ open: true, target: 'export' })}>
-                                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Atividade de Exportação
-                                </Button>
+                                {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground'>Selecione atividades para informar o faturamento.</p>}
                             </div>
                         </div>
                     </div>
@@ -443,9 +488,10 @@ export default function TaxCalculator() {
         </Form>
       
         <CnaeSelector
-            open={cnaeSelectorState.open}
-            onOpenChange={(open) => setCnaeSelectorState(s => ({ ...s, open }))}
-            onConfirm={handleAddActivities}
+            open={isCnaeSelectorOpen}
+            onOpenChange={setCnaeSelectorOpen}
+            onConfirm={handleCnaeConfirm}
+            initialSelectedCodes={selectedCnaes}
         />
 
         {renderResults()}
