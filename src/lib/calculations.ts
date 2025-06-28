@@ -102,7 +102,7 @@ export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutpu
 }
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners, proLaborePerPartner } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, numberOfPartners, proLaborePerPartner, otherINSSSourcesPerPartner } = values;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -112,8 +112,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   // --- 2. Pro-labore Taxes (per partner, then aggregated) ---
   const proLaboreTaxesPerPartner = calcularEncargosProLabore({
     valorProLaboreBruto: proLaborePerPartner,
-    outrasFontesRendaINSS: 0,
     configuracaoFiscal: fiscalConfig,
+    outrasFontesRendaINSS: otherINSSSourcesPerPartner,
   });
   const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
   const totalIRRFProLabore = proLaboreTaxesPerPartner.valorIRRFCalculado * numberOfPartners;
@@ -131,7 +131,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const totalTax = companyTaxes + totalINSSProLabore + totalIRRFProLabore;
     const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     
-    // Cost to the company is what it disburses: company taxes + salaries + contabilizei fee.
     const totalMonthlyCost = companyTaxes + totalSalaryExpense + fee;
 
     const breakdown = [
@@ -280,7 +279,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 }
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePerPartner, numberOfPartners } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLaborePerPartner, numberOfPartners, otherINSSSourcesPerPartner } = values;
   const totalProLaboreBruto = proLaborePerPartner * numberOfPartners;
   
   // --- Revenue Calculation ---
@@ -290,8 +289,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const proLaboreTaxesPerPartner = calcularEncargosProLabore({
     valorProLaboreBruto: proLaborePerPartner,
-    outrasFontesRendaINSS: 0,
     configuracaoFiscal: fiscalConfig,
+    outrasFontesRendaINSS: otherINSSSourcesPerPartner,
   });
 
   const totalINSSProLabore = proLaboreTaxesPerPartner.valorINSSCalculado * numberOfPartners;
@@ -403,8 +402,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               const optimizedValues: TaxFormValues = { ...values, proLaborePerPartner: adjustedProLaborePerPartner };
               simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, adjustedTotalProLabore, 'Simples Nacional com Fator R');
           } else {
-             // If no optimization is needed or possible, the "optimized" scenario is the same as the base one.
-             // We still give it a different name for UI clarity.
              simplesNacionalOtimizado = {...simplesNacionalBase, regime: 'Simples Nacional com Fator R'};
           }
       }

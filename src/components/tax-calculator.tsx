@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, AlertCircle, Briefcase, PlusCircle, Info } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
@@ -17,7 +17,7 @@ import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -32,7 +32,8 @@ const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
 const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
-    if (data.proLaborePerPartner > 0 && data.proLaborePerPartner < MINIMUM_WAGE) {
+    const proLaborePerSocio = data.proLaborePerPartner;
+    if (proLaborePerSocio > 0 && proLaborePerSocio < MINIMUM_WAGE) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `O pró-labore por sócio não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
@@ -41,7 +42,7 @@ const formSchema = TaxFormValuesSchema.superRefine((data, ctx) => {
     }
 }).refine(data => {
     const totalRevenue = data.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + data.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
-    return totalRevenue > 0 || data.proLaborePerPartner > 0;
+    return totalRevenue > 0 || (data.proLaborePerPartner * data.numberOfPartners > 0);
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
     path: ["proLaborePerPartner"],
@@ -73,6 +74,7 @@ export default function TaxCalculator() {
       exchangeRate: 1,
       totalSalaryExpense: 0,
       proLaborePerPartner: MINIMUM_WAGE,
+      otherINSSSourcesPerPartner: 0,
       numberOfPartners: 1,
     },
   });
@@ -358,6 +360,13 @@ export default function TaxCalculator() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
+                             <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Número de Sócios</FormLabel>
+                                    <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
                             <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
@@ -365,10 +374,13 @@ export default function TaxCalculator() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                             <FormField control={form.control} name="otherINSSSourcesPerPartner" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Número de Sócios</FormLabel>
-                                    <FormControl><Input type="number" step="1" placeholder="1" {...field} /></FormControl>
+                                    <FormLabel className="flex items-center gap-1.5">Outras Fontes de Renda p/ INSS (por Sócio) <Info className="w-3 h-3 text-muted-foreground"/></FormLabel>
+                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} /></FormControl>
+                                    <FormDescription>
+                                        Informe a soma de outras rendas que já contribuem para o teto do INSS (ex: salário CLT) para cada sócio.
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />

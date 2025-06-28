@@ -13,8 +13,9 @@ export const TaxFormValuesSchema = z.object({
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
-  totalSalaryExpense: z.coerce.number(),
-  proLaborePerPartner: z.coerce.number(),
+  totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
+  proLaborePerPartner: z.coerce.number().min(0, "O valor deve ser positivo."),
+  otherINSSSourcesPerPartner: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1."),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
