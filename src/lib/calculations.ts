@@ -202,7 +202,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
     if (annex === 'IV') {
         const cppRate = 0.20 + 0.03 + 0.058;
         cppFromAnnexIV += (totalPayroll) * cppRate;
-        notes.push("Anexo IV paga a CPP (28.8%) fora do DAS, sobre a folha de pagamento.");
+        notes.push("Anexo IV paga a CPP (INSS Patronal de 20% + adicionais) fora do DAS, sobre a folha de pagamento total.");
     }
      if (bracketIndex === annexTable.length - 1) {
       if (['III', 'IV', 'V'].includes(annex) && annexInfo.domestic > 0) {
@@ -229,7 +229,7 @@ function _calculateSimplesNacional(values: TaxFormValues, proLabore: number, reg
 
   const breakdown = [
     { name: "DAS", value: totalDas },
-    ...(cppFromAnnexIV > 0 ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }] : []),
+    ...(cppFromAnnexIV > 0 ? [{ name: "CPP (INSS Patronal Anexo IV)", value: cppFromAnnexIV }] : []),
     ...(totalIssSeparado > 0 ? [{ name: "ISS (À parte)", value: totalIssSeparado }] : []),
     { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
     { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
@@ -313,7 +313,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const inssPatronal = totalPayroll * (INSS_PATRONAL_RATE + RAT_RATE + TERCEIROS_RATE);
   
   if (totalPayroll > 0) {
-    notes.push("A CPP (28.8%) incide sobre o total da folha de pagamento (salários + pró-labore).");
+    notes.push("No Lucro Presumido, a empresa paga a CPP (INSS Patronal de 20% + adicionais) sobre o total da folha de pagamento (salários + pró-labore).");
   }
 
   const proLaborePerPartner = numberOfPartners > 0 ? proLaborePartners / numberOfPartners : 0;
@@ -337,7 +337,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: "ISS", value: iss, rate: municipalISSRate / 100 },
     { name: "IRPJ", value: irpj },
     { name: "CSLL", value: csll },
-    { name: "INSS Patronal", value: inssPatronal },
+    { name: "CPP (INSS Patronal)", value: inssPatronal },
     { name: "INSS s/ Pró-labore", value: totalProLaboreTaxes.inssOnProLabore },
     { name: "IRRF s/ Pró-labore", value: totalProLaboreTaxes.irrf },
   ];
