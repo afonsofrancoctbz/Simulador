@@ -49,7 +49,7 @@ const categoryToInternalMap: Record<string, string[]> = {
   "Corretagem de imóveis": ["Serviços Financeiros e Imobiliários"],
 }
 
-const MAX_SELECTION = 5;
+const MAX_SELECTION = 10;
 
 export function CnaeSelector({
   open,
