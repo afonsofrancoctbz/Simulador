@@ -1,58 +1,103 @@
 "use client";
 
-import { Star } from "lucide-react";
+import { ActivitySquare, HeartPulse, ShieldCheck } from "lucide-react";
 import Image from 'next/image';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
 
 export default function BenefitsSection() {
     return (
-        <div className="mt-12 w-full max-w-6xl mx-auto space-y-8 py-12 px-4 sm:px-6 lg:px-8">
-             <div className="text-left mb-12">
-                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Multibenefícios Contabilizei: confira todas as vantagens extras que você tem.</h2>
+        <div className="mt-12 w-full max-w-6xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
+             <div className="text-center mb-4">
+                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Multibenefícios Contabilizei</h2>
+                 <p className="text-muted-foreground mt-2 text-lg font-serif">Vantagens exclusivas para cuidar da sua saúde e bem-estar.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                {/* Text Content */}
-                <div className="border border-border rounded-xl p-6 shadow-md bg-card">
-                    <div className="flex items-center gap-3 mb-4">
-                        <Star className="h-6 w-6 text-primary fill-primary/20" strokeWidth="1.5" />
-                        <span className="text-lg font-semibold text-foreground tracking-wider">TOTAL PASS</span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                
+                {/* Starbem Card */}
+                <Card className="flex flex-col h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                    <CardHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="bg-primary/10 p-2 rounded-lg">
+                                <HeartPulse className="h-6 w-6 text-primary" />
+                            </div>
+                            <CardTitle>Parceria Starbem</CardTitle>
+                        </div>
+                        <CardDescription className="font-serif">
+                            Cuidado completo com sua saúde: consultas online com psicólogos, nutricionistas e descontos em exames e medicamentos.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex flex-col justify-end">
+                       <Image
+                            src="https://placehold.co/600x400.png"
+                            alt="Mulher sorrindo durante uma consulta de telemedicina"
+                            width={600}
+                            height={400}
+                            className="w-full h-auto object-cover rounded-md mt-auto"
+                            data-ai-hint="woman telemedicine"
+                        />
+                    </CardContent>
+                </Card>
+
+                {/* TotalPass Card */}
+                <Card className="flex flex-col h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                     <CardHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="bg-primary/10 p-2 rounded-lg">
+                                <ActivitySquare className="h-6 w-6 text-primary" />
+                            </div>
+                            <CardTitle>Parceria TotalPass</CardTitle>
+                        </div>
+                         <CardDescription className="font-serif">
+                            Acesso a mais de 20 mil academias e 250 modalidades esportivas em todo o Brasil, com planos flexíveis e descontos exclusivos.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex flex-col justify-end">
+                        <Image
+                            src="https://placehold.co/600x400.png"
+                            alt="Pessoa se exercitando em uma academia moderna"
+                            width={600}
+                            height={400}
+                            className="w-full h-auto object-cover rounded-md mt-auto"
+                            data-ai-hint="gym workout"
+                        />
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Health Plan Card */}
+            <Card className="w-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-card">
+                 <div className="grid md:grid-cols-2 items-center">
+                    <div className="p-8">
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="bg-accent/10 p-2 rounded-lg">
+                                <ShieldCheck className="h-6 w-6 text-accent" />
+                            </div>
+                            <CardTitle>Plano de Saúde com Desconto</CardTitle>
+                        </div>
+                         <CardDescription className="!mt-4 font-serif text-base">
+                            Clientes Contabilizei têm <span className="font-bold text-accent">até 30% de desconto</span> na contratação de planos de saúde para você e sua empresa, a partir de 1 vida e com as melhores operadoras do país.
+                        </CardDescription>
+                        <Button className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90">
+                            Consultar um especialista
+                        </Button>
                     </div>
-
-                    <p className="text-muted-foreground font-serif text-base mb-6">
-                        Você e 1 sócio + 1 dependente cada têm acesso ao TotalPass, um benefício exclusivamente corporativo de saúde e bem-estar:
-                    </p>
-
-                    <ul className="space-y-3 mb-6">
-                        <li className="flex items-center gap-3">
-                            <Star className="h-5 w-5 text-primary shrink-0" strokeWidth="1.5" />
-                            <span className="font-serif text-base text-foreground">Mais de 15 mil academias</span>
-                        </li>
-                        <li className="flex items-center gap-3">
-                            <Star className="h-5 w-5 text-primary shrink-0" strokeWidth="1.5" />
-                            <span className="font-serif text-base text-foreground">Mais de 5 mil psicólogos</span>
-                        </li>
-                    </ul>
-
-                    <p className="text-muted-foreground font-serif text-base">
-                        Dentro do app, você pode contratar planos de academias e estúdios por valores bem abaixo do mercado. São mais de 10 planos disponíveis para escolher o que mais combina com você!
-                    </p>
-                </div>
-
-                {/* Image Content */}
-                <div className="flex justify-center">
-                    <Image
-                        src="https://placehold.co/500x550.png"
-                        alt="Promoção TotalPass na Contabilizei com uma mulher se exercitando"
-                        width={500}
-                        height={550}
-                        className="w-full h-auto object-cover rounded-xl shadow-md"
-                        data-ai-hint="woman exercising"
-                    />
-                </div>
-            </div>
+                    <div className="hidden md:block">
+                         <Image
+                            src="https://placehold.co/600x400.png"
+                            alt="Médico e paciente conversando"
+                            width={600}
+                            height={400}
+                            className="w-full h-full object-cover rounded-r-lg"
+                            data-ai-hint="doctor patient"
+                        />
+                    </div>
+                 </div>
+            </Card>
             
-            <p className="text-center text-sm text-muted-foreground font-serif pt-8">
-                <span className="font-bold">IMPORTANTE:</span> *Assim que seu CNPJ for emitido, você vai receber um e-mail com instruções para assinar digitalmente o contrato do Multibenefícios.
+             <p className="text-center text-sm text-muted-foreground font-serif pt-2">
+                <span className="font-bold">IMPORTANTE:</span> *Benefícios e condições sujeitos aos termos de cada plano. Consulte nossos especialistas para mais detalhes.
             </p>
         </div>
     );

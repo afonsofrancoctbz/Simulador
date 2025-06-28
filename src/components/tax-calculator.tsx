@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, HeartPulse, Info } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Trash2, PlusCircle, RefreshCw, AlertCircle, Calculator, Info } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { calculateTaxes } from '@/lib/calculations';
@@ -249,7 +249,7 @@ export default function TaxCalculator() {
       <div className="w-full max-w-6xl mx-auto">
         <header className="text-center mb-12">
             <div className="inline-block bg-primary/20 p-3 rounded-lg mb-4">
-              <HeartPulse className="h-8 w-8 text-primary-foreground" />
+              <Calculator className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold">Calculadora de Impostos para Profissionais da Saúde</h1>
             <p className="text-muted-foreground mt-4 text-lg max-w-3xl mx-auto font-serif">Descubra o regime tributário ideal para sua clínica ou consultório e otimize suas finanças.</p>
