@@ -131,7 +131,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const totalTax = companyTaxes + totalWithheldTaxes;
     const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     
-    const totalMonthlyCost = totalTax;
+    const totalMonthlyCost = totalTax + fee;
 
     const breakdown = [
         ...(cppFromAnnexIV > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: cppFromAnnexIV }] : []),
@@ -240,7 +240,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
 
-  const totalMonthlyCost = totalTax;
+  const totalMonthlyCost = totalTax + contabilizeiFee;
   
   const annexKeys = Object.keys(revenueByAnnex) as Annex[];
   const mainAnnex: Annex | 'III' = annexKeys.length > 0
@@ -304,7 +304,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
       const totalTax = companyPayrollTaxes + totalWithheldTaxes;
       const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
-      const totalMonthlyCost = totalTax;
+      
+      const totalMonthlyCost = totalTax + fee;
 
       const breakdown = [
         ...(inssPatronal > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: inssPatronal }] : []),
@@ -354,7 +355,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
 
-  const totalMonthlyCost = totalTax;
+  const totalMonthlyCost = totalTax + contabilizeiFee;
 
   const breakdown = [
     { name: "PIS", value: pis }, { name: "COFINS", value: cofins },
