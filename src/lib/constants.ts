@@ -1,7 +1,7 @@
 import { CnaeData, FeeBracket } from "./types";
 
-export const MINIMUM_WAGE = 1320.00;
-export const INSS_CEILING = 7786.02;
+export const MINIMUM_WAGE = 1412.00;
+export const INSS_CEILING = 8157.40;
 export const PRO_LABORE_INSS_RATE = 0.11;
 export const SIMPLIFIED_DEDUCTION_IRRF = 564.80;
 
@@ -33,13 +33,14 @@ export const SIMPLES_NACIONAL_ANNEX_II = [ // Indústria
     { min: 3600000.01, max: 4800000, rate: 0.30, deduction: 720000, distribution: { IRPJ: 0.085, CSLL: 0.075, COFINS: 0.2274, PIS: 0.0276, CPP: 0.235, ICMS: 0, IPI: 0.35 } },
 ];
 
+// Alíquotas 2025
 export const SIMPLES_NACIONAL_ANNEX_III = [ // Serviços
     { min: 0, max: 180000, rate: 0.06, deduction: 0, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
-    { min: 180000.01, max: 360000, rate: 0.112, deduction: 9360, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
-    { min: 360000.01, max: 720000, rate: 0.135, deduction: 17640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
-    { min: 720000.01, max: 1800000, rate: 0.16, deduction: 35640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
-    { min: 1800000.01, max: 3600000, rate: 0.21, deduction: 125640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
-    { min: 3600000.01, max: 4800000, rate: 0.33, deduction: 648000, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.141, PIS: 0.0305, CPP: 0.3285, ISS: 0 } },
+    { min: 180000.01, max: 360000, rate: 0.0821, deduction: 3978, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
+    { min: 360000.01, max: 720000, rate: 0.1026, deduction: 11358, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
+    { min: 720000.01, max: 1800000, rate: 0.1131, deduction: 18918, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
+    { min: 1800000.01, max: 3600000, rate: 0.1140, deduction: 20538, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
+    { min: 3600000.01, max: 4800000, rate: 0.1242, deduction: 57258, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.141, PIS: 0.0305, CPP: 0.3285, ISS: 0 } },
 ];
 
 export const SIMPLES_NACIONAL_ANNEX_IV = [ // Serviços
@@ -51,13 +52,14 @@ export const SIMPLES_NACIONAL_ANNEX_IV = [ // Serviços
     { min: 3600000.01, max: 4800000, rate: 0.33, deduction: 828000, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.415, PIS: 0.085, ISS: 0 } },
 ];
 
+// Alíquotas 2025
 export const SIMPLES_NACIONAL_ANNEX_V = [ // Serviços
     { min: 0, max: 180000, rate: 0.155, deduction: 0, distribution: { IRPJ: 0.25, CSLL: 0.15, COFINS: 0.1485, PIS: 0.028, CPP: 0.2885, ISS: 0.135 } },
     { min: 180000.01, max: 360000, rate: 0.18, deduction: 4500, distribution: { IRPJ: 0.23, CSLL: 0.15, COFINS: 0.1635, PIS: 0.028, CPP: 0.2885, ISS: 0.14 } },
     { min: 360000.01, max: 720000, rate: 0.195, deduction: 9900, distribution: { IRPJ: 0.21, CSLL: 0.15, COFINS: 0.1785, PIS: 0.028, CPP: 0.2885, ISS: 0.145 } },
     { min: 720000.01, max: 1800000, rate: 0.205, deduction: 17100, distribution: { IRPJ: 0.19, CSLL: 0.15, COFINS: 0.1935, PIS: 0.028, CPP: 0.2885, ISS: 0.15 } },
     { min: 1800000.01, max: 3600000, rate: 0.23, deduction: 62100, distribution: { IRPJ: 0.17, CSLL: 0.15, COFINS: 0.1885, PIS: 0.028, CPP: 0.2885, ISS: 0.175 } },
-    { min: 3600000.01, max: 4800000, rate: 0.305, deduction: 540000, distribution: { IRPJ: 0.235, CSLL: 0.155, COFINS: 0.281, PIS: 0.024, CPP: 0.305, ISS: 0 } },
+    { min: 3600000.01, max: 4800000, rate: 0.245, deduction: 116100, distribution: { IRPJ: 0.235, CSLL: 0.155, COFINS: 0.281, PIS: 0.024, CPP: 0.305, ISS: 0 } },
 ];
 
 export { CNAE_DATA } from './cnaes';
