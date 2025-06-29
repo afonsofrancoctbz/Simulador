@@ -30,6 +30,10 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import CityInfoSection from './city-info-section';
 import CuritibaInfoSection from './curitiba-info-section';
 import RioInfoSection from './rio-info-section';
+import BeloHorizonteInfoSection from './belo-horizonte-info-section';
+import FlorianopolisInfoSection from './florianopolis-info-section';
+import SalvadorInfoSection from './salvador-info-section';
+import PortoAlegreInfoSection from './porto-alegre-info-section';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -636,6 +640,30 @@ export default function TaxCalculator() {
         {selectedCity === 'Rio de Janeiro - RJ' && (
             <div className="mt-12">
                 <RioInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Belo Horizonte - MG' && (
+            <div className="mt-12">
+                <BeloHorizonteInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Florianópolis - SC' && (
+            <div className="mt-12">
+                <FlorianopolisInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Salvador - BA' && (
+            <div className="mt-12">
+                <SalvadorInfoSection />
+            </div>
+        )}
+        
+        {selectedCity === 'Porto Alegre - RS' && (
+            <div className="mt-12">
+                <PortoAlegreInfoSection />
             </div>
         )}
 
