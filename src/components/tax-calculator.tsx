@@ -354,7 +354,7 @@ export default function TaxCalculator() {
                         <div className='border-b pb-4'>
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                                 <Building2 className="h-5 w-5 text-primary" />
-                                Dados da Empresa e Folha
+                                1. Dados da Empresa e Folha
                             </h3>
                             <p className='text-sm text-muted-foreground mt-1'>Informações sobre seus custos com pessoal.</p>
                         </div>
@@ -396,7 +396,7 @@ export default function TaxCalculator() {
                         <div className='border-b pb-4'>
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                                 <Briefcase className="h-5 w-5 text-primary" />
-                                Atividades e Faturamento Mensal
+                                2. Atividades e Faturamento Mensal
                             </h3>
                             <p className='text-sm text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
                         </div>
@@ -504,7 +504,7 @@ export default function TaxCalculator() {
             <CardFooter className="bg-muted/30 border-t p-6">
                 <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
-                  Analisar e Otimizar Impostos
+                  3. Analisar e Otimizar Impostos
                 </Button>
             </CardFooter>
         </Card>
