@@ -42,7 +42,7 @@ const bankFeatures = [
         description: "Receba do exterior e saiba o valor que vai receber na hora, direto na sua conta, e sem taxas ocultas*.",
         footnote: "*Serviço oferecido em parceria com a Remessa Online, correspondente cambial especialista no assunto.",
         footnoteLocation: 'header',
-        imageUrl: "https://www.contabilizei.com.br/_mobile/img/image-card-5.a97aa7e.webp",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/image-card-7.825b79c.webp",
         imageAlt: "Tela do app Contabilizei mostrando simulação de recebimento do exterior."
     },
     {
@@ -58,7 +58,7 @@ const bankFeatures = [
         description: "Pague as despesas da sua empresa com um cartão físico ou virtual, contrate serviços como o Google Workspace e participe do programa de benefícios Vai de Visa.",
         footnote: "*Sujeito a análise",
         footnoteLocation: 'content',
-        imageUrl: "https://www.contabilizei.com.br/_mobile/img/image-card-7.825b79c.webp",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/image-card-5.a97aa7e.webp",
         imageAlt: "Cartão de débito Visa da Contabilizei."
     }
 ];
