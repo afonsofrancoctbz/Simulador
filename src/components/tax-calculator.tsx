@@ -25,6 +25,7 @@ import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { Badge } from './ui/badge';
+import DigitalCertificateSection from './digital-certificate-section';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -334,6 +335,8 @@ export default function TaxCalculator() {
                     </CardContent>
                 </Card>
             )}
+
+            <DigitalCertificateSection />
       </div>
     );
   };
