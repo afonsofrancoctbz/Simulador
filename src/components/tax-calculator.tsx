@@ -38,6 +38,10 @@ import FortalezaInfoSection from './fortaleza-info-section';
 import RecifeInfoSection from './recife-info-section';
 import BrasiliaInfoSection from './brasilia-info-section';
 import GoianiaInfoSection from './goiania-info-section';
+import ManausInfoSection from './manaus-info-section';
+import CampinasInfoSection from './campinas-info-section';
+import JundiaiInfoSection from './jundiai-info-section';
+import UberlandiaInfoSection from './uberlandia-info-section';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -692,6 +696,30 @@ export default function TaxCalculator() {
         {selectedCity === 'Goiânia - GO' && (
             <div className="mt-12">
                 <GoianiaInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Manaus - AM' && (
+            <div className="mt-12">
+                <ManausInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Campinas - SP' && (
+            <div className="mt-12">
+                <CampinasInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Jundiaí - SP' && (
+            <div className="mt-12">
+                <JundiaiInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Uberlândia - MG' && (
+            <div className="mt-12">
+                <UberlandiaInfoSection />
             </div>
         )}
 
