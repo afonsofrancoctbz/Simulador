@@ -4,6 +4,8 @@ import FaqSection from '@/components/faq-section';
 import TaxCalculator from '@/components/tax-calculator';
 import AppFooter from '@/components/app-footer';
 import AppHeader from '@/components/app-header';
+import DigitalCertificateSection from '@/components/digital-certificate-section';
+import PjAccountSection from '@/components/pj-account-section';
 
 export default function Home() {
   return (
@@ -24,6 +26,18 @@ export default function Home() {
               <TaxCalculator />
             </div>
         </div>
+
+        <section className="py-16 lg:py-24 bg-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+            <DigitalCertificateSection />
+          </div>
+        </section>
+
+        <section className="pb-16 lg:pb-24 bg-slate-50/70">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+            <PjAccountSection />
+          </div>
+        </section>
 
         <section className="py-16 lg:py-24 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">

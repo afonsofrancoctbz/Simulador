@@ -25,7 +25,6 @@ import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { Badge } from './ui/badge';
-import DigitalCertificateSection from './digital-certificate-section';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 
@@ -340,8 +339,6 @@ export default function TaxCalculator() {
                     </Alert>
                 </div>
             )}
-
-            <DigitalCertificateSection />
       </div>
     );
   };
