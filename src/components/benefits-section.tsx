@@ -11,7 +11,7 @@ export default function BenefitsSection() {
         <div className="w-full max-w-6xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
              <div className="text-center mb-4">
                  <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Multibenefícios Contabilizei</h2>
-                 <p className="text-muted-foreground mt-2 text-lg font-serif">Vantagens exclusivas para sua empresa e bem-estar, inclusos no plano Multibenefícios e disponíveis no plano Experts.</p>
+                 <p className="text-muted-foreground mt-2 text-lg">Vantagens exclusivas para sua empresa e bem-estar, inclusos no plano Multibenefícios e disponíveis no plano Experts.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
@@ -25,7 +25,7 @@ export default function BenefitsSection() {
                             </div>
                             <CardTitle>Parceria Starbem</CardTitle>
                         </div>
-                        <CardDescription className="font-serif">
+                        <CardDescription className="text-base">
                            Cuide da sua saúde com o pacote de telemedicina que inclui mensalmente, 4 consultas online com psicólogos e 1 com nutricionista, além de descontos em exames e medicamentos.
                         </CardDescription>
                     </CardHeader>
@@ -50,7 +50,7 @@ export default function BenefitsSection() {
                             </div>
                             <CardTitle>Parceria TotalPass</CardTitle>
                         </div>
-                         <CardDescription className="font-serif">
+                         <CardDescription className="text-base">
                             Acesso a mais de 20 mil academias e 250 modalidades esportivas. Contrate o plano que mais se adapta à sua rotina por um valor com desconto, com um adicional de R$30 na mensalidade para acesso ao app.
                         </CardDescription>
                     </CardHeader>
@@ -77,7 +77,7 @@ export default function BenefitsSection() {
                             </div>
                             <CardTitle>Plano de Saúde com Desconto</CardTitle>
                         </div>
-                         <CardDescription className="!mt-4 font-serif text-base">
+                         <CardDescription className="!mt-4 text-base">
                             Clientes Contabilizei têm <span className="font-bold text-accent">até 30% de desconto</span> na contratação de planos de saúde para você e sua empresa, a partir de 1 vida e com as melhores operadoras do país.
                         </CardDescription>
                         <Button className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90">
@@ -97,7 +97,7 @@ export default function BenefitsSection() {
                  </div>
             </Card>
             
-             <p className="text-center text-sm text-muted-foreground font-serif pt-2">
+             <p className="text-center text-sm text-muted-foreground pt-2">
                 <span className="font-bold">IMPORTANTE:</span> *Benefícios e condições sujeitos aos termos de cada plano. Consulte nossos especialistas para mais detalhes.
             </p>
         </div>

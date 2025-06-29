@@ -26,7 +26,7 @@ export default function PjAccountSection() {
                         <Banknote className="text-primary" />
                         Conta PJ Integrada à sua Contabilidade
                     </CardTitle>
-                    <CardDescription className="font-serif !mt-2">
+                    <CardDescription className="!mt-2 text-base">
                         Uma conta PJ gratuita e inteligente, que separa suas finanças e automatiza sua contabilidade.
                     </CardDescription>
                 </CardHeader>
@@ -37,7 +37,7 @@ export default function PjAccountSection() {
                                 <feature.icon className="h-8 w-8 text-primary shrink-0" />
                                 <div>
                                     <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                                    <p className="text-sm text-muted-foreground font-serif">{feature.description}</p>
+                                    <p className="text-base text-muted-foreground">{feature.description}</p>
                                 </div>
                             </div>
                         ))}
@@ -51,7 +51,7 @@ export default function PjAccountSection() {
                                     <feature.icon className="h-8 w-8 text-accent shrink-0 mt-1" />
                                     <div>
                                         <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                                        <p className="text-sm text-muted-foreground font-serif">{feature.description}</p>
+                                        <p className="text-base text-muted-foreground">{feature.description}</p>
                                     </div>
                                 </div>
                             ))}

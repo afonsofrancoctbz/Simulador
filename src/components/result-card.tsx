@@ -32,7 +32,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
             <CardContent className="flex-grow p-4 space-y-4 flex flex-col">
                 
-                <div className="p-3 border rounded-lg bg-background/80 space-y-2 font-serif text-sm">
+                <div className="p-3 border rounded-lg bg-background/80 space-y-2 text-base">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Faturamento Mensal</span>
                         <span className="font-mono font-medium text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
@@ -44,7 +44,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                 </div>
                 
                 <div className="space-y-3">
-                     <div className="p-3 border rounded-lg bg-background/80 space-y-2 font-serif text-sm">
+                     <div className="p-3 border rounded-lg bg-background/80 space-y-2 text-base">
                         
                         {faturamentoTaxes.length > 0 && (
                              <div className="space-y-1">
@@ -88,7 +88,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
                  {details.fatorR !== undefined && (
                     <div className={cn(
-                        "text-center rounded-lg p-2 text-xs", 
+                        "text-center rounded-lg p-2 text-sm", 
                         details.fatorR >= 0.28 
                             ? 'bg-green-100 text-green-900 border border-green-200' 
                             : 'bg-amber-100 text-amber-900 border border-amber-200'
@@ -99,7 +99,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                 )}
 
                  {details.optimizationNote && (
-                    <div className="p-3 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-xs font-serif flex items-start gap-2">
+                    <div className="p-3 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-sm flex items-start gap-2">
                          <Info className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                          <p>{details.optimizationNote}</p>
                      </div>
@@ -108,11 +108,11 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
             <CardFooter className="p-4 bg-muted/30 mt-auto border-t">
                 <div className="text-center w-full space-y-1">
-                    <div className="text-sm text-muted-foreground">Custo Total Mensal Estimado</div>
+                    <div className="text-base text-muted-foreground">Custo Total Mensal Estimado</div>
                     <div className="text-2xl font-bold text-accent">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
-                     <div className="text-xs text-muted-foreground">
+                     <div className="text-sm text-muted-foreground">
                         (Impostos + Mensalidade)
                     </div>
                 </div>

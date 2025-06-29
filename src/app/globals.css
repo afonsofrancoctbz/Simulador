@@ -22,7 +22,7 @@
     --muted: 220 13% 91%;
     --muted-foreground: 217 19% 50%; /* cinza-texto: #64748b */
 
-    --accent: 167 100% 42%; /* verde-contabilizei: #00d4aa */
+    --accent: 180 100% 50%; /* #00ffff */
     --accent-foreground: 215 28% 17%;
     
     --destructive: 3 84% 60%; /* #ef4444 */
@@ -30,15 +30,15 @@
 
     --border: 220 29% 94%; /* cinza-borda: #e2e8f0 */
     --input: 220 29% 94%; /* #e2e8f0 */
-    --ring: 167 100% 36%; /* verde-escuro: #00b894 */
+    --ring: 180 100% 45%; /* slightly darker cyan for better visibility */
 
     --radius: 0.8rem;
 
     --chart-1: 228 64% 33%; /* azul-contabilizei */
-    --chart-2: 167 100% 42%; /* verde-contabilizei */
+    --chart-2: 180 100% 50%; /* cyan */
     --chart-3: 228 50% 45%;
-    --chart-4: 167 80% 50%;
-    --chart-5: 167 60% 60%;
+    --chart-4: 180 80% 60%;
+    --chart-5: 180 60% 70%;
   }
 }
  

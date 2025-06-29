@@ -45,7 +45,7 @@ const ActivityFieldComponent = ({ form, fieldName, index, removeFn, isExport = f
         <Alert variant="default" className="bg-amber-100 border-amber-300 text-amber-800 mt-2">
             <AlertCircle className="h-4 w-4 text-amber-600" />
             <AlertTitle className="font-semibold text-amber-700">Ponto de Atenção</AlertTitle>
-            <AlertDescription className="text-amber-700/90 font-serif">{selectedCnaeData.notes}</AlertDescription>
+            <AlertDescription className="text-amber-700/90">{selectedCnaeData.notes}</AlertDescription>
         </Alert>
       )}
     </div>

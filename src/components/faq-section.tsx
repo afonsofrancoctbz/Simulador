@@ -69,13 +69,13 @@ export default function FaqSection() {
                         <Building className="text-primary" />
                         Cidades Atendidas pela Contabilizei
                     </CardTitle>
-                    <CardDescription className="font-serif !mt-2">
+                    <CardDescription className="!mt-2 text-base">
                         Oferecemos cobertura nacional, atendendo centenas de cidades em todos os estados do Brasil. Verifique se a sua cidade é atendida:
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center">
                     <CityCombobox />
-                     <p className="mt-4 text-sm text-muted-foreground text-center font-serif">Se sua cidade não está na lista, consulte-nos. Nosso serviço de contabilidade online nos permite alcançar empresas em todo o território nacional.</p>
+                     <p className="mt-4 text-sm text-muted-foreground text-center">Se sua cidade não está na lista, consulte-nos. Nosso serviço de contabilidade online nos permite alcançar empresas em todo o território nacional.</p>
                 </CardContent>
             </Card>
         </div>
