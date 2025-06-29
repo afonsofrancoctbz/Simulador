@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
-import { CheckCircle, Dumbbell, Monitor, AlertTriangle, ArrowRight } from 'lucide-react';
+import { CheckCircle, Dumbbell, Monitor, AlertTriangle } from 'lucide-react';
 
 const coreBenefits = [
     {
@@ -115,8 +115,7 @@ export default function MultibenefitsSection() {
             {/* CTA Button */}
             <div className="text-center">
                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg py-7 px-10">
-                    QUERO ATIVAR O MULTIBENEFÍCIOS AGORA
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    ATIVE AGORA MESMO O SEU MULTIBENEFÍCIOS
                 </Button>
             </div>
         </div>
