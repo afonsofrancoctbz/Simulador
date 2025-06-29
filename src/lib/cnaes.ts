@@ -1558,7 +1558,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de publicidade, sujeita a regulamentação específica. A empresa pode necessitar de registro em órgãos competentes como ANCINE.'
   },
   {
     code: '5911-1/99',
@@ -1575,7 +1576,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Profissão de Artista/Ator regulamentada. Requer registro profissional (DRT) para os profissionais envolvidos.'
   },
   {
     code: '5912-0/02',
@@ -1951,7 +1953,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'A profissão de publicitário é regulamentada. A agência pode necessitar de registro técnico ou de responsável técnico.'
   },
   {
     code: '7312-2/00',
@@ -2077,7 +2080,7 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Atividades Profissionais, Científicas e Técnicas',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: false
   },
   {
     code: '7420-0/05',
@@ -2562,7 +2565,7 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: false
   },
   {
     code: '8591-1/00',
@@ -2570,7 +2573,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREF (Conselho Regional de Educação Física). A empresa precisa de um responsável técnico.'
   },
   {
     code: '8592-9/01',
@@ -2578,7 +2582,7 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: false
   },
   {
     code: '8592-9/02',
@@ -2586,7 +2590,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de artista é regulamentada. Os instrutores podem necessitar de registro profissional (DRT).'
   },
   {
     code: '8592-9/03',
@@ -2594,7 +2599,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: false,
+    notes: 'A exigência de registro na Ordem dos Músicos do Brasil (OMB) foi declarada inconstitucional pelo STF.'
   },
   {
     code: '8592-9/99',
@@ -2662,8 +2668,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atenção: Necessário confirmar Objeto Social.'
+    isRegulated: false,
+    notes: 'Atenção: Atividade genérica. A necessidade de regulamentação depende do serviço específico prestado. Verifique o objeto social.'
   },
   {
     code: '8610-1/01',
@@ -3010,7 +3016,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de gestão, geralmente regulamentada pelo CRA (Conselho Regional de Administração).'
   },
   {
     code: '8690-9/01',
@@ -3093,7 +3100,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de artista é regulamentada. Os profissionais envolvidos podem necessitar de registro profissional (DRT).'
   },
   {
     code: '9001-9/02',
@@ -3101,7 +3109,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: false,
+    notes: 'A exigência de registro na Ordem dos Músicos do Brasil (OMB) foi declarada inconstitucional pelo STF.'
   },
   {
     code: '9001-9/03',
@@ -3109,7 +3118,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de artista é regulamentada. Os dançarinos podem necessitar de registro profissional (DRT).'
   },
   {
     code: '9001-9/04',
@@ -3117,7 +3127,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de artista é regulamentada. Os profissionais envolvidos podem necessitar de registro profissional (DRT).'
   },
   {
     code: '9001-9/05',
@@ -3125,7 +3136,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: false,
+    notes: 'A produção em si não é regulamentada, mas o evento pode exigir a contratação de profissionais regulamentados (ex: veterinários, engenheiros).'
   },
   {
     code: '9001-9/06',
@@ -3160,7 +3172,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade técnica que pode exigir registro em conselhos de Museologia (COREM) ou Arquitetura (CAU), dependendo do objeto a ser restaurado.'
   },
   {
     code: '9003-5/00',
@@ -3168,7 +3181,8 @@ export const CNAE_DATA: CnaeData[] = [
     category: 'Arte, Cultura e Entretenimento',
     annex: 'III',
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade de gestão, pode ser regulamentada pelo CRA (Conselho Regional de Administração).'
   },
   {
     code: '9101-5/00',
@@ -3201,7 +3215,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade regulamentada. Pode exigir registro no CREF (responsável técnico) e/ou CRA (gestão administrativa).'
   },
   {
     code: '9313-1/00',
@@ -3219,7 +3234,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: true
+    isRegulated: true,
+    notes: 'Atividade regulamentada. Pode exigir registro no CREF (responsável técnico) e/ou CRA (gestão do evento).'
   },
   {
     code: '9319-1/99',
