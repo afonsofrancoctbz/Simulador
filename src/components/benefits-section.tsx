@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription } from './ui/alert';
 
 const partners = [
@@ -43,14 +42,9 @@ export default function BenefitsSection() {
     return (
         <div className="w-full max-w-7xl mx-auto space-y-16 py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center space-y-6">
-                <div className="inline-flex items-center justify-center gap-3">
-                   <div className="bg-primary/10 p-3 rounded-full">
-                        <ShieldCheck className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                        Cliente Contabilizei tem plano de saúde PJ com condições exclusivas
-                    </h2>
-                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+                    Cliente Contabilizei tem plano de saúde PJ com condições exclusivas
+                </h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
                     Conte com as melhores condições nas maiores operadoras de saúde do Brasil, inclusive com a opção de plano de saúde a partir de uma vida.
                 </p>

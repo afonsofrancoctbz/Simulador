@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Banknote } from 'lucide-react';
 
 const bankFeatures = [
     {
@@ -68,14 +67,9 @@ export default function PjAccountSection() {
     return (
         <div className="w-full max-w-7xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-                <div className="inline-flex items-center gap-3 mb-4 justify-center">
-                    <div className="bg-primary/10 p-3 rounded-full">
-                        <Banknote className="h-7 w-7 text-primary" />
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                        Abra uma conta digital PJ gratuita e integrada à sua contabilidade.
-                    </h2>
-                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+                    Abra uma conta digital PJ gratuita e integrada à sua contabilidade.
+                </h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
                     É a forma mais rápida para receber de seus clientes, pois já temos todos os documentos necessários para deixar a sua conta pronta. Baixe o app e conclua o cadastro assim que o seu CNPJ estiver disponível.
                 </p>
