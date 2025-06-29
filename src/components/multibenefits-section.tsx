@@ -107,7 +107,8 @@ export default function MultibenefitsSection() {
                     <AlertTriangle className="h-5 w-5 text-amber-600" />
                     <AlertTitle className="font-semibold">IMPORTANTE</AlertTitle>
                     <AlertDescription>
-                       *Assim que seu CNPJ for emitido, você vai receber um e-mail com instruções para assinar digitalmente o contrato do Multibenefícios. Para adquirir o Multibenefícios é cobrado um valor de R$30,00 a mais na mensalidade. Se contratar o plano de saúde com a Contabilizei, não há cobrança deste valor adicional.
+                       Para adquirir o Multibenefícios é cobrado um valor de R$30,00 a mais na mensalidade. Se contratar o plano de saúde com a Contabilizei, não há cobrança deste valor adicional.
+                       <span className="block mt-2 text-xs opacity-80">*Assim que seu CNPJ for emitido, você receberá as instruções para assinar o contrato digitalmente.</span>
                     </AlertDescription>
                 </Alert>
             </div>
