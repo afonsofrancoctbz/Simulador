@@ -34,6 +34,7 @@ import BeloHorizonteInfoSection from './belo-horizonte-info-section';
 import FlorianopolisInfoSection from './florianopolis-info-section';
 import SalvadorInfoSection from './salvador-info-section';
 import PortoAlegreInfoSection from './porto-alegre-info-section';
+import FortalezaInfoSection from './fortaleza-info-section';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -664,6 +665,12 @@ export default function TaxCalculator() {
         {selectedCity === 'Porto Alegre - RS' && (
             <div className="mt-12">
                 <PortoAlegreInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Fortaleza - CE' && (
+            <div className="mt-12">
+                <FortalezaInfoSection />
             </div>
         )}
 
