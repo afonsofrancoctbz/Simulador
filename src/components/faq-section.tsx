@@ -62,7 +62,7 @@ const CityCombobox = () => {
 
 export default function FaqSection() {
     return (
-        <div className="w-full max-w-6xl space-y-8">
+        <div className="w-full max-w-5xl mx-auto">
             <Card className="bg-card shadow-lg">
                 <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-3">

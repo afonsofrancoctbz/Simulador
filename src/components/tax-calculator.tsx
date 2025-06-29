@@ -356,15 +356,15 @@ export default function TaxCalculator() {
                                 <Building2 className="h-5 w-5 text-primary" />
                                 1. Dados da Empresa e Folha
                             </h3>
-                            <p className='text-sm text-muted-foreground mt-1'>Informações sobre seus custos com pessoal.</p>
+                            <p className='text-sm text-muted-foreground mt-1 font-serif'>Informações sobre seus custos com pessoal.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Despesa com Salários (CLT)</FormLabel>
                                     <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
-                                    <FormDescription className='text-xs'>
-                                        Custo total com funcionários (se houver).
+                                    <FormDescription className='text-xs font-serif'>
+                                        Custo total mensal com funcionários registrados (se houver).
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -373,8 +373,8 @@ export default function TaxCalculator() {
                                 <FormItem>
                                     <FormLabel>Número de Sócios</FormLabel>
                                     <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
-                                     <FormDescription className='text-xs'>
-                                        Quantos sócios a empresa possui.
+                                     <FormDescription className='text-xs font-serif'>
+                                        Quantos sócios administram a empresa.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -383,8 +383,8 @@ export default function TaxCalculator() {
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
                                     <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
-                                     <FormDescription className='text-xs'>
-                                        Remuneração mensal de cada sócio.
+                                     <FormDescription className='text-xs font-serif'>
+                                        Salário mensal de cada sócio administrador. Mínimo de R$ {formatCurrencyBRL(MINIMUM_WAGE)}.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -398,7 +398,7 @@ export default function TaxCalculator() {
                                 <Briefcase className="h-5 w-5 text-primary" />
                                 2. Atividades e Faturamento Mensal
                             </h3>
-                            <p className='text-sm text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
+                            <p className='text-sm text-muted-foreground mt-1 font-serif'>Selecione suas atividades e informe a receita correspondente.</p>
                         </div>
                        
                         <div>
@@ -411,7 +411,7 @@ export default function TaxCalculator() {
                                             <XCircle className="h-3 w-3 text-destructive/80" />
                                         </Button>
                                     </Badge>
-                                )) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
+                                )) : <p className="text-sm text-muted-foreground px-1 font-serif">Nenhuma atividade selecionada.</p>}
                             </div>
                             <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorOpen(true)}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
@@ -497,7 +497,7 @@ export default function TaxCalculator() {
                                 </div>
                             </div>
                         )}
-                        {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
+                        {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground mt-4 font-serif'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
                 </div>
             </CardContent>
