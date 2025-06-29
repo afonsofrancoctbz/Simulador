@@ -1,10 +1,9 @@
-
 "use client";
 
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Hospital, Users, ShieldCheck, Clock } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription } from './ui/alert';
 
 const partners = [
@@ -18,27 +17,24 @@ const partners = [
 
 const features = [
     {
-        icon: Hospital,
-        title: "Opções de cobertura",
-        description: "Encontre planos com a cobertura ideal para suas necessidades, desde consultas e exames até internações e cirurgias.",
-        imageUrl: "https://placehold.co/200x200.png",
-        imageAlt: "Doutora explicando plano para paciente",
+        title: "Diversas opções de cobertura",
+        description: "Você pode escolher a melhor opção de cobertura do seu plano de saúde, aquela que se encaixa no seu perfil e na sua necessidade.",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/opcoes-cobertura.a57458f.webp",
+        imageAlt: "Doutora explicando plano de saúde para paciente",
         aiHint: "doctor patient"
     },
     {
-        icon: Users,
-        title: "Planos para dependentes",
-        description: "Estenda os benefícios para sua família, com opções de inclusão de cônjuges e filhos, garantindo a tranquilidade de todos.",
-        imageUrl: "https://placehold.co/200x200.png",
-        imageAlt: "Família feliz e protegida pelo plano de saúde",
-        aiHint: "happy family"
+        title: "Planos só para você ou com dependentes",
+        description: "Conte com planos para apenas uma vida ou ainda para seus dependentes como filhos, cônjuges e outras pessoas vinculadas ao seu CNPJ.",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/planos-dependentes.9f1b6d6.webp",
+        imageAlt: "Mãe e filha sorrindo, representando plano de saúde para dependentes",
+        aiHint: "mother daughter"
     },
     {
-        icon: Clock,
-        title: "Aproveitamento de carências",
-        description: "Se você já possui um plano, pode ter isenção ou redução das carências ao trocar para um novo, aproveitando seus benefícios mais rápido.",
-        imageUrl: "https://placehold.co/200x200.png",
-        imageAlt: "Homem sorrindo enquanto usa notebook",
+        title: "Orientação sobre as carência do plano",
+        description: "Antes de qualquer decisão, orientamos você sobre possíveis carências e o aproveitamento delas caso você esteja pensando em mudar de plano de saúde.",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/carencia-planos.36d2d42.webp",
+        imageAlt: "Homem usando notebook, planejando plano de saúde",
         aiHint: "man laptop"
     },
 ];
@@ -73,27 +69,22 @@ export default function BenefitsSection() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                     {features.map((feature, index) => (
-                        <Card key={index} className="flex flex-col text-center overflow-hidden shadow-md hover:shadow-xl transition-shadow p-6 items-center">
-                            <CardHeader className="p-0">
-                                <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4">
-                                    <feature.icon className="h-7 w-7 text-primary" />
-                                </div>
-                                <CardTitle>{feature.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0 mt-4 flex-grow flex flex-col items-center">
-                                <div className='relative w-48 h-48 rounded-full overflow-hidden my-4'>
+                        <Card key={index} className="flex flex-col text-left overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-card">
+                           <CardContent className="p-6 pb-4 flex-grow flex flex-col">
+                                <CardTitle className="text-xl font-bold mb-2 text-primary">{feature.title}</CardTitle>
+                                <CardDescription className="text-base text-muted-foreground">
+                                    {feature.description}
+                                </CardDescription>
+                                <div className="relative mt-auto pt-4 h-48">
                                     <Image
                                         src={feature.imageUrl}
                                         alt={feature.imageAlt}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain"
                                         data-ai-hint={feature.aiHint}
                                     />
                                 </div>
-                                <CardDescription className="text-base mt-2 max-w-xs">
-                                    {feature.description}
-                                </CardDescription>
-                            </CardContent>
+                           </CardContent>
                         </Card>
                     ))}
                 </div>
