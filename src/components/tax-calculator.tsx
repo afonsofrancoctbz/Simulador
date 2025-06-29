@@ -341,143 +341,163 @@ export default function TaxCalculator() {
   return (
     <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
-        <Card className="shadow-xl overflow-hidden border-2 border-transparent hover:border-primary/10 transition-all duration-300 max-w-6xl mx-auto bg-card">
+        <Card className="shadow-xl overflow-hidden border bg-card max-w-5xl mx-auto">
             <CardContent className="p-6 md:p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
-                    {/* Coluna Dados da Empresa */}
+                <div className="flex flex-col gap-8">
+                    
                     <div className="space-y-6">
-                        <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
-                            <Building2 className="h-5 w-5 text-primary" />
-                            Dados da Empresa
-                        </h3>
-                        <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
-                                <FormDescription>
-                                    Informe a despesa total com a folha de pagamento de funcionários (se houver).
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                         <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Número de Sócios</FormLabel>
-                                <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Pró-labore por Sócio</FormLabel>
-                                <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
+                        <div className='border-b pb-4'>
+                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                                <Building2 className="h-5 w-5 text-primary" />
+                                Dados da Empresa e Folha
+                            </h3>
+                            <p className='text-sm text-muted-foreground mt-1'>Informações sobre seus custos com pessoal.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Despesa com Salários (CLT)</FormLabel>
+                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormDescription className='text-xs'>
+                                        Custo total com funcionários (se houver).
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                             <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Número de Sócios</FormLabel>
+                                    <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
+                                     <FormDescription className='text-xs'>
+                                        Quantos sócios a empresa possui.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Pró-labore por Sócio</FormLabel>
+                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                     <FormDescription className='text-xs'>
+                                        Remuneração mensal de cada sócio.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        </div>
                     </div>
 
-                    {/* Coluna Atividades e Faturamento */}
                     <div className="space-y-6">
-                        <h3 className="font-semibold text-lg text-foreground flex items-center gap-2 border-b pb-2">
-                            <Briefcase className="h-5 w-5 text-primary" />
-                            Atividades e Faturamento
-                        </h3>
+                        <div className='border-b pb-4'>
+                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                                <Briefcase className="h-5 w-5 text-primary" />
+                                Atividades e Faturamento Mensal
+                            </h3>
+                            <p className='text-sm text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
+                        </div>
                        
                         <div>
-                            <FormLabel>Atividades (CNAEs) Selecionados</FormLabel>
+                            <FormLabel>Atividades (CNAEs) da empresa</FormLabel>
                             <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[40px] bg-background">
                                 {selectedCnaes.length > 0 ? selectedCnaes.map(code => (
                                     <Badge key={code} variant="secondary" className="text-sm">
                                         {code}
-                                        <Button variant="ghost" size="icon" className="h-4 w-4 ml-1" onClick={() => handleCnaeConfirm(selectedCnaes.filter(c => c !== code))}>
-                                            <XCircle className="h-3 w-3" />
+                                        <Button variant="ghost" size="icon" className="h-4 w-4 ml-1 hover:bg-destructive/20" onClick={() => handleCnaeConfirm(selectedCnaes.filter(c => c !== code))}>
+                                            <XCircle className="h-3 w-3 text-destructive/80" />
                                         </Button>
                                     </Badge>
-                                )) : <p className="text-sm text-muted-foreground">Nenhuma atividade selecionada.</p>}
+                                )) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
                             </div>
                             <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorOpen(true)}>
-                                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar/Editar Atividades
+                                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                             </Button>
                         </div>
                         
-                        <Separator />
+                        {revenueGroups.length > 0 && <Separator />}
 
-                         <div>
-                            <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receitas Nacionais</h4>
-                            {revenueGroups.map(annex => (
-                                <FormField
-                                    key={`domestic_${annex}`}
-                                    control={form.control}
-                                    name={`revenues.domestic_${annex}`}
-                                    render={({ field }) => (
-                                    <FormItem className='mb-2'>
-                                        <FormLabel>Faturamento Nacional (Anexo {annex})</FormLabel>
-                                        <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                            ))}
-                            {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground'>Selecione atividades para informar o faturamento.</p>}
-                        </div>
-
-                        <div>
-                            <h4 className="font-medium text-md text-foreground mb-3 flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receitas de Exportação</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                                <FormField control={form.control} name="exportCurrency" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Moeda</FormLabel>
-                                        <Select onValueChange={(value) => {
-                                            field.onChange(value)
-                                            if (exchangeRates[value]) {
-                                                form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true })
-                                            } else if (value === 'BRL') {
-                                                form.setValue('exchangeRate', 1, { shouldValidate: true })
-                                            }
-                                        }} defaultValue={field.value}>
-                                            <FormControl><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger></FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="BRL">Real (BRL)</SelectItem>
-                                                <SelectItem value="USD">Dólar (USD)</SelectItem>
-                                                <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )} />
-                                {exportCurrency !== 'BRL' && (
-                                    <FormField control={form.control} name="exchangeRate" render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Taxa de Câmbio ({exportCurrency})</FormLabel>
-                                            <div className="relative">
-                                                <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} disabled={isFetchingRate} /></FormControl>
-                                                 <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate}>
-                                                    <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
-                                                </Button>
-                                            </div>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                )}
+                        {revenueGroups.length > 0 && (
+                            <div className='space-y-8'>
+                                <div>
+                                    <h4 className="font-medium text-md text-foreground mb-4 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {revenueGroups.map(annex => (
+                                            <FormField
+                                                key={`domestic_${annex}`}
+                                                control={form.control}
+                                                name={`revenues.domestic_${annex}`}
+                                                render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Faturamento (Anexo {annex})</FormLabel>
+                                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 className="font-medium text-md text-foreground mb-4 flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <FormField control={form.control} name="exportCurrency" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Moeda</FormLabel>
+                                                <Select onValueChange={(value) => {
+                                                    field.onChange(value)
+                                                    if (exchangeRates[value]) {
+                                                        form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true })
+                                                    } else if (value === 'BRL') {
+                                                        form.setValue('exchangeRate', 1, { shouldValidate: true })
+                                                    }
+                                                }} defaultValue={field.value}>
+                                                    <FormControl><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger></FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="BRL">Real (BRL)</SelectItem>
+                                                        <SelectItem value="USD">Dólar (USD)</SelectItem>
+                                                        <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )} />
+                                        {exportCurrency !== 'BRL' && (
+                                            <FormField control={form.control} name="exchangeRate" render={({ field }) => (
+                                                <FormItem className='md:col-span-2'>
+                                                    <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
+                                                    <div className="relative">
+                                                        <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} disabled={isFetchingRate} /></FormControl>
+                                                         <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate}>
+                                                            <RefreshCw className={cn("h-4 w-4", isFetchingRate && "animate-spin")} />
+                                                        </Button>
+                                                    </div>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        )}
+                                    </div>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {revenueGroups.map(annex => (
+                                            <FormField
+                                                key={`export_${annex}`}
+                                                control={form.control}
+                                                name={`revenues.export_${annex}`}
+                                                render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Faturamento (Anexo {annex})</FormLabel>
+                                                    <FormControl><Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                             {revenueGroups.map(annex => (
-                                <FormField
-                                    key={`export_${annex}`}
-                                    control={form.control}
-                                    name={`revenues.export_${annex}`}
-                                    render={({ field }) => (
-                                    <FormItem className='mb-2'>
-                                        <FormLabel>Faturamento Exportação (Anexo {annex})</FormLabel>
-                                        <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                            ))}
-                            {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground'>Selecione atividades para informar o faturamento.</p>}
-                        </div>
+                        )}
+                        {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className="bg-slate-50/50 border-t p-6">
-                <Button type="submit" size="lg" disabled={isLoading} className="w-full sm:w-auto ml-auto bg-primary text-primary-foreground hover:bg-primary/90">
+            <CardFooter className="bg-muted/30 border-t p-6">
+                <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
                   Analisar e Otimizar Impostos
                 </Button>

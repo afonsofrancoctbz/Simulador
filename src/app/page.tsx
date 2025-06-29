@@ -16,12 +16,14 @@ export default function Home() {
             <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-serif">
               Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
             </p>
-
-            <div className="mt-12">
-              <TaxCalculator />
-            </div>
           </div>
         </section>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="-mt-16">
+              <TaxCalculator />
+            </div>
+        </div>
 
         <section className="py-16 lg:py-24 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
