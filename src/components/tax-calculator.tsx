@@ -10,7 +10,7 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
 import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex } from '@/lib/types';
-import { cn, formatCurrencyBRL } from "@/lib/utils";
+import { cn, formatCurrencyBRL, formatPercent, formatBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 
@@ -362,7 +362,7 @@ export default function TaxCalculator() {
                             <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormControl><Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
                                     <FormDescription className='text-xs font-serif'>
                                         Custo total mensal com funcionários registrados (se houver).
                                     </FormDescription>
@@ -382,7 +382,7 @@ export default function TaxCalculator() {
                             <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormControl><Input type="number" step="0.01" placeholder={formatBRL(MINIMUM_WAGE)} {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
                                      <FormDescription className='text-xs font-serif'>
                                         Salário mensal de cada sócio administrador. Mínimo de R$ {formatCurrencyBRL(MINIMUM_WAGE)}.
                                     </FormDescription>
@@ -433,7 +433,7 @@ export default function TaxCalculator() {
                                                 render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Faturamento (Anexo {annex})</FormLabel>
-                                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
+                                                    <FormControl><Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )} />
