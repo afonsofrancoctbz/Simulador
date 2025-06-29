@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, MapPin } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
@@ -13,6 +13,7 @@ import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, Cnae
 import { cn, formatCurrencyBRL, formatBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
+import { CIDADES_ATENDIDAS } from '@/lib/cities';
 
 
 import { Button } from "@/components/ui/button";
@@ -26,12 +27,14 @@ import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import CityInfoSection from './city-info-section';
 
 
 const fiscalConfig = getFiscalParameters();
 const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
 const calculatorFormSchema = z.object({
+  city: z.string().optional(),
   selectedCnaes: z.array(z.string()).min(1, "Selecione pelo menos um CNAE."),
   revenues: z.record(z.string(), z.coerce.number().optional()), // e.g. revenues['domestic_V']
   exportCurrency: z.string(),
@@ -70,6 +73,7 @@ export default function TaxCalculator() {
   const form = useForm<CalculatorFormValues>({
     resolver: zodResolver(calculatorFormSchema),
     defaultValues: {
+      city: undefined,
       selectedCnaes: [],
       revenues: {},
       exportCurrency: 'BRL',
@@ -82,6 +86,7 @@ export default function TaxCalculator() {
 
   const selectedCnaes = form.watch("selectedCnaes");
   const exportCurrency = form.watch("exportCurrency");
+  const selectedCity = form.watch("city");
   
   const revenueGroups = useMemo(() => {
     const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is CnaeData => !!c);
@@ -356,9 +361,36 @@ export default function TaxCalculator() {
                                 <Building2 className="h-5 w-5 text-primary" />
                                 1. Dados da Empresa e Folha
                             </h3>
-                            <p className='text-base text-muted-foreground mt-1'>Informações sobre seus custos com pessoal.</p>
+                            <p className='text-base text-muted-foreground mt-1'>Informações sobre seus custos com pessoal e localização.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <FormField
+                                control={form.control}
+                                name="city"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Onde sua empresa será registrada?</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecione uma cidade" />
+                                            </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                            {CIDADES_ATENDIDAS.map((city) => (
+                                                <SelectItem key={city} value={city}>
+                                                {city}
+                                                </SelectItem>
+                                            ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription className='text-sm'>
+                                            Selecionar a cidade nos permite fornecer informações mais precisas sobre taxas e prazos.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => {
                                 const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                     const { value } = e.target;
@@ -381,7 +413,7 @@ export default function TaxCalculator() {
                                         />
                                     </FormControl>
                                     <FormDescription className='text-sm'>
-                                        Custo total mensal com funcionários registrados (se houver).
+                                        Custo total mensal com funcionários.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -392,7 +424,7 @@ export default function TaxCalculator() {
                                     <FormLabel>Número de Sócios</FormLabel>
                                     <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
                                      <FormDescription className='text-sm'>
-                                        Quantos sócios administram a empresa.
+                                        Quantos sócios administram.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -419,7 +451,7 @@ export default function TaxCalculator() {
                                         />
                                     </FormControl>
                                      <FormDescription className='text-sm'>
-                                        Salário mensal de cada sócio administrador. Mínimo de R$ {formatCurrencyBRL(MINIMUM_WAGE)}.
+                                        Salário mensal de cada sócio.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -586,6 +618,12 @@ export default function TaxCalculator() {
             onConfirm={handleCnaeConfirm}
             initialSelectedCodes={selectedCnaes}
         />
+        
+        {selectedCity === 'São Paulo - SP' && (
+            <div className="mt-12">
+                <CityInfoSection />
+            </div>
+        )}
 
         {renderResults()}
     </FormProvider>

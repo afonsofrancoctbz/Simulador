@@ -7,122 +7,60 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle, Ticket, Clock, Gift, Home } from "lucide-react";
+
+const faqData = [
+  {
+    question: "Como a Contabilizei pode me ajudar a economizar nos impostos?",
+    answer:
+      "Nossa plataforma analisa suas atividades e faturamento para identificar o regime tributário mais vantajoso (Simples Nacional ou Lucro Presumido). Além disso, nossa assessoria especializada te orienta sobre as melhores práticas para otimização fiscal, como o Fator R, garantindo que você pague o mínimo de impostos dentro da lei.",
+  },
+  {
+    question: "O que é o Fator R e como ele funciona?",
+    answer:
+      "O Fator R é um cálculo que pode permitir que empresas do Simples Nacional, que estariam no Anexo V, sejam tributadas pelo Anexo III, que possui alíquotas menores. Isso acontece quando a folha de pagamento (incluindo salários e pró-labore) é igual ou superior a 28% do seu faturamento. Nossa calculadora simula este cenário para você.",
+  },
+  {
+    question: "A Contabilizei atende a minha cidade?",
+    answer:
+      "Atendemos centenas de cidades em todo o Brasil. Para confirmar se a sua cidade está na nossa área de cobertura e conhecer as taxas e prazos específicos, por favor, selecione sua cidade na calculadora acima. A informação detalhada aparecerá automaticamente.",
+  },
+  {
+    question: "É complicado abrir uma empresa? Quanto tempo leva?",
+    answer:
+      "Com a Contabilizei, o processo é 100% digital e simplificado. Cuidamos de toda a burocracia para você. O prazo para ter seu CNPJ ativo pode variar, mas geralmente leva poucos dias, dependendo da sua cidade. Ao selecionar sua cidade na calculadora, você verá mais detalhes sobre os prazos.",
+  },
+  {
+    question:
+      "Posso ter um plano de saúde e outros benefícios pela minha empresa?",
+    answer:
+      "Sim! Clientes Contabilizei têm acesso a planos de saúde PJ com condições exclusivas e até 30% mais baratos que os planos para pessoa física. Oferecemos também o plano Multibenefícios, com acesso a academias (TotalPass), telemedicina (Starbem) e muito mais, para cuidar de você e do seu negócio.",
+  },
+];
 
 export default function FaqSection() {
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <Card className="shadow-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">
-            Tudo o que você precisa saber para abrir seu CNPJ
-          </CardTitle>
-          <CardDescription className="text-lg mt-2 text-muted-foreground">
-            Informações claras e transparentes para você começar com segurança.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full text-left">
-            
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="text-lg font-semibold">
-                <Ticket className="mr-3 text-primary" />
-                Quais são os custos para abrir a empresa?
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  Na Contabilizei, <strong>não cobramos honorários para a abertura do seu CNPJ</strong>. Você contrata o plano de contabilidade e arca apenas com as taxas dos órgãos públicos. Para <strong>São Paulo - SP</strong>, os custos iniciais são:
-                </p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Taxa da Junta Comercial (JUCESP):</strong> <Badge variant="secondary">R$ 211,01</Badge> para sociedades (LTDA/SLU) ou <Badge variant="secondary">R$ 91,44</Badge> para Empresário Individual (EI). Esta taxa é paga apenas uma vez.</li>
-                  <li><strong>Taxa de Alvará (Prefeitura):</strong> A partir de <Badge variant="secondary">R$ 216,23</Badge>.</li>
-                </ul>
-                <div className="p-3 border-l-4 border-green-500 bg-green-50 text-green-800 rounded-r-md">
-                    <h4 className="font-bold flex items-center gap-2"><Gift className="h-5 w-5"/>Campanha Custo Zero</h4>
-                    <p className="mt-1">
-                        São Paulo participa da nossa campanha de <strong>Custo Zero</strong>! Isso significa que <strong>isentamos você da taxa da Junta Comercial</strong>, uma economia e tanto para começar.
-                    </p>
-                </div>
-                <p className="text-sm">
-                  <strong>Para atividades de advocacia:</strong> O processo ocorre junto à OAB, e não na Junta Comercial. O valor da taxa da OAB não é informado neste momento.
-                </p>
-                 <p className="text-sm">
-                  <strong>Taxa de Fiscalização de Estabelecimentos (TFE):</strong> Em São Paulo, este é um tributo municipal cobrado anualmente em decorrência das atividades de fiscalização.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-2">
-              <AccordionTrigger className="text-lg font-semibold">
-                <Clock className="mr-3 text-primary" />
-                Quais os prazos para ter meu CNPJ?
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O processo é mais rápido do que você imagina:</p>
-                 <ul className="list-disc pl-6 space-y-2">
-                  <li>O prazo para obtenção do <strong>CNPJ é de aproximadamente 6 dias corridos</strong>.</li>
-                  <li>A emissão de notas fiscais poderá acontecer após o enquadramento da empresa no regime tributário, com um prazo total de aproximadamente <strong>29 dias corridos</strong>.</li>
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-3">
-              <AccordionTrigger className="text-lg font-semibold">
-                <CheckCircle className="mr-3 text-primary" />
-                O que está incluso no serviço da Contabilizei?
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  Depois que sua empresa estiver aberta, cuidamos de toda a rotina contábil para você focar no que realmente importa: seu negócio. Nossos serviços incluem:
-                </p>
-                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Cálculo e emissão de guias de impostos.</li>
-                  <li>Entrega de todas as declarações contábeis obrigatórias.</li>
-                  <li>Elaboração do Imposto de Renda da Pessoa Jurídica (IRPJ).</li>
-                  <li>Acesso a relatórios contábeis online sempre que precisar.</li>
-                  <li><strong>Emissor de Notas Fiscais</strong> integrado à plataforma para facilitar sua rotina.</li>
-                </ul>
-                 <div className="p-3 border-l-4 border-blue-500 bg-blue-50 text-blue-800 rounded-r-md">
-                    <h4 className="font-bold">Conta PJ Gratuita e Integrada</h4>
-                    <p className="mt-1">
-                     É fundamental separar suas finanças pessoais e empresariais. Por isso, oferecemos o <strong>Contabilizei Bank</strong>, uma conta PJ digital gratuita, sem tarifas de manutenção e totalmente integrada à sua contabilidade, simplificando o envio de extratos.
-                    </p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-4">
-               <AccordionTrigger className="text-lg font-semibold">
-                <Home className="mr-3 text-primary" />
-                Preciso sair de casa para abrir a empresa?
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 text-base text-muted-foreground">
-                <p>
-                  Não! Com a Contabilizei, você pode ter o seu CNPJ <strong>sem sair de casa</strong>. Cuidamos de todo o processo de forma digital, com auxílio dos nossos especialistas em todas as etapas e um valor muito acessível.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-          </Accordion>
-
-          <Alert variant="default" className="mt-8 bg-amber-50 border-amber-200 text-amber-900">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
-            <AlertTitle className="font-semibold">Atenção aos Custos Adicionais</AlertTitle>
-            <AlertDescription>
-              Este simulador contempla apenas os valores iniciais da taxa de alvará. Dependendo da sua atividade e município, podem incidir taxas adicionais como <strong>AVCB (Bombeiros)</strong> e <strong>Vigilância Sanitária</strong>, que não estão inclusas nesta estimativa.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <div className="text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+          Perguntas Frequentes
+        </h2>
+        <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
+          Tire suas principais dúvidas sobre como abrir e gerenciar sua empresa
+          com a gente.
+        </p>
+      </div>
+      <Accordion type="single" collapsible className="w-full">
+        {faqData.map((faq, index) => (
+          <AccordionItem value={`item-${index + 1}`} key={index}>
+            <AccordionTrigger className="text-lg font-semibold text-left">
+              {faq.question}
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground text-left">
+              {faq.answer}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
     </div>
   );
 }
