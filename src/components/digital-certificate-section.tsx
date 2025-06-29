@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 
 export default function DigitalCertificateSection() {
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto">
       <div className="bg-card rounded-lg border shadow-lg p-8">
         <div className="grid md:grid-cols-3 gap-12 items-center">
           {/* Left Column */}

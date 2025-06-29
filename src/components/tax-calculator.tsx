@@ -346,7 +346,7 @@ export default function TaxCalculator() {
   return (
     <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
-        <Card className="shadow-xl overflow-hidden border bg-card max-w-5xl mx-auto">
+        <Card className="shadow-xl overflow-hidden border bg-card max-w-6xl mx-auto">
             <CardContent className="p-6 md:p-8">
                 <div className="flex flex-col gap-8">
                     
@@ -362,7 +362,7 @@ export default function TaxCalculator() {
                             <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormControl><Input type="number" step="0.01" placeholder="R$ 0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
                                     <FormDescription className='text-xs font-serif'>
                                         Custo total mensal com funcionários registrados (se houver).
                                     </FormDescription>
@@ -382,7 +382,7 @@ export default function TaxCalculator() {
                             <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormControl><Input type="number" step="0.01" placeholder={formatCurrencyBRL(MINIMUM_WAGE)} {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
                                      <FormDescription className='text-xs font-serif'>
                                         Salário mensal de cada sócio administrador. Mínimo de R$ {formatCurrencyBRL(MINIMUM_WAGE)}.
                                     </FormDescription>
