@@ -346,7 +346,7 @@ export default function TaxCalculator() {
   return (
     <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
-        <Card className="shadow-xl overflow-hidden border bg-card max-w-6xl mx-auto">
+        <Card className="shadow-xl overflow-hidden border bg-card max-w-7xl mx-auto">
             <CardContent className="p-6 md:p-8">
                 <div className="flex flex-col gap-8">
                     

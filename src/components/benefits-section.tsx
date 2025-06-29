@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 
 export default function BenefitsSection() {
     return (
-        <div className="w-full max-w-6xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
              <div className="text-center mb-4">
                  <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Multibenefícios Contabilizei</h2>
                  <p className="text-muted-foreground mt-2 text-lg">Vantagens exclusivas para sua empresa e bem-estar, inclusos no plano Multibenefícios e disponíveis no plano Experts.</p>
