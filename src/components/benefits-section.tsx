@@ -1,105 +1,116 @@
-
 "use client";
 
-import { ActivitySquare, HeartPulse, ShieldCheck } from "lucide-react";
 import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Hospital, Users, ShieldCheck, Clock } from 'lucide-react';
+
+const partners = [
+    { name: 'Alice', logo: 'https://www.contabilizei.com.br/_mobile/img/alice.bd17484.webp' },
+    { name: 'Sami', logo: 'https://www.contabilizei.com.br/_mobile/img/sami.4957992.webp' },
+    { name: 'Amil', logo: 'https://www.contabilizei.com.br/_mobile/img/amil.59868e8.webp' },
+    { name: 'SulAmérica', logo: 'https://www.contabilizei.com.br/_mobile/img/sulamerica.7f4592a.webp' },
+    { name: 'Bradesco Saúde', logo: 'https://www.contabilizei.com.br/_mobile/img/bradesco.114471e.webp' },
+    { name: 'Unimed', logo: 'https://www.contabilizei.com.br/_mobile/img/unimed.85e006d.webp' },
+];
+
+const features = [
+    {
+        icon: Hospital,
+        title: "Opções de cobertura",
+        description: "Encontre planos com a cobertura ideal para suas necessidades, desde consultas e exames até internações e cirurgias.",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/opcoes-cobertura.a57458f.webp",
+        imageAlt: "Ícones representando diferentes tipos de cobertura de saúde"
+    },
+    {
+        icon: Users,
+        title: "Planos para dependentes",
+        description: "Estenda os benefícios para sua família, com opções de inclusão de cônjuges e filhos, garantindo a tranquilidade de todos.",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/planos-dependentes.9f1b6d6.webp",
+        imageAlt: "Família feliz e protegida pelo plano de saúde"
+    },
+    {
+        icon: Clock,
+        title: "Aproveitamento de carências",
+        description: "Se você já possui um plano, pode ter isenção ou redução das carências ao trocar para um novo, aproveitando seus benefícios mais rápido.",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/carencia-planos.36d2d42.webp",
+        imageAlt: "Calendário com marcação de tempo reduzido, simbolizando aproveitamento de carências"
+    },
+];
 
 export default function BenefitsSection() {
     return (
-        <div className="w-full max-w-7xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
-             <div className="text-center mb-4">
-                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Multibenefícios Contabilizei</h2>
-                 <p className="text-muted-foreground mt-2 text-lg">Vantagens exclusivas para sua empresa e bem-estar, inclusos no plano Multibenefícios e disponíveis no plano Experts.</p>
+        <div className="w-full max-w-7xl mx-auto space-y-16 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="text-center space-y-4">
+                <div className="inline-flex items-center justify-center gap-3">
+                   <div className="bg-primary/10 p-3 rounded-full">
+                        <ShieldCheck className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+                        Cliente Contabilizei tem plano de saúde PJ com condições exclusivas
+                    </h2>
+                </div>
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Conte com as melhores condições nas maiores operadoras de saúde do Brasil, inclusive com a opção de plano de saúde a partir de uma vida.
+                </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-                
-                {/* Starbem Card */}
-                <Card className="flex flex-col h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                    <CardHeader>
-                        <div className="flex items-center gap-3 mb-2">
-                           <div className="bg-primary/10 p-2 rounded-lg">
-                                <HeartPulse className="h-6 w-6 text-primary" />
-                            </div>
-                            <CardTitle>Parceria Starbem</CardTitle>
-                        </div>
-                        <CardDescription className="text-base">
-                           Cuide da sua saúde com o pacote de telemedicina que inclui mensalmente, 4 consultas online com psicólogos e 1 com nutricionista, além de descontos em exames e medicamentos.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow flex flex-col justify-end">
-                       <Image
-                            src="https://placehold.co/500x300.png"
-                            alt="Mulher sorrindo durante uma consulta de telemedicina"
-                            width={500}
-                            height={300}
-                            className="w-full h-auto object-cover rounded-md mt-auto"
-                            data-ai-hint="woman telemedicine"
-                        />
-                    </CardContent>
-                </Card>
-
-                {/* TotalPass Card */}
-                <Card className="flex flex-col h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                     <CardHeader>
-                        <div className="flex items-center gap-3 mb-2">
-                           <div className="bg-primary/10 p-2 rounded-lg">
-                                <ActivitySquare className="h-6 w-6 text-primary" />
-                            </div>
-                            <CardTitle>Parceria TotalPass</CardTitle>
-                        </div>
-                         <CardDescription className="text-base">
-                            Acesso a mais de 20 mil academias e 250 modalidades esportivas. Contrate o plano que mais se adapta à sua rotina por um valor com desconto, com um adicional de R$30 na mensalidade para acesso ao app.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow flex flex-col justify-end">
-                        <Image
-                            src="https://placehold.co/500x300.png"
-                            alt="Pessoa se exercitando em uma academia moderna"
-                            width={500}
-                            height={300}
-                            className="w-full h-auto object-cover rounded-md mt-auto"
-                            data-ai-hint="gym workout"
-                        />
-                    </CardContent>
-                </Card>
+            <div className="space-y-12">
+                <div className="text-center">
+                    <h3 className="text-2xl font-semibold text-foreground">Plano de saúde de acordo com a sua necessidade</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                    {features.map((feature, index) => (
+                        <Card key={index} className="flex flex-col h-full text-center overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                            <CardHeader>
+                                <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4">
+                                    <feature.icon className="h-7 w-7 text-primary" />
+                                </div>
+                                <CardTitle>{feature.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-grow">
+                                <Image
+                                    src={feature.imageUrl}
+                                    alt={feature.imageAlt}
+                                    width={300}
+                                    height={200}
+                                    className="w-full h-auto object-contain rounded-md"
+                                />
+                                <CardDescription className="mt-4 text-base">
+                                    {feature.description}
+                                </CardDescription>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             </div>
 
-            {/* Health Plan Card */}
-            <Card className="w-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-card">
-                 <div className="grid md:grid-cols-2 items-center">
-                    <div className="p-8">
-                        <div className="flex items-center gap-3 mb-2">
-                           <div className="bg-accent/10 p-2 rounded-lg">
-                                <ShieldCheck className="h-6 w-6 text-accent" />
-                            </div>
-                            <CardTitle>Plano de Saúde com Desconto</CardTitle>
-                        </div>
-                         <CardDescription className="!mt-4 text-base">
-                            Clientes Contabilizei têm <span className="font-bold text-accent">até 30% de desconto</span> na contratação de planos de saúde para você e sua empresa, a partir de 1 vida e com as melhores operadoras do país.
-                        </CardDescription>
-                        <Button className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90">
-                            Consultar um especialista
-                        </Button>
+            <Card className="bg-card shadow-lg overflow-hidden">
+                <CardContent className="p-8 md:p-12 text-center">
+                    <h3 className="text-2xl font-semibold text-foreground">
+                        Planos com os melhores hospitais, clínicas, médicos e laboratórios do Brasil
+                    </h3>
+                    <p className="mt-2 text-muted-foreground">Conheça alguns dos nossos parceiros:</p>
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+                        {partners.map((partner) => (
+                            <Image
+                                key={partner.name}
+                                src={partner.logo}
+                                alt={`Logo ${partner.name}`}
+                                width={120}
+                                height={40}
+                                className="object-contain"
+                            />
+                        ))}
                     </div>
-                    <div className="hidden md:block">
-                         <Image
-                            src="https://placehold.co/500x350.png"
-                            alt="Médico e paciente conversando"
-                            width={500}
-                            height={350}
-                            className="w-full h-full object-cover rounded-r-lg"
-                            data-ai-hint="doctor patient"
-                        />
-                    </div>
-                 </div>
+                </CardContent>
             </Card>
-            
-             <p className="text-center text-sm text-muted-foreground pt-2">
-                <span className="font-bold">IMPORTANTE:</span> *Benefícios e condições sujeitos aos termos de cada plano. Consulte nossos especialistas para mais detalhes.
-            </p>
+
+            <div className="text-center">
+                <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                    Quero uma cotação de plano de saúde
+                </Button>
+            </div>
         </div>
     );
 }
