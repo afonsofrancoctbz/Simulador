@@ -9,8 +9,8 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex } from '@/lib/types';
-import { cn, formatCurrencyBRL, formatPercent, formatBRL } from "@/lib/utils";
+import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData } from '@/lib/types';
+import { cn, formatCurrencyBRL, formatBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 
@@ -84,7 +84,7 @@ export default function TaxCalculator() {
   const exportCurrency = form.watch("exportCurrency");
   
   const revenueGroups = useMemo(() => {
-    const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter(Boolean) as (typeof CNAE_DATA)[0][];
+    const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is CnaeData => !!c);
     const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
     return annexes;
   }, [selectedCnaes]);
@@ -359,16 +359,34 @@ export default function TaxCalculator() {
                             <p className='text-sm text-muted-foreground mt-1 font-serif'>Informações sobre seus custos com pessoal.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => (
+                            <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
                                 <FormItem>
                                     <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormControl>
+                                        <Input 
+                                            type="text" 
+                                            inputMode="decimal"
+                                            placeholder="0,00"
+                                            onChange={handleChange}
+                                            onBlur={field.onBlur}
+                                            value={field.value ? formatBRL(field.value) : ''}
+                                            name={field.name}
+                                            ref={field.ref}
+                                        />
+                                    </FormControl>
                                     <FormDescription className='text-xs font-serif'>
                                         Custo total mensal com funcionários registrados (se houver).
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
-                            )} />
+                                );
+                            }} />
                              <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Número de Sócios</FormLabel>
@@ -379,16 +397,34 @@ export default function TaxCalculator() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => (
+                            <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
                                 <FormItem>
                                     <FormLabel>Pró-labore por Sócio</FormLabel>
-                                    <FormControl><Input type="number" step="0.01" placeholder={formatBRL(MINIMUM_WAGE)} {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} /></FormControl>
+                                    <FormControl>
+                                        <Input
+                                            type="text" 
+                                            inputMode="decimal"
+                                            placeholder={formatBRL(MINIMUM_WAGE)}
+                                            onChange={handleChange}
+                                            onBlur={field.onBlur}
+                                            value={field.value ? formatBRL(field.value) : ''}
+                                            name={field.name}
+                                            ref={field.ref}
+                                        />
+                                    </FormControl>
                                      <FormDescription className='text-xs font-serif'>
                                         Salário mensal de cada sócio administrador. Mínimo de R$ {formatCurrencyBRL(MINIMUM_WAGE)}.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
-                            )} />
+                                );
+                            }} />
                         </div>
                     </div>
 
@@ -430,13 +466,30 @@ export default function TaxCalculator() {
                                                 key={`domestic_${annex}`}
                                                 control={form.control}
                                                 name={`revenues.domestic_${annex}`}
-                                                render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Faturamento (Anexo {annex})</FormLabel>
-                                                    <FormControl><Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
+                                                render={({ field }) => {
+                                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = e.target;
+                                                        const digitsOnly = value.replace(/\D/g, '');
+                                                        field.onChange(Number(digitsOnly) / 100);
+                                                    };
+                                                    return (
+                                                    <FormItem>
+                                                        <FormLabel>Faturamento (Anexo {annex})</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="text"
+                                                                inputMode="decimal"
+                                                                placeholder="0,00"
+                                                                onChange={handleChange}
+                                                                onBlur={field.onBlur}
+                                                                value={field.value ? formatBRL(field.value) : ''}
+                                                                name={field.name}
+                                                                ref={field.ref}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}} />
                                         ))}
                                     </div>
                                 </div>
@@ -485,13 +538,30 @@ export default function TaxCalculator() {
                                                 key={`export_${annex}`}
                                                 control={form.control}
                                                 name={`revenues.export_${annex}`}
-                                                render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Faturamento (Anexo {annex})</FormLabel>
-                                                    <FormControl><Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)}/></FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
+                                                render={({ field }) => {
+                                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = e.target;
+                                                        const digitsOnly = value.replace(/\D/g, '');
+                                                        field.onChange(Number(digitsOnly) / 100);
+                                                    };
+                                                    return (
+                                                    <FormItem>
+                                                        <FormLabel>Faturamento (Anexo {annex})</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="text"
+                                                                inputMode="decimal"
+                                                                placeholder="0,00"
+                                                                onChange={handleChange}
+                                                                onBlur={field.onBlur}
+                                                                value={field.value ? formatBRL(field.value) : ''}
+                                                                name={field.name}
+                                                                ref={field.ref}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}} />
                                         ))}
                                     </div>
                                 </div>
