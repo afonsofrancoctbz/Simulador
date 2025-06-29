@@ -29,6 +29,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import CityInfoSection from './city-info-section';
 import CuritibaInfoSection from './curitiba-info-section';
+import RioInfoSection from './rio-info-section';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -629,6 +630,12 @@ export default function TaxCalculator() {
         {selectedCity === 'Curitiba - PR' && (
             <div className="mt-12">
                 <CuritibaInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Rio de Janeiro - RJ' && (
+            <div className="mt-12">
+                <RioInfoSection />
             </div>
         )}
 
