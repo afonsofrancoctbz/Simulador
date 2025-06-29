@@ -56,16 +56,16 @@ export default function PjAccountSection() {
                 }}
                 className="w-full relative px-10"
             >
-                <CarouselContent className="-ml-4">
+                <CarouselContent className="-ml-4 items-stretch">
                     {bankFeatures.map((feature, index) => (
                         <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/4">
                             <div className="p-1 h-full">
                                 <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-card">
                                     <CardHeader className="pb-4">
-                                        <CardTitle className="text-lg font-semibold h-12">{feature.title}</CardTitle>
-                                        <CardDescription className="text-sm !mt-2 h-24">{feature.description}</CardDescription>
+                                        <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
+                                        <CardDescription className="text-sm !mt-2">{feature.description}</CardDescription>
                                     </CardHeader>
-                                    <CardContent className="p-4 mt-auto flex-grow flex items-end justify-center bg-slate-50/50 rounded-b-lg">
+                                    <CardContent className="p-4 mt-auto flex-grow flex items-end justify-center">
                                         <Image
                                             src={feature.imageUrl}
                                             alt={feature.imageAlt}
