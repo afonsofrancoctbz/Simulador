@@ -6,6 +6,7 @@ import AppFooter from '@/components/app-footer';
 import AppHeader from '@/components/app-header';
 import DigitalCertificateSection from '@/components/digital-certificate-section';
 import PjAccountSection from '@/components/pj-account-section';
+import MultibenefitsSection from '@/components/multibenefits-section';
 
 export default function Home() {
   return (
@@ -45,7 +46,13 @@ export default function Home() {
           </div>
         </section>
 
-         <section className="py-16 lg:py-24 bg-slate-50/70">
+        <section className="py-16 lg:py-24 bg-slate-50/70">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <MultibenefitsSection />
+          </div>
+        </section>
+
+         <section className="py-16 lg:py-24 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <FaqSection />
           </div>
