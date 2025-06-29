@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, MapPin } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, MapPin, Ban } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
@@ -35,6 +35,9 @@ import FlorianopolisInfoSection from './florianopolis-info-section';
 import SalvadorInfoSection from './salvador-info-section';
 import PortoAlegreInfoSection from './porto-alegre-info-section';
 import FortalezaInfoSection from './fortaleza-info-section';
+import RecifeInfoSection from './recife-info-section';
+import BrasiliaInfoSection from './brasilia-info-section';
+import GoianiaInfoSection from './goiania-info-section';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -671,6 +674,24 @@ export default function TaxCalculator() {
         {selectedCity === 'Fortaleza - CE' && (
             <div className="mt-12">
                 <FortalezaInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Recife - PE' && (
+            <div className="mt-12">
+                <RecifeInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Brasília - DF' && (
+            <div className="mt-12">
+                <BrasiliaInfoSection />
+            </div>
+        )}
+
+        {selectedCity === 'Goiânia - GO' && (
+            <div className="mt-12">
+                <GoianiaInfoSection />
             </div>
         )}
 
