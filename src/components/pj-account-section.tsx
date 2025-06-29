@@ -41,11 +41,11 @@ export default function PjAccountSection() {
                         <Banknote className="h-7 w-7 text-primary" />
                     </div>
                     <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                        A conta PJ feita para o seu negócio
+                        Abra uma conta digital PJ gratuita e integrada à sua contabilidade.
                     </h2>
                 </div>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Com o Contabilizei Bank, sua rotina financeira e contábil é integrada e automatizada, para você focar no que realmente importa.
+                    É a forma mais rápida para receber de seus clientes, pois já temos todos os documentos necessários para deixar a sua conta pronta. Baixe o app e conclua o cadastro assim que o seu CNPJ estiver disponível.
                 </p>
             </div>
             
