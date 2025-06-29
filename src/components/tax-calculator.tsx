@@ -26,6 +26,7 @@ import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { Badge } from './ui/badge';
 import DigitalCertificateSection from './digital-certificate-section';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -322,18 +323,22 @@ export default function TaxCalculator() {
             </div>
 
             {advice && (
-                <Card className="mt-12 max-w-4xl mx-auto border-primary/20 bg-primary/5 shadow-lg">
-                    <CardHeader className="flex-row items-center gap-4">
-                        <Lightbulb className="h-8 w-8 text-primary" />
-                        <div>
-                            <CardTitle className="text-primary">Recomendação da IA</CardTitle>
-                            <CardDescription className="text-primary/90">Análise e conselhos para otimizar seus impostos.</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {isAdviceLoading ? <Skeleton className="h-5 w-full mt-2" /> : <p className="font-serif text-primary/90">{advice}</p>}
-                    </CardContent>
-                </Card>
+                <div className="mt-12 max-w-4xl mx-auto">
+                    <Alert variant="default" className="bg-primary/5 border-primary/20">
+                        <Lightbulb className="h-5 w-5 text-primary" />
+                        <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
+                        <AlertDescription className="font-serif text-foreground/90">
+                            {isAdviceLoading ? (
+                                <div className="space-y-1.5 pt-1">
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-11/12" />
+                                </div>
+                            ) : (
+                                advice
+                            )}
+                        </AlertDescription>
+                    </Alert>
+                </div>
             )}
 
             <DigitalCertificateSection />
