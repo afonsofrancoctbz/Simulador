@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, type ComponentType } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, MapPin, Ban } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
