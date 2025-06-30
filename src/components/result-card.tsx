@@ -10,7 +10,7 @@ import { Info } from 'lucide-react';
 const ResultCardComponent = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
     const numSocios = formValues.numberOfPartners || 1;
     
-    const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'].includes(item.name));
+    const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'ISS (Fora do DAS)'].includes(item.name));
     const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
 
     const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
@@ -66,12 +66,24 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                         {folhaTaxes.length > 0 && (
                              <div className="space-y-1 pt-1.5">
                                 <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Encargos s/ Folha e Pró-labore</h4>
-                                {folhaTaxes.map((item, index) => (
-                                    <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
-                                        <span className="text-muted-foreground">{item.name}</span>
-                                        <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                    </div>
-                                ))}
+                                {folhaTaxes.map((item, index) => {
+                                    const match = item.name.match(/(\(\s*\d+(\.\d+)?%\s*\))/);
+                                    return (
+                                        <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
+                                            <span className="text-muted-foreground">
+                                                {match ? (
+                                                    <>
+                                                        {item.name.replace(match[0], '').trim()}
+                                                        <span className='ml-1.5 font-bold text-primary'>{match[0]}</span>
+                                                    </>
+                                                ) : (
+                                                    item.name
+                                                )}
+                                            </span>
+                                            <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         )}
 
