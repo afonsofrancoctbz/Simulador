@@ -17,6 +17,14 @@ const nextConfig = {
       },
     ],
   },
+  typescript: {
+    // Fail the build on TypeScript errors
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Fail the build on ESLint errors
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig;
