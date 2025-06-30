@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, type ComponentType } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
 import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData } from '@/lib/types';
-import { cn, formatCurrencyBRL, formatBRL } from "@/lib/utils";
+import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
@@ -74,6 +74,24 @@ const calculatorFormSchema = z.object({
 });
 
 type CalculatorFormValues = z.infer<typeof calculatorFormSchema>;
+
+const cityInfoComponents: { [key: string]: ComponentType } = {
+  'São Paulo - SP': CityInfoSection,
+  'Curitiba - PR': CuritibaInfoSection,
+  'Rio de Janeiro - RJ': RioInfoSection,
+  'Belo Horizonte - MG': BeloHorizonteInfoSection,
+  'Florianópolis - SC': FlorianopolisInfoSection,
+  'Salvador - BA': SalvadorInfoSection,
+  'Porto Alegre - RS': PortoAlegreInfoSection,
+  'Fortaleza - CE': FortalezaInfoSection,
+  'Recife - PE': RecifeInfoSection,
+  'Brasília - DF': BrasiliaInfoSection,
+  'Goiânia - GO': GoianiaInfoSection,
+  'Manaus - AM': ManausInfoSection,
+  'Campinas - SP': CampinasInfoSection,
+  'Jundiaí - SP': JundiaiInfoSection,
+  'Uberlândia - MG': UberlandiaInfoSection,
+};
 
 export default function TaxCalculator() {
   const [results, setResults] = useState<CalculationResults | null>(null);
@@ -375,9 +393,6 @@ export default function TaxCalculator() {
                                     .filter(item => ['INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name))
                                     .reduce((sum, item) => sum + item.value, 0);
 
-                                // Reestruturando o demonstrativo para usar o Pró-labore líquido,
-                                // o que exige mostrar o total de impostos em vez de apenas os da empresa.
-                                // O resultado final (lucroDisponivel) permanece o mesmo.
                                 const proLaboreLiquido = details.proLabore - totalWithheldTaxes;
                                 const lucroDisponivel = details.totalRevenue - details.totalTax - proLaboreLiquido - details.contabilizeiFee;
 
@@ -417,6 +432,8 @@ export default function TaxCalculator() {
     );
   };
   
+  const CityComponent = selectedCity ? cityInfoComponents[selectedCity] : null;
+
   return (
     <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
@@ -688,93 +705,9 @@ export default function TaxCalculator() {
             initialSelectedCodes={selectedCnaes}
         />
         
-        {selectedCity === 'São Paulo - SP' && (
+        {CityComponent && (
             <div className="mt-12">
-                <CityInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Curitiba - PR' && (
-            <div className="mt-12">
-                <CuritibaInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Rio de Janeiro - RJ' && (
-            <div className="mt-12">
-                <RioInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Belo Horizonte - MG' && (
-            <div className="mt-12">
-                <BeloHorizonteInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Florianópolis - SC' && (
-            <div className="mt-12">
-                <FlorianopolisInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Salvador - BA' && (
-            <div className="mt-12">
-                <SalvadorInfoSection />
-            </div>
-        )}
-        
-        {selectedCity === 'Porto Alegre - RS' && (
-            <div className="mt-12">
-                <PortoAlegreInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Fortaleza - CE' && (
-            <div className="mt-12">
-                <FortalezaInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Recife - PE' && (
-            <div className="mt-12">
-                <RecifeInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Brasília - DF' && (
-            <div className="mt-12">
-                <BrasiliaInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Goiânia - GO' && (
-            <div className="mt-12">
-                <GoianiaInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Manaus - AM' && (
-            <div className="mt-12">
-                <ManausInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Campinas - SP' && (
-            <div className="mt-12">
-                <CampinasInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Jundiaí - SP' && (
-            <div className="mt-12">
-                <JundiaiInfoSection />
-            </div>
-        )}
-
-        {selectedCity === 'Uberlândia - MG' && (
-            <div className="mt-12">
-                <UberlandiaInfoSection />
+                <CityComponent />
             </div>
         )}
 
