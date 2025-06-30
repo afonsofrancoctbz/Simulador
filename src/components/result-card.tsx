@@ -147,7 +147,14 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
             <CardFooter className="p-2 bg-muted/30 mt-auto border-t">
                 <div className="text-center w-full space-y-0.5">
-                    <div className="text-sm text-muted-foreground">Custo Total Mensal Estimado</div>
+                    <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground">
+                       <span>Custo Total Mensal Estimado</span>
+                        {details.totalRevenue > 0 && (
+                            <span className="font-bold text-primary">
+                                {formatPercent(details.totalMonthlyCost / details.totalRevenue)}
+                            </span>
+                        )}
+                    </div>
                     <div className="text-2xl font-bold text-primary">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
