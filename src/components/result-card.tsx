@@ -15,6 +15,14 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
     const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
 
+    const lucroPresumidoPercentages: { [key: string]: string } = {
+      'PIS': '0,65%',
+      'COFINS': '3,00%',
+      'IRPJ': '4,80%',
+      'CSLL': '2,88%',
+      'ISS': '5,00%',
+    };
+
     return (
         <Card className={cn(
             "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2", 
@@ -53,6 +61,9 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                                     <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
                                         <span className="text-muted-foreground">
                                             {item.name}
+                                            {details.regime === 'Lucro Presumido' && lucroPresumidoPercentages[item.name] && (
+                                                <span className='ml-1.5 font-bold text-primary'>({lucroPresumidoPercentages[item.name]})</span>
+                                            )}
                                             {item.name === 'DAS (Guia Unificada)' && details.effectiveDasRate !== undefined && (
                                                 <span className='ml-1.5 font-bold text-primary'>({formatPercent(details.effectiveDasRate)})</span>
                                             )}
