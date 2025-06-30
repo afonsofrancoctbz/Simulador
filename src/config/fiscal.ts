@@ -73,6 +73,8 @@ export const FISCAL_CONFIG_2025 = {
   }
 };
 
+export type FiscalConfig = typeof FISCAL_CONFIG_2025;
+
 /**
  * In a real application, this function would fetch the configuration for a given year,
  * possibly from a database or a remote service, allowing for dynamic updates without

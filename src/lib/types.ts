@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { FiscalConfig } from "./config/fiscal";
 
 // Schema for an individual CNAE item
 export const CnaeItemSchema = z.object({
@@ -85,7 +86,7 @@ export interface FeeBracket {
 
 export interface ProLaboreInput {
   valorProLaboreBruto: number;
-  configuracaoFiscal: any; // Objeto com os parâmetros do ano (tabelas, tetos)
+  configuracaoFiscal: FiscalConfig; // Objeto com os parâmetros do ano (tabelas, tetos)
 }
 
 export interface ProLaboreOutput {
