@@ -26,6 +26,12 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
     const totalImpostosFaturamento = faturamentoTaxes.reduce((sum, item) => sum + item.value, 0);
     const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamento / details.totalRevenue : 0;
+    
+    const totalWithheldTaxes = details.breakdown
+        .filter(item => ['INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name))
+        .reduce((sum, item) => sum + item.value, 0);
+    const companyTaxesAndCharges = details.totalTax - totalWithheldTaxes;
+    const lucroDisponivel = details.totalRevenue - companyTaxesAndCharges - details.proLabore - details.contabilizeiFee;
 
     return (
         <Card className={cn(
@@ -123,6 +129,31 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                         </div>
 
                      </div>
+                </div>
+
+                <div className="p-2 border rounded-md bg-background/80 space-y-1.5 text-sm">
+                    <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Demonstrativo de Lucro</h4>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">(+) Faturamento</span>
+                        <span className="font-medium text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">(-) Impostos e Encargos da Empresa</span>
+                        <span className="font-medium text-foreground">-{formatCurrencyBRL(companyTaxesAndCharges)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">(-) Pró-labore (Bruto)</span>
+                        <span className="font-medium text-foreground">-{formatCurrencyBRL(details.proLabore)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">(-) Mensalidade Contabilizei</span>
+                        <span className="font-medium text-foreground">-{formatCurrencyBRL(details.contabilizeiFee)}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-solid pt-1 mt-1 font-semibold">
+                        <span>(=) Lucro Disponível para Distribuição</span>
+                        <span className="text-primary">{formatCurrencyBRL(lucroDisponivel)}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground/80 pt-1 text-center">A distribuição de lucros é isenta de Imposto de Renda para o sócio (Lei 9.249/95 – Art.10).</p>
                 </div>
 
                  {details.fatorR !== undefined && (
