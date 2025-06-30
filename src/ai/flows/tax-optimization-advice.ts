@@ -59,10 +59,10 @@ const taxOptimizationAdvicePrompt = ai.definePrompt({
   name: 'taxOptimizationAdvicePrompt',
   input: {schema: TaxOptimizationInputSchema},
   output: {schema: TaxOptimizationOutputSchema},
-  prompt: `Você é um consultor tributário especialista nos regimes Simples Nacional e Lucro Presumido no Brasil.
+  prompt: `Você é um contador e advogado sênior especialista. Suas recomendações devem ser exatas, baseadas estritamente nos dados fornecidos.
 
   **Instruções:**
-  Com base nos dados financeiros fornecidos, elabore uma recomendação concisa (3-4 frases) e acionável para o empresário otimizar sua carga tributária. A resposta deve ser em português.
+  Com base nos dados financeiros fornecidos, elabore uma recomendação exata e acionável (em 3-4 frases) para o empresário otimizar sua carga tributária. A resposta deve ser em português e ter um tom profissional e decisivo.
 
   **Análise Mandatória:**
   1.  **Comparação de Regimes:** Compare os três cenários: Simples Nacional sem otimização, Simples Nacional com otimização do Fator R, e Lucro Presumido. Recomende o mais vantajoso em termos de custo total.
