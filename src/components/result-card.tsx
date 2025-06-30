@@ -67,14 +67,15 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                              <div className="space-y-1 pt-1.5">
                                 <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Encargos s/ Folha e Pró-labore</h4>
                                 {folhaTaxes.map((item, index) => {
-                                    const match = item.name.match(/(\(\s*\d+(\.\d+)?%\s*\))/);
+                                    const match = item.name.match(/(\d+(\.\d+)?%)/);
                                     return (
                                         <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
                                             <span className="text-muted-foreground">
                                                 {match ? (
                                                     <>
-                                                        {item.name.replace(match[0], '').trim()}
-                                                        <span className='ml-1.5 font-bold text-primary'>{match[0]}</span>
+                                                        {item.name.split(match[0])[0]}
+                                                        <span className='font-bold text-primary'>{match[0]}</span>
+                                                        {item.name.split(match[0])[1]}
                                                     </>
                                                 ) : (
                                                     item.name
