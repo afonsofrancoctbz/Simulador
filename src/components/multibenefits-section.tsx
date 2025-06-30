@@ -116,7 +116,7 @@ export default function MultibenefitsSection() {
             {/* CTA Button */}
             <div className="text-center">
                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg py-7 px-10">
-                    ATIVE AGORA MESMO O SEU MULTIBENEFÍCIOS
+                    GARANTIR MEUS BENEFÍCIOS AGORA
                 </Button>
             </div>
         </div>
