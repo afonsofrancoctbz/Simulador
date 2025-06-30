@@ -15,13 +15,17 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
     const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
 
+    const isLucroPresumido = details.regime === 'Lucro Presumido';
+
     const lucroPresumidoPercentages: { [key: string]: string } = {
       'PIS': '0,65%',
       'COFINS': '3,00%',
-      'IRPJ': '4,80%',
       'CSLL': '2,88%',
       'ISS': '5,00%',
     };
+
+    const totalImpostosFaturamento = faturamentoTaxes.reduce((sum, item) => sum + item.value, 0);
+    const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamento / details.totalRevenue : 0;
 
     return (
         <Card className={cn(
@@ -38,9 +42,9 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                 {details.annex && <CardDescription className='font-semibold text-primary/90 text-base'>{details.annex}</CardDescription>}
             </CardHeader>
 
-            <CardContent className="flex-grow p-3 space-y-2 flex flex-col text-sm">
+            <CardContent className="flex-grow p-3 space-y-2 flex flex-col">
                 
-                <div className="p-2 border rounded-md bg-background/80 space-y-1">
+                <div className="p-2 border rounded-md bg-background/80 space-y-1 text-sm">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Faturamento Mensal</span>
                         <span className="font-medium text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
@@ -52,7 +56,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                 </div>
                 
                 <div className="space-y-2">
-                     <div className="p-2 border rounded-md bg-background/80 space-y-1.5">
+                     <div className="p-2 border rounded-md bg-background/80 space-y-1.5 text-sm">
                         
                         {faturamentoTaxes.length > 0 && (
                              <div className="space-y-1">
@@ -61,16 +65,27 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                                     <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
                                         <span className="text-muted-foreground">
                                             {item.name}
-                                            {details.regime === 'Lucro Presumido' && lucroPresumidoPercentages[item.name] && (
-                                                <span className='ml-1.5 font-bold text-primary'>({lucroPresumidoPercentages[item.name]})</span>
+                                            {isLucroPresumido && (
+                                                <span className='ml-1.5 font-bold text-primary'>
+                                                    {item.name === 'IRPJ' 
+                                                        ? formatPercent(details.totalRevenue > 0 ? item.value / details.totalRevenue : 0) 
+                                                        : (lucroPresumidoPercentages[item.name] || '')
+                                                    }
+                                                </span>
                                             )}
                                             {item.name === 'DAS (Guia Unificada)' && details.effectiveDasRate !== undefined && (
-                                                <span className='ml-1.5 font-bold text-primary'>({formatPercent(details.effectiveDasRate)})</span>
+                                                <span className='ml-1.5 font-bold text-primary'>{formatPercent(details.effectiveDasRate)}</span>
                                             )}
                                         </span>
                                         <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                     </div>
                                 ))}
+                                {isLucroPresumido && (
+                                    <div className="flex justify-between items-center border-t border-solid pt-1 mt-1 font-semibold">
+                                        <span>Alíquota Efetiva Total</span>
+                                        <span className="text-primary">{formatPercent(aliquotaEfetivaFaturamento)}</span>
+                                    </div>
+                                )}
                             </div>
                         )}
                         
