@@ -374,8 +374,12 @@ export default function TaxCalculator() {
                                 const totalWithheldTaxes = details.breakdown
                                     .filter(item => ['INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name))
                                     .reduce((sum, item) => sum + item.value, 0);
-                                const companyTaxesAndCharges = details.totalTax - totalWithheldTaxes;
-                                const lucroDisponivel = details.totalRevenue - companyTaxesAndCharges - details.proLabore - details.contabilizeiFee;
+
+                                // Reestruturando o demonstrativo para usar o Pró-labore líquido,
+                                // o que exige mostrar o total de impostos em vez de apenas os da empresa.
+                                // O resultado final (lucroDisponivel) permanece o mesmo.
+                                const proLaboreLiquido = details.proLabore - totalWithheldTaxes;
+                                const lucroDisponivel = details.totalRevenue - details.totalTax - proLaboreLiquido - details.contabilizeiFee;
 
                                 return (
                                     <>
@@ -384,12 +388,12 @@ export default function TaxCalculator() {
                                             <span className="font-semibold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
-                                            <span className="text-muted-foreground">(-) Impostos e Encargos da Empresa</span>
-                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(companyTaxesAndCharges)}</span>
+                                            <span className="text-muted-foreground">(-) Total de Impostos e Encargos</span>
+                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(details.totalTax)}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
-                                            <span className="text-muted-foreground">(-) Pró-labore (Bruto)</span>
-                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(details.proLabore)}</span>
+                                            <span className="text-muted-foreground">(-) Pró-labore (Líquido)</span>
+                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(proLaboreLiquido)}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
                                             <span className="text-muted-foreground">(-) Mensalidade Contabilizei</span>
