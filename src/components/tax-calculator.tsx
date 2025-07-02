@@ -3,9 +3,9 @@
 
 import { useEffect, useState, useMemo, type ComponentType } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
@@ -54,20 +54,22 @@ const calculatorFormSchema = z.object({
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
-  proLaborePerPartner: z.coerce.number().min(0, "O valor deve ser positivo."),
+  proLabores: z.array(z.object({ value: z.coerce.number().min(0, "O valor deve ser positivo.")})),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
 }).superRefine((data, ctx) => {
-    const proLaborePerSocio = data.proLaborePerPartner;
-    if (proLaborePerSocio > 0 && proLaborePerSocio < MINIMUM_WAGE) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `O pró-labore por sócio não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
-            path: ["proLaborePerPartner"],
-        });
-    }
+    data.proLabores.forEach((proLabore, index) => {
+      if (proLabore.value > 0 && proLabore.value < MINIMUM_WAGE) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+              path: [`proLabores.${index}.value`],
+          });
+      }
+    });
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
-    return totalRevenue > 0 || (data.proLaborePerPartner > 0);
+    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
+    return totalRevenue > 0 || totalProLabore > 0;
 }, {
     message: "Informe ao menos um valor de faturamento ou pró-labore.",
     path: ["revenues"],
@@ -111,10 +113,29 @@ export default function TaxCalculator() {
       exportCurrency: 'BRL',
       exchangeRate: 1,
       totalSalaryExpense: 0,
-      proLaborePerPartner: MINIMUM_WAGE,
+      proLabores: [{ value: MINIMUM_WAGE }],
       numberOfPartners: 1,
     },
   });
+
+  const { fields, replace } = useFieldArray({
+    control: form.control,
+    name: "proLabores",
+  });
+  
+  const numberOfPartners = form.watch("numberOfPartners");
+
+  useEffect(() => {
+    const currentProLabores = form.getValues('proLabores');
+    if (currentProLabores.length !== numberOfPartners) {
+        const newProLabores = Array.from({ length: numberOfPartners }, (_, i) => {
+            // Preserve existing value if available, otherwise default
+            return currentProLabores[i] || { value: MINIMUM_WAGE };
+        });
+        replace(newProLabores);
+    }
+  }, [numberOfPartners, replace, form]);
+
 
   const selectedCnaes = form.watch("selectedCnaes");
   const exportCurrency = form.watch("exportCurrency");
@@ -204,7 +225,7 @@ export default function TaxCalculator() {
         exportCurrency: values.exportCurrency,
         exchangeRate: values.exportCurrency !== 'BRL' ? (values.exchangeRate ?? 1) : 1,
         totalSalaryExpense: values.totalSalaryExpense,
-        proLaborePerPartner: values.proLaborePerPartner,
+        proLabores: values.proLabores.map(p => p.value || MINIMUM_WAGE),
         numberOfPartners: values.numberOfPartners,
     };
   }
@@ -228,7 +249,9 @@ export default function TaxCalculator() {
     setIsLoading(false);
     
     const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
-    if (totalRevenue === 0 && values.proLaborePerPartner === 0) {
+    const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl, 0);
+
+    if (totalRevenue === 0 && totalProLabore === 0) {
       return; // No need to call AI if there's no financial activity
     }
 
@@ -246,7 +269,7 @@ export default function TaxCalculator() {
         totalDomesticRevenue,
         totalExportRevenue,
         totalSalaryExpense: values.totalSalaryExpense,
-        totalProLabore: values.proLaborePerPartner * values.numberOfPartners,
+        totalProLabore: totalProLabore,
         numberOfPartners: values.numberOfPartners,
         simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalSemFatorR.totalMonthlyCost,
         simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalComFatorR.totalMonthlyCost,
@@ -265,13 +288,14 @@ export default function TaxCalculator() {
   const displayedScenarios = useMemo(() => {
     if (!results) return [];
 
-    const { selectedCnaes } = form.getValues();
+    const { selectedCnaes, proLabores } = form.getValues();
     if (selectedCnaes.length === 0) return [];
-
+    
+    const totalProLabore = proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
     const submissionValues = transformFormToSubmission(form.getValues());
     const totalRevenue = submissionValues.domesticActivities.reduce((sum, act) => sum + act.revenue, 0) + submissionValues.exportActivities.reduce((sum, act) => sum + act.revenue, 0);
 
-    if (totalRevenue === 0 && form.getValues('proLaborePerPartner') === 0) return [];
+    if (totalRevenue === 0 && totalProLabore === 0) return [];
 
     const scenarios = [];
 
@@ -292,7 +316,7 @@ export default function TaxCalculator() {
 
         const cenarioOtimizado = results.simplesNacionalComFatorR;
         const proLaboreOtimizado = cenarioOtimizado.proLabore;
-        const optimizationNote = `Para alcançar este cenário, seu pró-labore foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado / (form.getValues().numberOfPartners || 1))} por sócio, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
+        const optimizationNote = `Para alcançar este cenário, seu pró-labore total foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, distribuído igualmente entre os sócios, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
         
         scenarios.push({
             ...cenarioOtimizado,
@@ -350,7 +374,7 @@ export default function TaxCalculator() {
             <div className="flex flex-wrap justify-center items-stretch gap-8">
                 {displayedScenarios.map(scenario => (
                      <ResultCard 
-                        key={scenario.regime} 
+                        key={`${scenario.regime}-${scenario.annex}`} 
                         details={scenario} 
                         isCheapest={scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && displayedScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0}
                         formValues={submissionValues}
@@ -358,6 +382,48 @@ export default function TaxCalculator() {
                 ))}
             </div>
 
+            {cheapestScenario && cheapestScenario.partnerTaxes.length > 1 && (
+                <div className="mt-12 max-w-4xl mx-auto">
+                    <Card className="shadow-lg border-primary/10">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-bold text-foreground text-center flex items-center justify-center gap-2">
+                                <Users className="h-5 w-5 text-primary"/>
+                                Detalhamento por Sócio (Cenário Recomendado)
+                            </CardTitle>
+                            <CardDescription className="text-center">
+                                Valores individuais de pró-labore e impostos retidos no cenário mais econômico.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {cheapestScenario.partnerTaxes.map((partner, index) => (
+                                <div key={index} className="p-4 border rounded-lg bg-muted/30">
+                                    <h4 className="font-semibold mb-3 text-foreground">Sócio {index + 1}</h4>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between items-baseline">
+                                            <span className="text-muted-foreground">Pró-labore Bruto</span>
+                                            <span className="font-medium">{formatCurrencyBRL(partner.proLaboreBruto)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-baseline">
+                                            <span className="text-muted-foreground">(-) INSS Retido (11%)</span>
+                                            <span className="font-medium text-destructive/90">-{formatCurrencyBRL(partner.inss)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-baseline">
+                                            <span className="text-muted-foreground">(-) IRRF Retido</span>
+                                            <span className="font-medium text-destructive/90">-{formatCurrencyBRL(partner.irrf)}</span>
+                                        </div>
+                                        <Separator className="my-2"/>
+                                        <div className="flex justify-between items-baseline font-bold">
+                                            <span className="text-foreground">(=) Pró-labore Líquido</span>
+                                            <span className="text-primary">{formatCurrencyBRL(partner.proLaboreLiquido)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+            
             {advice && (
                 <div className="mt-12 max-w-5xl mx-auto">
                     <Alert variant="default" className="bg-primary/5 border-primary/20">
@@ -515,34 +581,49 @@ export default function TaxCalculator() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="proLaborePerPartner" render={({ field }) => {
-                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const { value } = e.target;
-                                    const digitsOnly = value.replace(/\D/g, '');
-                                    field.onChange(Number(digitsOnly) / 100);
-                                };
-                                return (
-                                <FormItem>
-                                    <FormLabel>Pró-labore por Sócio</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="text" 
-                                            inputMode="decimal"
-                                            placeholder={formatBRL(MINIMUM_WAGE)}
-                                            onChange={handleChange}
-                                            onBlur={field.onBlur}
-                                            value={field.value ? formatBRL(field.value) : ''}
-                                            name={field.name}
-                                            ref={field.ref}
-                                        />
-                                    </FormControl>
-                                     <FormDescription className='text-sm'>
-                                        Salário mensal de cada sócio.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                                );
-                            }} />
+                            <div className="md:col-span-3 space-y-2">
+                                <FormLabel>Pró-labore Mensal por Sócio</FormLabel>
+                                <FormDescription className='text-sm !mt-0'>
+                                    Salário mensal de cada sócio. Se o valor for R$ 0,00, será considerado o salário mínimo ({formatCurrencyBRL(MINIMUM_WAGE)}) para o cálculo.
+                                </FormDescription>
+                                <div className={cn(
+                                    "grid grid-cols-1 gap-x-6 gap-y-4 pt-2",
+                                    numberOfPartners > 1 && "md:grid-cols-2 lg:grid-cols-3"
+                                )}>
+                                    {fields.map((item, index) => (
+                                      <FormField
+                                        key={item.id}
+                                        control={form.control}
+                                        name={`proLabores.${index}.value`}
+                                        render={({ field }) => {
+                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                const { value } = e.target;
+                                                const digitsOnly = value.replace(/\D/g, '');
+                                                field.onChange(Number(digitsOnly) / 100);
+                                            };
+                                            return (
+                                                <FormItem>
+                                                  {numberOfPartners > 1 && <FormLabel>Sócio {index + 1}</FormLabel>}
+                                                  <FormControl>
+                                                    <Input
+                                                      type="text"
+                                                      inputMode="decimal"
+                                                      placeholder={formatBRL(MINIMUM_WAGE)}
+                                                      onChange={handleChange}
+                                                      onBlur={field.onBlur}
+                                                      value={field.value ? formatBRL(field.value) : ''}
+                                                      name={field.name}
+                                                      ref={field.ref}
+                                                    />
+                                                  </FormControl>
+                                                  <FormMessage />
+                                                </FormItem>
+                                            );
+                                        }}
+                                      />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
 

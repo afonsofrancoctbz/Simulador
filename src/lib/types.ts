@@ -1,5 +1,11 @@
 import { z } from "zod";
 import type { FiscalConfig } from "./config/fiscal";
+import { getFiscalParameters } from "@/config/fiscal";
+import { formatCurrencyBRL } from "./utils";
+
+const fiscalConfig = getFiscalParameters();
+const MINIMUM_WAGE = fiscalConfig.salario_minimo;
+
 
 // Schema for an individual CNAE item
 export const CnaeItemSchema = z.object({
@@ -8,14 +14,14 @@ export const CnaeItemSchema = z.object({
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
-// Schema for the main form input
+// Schema for the main form input passed to calculation functions
 export const TaxFormValuesSchema = z.object({
   domesticActivities: z.array(CnaeItemSchema),
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
-  proLaborePerPartner: z.coerce.number().min(0, "O valor deve ser positivo."),
+  proLabores: z.array(z.coerce.number().min(0, "O valor deve ser positivo.")),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
@@ -27,6 +33,16 @@ export const TaxBreakdownItemSchema = z.object({
     value: z.number(),
 });
 export type TaxBreakdownItem = z.infer<typeof TaxBreakdownItemSchema>;
+
+// Schema for individual partner tax details in results
+export const PartnerTaxDetailsSchema = z.object({
+    proLaboreBruto: z.number(),
+    inss: z.number(),
+    irrf: z.number(),
+    proLaboreLiquido: z.number(),
+});
+export type PartnerTaxDetails = z.infer<typeof PartnerTaxDetailsSchema>;
+
 
 // Schema for the details of a single tax scenario
 export const TaxDetailsSchema = z.object({
@@ -44,7 +60,7 @@ export const TaxDetailsSchema = z.object({
     annex: z.string().optional(),
     annualSavings: z.number().optional(),
     optimizationNote: z.string().optional(),
-    partnerTaxes: z.object({ inss: z.number(), irrf: z.number() })
+    partnerTaxes: z.array(PartnerTaxDetailsSchema), // Changed to array
 });
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
