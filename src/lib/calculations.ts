@@ -120,7 +120,11 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
     let cppFromAnnexIV = 0;
-    const hasAnnexIV = [...domesticActivities, ...exportActivities].some(a => getCnaeData(a.code)?.annex === 'IV');
+    const allCnaesData = [...domesticActivities, ...exportActivities]
+        .map(a => getCnaeData(a.code))
+        .filter((c): c is CnaeData => !!c);
+    
+    const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
     if (hasAnnexIV && (totalSalaryExpense + totalProLaboreBruto > 0)) {
         const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
         cppFromAnnexIV = (totalSalaryExpense + totalProLaboreBruto) * cppRate;
@@ -139,6 +143,16 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
     ];
 
+    const uniqueAnnexes = [...new Set(allCnaesData.map(c => c.annex))];
+    let annexLabel;
+    if (uniqueAnnexes.length === 1) {
+        annexLabel = `Anexo ${uniqueAnnexes[0]}`;
+    } else if (uniqueAnnexes.length > 1) {
+        annexLabel = 'Múltiplos Anexos';
+    } else {
+        annexLabel = 'Padrão';
+    }
+
     return {
       regime: regimeName,
       totalTax,
@@ -148,7 +162,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       effectiveRate: 0,
       contabilizeiFee: fee,
       breakdown: breakdown.filter(item => item.value > 0),
-      partnerTaxes: { inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFCalculado }
+      partnerTaxes: { inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFCalculado },
+      annex: annexLabel,
     };
   }
   
