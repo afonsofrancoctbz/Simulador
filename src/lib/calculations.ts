@@ -150,7 +150,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     } else if (uniqueAnnexes.length > 1) {
         annexLabel = 'Múltiplos Anexos';
     } else {
-        annexLabel = 'Padrão';
+        annexLabel = 'Nenhum';
     }
 
     return {
@@ -237,9 +237,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     totalDas += dasForDomestic + dasForExport;
     
     if (annex === 'IV' && (totalSalaryExpense + totalProLaboreBruto > 0)) {
+      const annexIVRevenue = (annexInfo.domestic || 0) + (annexInfo.export || 0);
+      const proportionAnnexIV = totalRevenue > 0 ? annexIVRevenue / totalRevenue : 0;
       const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
-      cppFromAnnexIV += (totalSalaryExpense + totalProLaboreBruto) * cppRate;
-      notes.push("Anexo IV paga a CPP (INSS Patronal - 20%) fora do DAS.");
+      cppFromAnnexIV += (totalSalaryExpense + totalProLaboreBruto) * cppRate * proportionAnnexIV;
+      
+      notes.push("Anexo IV paga a CPP (INSS Patronal - 20%) fora do DAS, proporcional à sua receita.");
     }
     if (bracketIndex === annexTable.length - 1 && ['III', 'IV', 'V'].includes(annex) && annexInfo.domestic > 0) {
       totalIssSeparado += annexInfo.domestic * municipalISSRate;
