@@ -369,7 +369,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.total : 0;
+  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
 
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
@@ -381,7 +381,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       const totalMonthlyCost = totalTax + fee;
 
       const breakdown = [
-        ...(inssPatronal > 0 ? [{ name: "CPP (Encargos Patronais)", value: inssPatronal }] : []),
+        ...(inssPatronal > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: inssPatronal }] : []),
         ...(totalINSSRetido > 0 ? [{ name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido }] : []),
         ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
       ];
@@ -401,7 +401,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const notes: string[] = [];
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
-  if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga os Encargos Patronais (CPP de ~${formatPercent(fiscalConfig.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento.`);
+  if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga o INSS Patronal (CPP de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha de pagamento.`);
   
   // --- Federal Taxes Calculation ---
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
@@ -433,7 +433,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const breakdown = [
     { name: "PIS", value: pis }, { name: "COFINS", value: cofins },
     { name: "ISS", value: iss }, { name: "IRPJ", value: irpj },
-    { name: "CSLL", value: csll }, { name: "CPP (Encargos Patronais)", value: inssPatronal },
+    { name: "CSLL", value: csll }, { name: "CPP (INSS Patronal - 20%)", value: inssPatronal },
     { name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido },
     { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
   ];
