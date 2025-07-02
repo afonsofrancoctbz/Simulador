@@ -11,7 +11,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
     const numSocios = formValues.numberOfPartners || 1;
     
     const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'ISS (Fora do DAS)'].includes(item.name));
-    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
+    const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
 
     const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
 

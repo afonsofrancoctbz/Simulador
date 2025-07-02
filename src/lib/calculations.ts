@@ -16,7 +16,7 @@ import {
   type ProLaboreOutput,
   type PartnerTaxDetails,
 } from './types';
-import { formatCurrencyBRL } from './utils';
+import { formatCurrencyBRL, formatPercent } from './utils';
 
 const fiscalConfig = getFiscalParameters();
 
@@ -116,12 +116,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   let totalINSSRetido = 0;
   let totalIRRFRetido = 0;
   for (const proLabore of proLabores) {
-    const { valorINSSCalculado, valorIRRFCalculado, valorLiquido } = calcularEncargosProLabore({
+    const { valorINSSCalculado, valorIRRFCalculado, valorLiquido, valorBruto } = calcularEncargosProLabore({
       valorProLaboreBruto: proLabore,
       configuracaoFiscal: fiscalConfig,
     });
     partnerTaxes.push({
-      proLaboreBruto: proLabore,
+      proLaboreBruto: valorBruto,
       inss: valorINSSCalculado,
       irrf: valorIRRFCalculado,
       proLaboreLiquido: valorLiquido,
@@ -164,7 +164,14 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     } else if (uniqueAnnexes.length > 1) {
         annexLabel = 'Múltiplos Anexos';
     } else {
-        annexLabel = 'Nenhum';
+        const uniqueAnnexesFromCnaes = [...new Set(allCnaesData.map(c => c.annex))];
+        if (uniqueAnnexesFromCnaes.length === 1) {
+            annexLabel = `Anexo ${uniqueAnnexesFromCnaes[0]}`;
+        } else if (uniqueAnnexesFromCnaes.length > 1) {
+            annexLabel = 'Múltiplos Anexos';
+        } else {
+            annexLabel = 'Nenhum'; 
+        }
     }
 
     return {
@@ -210,7 +217,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   if (isFatorRApplicable) {
     const useAnnexIIIForV = fatorR >= 0.28;
     effectiveAnnexForV = useAnnexIIIForV ? 'III' : 'V';
-    notes.push(`Seu "Fator R" é de ${(fatorR * 100).toFixed(2)}%. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
+    notes.push(`Seu "Fator R" é de ${formatPercent(fatorR)}. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
   }
 
   // --- Group Revenue & Calculate DAS ---
@@ -347,12 +354,12 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   let totalINSSRetido = 0;
   let totalIRRFRetido = 0;
   for (const proLabore of proLabores) {
-    const { valorINSSCalculado, valorIRRFCalculado, valorLiquido } = calcularEncargosProLabore({
+    const { valorINSSCalculado, valorIRRFCalculado, valorLiquido, valorBruto } = calcularEncargosProLabore({
       valorProLaboreBruto: proLabore,
       configuracaoFiscal: fiscalConfig,
     });
     partnerTaxes.push({
-      proLaboreBruto: proLabore,
+      proLaboreBruto: valorBruto,
       inss: valorINSSCalculado,
       irrf: valorIRRFCalculado,
       proLaboreLiquido: valorLiquido,
@@ -362,7 +369,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
+  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.total : 0;
 
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0) {
@@ -374,7 +381,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       const totalMonthlyCost = totalTax + fee;
 
       const breakdown = [
-        ...(inssPatronal > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: inssPatronal }] : []),
+        ...(inssPatronal > 0 ? [{ name: "CPP (Encargos Patronais)", value: inssPatronal }] : []),
         ...(totalINSSRetido > 0 ? [{ name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido }] : []),
         ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
       ];
@@ -394,7 +401,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const notes: string[] = [];
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS no Lucro Presumido.");
-  if (totalPayroll > 0) notes.push("No Lucro Presumido, a CPP (INSS Patronal - 20%) é paga sobre a folha de pagamento.");
+  if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga os Encargos Patronais (CPP de ~${formatPercent(fiscalConfig.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento.`);
   
   // --- Federal Taxes Calculation ---
   const allActivities = [ ...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate})) ];
@@ -426,7 +433,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const breakdown = [
     { name: "PIS", value: pis }, { name: "COFINS", value: cofins },
     { name: "ISS", value: iss }, { name: "IRPJ", value: irpj },
-    { name: "CSLL", value: csll }, { name: "CPP (INSS Patronal - 20%)", value: inssPatronal },
+    { name: "CSLL", value: csll }, { name: "CPP (Encargos Patronais)", value: inssPatronal },
     { name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido },
     { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
   ];
