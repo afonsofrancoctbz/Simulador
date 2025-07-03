@@ -18,8 +18,10 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { CNAE_SERVICE_LIST } from "@/lib/cnae-groups"
 
 const mainCategories = [
+  "Lista de Serviços",
   "Consultoria",
   "Desenvolvimento de Software",
   "Educação e Cursos",
@@ -72,6 +74,13 @@ export function CnaeSelector({
     }
   }, [open, initialSelectedCodes])
 
+  const serviceListWithDetails = React.useMemo(() => {
+    return CNAE_SERVICE_LIST.map(service => {
+      const cnaeData = CNAE_DATA.find(c => c.code === service.code);
+      return { ...cnaeData, ...service };
+    })
+  }, []);
+
   const filteredCnaes = React.useMemo(() => {
     let results = CNAE_DATA
     const lowercasedSearch = search.toLowerCase().trim()
@@ -82,7 +91,7 @@ export function CnaeSelector({
           cnae.description.toLowerCase().includes(lowercasedSearch) ||
           cnae.category?.toLowerCase().includes(lowercasedSearch)
       )
-    } else if (selectedCategory) {
+    } else if (selectedCategory && selectedCategory !== "Lista de Serviços") {
       const internalCategories = categoryToInternalMap[selectedCategory] || []
       results = results.filter((cnae) => cnae.category && internalCategories.includes(cnae.category))
     } else {
@@ -135,7 +144,7 @@ export function CnaeSelector({
         <DialogHeader className="p-6 pb-2 shrink-0">
           <DialogTitle className="text-2xl font-bold text-center">Selecionar Atividades (CNAE)</DialogTitle>
           <DialogDescription className="text-center">
-            Busque ou filtre por categoria. Você pode adicionar até {MAX_SELECTION} atividades.
+            Selecione por Lista de Serviços, busque ou filtre por categoria. Você pode adicionar até {MAX_SELECTION} atividades.
           </DialogDescription>
         </DialogHeader>
 
@@ -161,63 +170,98 @@ export function CnaeSelector({
           </Tabs>
         </div>
         
-        <div className="px-6 pt-4 flex items-center justify-between border-t mt-4 shrink-0">
-            <p className="text-sm text-muted-foreground">
-                {filteredCnaes.length > 0
-                    ? `${filteredCnaes.length} resultados na visão atual.`
-                    : "Nenhum CNAE encontrado."}
-            </p>
-            {filteredCnaes.length > 0 && (
-            <div className="flex items-center gap-2">
-                <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
-                    Selecionar todos
-                </Button>
-                <span className="text-muted-foreground/50">/</span>
-                <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
-                    Limpar todos
-                </Button>
+        {selectedCategory !== 'Lista de Serviços' && (
+            <div className="px-6 pt-4 flex items-center justify-between border-t mt-4 shrink-0">
+                <p className="text-sm text-muted-foreground">
+                    {filteredCnaes.length > 0
+                        ? `${filteredCnaes.length} resultados na visão atual.`
+                        : "Nenhum CNAE encontrado."}
+                </p>
+                {filteredCnaes.length > 0 && (
+                <div className="flex items-center gap-2">
+                    <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
+                        Selecionar todos
+                    </Button>
+                    <span className="text-muted-foreground/50">/</span>
+                    <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
+                        Limpar todos
+                    </Button>
+                </div>
+                )}
             </div>
-            )}
-        </div>
+        )}
 
         <ScrollArea className="flex-grow min-h-0 border-t">
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-2">
-            {filteredCnaes.length > 0 ? (
-              filteredCnaes.map((cnae) => (
+          {selectedCategory === 'Lista de Serviços' ? (
+             <div className="p-6 space-y-4">
+              {serviceListWithDetails.map((service) => (
                 <button
-                  key={cnae.code}
+                  key={service.code}
                   className={cn(
-                    "w-full text-left p-3 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
-                    selectedCodes.includes(cnae.code) && "bg-accent/80 text-accent-foreground ring-2 ring-ring"
+                    "w-full text-left p-4 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
+                    selectedCodes.includes(service.code) && "bg-primary/10 text-primary-foreground border-primary"
                   )}
-                  onClick={() => handleToggleCnae(cnae.code)}
-                  disabled={!selectedCodes.includes(cnae.code) && selectedCodes.length >= MAX_SELECTION}
+                  onClick={() => handleToggleCnae(service.code)}
+                  disabled={!selectedCodes.includes(service.code) && selectedCodes.length >= MAX_SELECTION}
                 >
-                  {selectedCodes.includes(cnae.code) && (
+                  {selectedCodes.includes(service.code) && (
                     <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
                       <Check className="h-4 w-4" />
                     </div>
                   )}
-                  <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
-                   <div className="flex flex-wrap gap-2 mt-2">
-                     <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
-                     <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
-                        Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
-                    </Badge>
-                     {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
-                   </div>
+                  <p className="font-semibold text-md pr-8">{service.description} ({service.code})</p>
+                  <p className="text-sm text-muted-foreground mt-1">{service.group} - Item {service.item}</p>
+                  <p className="text-sm text-muted-foreground italic mt-2">"{service.subItemDescription}"</p>
+
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {service.category && <Badge variant="secondary" className="text-xs">{service.category}</Badge>}
+                    {service.annex && <Badge variant={service.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                        Anexo {service.annex}{service.requiresFatorR ? ' (Fator R)' : ''}
+                    </Badge>}
+                    {service.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
+                  </div>
                 </button>
-              ))
-            ) : (
-              <div className="text-center text-muted-foreground py-16 col-span-2">
-                <p>
-                  {search.length > 1 || selectedCategory
-                    ? "Nenhum CNAE encontrado com os filtros atuais."
-                    : "Busque por um termo ou selecione uma categoria para ver os CNAEs."}
-                </p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-2">
+                {filteredCnaes.length > 0 ? (
+                filteredCnaes.map((cnae) => (
+                    <button
+                    key={cnae.code}
+                    className={cn(
+                        "w-full text-left p-3 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
+                        selectedCodes.includes(cnae.code) && "bg-accent/80 text-accent-foreground ring-2 ring-ring"
+                    )}
+                    onClick={() => handleToggleCnae(cnae.code)}
+                    disabled={!selectedCodes.includes(cnae.code) && selectedCodes.length >= MAX_SELECTION}
+                    >
+                    {selectedCodes.includes(cnae.code) && (
+                        <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
+                        <Check className="h-4 w-4" />
+                        </div>
+                    )}
+                    <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
+                        <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                            Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
+                        </Badge>
+                        {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
+                    </div>
+                    </button>
+                ))
+                ) : (
+                <div className="text-center text-muted-foreground py-16 col-span-2">
+                    <p>
+                    {search.length > 1 || selectedCategory
+                        ? "Nenhum CNAE encontrado com os filtros atuais."
+                        : "Busque por um termo ou selecione uma categoria para ver os CNAEs."}
+                    </p>
+                </div>
+                )}
+            </div>
+          )}
         </ScrollArea>
         <DialogFooter className="p-4 border-t bg-background items-center justify-between flex-row shrink-0">
             <div className="text-sm text-muted-foreground">
