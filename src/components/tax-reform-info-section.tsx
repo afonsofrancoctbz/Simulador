@@ -8,8 +8,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Library, Banknote, Percent, Recycle, Gauge, CalendarClock, Landmark } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Library, AlertTriangle, Building, BookOpen, Lightbulb } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
@@ -18,145 +18,87 @@ export default function TaxReformInfoSection() {
         <CardHeader className="text-center">
           <Library className="mx-auto h-8 w-8 text-primary mb-2" />
           <CardTitle className="text-2xl font-bold text-primary">
-            Guia da Reforma Tributária (LC 214/2025)
+            Guia Prático da Reforma Tributária para Empresas
           </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
-            Entenda os principais pontos da lei que regulamenta o IBS e a CBS, e como eles impactarão sua empresa.
+            Entenda o impacto do IVA (IBS/CBS) no Simples Nacional e Lucro Presumido.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+
+          <Alert variant="default" className="bg-amber-50/80 border-amber-200 text-amber-900">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <AlertTitle className="font-semibold">Ressalva Importante</AlertTitle>
+            <AlertDescription>
+              A Reforma Tributária (EC nº 132/2023) está em regulamentação. Detalhes como alíquotas exatas ainda podem mudar. As informações abaixo baseiam-se nos textos mais recentes, considerando a transição gradual de 2026 a 2033.
+            </AlertDescription>
+          </Alert>
+
+          <div className="text-center">
+            <h3 className="text-xl font-semibold text-foreground">O Novo Cenário Fiscal: IBS, CBS e o Fim de Cinco Tributos</h3>
+            <p className="mt-2 text-muted-foreground max-w-3xl mx-auto">
+              A espinha dorsal da Reforma é a unificação de cinco tributos em um sistema de IVA dual, composto por <strong>CBS (federal, substituindo PIS/COFINS)</strong> e <strong>IBS (estadual/municipal, substituindo ICMS/ISS)</strong>. O IPI será, em grande parte, substituído pelo novo Imposto Seletivo (IS).
+            </p>
+          </div>
+
           <Accordion type="single" collapsible className="w-full text-left">
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
-                <Banknote className="mr-3 text-primary h-5 w-5" />
-                1. Unificação de Tributos e o IVA Dual
+                <Building className="mr-3 text-primary h-5 w-5" />
+                1. Empresas do Simples Nacional na Reforma Tributária
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O pilar da reforma é a substituição de 5 impostos sobre o consumo por um Imposto sobre Valor Agregado (IVA) de modelo "dual", ou seja, dividido em duas esferas:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Contribuição sobre Bens e Serviços (CBS):</strong> De competência federal, unifica PIS, COFINS e o IPI (que terá suas alíquotas zeradas, com exceções para a Zona Franca de Manaus).</li>
-                  <li><strong>Imposto sobre Bens e Serviços (IBS):</strong> De competência de estados e municípios, unifica o ICMS e o ISS.</li>
-                </ul>
-                <p>Essa unificação visa simplificar radicalmente o sistema, substituindo milhares de legislações municipais e estaduais por uma regra nacional, com a mesma base de cálculo e fato gerador para todos.</p>
+                <p>O regime do Simples Nacional foi mantido. A principal mudança é a opcionalidade no recolhimento do IBS e da CBS.</p>
+                <div className="space-y-3 p-4 border rounded-md bg-background">
+                  <h4 className="font-bold text-foreground">Opção 1: Manter o Recolhimento Unificado (Padrão)</h4>
+                  <p><strong>Lógica:</strong> A empresa continua a recolher seus tributos na guia única (DAS). A composição interna da alíquota muda (IBS e CBS substituem ICMS, ISS, PIS, COFINS), mas o valor total permanece o mesmo.</p>
+                  <p><strong>Vantagem:</strong> Mantém a simplicidade e a carga tributária atual.</p>
+                  <p><strong>Desvantagem:</strong> O crédito de IBS/CBS que seus clientes PJ poderão aproveitar será muito limitado, o que pode reduzir sua competitividade no mercado B2B.</p>
+                </div>
+                <div className="space-y-3 p-4 border rounded-md bg-background">
+                  <h4 className="font-bold text-foreground">Opção 2: Recolher IBS e CBS "por Fora" (Modelo Híbrido)</h4>
+                  <p><strong>Lógica:</strong> A empresa paga o IBS e a CBS pelas regras do regime geral (com alíquota padrão, estimada em ~26.5%) e o restante dos impostos (IRPJ, CSLL, etc.) continua no DAS.</p>
+                  <p><strong>Vantagem:</strong> Permite que seus clientes aproveitem o crédito integral de IBS/CBS, tornando sua empresa mais atrativa. Você também poderá se creditar do IBS/CBS de suas compras.</p>
+                  <p><strong>Desvantagem:</strong> A carga tributária sobre o faturamento tende a aumentar consideravelmente.</p>
+                </div>
+
+                <h4 className="font-bold text-foreground mt-4">Faturamento com o Exterior (Exportações)</h4>
+                <p>As exportações continuam imunes de IBS e CBS. A grande vantagem é que a empresa manterá o direito de usar os créditos de IBS/CBS de suas compras, gerando um benefício financeiro.</p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                 <Gauge className="mr-3 text-primary h-5 w-5" />
-                2. Alíquotas: Padrão, Reduzida e Isenção
+                 <BookOpen className="mr-3 text-primary h-5 w-5" />
+                2. Empresas do Lucro Presumido na Reforma Tributária
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                 <p>A reforma estabelece uma alíquota padrão e tratamentos favorecidos para setores essenciais. Embora a alíquota final ainda dependa de definições, as estimativas são:</p>
-                  <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="font-semibold text-foreground/80">Regime de Alíquota</TableHead>
-                      <TableHead className="font-semibold text-foreground/80">Alíquota Estimada (IVA)</TableHead>
-                      <TableHead className="font-semibold text-foreground/80">Principais Beneficiados</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Alíquota Padrão</TableCell>
-                      <TableCell>~27.5%</TableCell>
-                      <TableCell>Regra geral para a maioria dos bens e serviços.</TableCell>
-                    </TableRow>
-                     <TableRow>
-                      <TableCell className="font-medium">Redução de 30%</TableCell>
-                      <TableCell>~19.25%</TableCell>
-                      <TableCell>Profissionais liberais com profissão regulamentada (advogados, engenheiros, arquitetos, etc.).</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Redução de 60%</TableCell>
-                      <TableCell>~11%</TableCell>
-                      <TableCell>Serviços de educação, saúde, transporte público, produções artísticas e culturais, medicamentos e dispositivos médicos.</TableCell>
-                    </TableRow>
-                     <TableRow>
-                      <TableCell className="font-medium">Alíquota Zero</TableCell>
-                      <TableCell>0%</TableCell>
-                      <TableCell>Produtos da cesta básica, serviços de transporte coletivo (rodoviário, metroviário), entre outros.</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-                <p className="text-sm text-muted-foreground"><strong>Importante:</strong> Estas alíquotas reduzidas se aplicam aos regimes de Lucro Presumido e Lucro Real. O Simples Nacional mantém suas próprias tabelas de alíquotas.</p>
+                <p>A principal mudança é a migração do regime cumulativo de PIS/COFINS (3,65%) para o regime não-cumulativo do IVA (IBS/CBS), com alíquota muito maior mas com direito a créditos.</p>
+                <h4 className="font-bold text-foreground">Lógica de Cálculo</h4>
+                <p><strong>IBS/CBS:</strong> Seguirá a lógica da não-cumulatividade. O imposto a pagar será o resultado do débito sobre as vendas (Faturamento x Alíquota Padrão) menos o crédito sobre as compras de bens e serviços.</p>
+                <p><strong>IRPJ e CSLL:</strong> O cálculo permanece o mesmo, incidindo sobre uma base de lucro presumida (ex: 8% para comércio, 32% para serviços).</p>
+                <h4 className="font-bold text-foreground mt-4">Impacto</h4>
+                <p>Para prestadores de serviço com poucos insumos, a carga tributária tende a aumentar, pois a nova alíquota do IVA será maior que a soma atual de PIS/COFINS e ISS. Para comércio e indústria, o impacto pode ser menor devido à maior geração de créditos.</p>
+                 <h4 className="font-bold text-foreground mt-4">Faturamento com o Exterior (Exportações)</h4>
+                <p>As exportações são desoneradas do IBS e CBS para aumentar a competitividade. A empresa mantém o direito de se creditar do IBS/CBS pagos na aquisição de insumos, e o saldo credor pode ser usado para abater outros débitos ou ser ressarcido.</p>
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                <Recycle className="mr-3 text-primary h-5 w-5" />
-                3. Não Cumulatividade Plena (Créditos)
+                <Lightbulb className="mr-3 text-primary h-5 w-5" />
+                Apanhado Geral para se Tornar um Expert
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>Uma das maiores mudanças é o princípio da "não cumulatividade plena". Isso significa que o imposto pago em cada etapa da cadeia de produção vira crédito para ser abatido na etapa seguinte. O objetivo é tributar apenas o "valor agregado" em cada fase, eliminando o "imposto em cascata".</p>
-                <ul className="list-disc pl-6 space-y-2">
-                    <li><strong>Direito ao Crédito:</strong> Empresas do regime regular (Lucro Presumido e Real) poderão se creditar do IVA pago na aquisição de praticamente todos os bens e serviços usados em sua atividade, com poucas exceções (como bens de uso e consumo pessoal).</li>
-                    <li><strong>Fim da Bitributação:</strong> O sistema evita que o imposto seja calculado sobre ele mesmo, como acontece hoje em algumas situações. O resultado é uma tributação mais transparente e justa.</li>
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-            
-             <AccordionItem value="item-4">
-              <AccordionTrigger className="text-lg font-semibold">
-                <Percent className="mr-3 text-primary h-5 w-5" />
-                4. Impacto no Simples Nacional
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O Simples Nacional não foi extinto, mas será impactado. Empresas optantes terão duas alternativas a partir de 2027:</p>
-                <ol className="list-decimal pl-6 space-y-3">
-                  <li>
-                    <strong>Manter o Regime Padrão:</strong> Continuar pagando todos os impostos na guia unificada (DAS).
-                    <ul className="list-disc pl-5 mt-2 space-y-1">
-                      <li><strong>Vantagem:</strong> Carga tributária continua baixa e simplificada.</li>
-                      <li><strong>Desvantagem:</strong> Gera pouco crédito de IVA para seus clientes PJ (Pessoa Jurídica), o que pode te tornar menos competitivo ao vender para empresas maiores.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Optar pelo Regime Híbrido:</strong> Pagar o IBS e a CBS por fora da guia do Simples, como uma empresa do Lucro Presumido/Real, enquanto os outros impostos continuam no DAS.
-                     <ul className="list-disc pl-5 mt-2 space-y-1">
-                      <li><strong>Vantagem:</strong> Gera crédito cheio de IVA para seus clientes PJ, aumentando sua competitividade. Também permite que sua empresa se credite do IVA de suas compras.</li>
-                      <li><strong>Desvantagem:</strong> A carga tributária sobre o faturamento aumenta significativamente.</li>
-                    </ul>
-                  </li>
-                </ol>
-                 <p className="pt-2">A escolha dependerá do perfil do seu cliente. Se você vende majoritariamente para o consumidor final (B2C), o regime padrão tende a ser melhor. Se seu foco é em outras empresas (B2B), o regime híbrido pode ser uma necessidade estratégica.</p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-5">
-              <AccordionTrigger className="text-lg font-semibold">
-                <CalendarClock className="mr-3 text-primary h-5 w-5" />
-                5. Cronograma de Transição
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>A mudança será gradual para permitir a adaptação de empresas e governos.</p>
-                 <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>2026:</strong> Início da fase de testes. A CBS (0.9%) e o IBS (0.1%) serão calculados e destacados em nota, mas o valor poderá ser compensado com os impostos do sistema antigo. A carga tributária efetiva não muda.</li>
-                  <li><strong>2027:</strong> A CBS entra em vigor plenamente, extinguindo PIS e COFINS. O IPI é zerado (com exceções). Empresas do Simples Nacional passam a poder optar pelo regime híbrido.</li>
-                  <li><strong>2029 a 2032:</strong> O ICMS e o ISS começam a ser reduzidos gradualmente, enquanto as alíquotas do IBS sobem na mesma proporção.</li>
-                  <li><strong>2033:</strong> Extinção completa do ICMS e ISS. O novo sistema tributário com IBS e CBS estará 100% em vigor.</li>
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-6">
-              <AccordionTrigger className="text-lg font-semibold">
-                <Landmark className="mr-3 text-primary h-5 w-5" />
-                6. Governança: O Comitê Gestor do IBS (CG-IBS)
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>Para garantir que o IBS (o imposto que unifica ICMS e ISS) funcione de forma padronizada em todo o Brasil, a Reforma Tributária criou o <strong>Comitê Gestor do Imposto sobre Bens e Serviços (CG-IBS)</strong>. Esta é uma entidade técnica e independente que vai centralizar a administração do imposto.</p>
-                <h4 className="font-semibold text-foreground">Principais Responsabilidades do CG-IBS:</h4>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Regulamento Único:</strong> O CG-IBS será responsável por criar e manter uma única legislação para o IBS em todo o território nacional. Isso acaba com as milhares de regras diferentes de ICMS e ISS que existem hoje.</li>
-                  <li><strong>Arrecadação Centralizada:</strong> O Comitê irá arrecadar o IBS, realizar as compensações de créditos e distribuir o valor arrecadado para os estados e municípios de destino da operação.</li>
-                  <li><strong>Contencioso Unificado:</strong> Disputas e questionamentos administrativos sobre o IBS serão resolvidos pelo CG-IBS, e não mais em instâncias separadas de cada estado ou município.</li>
-                  <li><strong>Coordenação da Fiscalização:</strong> A fiscalização das empresas continuará sendo feita pelas administrações tributárias estaduais e municipais, mas de forma integrada e coordenada pelo Comitê.</li>
-                </ul>
-                <p className="pt-2"><strong>Na prática, o que isso significa para sua empresa?</strong> A criação do CG-IBS representa uma grande simplificação. Em vez de lidar com legislações e sistemas diferentes para cada estado e município onde atua, sua empresa responderá a um conjunto único de regras para o IBS, facilitando a conformidade e a gestão fiscal.</p>
+              <AccordionContent className="space-y-3 pt-2 text-base text-muted-foreground">
+                  <p><strong>Entenda o IVA:</strong> A chave é a não-cumulatividade. O imposto pago na compra vira "crédito" para abater do imposto devido na venda. O custo real é transferido para o consumidor final.</p>
+                  <p><strong>Atenção à Competitividade (Simples Nacional):</strong> A decisão será entre simplicidade (menor geração de crédito para clientes) ou competitividade no B2B (modelo híbrido com maior custo tributário). Analisar o perfil da sua clientela será fundamental.</p>
+                  <p><strong>Planejamento para Serviços (Lucro Presumido):</strong> O setor de serviços, especialmente com poucos insumos, deve se preparar para um aumento da carga tributária sobre o consumo. Será crucial reavaliar preços e custos.</p>
+                  <p><strong>Transição Gradual (2026-2033):</strong> A mudança não será imediata. 2026 será um ano de teste com alíquotas simbólicas (0,9% CBS + 0,1% IBS). Os sistemas antigo e novo coexistirão, exigindo atenção contábil.</p>
+                  <p><strong>Exportação é Vantagem:</strong> A desoneração das exportações com manutenção integral dos créditos é um dos pontos mais positivos da reforma.</p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+
         </CardContent>
       </Card>
     </div>
