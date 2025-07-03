@@ -10,7 +10,19 @@ import { Info } from 'lucide-react';
 const ResultCardComponent = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
     const numSocios = formValues.numberOfPartners || 1;
     
-    const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'ISS (Fora do DAS)'].includes(item.name));
+    const faturamentoTaxes = details.breakdown.filter(item => [
+        'DAS (Guia Unificada)', 
+        'DAS (Simples Nacional)',
+        'IVA (CBS+IBS) fora do DAS',
+        'PIS', 
+        'COFINS', 
+        'ISS', 
+        'IRPJ', 
+        'CSLL', 
+        'ISS (Fora do DAS)',
+        'CBS',
+        'IBS'
+    ].includes(item.name));
     const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
 
     const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
