@@ -1044,12 +1044,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             <CityInfoRenderer city={selectedCity} />
         </div>
 
-        {results && (
-          <div className="mt-12">
-            <RocSection />
-          </div>
-        )}
-
         {renderResults()}
     </FormProvider>
   );
