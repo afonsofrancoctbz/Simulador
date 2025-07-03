@@ -453,13 +453,13 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const lucroPresumido = calculateLucroPresumido(values);
   const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, 'Simples Nacional');
 
-  let simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional (Otimizado)' };
+  let simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional com Fator R' };
 
   const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
   
   if (hasAnnexVActivity) {
       const totalRevenue = simplesNacionalBase.totalRevenue;
-      if (totalRevenue > 0) {
+      if (totalRevenue > 0 && simplesNacionalBase.fatorR && simplesNacionalBase.fatorR < 0.28) {
           const requiredPayroll = totalRevenue * 0.28;
           const currentPayrollForFatorR = values.totalSalaryExpense;
           let requiredTotalProLabore = requiredPayroll - currentPayrollForFatorR;
@@ -480,8 +480,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
               simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional com Fator R');
-          } else {
-             simplesNacionalOtimizado = {...simplesNacionalBase, regime: 'Simples Nacional com Fator R'};
           }
       }
   }

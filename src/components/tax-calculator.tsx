@@ -45,6 +45,9 @@ import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { useToast } from '@/hooks/use-toast';
+import { Label } from './ui/label';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -110,9 +113,10 @@ const cityInfoComponents: { [key: string]: ComponentType } = {
 };
 
 const planOptions = [
-    { value: 'expertsEssencial', title: 'Experts Essencial', description: 'Assessoria dedicada' },
-    { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades' },
     { value: 'basico', title: 'Básico', description: 'Essencial para começar' },
+    { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades e suporte' },
+    { value: 'multibeneficios', title: 'Multibenefícios', description: 'Inclui benefícios para os sócios' },
+    { value: 'expertsEssencial', title: 'Experts', description: 'Assessoria fiscal dedicada' },
 ];
 
 export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
@@ -123,6 +127,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
   const [isFetchingRate, setIsFetchingRate] = useState(false);
   const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
+  const { toast } = useToast();
 
   const fiscalConfig = getFiscalParameters(year);
   const MINIMUM_WAGE = fiscalConfig.salario_minimo;
@@ -196,6 +201,23 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
     return annexes;
   }, [selectedCnaes]);
+
+  const isCommerceOnly = useMemo(() => {
+    if (selectedCnaes.length === 0) return false;
+    return selectedCnaes.every(code => getCnaeData(code)?.annex === 'I');
+  }, [selectedCnaes]);
+  
+  useEffect(() => {
+      if (isCommerceOnly && form.getValues('selectedPlan') === 'expertsEssencial') {
+          form.setValue('selectedPlan', 'padrao'); // Switch to a default available plan
+          toast({
+              title: "Plano ajustado",
+              description: "O plano Experts não está disponível para atividades de comércio. Selecionamos o plano Padrão para você.",
+              variant: "default",
+          });
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCommerceOnly, form]);
 
   const fetchRates = async () => {
     setIsFetchingRate(true);
@@ -376,11 +398,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
         scenarios.push({ ...results.lucroPresumido });
         
-        scenarios.push({ ...results.simplesNacionalSemFatorR, annex: results.simplesNacionalSemFatorR.fatorR === undefined ? `${results.simplesNacionalSemFatorR.annex} (Não sujeito ao Fator R)` : `${results.simplesNacionalSemFatorR.annex} (Fator R não aplicado)` });
+        scenarios.push({ ...results.simplesNacionalSemFatorR });
         
-        if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR) {
+        if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR && results.simplesNacionalComFatorR.proLabore > simplesNacionalBase.proLabore) {
             const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...results.simplesNacionalComFatorR, annex: `${results.simplesNacionalComFatorR.annex} com Fator R`, optimizationNote });
+            scenarios.push({ ...results.simplesNacionalComFatorR, optimizationNote });
+        } else if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR) {
+             scenarios.push({ ...results.simplesNacionalComFatorR });
         }
         
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
@@ -957,33 +981,51 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                 3. Selecione o Plano Contabilizei
                             </h3>
                         </div>
-                        <FormField
-                            control={form.control}
-                            name="selectedPlan"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Plano de Contabilidade</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Selecione um plano" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {planOptions.map(plan => (
-                                                <SelectItem key={plan.value} value={plan.value}>
-                                                    {plan.title} - {plan.description}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>
-                                        A mensalidade nos resultados será baseada no plano escolhido.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                       <FormField
+                          control={form.control}
+                          name="selectedPlan"
+                          render={({ field }) => (
+                              <FormItem className="space-y-3">
+                                  <FormLabel>Qual plano de contabilidade melhor se encaixa no seu perfil?</FormLabel>
+                                  <FormControl>
+                                      <RadioGroup
+                                          onValueChange={field.onChange}
+                                          value={field.value}
+                                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                                      >
+                                          {planOptions.map(plan => {
+                                              const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
+                                              const isRecommended = plan.value === 'expertsEssencial';
+                                              return (
+                                                  <FormItem key={plan.value} className="h-full relative">
+                                                      <FormControl>
+                                                          <RadioGroupItem value={plan.value} id={plan.value} className="sr-only" disabled={isDisabled} />
+                                                      </FormControl>
+                                                      <Label
+                                                          htmlFor={plan.value}
+                                                          className={cn(
+                                                              "flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer h-full transition-all",
+                                                              field.value === plan.value && "border-primary",
+                                                              isRecommended && !isDisabled && "border-primary shadow-lg scale-105",
+                                                              isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
+                                                          )}
+                                                      >
+                                                          {isRecommended && !isDisabled && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">Recomendado</Badge>}
+                                                          <div className='text-center'>
+                                                              <span className="font-bold text-lg">{plan.title}</span>
+                                                              <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
+                                                          </div>
+                                                          {isDisabled && <p className="text-xs text-destructive mt-2 text-center">Não disponível para Comércio</p>}
+                                                      </Label>
+                                                  </FormItem>
+                                              );
+                                          })}
+                                      </RadioGroup>
+                                  </FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
                     </div>
 
                 </div>
