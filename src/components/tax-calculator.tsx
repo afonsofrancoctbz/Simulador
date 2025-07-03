@@ -9,7 +9,7 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData } from '@/lib/types';
+import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -285,7 +285,7 @@ export default function TaxCalculator() {
     }
   }
 
-  const displayedScenarios = useMemo(() => {
+  const scenarios = useMemo(() => {
     if (!results) return [];
 
     const { selectedCnaes, proLabores } = form.getValues();
@@ -297,7 +297,7 @@ export default function TaxCalculator() {
 
     if (totalRevenue === 0 && totalProLabore === 0) return [];
 
-    const scenarios = [];
+    const scenarios: TaxDetails[] = [];
 
     const lucroPresumidoScenario = {
         ...results.lucroPresumido,
@@ -311,17 +311,17 @@ export default function TaxCalculator() {
         scenarios.push({
             ...results.simplesNacionalSemFatorR,
             regime: 'Simples Nacional',
-            annex: 'Anexo V - Sem Utilizar o Fator R'
+            annex: 'Anexo V'
         });
 
         const cenarioOtimizado = results.simplesNacionalComFatorR;
         const proLaboreOtimizado = cenarioOtimizado.proLabore;
-        const optimizationNote = `Para alcançar este cenário, seu pró-labore total foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, distribuído igualmente entre os sócios, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
+        const optimizationNote = `Para alcançar este cenário, seu pró-labore total foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
         
         scenarios.push({
             ...cenarioOtimizado,
-            regime: 'Simples Nacional com Fator R',
-            annex: 'Anexo III - Usando Fator R',
+            regime: 'Simples Nacional',
+            annex: 'Anexo III (Otimizado com Fator R)',
             optimizationNote: optimizationNote
         });
         
@@ -338,9 +338,7 @@ export default function TaxCalculator() {
         scenarios.push(lucroPresumidoScenario);
     }
     
-    const sortedScenarios = scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-    
-    return sortedScenarios;
+    return scenarios;
 
   }, [results, form]);
 
@@ -355,11 +353,33 @@ export default function TaxCalculator() {
       );
     }
 
-    if (!results || displayedScenarios.length === 0) {
+    if (!results || scenarios.length === 0) {
       return null;
     }
+    
+    const cheapestScenario = scenarios.length > 0
+      ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
+      : null;
 
-    const cheapestScenario = displayedScenarios[0];
+    const orderMap: Record<string, number> = {
+        'Anexo III': 1,
+        'Anexo IV': 2,
+        'Anexo V': 3,
+        'Lucro Presumido': 4,
+    };
+
+    const getOrderKey = (scenario: TaxDetails) => {
+        if (scenario.regime.includes('Lucro Presumido')) return orderMap['Lucro Presumido'];
+        if (scenario.annex?.includes('III')) return orderMap['Anexo III'];
+        if (scenario.annex?.includes('IV')) return orderMap['Anexo IV'];
+        if (scenario.annex?.includes('V')) return orderMap['Anexo V'];
+        if (scenario.regime.includes('Simples')) return orderMap['Anexo III'];
+        return 99;
+    };
+
+    const sortedForDisplay = [...scenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
+
+
     const submissionValues = transformFormToSubmission(form.getValues());
     const { selectedCnaes } = form.getValues();
 
@@ -388,12 +408,12 @@ export default function TaxCalculator() {
                             const cnae = getCnaeData(code);
                             if (!cnae) return null;
                             return (
-                                <li key={code} className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs">
-                                    <div className="flex-grow">
+                                <li key={code} className="flex items-center justify-between text-xs p-1 rounded hover:bg-background">
+                                    <div className="flex-grow truncate pr-4">
                                         <span className="font-semibold text-foreground">{cnae.code}</span>
-                                        <span className="text-muted-foreground ml-2">{cnae.description}</span>
+                                        <span className="text-muted-foreground ml-2 truncate">{cnae.description}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 mt-1 sm:mt-0 sm:ml-4 flex-shrink-0">
+                                    <div className="flex items-center gap-2 flex-shrink-0">
                                         <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
                                         {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
                                         {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
@@ -406,11 +426,11 @@ export default function TaxCalculator() {
             )}
             
             <div className="flex flex-wrap justify-center items-stretch gap-8">
-                {displayedScenarios.map(scenario => (
+                {sortedForDisplay.map(scenario => (
                      <ResultCard 
                         key={`${scenario.regime}-${scenario.annex}`} 
                         details={scenario} 
-                        isCheapest={scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && displayedScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0}
+                        isCheapest={cheapestScenario !== null && scenario === cheapestScenario && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
                         formValues={submissionValues}
                     />
                 ))}
