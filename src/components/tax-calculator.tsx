@@ -302,7 +302,6 @@ export default function TaxCalculator() {
     const lucroPresumidoScenario = {
         ...results.lucroPresumido,
         regime: 'Lucro Presumido',
-        annex: 'Alternativa de Regime'
     };
 
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
@@ -403,15 +402,18 @@ export default function TaxCalculator() {
                             Esta é a lista de CNAEs utilizada para a simulação dos impostos.
                         </p>
                     </div>
-                    <ul className="space-y-1 border rounded-md p-3 bg-muted/20">
-                        {selectedCnaes.map(code => {
+                    <ul className="border rounded-md p-3 bg-muted/20">
+                        {selectedCnaes.map((code, index) => {
                             const cnae = getCnaeData(code);
                             if (!cnae) return null;
                             return (
-                                <li key={code} className="flex items-center justify-between text-xs p-1 rounded hover:bg-background">
-                                    <div className="flex-grow truncate pr-4">
+                                <li key={code} className={cn(
+                                    "flex items-start justify-between gap-4 text-sm py-2",
+                                    index < selectedCnaes.length - 1 && "border-b border-border/50"
+                                )}>
+                                    <div className="flex-1">
                                         <span className="font-semibold text-foreground">{cnae.code}</span>
-                                        <span className="text-muted-foreground ml-2 truncate">{cnae.description}</span>
+                                        <span className="text-muted-foreground ml-2">{cnae.description}</span>
                                     </div>
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
@@ -850,5 +852,7 @@ export default function TaxCalculator() {
     </FormProvider>
   );
 }
+
+    
 
     
