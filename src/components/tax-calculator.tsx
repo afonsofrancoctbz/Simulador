@@ -320,28 +320,22 @@ export default function TaxCalculator() {
         regime: 'Lucro Presumido',
     });
 
-    if (hasAnnexVActivity) {
-        if (cenarioBase.annex?.includes('V')) { 
-            scenarios.push({
-                ...cenarioBase,
-                regime: 'Simples Nacional',
-                annex: 'Anexo V',
-            });
-            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(cenarioOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({
-                ...cenarioOtimizado,
-                regime: 'Simples Nacional',
-                annex: 'Anexo III (Com Fator R)',
-                optimizationNote: optimizationNote
-            });
-        } else {
-            scenarios.push({
-                ...cenarioBase,
-                regime: 'Simples Nacional',
-                annex: 'Anexo III (Com Fator R)',
-            });
-        }
+    if (hasAnnexVActivity && cenarioBase.annex?.includes('V')) {
+        // Show both Anexo V (default) and Anexo III (optimized)
+        scenarios.push({
+            ...cenarioBase,
+            regime: 'Simples Nacional',
+            annex: 'Anexo V',
+        });
+        const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(cenarioOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
+        scenarios.push({
+            ...cenarioOtimizado,
+            regime: 'Simples Nacional',
+            annex: 'Anexo III (Com Fator R)',
+            optimizationNote: optimizationNote
+        });
     } else {
+        // If no Anexo V or already in Anexo III, just show the base scenario
         scenarios.push({
             ...cenarioBase,
             regime: 'Simples Nacional',
@@ -372,18 +366,16 @@ export default function TaxCalculator() {
       : null;
 
     const orderMap: Record<string, number> = {
-        'Anexo III': 1,
-        'Anexo IV': 2,
-        'Anexo V': 3,
-        'Lucro Presumido': 4,
+      'Anexo III (Com Fator R)': 1,
+      'Anexo V': 2,
+      'Lucro Presumido': 3,
     };
-
+    
     const getOrderKey = (scenario: TaxDetails) => {
-        if (scenario.regime.includes('Lucro Presumido')) return orderMap['Lucro Presumido'];
-        if (scenario.annex?.includes('Anexo III')) return orderMap['Anexo III'];
-        if (scenario.annex?.includes('Anexo IV')) return orderMap['Anexo IV'];
-        if (scenario.annex?.includes('Anexo V')) return orderMap['Anexo V'];
-        return 99;
+        if(scenario.regime === 'Lucro Presumido') return orderMap['Lucro Presumido'];
+        if(scenario.annex && scenario.annex in orderMap) return orderMap[scenario.annex];
+        if(scenario.annex && scenario.annex.includes('Anexo III')) return 1;
+        return 99; // Default for others like 'Múltiplos Anexos' or 'Anexo IV'
     };
     
     const sortedForDisplay = [...scenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
@@ -393,41 +385,39 @@ export default function TaxCalculator() {
 
     return (
         <div id="results-section" className="mt-16 w-full">
-            {selectedCnaes && selectedCnaes.length > 0 && (
-                 <div className="max-w-4xl mx-auto mb-12">
-                    <div className="text-center mb-4">
-                        <h3 className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
-                            <ListChecks className="h-5 w-5 text-primary"/>
-                            Resumo das Atividades Selecionadas
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                            Esta é a lista de CNAEs utilizada para a simulação dos impostos.
-                        </p>
-                    </div>
-                    <ul className="border rounded-md p-3 bg-muted/20">
-                        {selectedCnaes.map((code, index) => {
-                            const cnae = getCnaeData(code);
-                            if (!cnae) return null;
-                            return (
-                                <li key={code} className={cn(
-                                    "flex items-start justify-between gap-4 text-sm py-2",
-                                    index < selectedCnaes.length - 1 && "border-b border-border/50"
-                                )}>
-                                    <div className="flex-1">
-                                        <p className="font-semibold text-foreground">{cnae.code}</p>
-                                        <p className="text-muted-foreground">{cnae.description}</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 flex-shrink-0 mt-1">
-                                        <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
-                                        {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
-                                        {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
-                                    </div>
-                                </li>
-                            );
-                        })}
-                    </ul>
+             <div className="max-w-4xl mx-auto mb-12">
+                <div className="text-center mb-4">
+                    <h3 className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
+                        <ListChecks className="h-5 w-5 text-primary"/>
+                        Resumo das Atividades Selecionadas
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        Esta é a lista de CNAEs utilizada para a simulação dos impostos.
+                    </p>
                 </div>
-            )}
+                <ul className="border rounded-md p-3 bg-muted/20">
+                    {selectedCnaes.map((code, index) => {
+                        const cnae = getCnaeData(code);
+                        if (!cnae) return null;
+                        return (
+                             <li key={code} className={cn(
+                                "flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 text-sm py-2",
+                                index < selectedCnaes.length - 1 && "border-b border-border/50"
+                            )}>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-foreground">{cnae.code}</p>
+                                    <p className="text-muted-foreground break-words">{cnae.description}</p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center mt-1 sm:mt-0">
+                                    <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
+                                    {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
+                                    {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
             
             <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
@@ -652,9 +642,8 @@ export default function TaxCalculator() {
                                     {fields.map((item, index) => (
                                         <div key={item.id} className="p-4 border rounded-lg space-y-4 bg-muted/20">
                                             <h4 className="font-semibold text-foreground">Sócio {index + 1}</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                                                 <FormField
-                                                    key={item.id}
                                                     control={form.control}
                                                     name={`proLabores.${index}.value`}
                                                     render={({ field }) => {
@@ -683,8 +672,36 @@ export default function TaxCalculator() {
                                                         );
                                                     }}
                                                 />
-                                                <div />
-
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`proLabores.${index}.otherContributionSalary`}
+                                                    render={({ field }) => {
+                                                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                            const { value } = e.target;
+                                                            const digitsOnly = value.replace(/\D/g, '');
+                                                            field.onChange(Number(digitsOnly) / 100);
+                                                        };
+                                                        return(
+                                                        <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible')}>
+                                                            <FormLabel>Salário de Contribuição (Outro Vínculo)</FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="text"
+                                                                    inputMode="decimal"
+                                                                    placeholder="0,00"
+                                                                    onChange={handleChange}
+                                                                    onBlur={field.onBlur}
+                                                                    value={field.value ? formatBRL(field.value) : ''}
+                                                                    name={field.name}
+                                                                    ref={field.ref}
+                                                                />
+                                                            </FormControl>
+                                                            <FormDescription className="text-sm">Seu salário base de contribuição.</FormDescription>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                        )
+                                                    }}
+                                                />
                                                 <FormField
                                                     control={form.control}
                                                     name={`proLabores.${index}.hasOtherInssContribution`}
@@ -705,41 +722,6 @@ export default function TaxCalculator() {
                                                         </FormItem>
                                                     )}
                                                 />
-
-                                                {form.watch(`proLabores.${index}.hasOtherInssContribution`) && (
-                                                    <FormField
-                                                        control={form.control}
-                                                        name={`proLabores.${index}.otherContributionSalary`}
-                                                        render={({ field }) => {
-                                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                const { value } = e.target;
-                                                                const digitsOnly = value.replace(/\D/g, '');
-                                                                field.onChange(Number(digitsOnly) / 100);
-                                                            };
-                                                            return(
-                                                            <FormItem className="md:col-span-2">
-                                                                <FormLabel>Salário de Contribuição no outro vínculo (R$)</FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        type="text"
-                                                                        inputMode="decimal"
-                                                                        placeholder="0,00"
-                                                                        onChange={handleChange}
-                                                                        onBlur={field.onBlur}
-                                                                        value={field.value ? formatBRL(field.value) : ''}
-                                                                        name={field.name}
-                                                                        ref={field.ref}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormDescription className='text-sm'>
-                                                                    Informe o valor total do seu salário base de contribuição em outras fontes.
-                                                                </FormDescription>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                            )
-                                                        }}
-                                                    />
-                                                )}
                                             </div>
                                         </div>
                                     ))}
