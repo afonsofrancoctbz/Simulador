@@ -111,7 +111,6 @@ const cityInfoComponents: { [key: string]: ComponentType } = {
 
 const planOptions = [
     { value: 'expertsEssencial', title: 'Experts Essencial', description: 'Assessoria dedicada' },
-    { value: 'multibeneficios', title: 'Multibenefícios', description: 'Vantagens para você' },
     { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades' },
     { value: 'basico', title: 'Básico', description: 'Essencial para começar' },
 ];
@@ -381,7 +380,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         
         if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR) {
             const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...results.simplesNacionalComFatorR, annex: `${results.simplesNacionalComFatorR.annex} (Otimizado com Fator R)`, optimizationNote });
+            scenarios.push({ ...results.simplesNacionalComFatorR, annex: `${results.simplesNacionalComFatorR.annex} com Fator R`, optimizationNote });
         }
         
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
