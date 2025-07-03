@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Library, Banknote, Percent, Recycle, Gauge, CalendarClock } from "lucide-react";
+import { Library, Banknote, Percent, Recycle, Gauge, CalendarClock, Landmark } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
@@ -136,6 +137,23 @@ export default function TaxReformInfoSection() {
                   <li><strong>2029 a 2032:</strong> O ICMS e o ISS começam a ser reduzidos gradualmente, enquanto as alíquotas do IBS sobem na mesma proporção.</li>
                   <li><strong>2033:</strong> Extinção completa do ICMS e ISS. O novo sistema tributário com IBS e CBS estará 100% em vigor.</li>
                 </ul>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6">
+              <AccordionTrigger className="text-lg font-semibold">
+                <Landmark className="mr-3 text-primary h-5 w-5" />
+                6. Governança: O Comitê Gestor do IBS (CG-IBS)
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>Para garantir que o IBS (o imposto que unifica ICMS e ISS) funcione de forma padronizada em todo o Brasil, a Reforma Tributária criou o <strong>Comitê Gestor do Imposto sobre Bens e Serviços (CG-IBS)</strong>. Esta é uma entidade técnica e independente que vai centralizar a administração do imposto.</p>
+                <h4 className="font-semibold text-foreground">Principais Responsabilidades do CG-IBS:</h4>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li><strong>Regulamento Único:</strong> O CG-IBS será responsável por criar e manter uma única legislação para o IBS em todo o território nacional. Isso acaba com as milhares de regras diferentes de ICMS e ISS que existem hoje.</li>
+                  <li><strong>Arrecadação Centralizada:</strong> O Comitê irá arrecadar o IBS, realizar as compensações de créditos e distribuir o valor arrecadado para os estados e municípios de destino da operação.</li>
+                  <li><strong>Contencioso Unificado:</strong> Disputas e questionamentos administrativos sobre o IBS serão resolvidos pelo CG-IBS, e não mais em instâncias separadas de cada estado ou município.</li>
+                  <li><strong>Coordenação da Fiscalização:</strong> A fiscalização das empresas continuará sendo feita pelas administrações tributárias estaduais e municipais, mas de forma integrada e coordenada pelo Comitê.</li>
+                </ul>
+                <p className="pt-2"><strong>Na prática, o que isso significa para sua empresa?</strong> A criação do CG-IBS representa uma grande simplificação. Em vez de lidar com legislações e sistemas diferentes para cada estado e município onde atua, sua empresa responderá a um conjunto único de regras para o IBS, facilitando a conformidade e a gestão fiscal.</p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
