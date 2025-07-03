@@ -155,7 +155,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
     code: '6311-9/00',
