@@ -365,49 +365,45 @@ export default function TaxCalculator() {
 
     return (
         <div id="results-section" className="mt-16 w-full">
-            {selectedCnaes && selectedCnaes.length > 0 && (
-                 <div className="max-w-4xl mx-auto mb-12">
-                    <Card className="shadow-lg border-primary/10">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
-                                <ListChecks className="h-5 w-5 text-primary"/>
-                                Resumo das Atividades Selecionadas
-                            </CardTitle>
-                            <CardDescription className="text-center">
-                                Esta é a lista de CNAEs utilizada para a simulação dos impostos.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="px-4 sm:px-6 py-4">
-                            <ul className="space-y-3">
-                                {selectedCnaes.map(code => {
-                                    const cnae = getCnaeData(code);
-                                    if (!cnae) return null;
-                                    return (
-                                        <li key={code} className="p-3 border rounded-md bg-background flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm">
-                                            <div className="flex-grow">
-                                                <span className="font-semibold text-foreground">{cnae.code}</span>
-                                                <span className="text-muted-foreground ml-2">{cnae.description}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 mt-2 sm:mt-0 sm:ml-4 flex-shrink-0">
-                                                <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
-                                                {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
-                                                {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
-                                            </div>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
-
             <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
                 <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
                     Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
                 </p>
             </div>
+
+            {selectedCnaes && selectedCnaes.length > 0 && (
+                 <div className="max-w-4xl mx-auto mb-12">
+                    <div className="text-center mb-4">
+                        <h3 className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
+                            <ListChecks className="h-5 w-5 text-primary"/>
+                            Resumo das Atividades Selecionadas
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                            Esta é a lista de CNAEs utilizada para a simulação dos impostos.
+                        </p>
+                    </div>
+                    <ul className="space-y-1 border rounded-md p-3 bg-muted/20">
+                        {selectedCnaes.map(code => {
+                            const cnae = getCnaeData(code);
+                            if (!cnae) return null;
+                            return (
+                                <li key={code} className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs">
+                                    <div className="flex-grow">
+                                        <span className="font-semibold text-foreground">{cnae.code}</span>
+                                        <span className="text-muted-foreground ml-2">{cnae.description}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1 sm:mt-0 sm:ml-4 flex-shrink-0">
+                                        <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
+                                        {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
+                                        {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </div>
+            )}
             
             <div className="flex flex-wrap justify-center items-stretch gap-8">
                 {displayedScenarios.map(scenario => (
