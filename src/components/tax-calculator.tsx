@@ -114,10 +114,10 @@ const cityInfoComponents: { [key: string]: ComponentType } = {
 };
 
 const planOptions = [
-    { value: 'basico', title: 'Básico', description: 'Essencial para começar' },
-    { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades e suporte' },
-    { value: 'multibeneficios', title: 'Multibenefícios', description: 'Inclui benefícios para os sócios' },
-    { value: 'expertsEssencial', title: 'Experts', description: 'Assessoria fiscal dedicada' },
+    { value: 'basico', title: 'Básico' },
+    { value: 'padrao', title: 'Padrão' },
+    { value: 'multibeneficios', title: 'Multibenefícios' },
+    { value: 'expertsEssencial', title: 'Experts' },
 ];
 
 export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
@@ -971,24 +971,24 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
 
-                    <div className="space-y-4">
-                        <div className='border-b pb-4'>
+                    <div className="space-y-2">
+                        <div className='border-b pb-2'>
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                                 <ListChecks className="h-5 w-5 text-primary" />
                                 3. Selecione o Plano Contabilizei
                             </h3>
+                             <p className='text-muted-foreground text-sm mt-1'>Qual plano melhor se encaixa no seu perfil?</p>
                         </div>
                        <FormField
                           control={form.control}
                           name="selectedPlan"
                           render={({ field }) => (
-                              <FormItem className="space-y-2">
-                                  <FormLabel>Qual plano de contabilidade melhor se encaixa no seu perfil?</FormLabel>
+                              <FormItem>
                                   <FormControl>
                                       <RadioGroup
                                           onValueChange={field.onChange}
                                           value={field.value}
-                                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
+                                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 pt-2"
                                       >
                                           {planOptions.map(plan => {
                                               const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
@@ -1001,14 +1001,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                       <Label
                                                           htmlFor={plan.value}
                                                           className={cn(
-                                                              "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center",
+                                                              "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center h-full",
                                                               field.value === plan.value && "border-primary",
                                                               isRecommended && !isDisabled && "border-primary shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
                                                           )}
                                                       >
                                                           <span className="font-semibold text-sm">{plan.title}</span>
-                                                          <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                                                           {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
                                                       </Label>
                                                   </FormItem>
