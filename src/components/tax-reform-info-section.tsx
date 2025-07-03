@@ -9,9 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Library, AlertTriangle, Table as TableIcon, ListChecks, NotebookTabs, Ban, BrainCircuit } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
+import { Library, AlertTriangle, Scale, Percent, FileText, Pickaxe, BookUser, BarChartHorizontal, CheckSquare, Calendar, Users, Briefcase } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
@@ -20,10 +19,10 @@ export default function TaxReformInfoSection() {
         <CardHeader className="text-center">
           <Library className="mx-auto h-8 w-8 text-primary mb-2" />
           <CardTitle className="text-2xl font-bold text-primary">
-            Guia das "Tabelas" de Tributação na Reforma
+            Guia Rápido da Reforma Tributária para Empresas
           </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
-            Entenda como a lógica de alíquotas funcionará no novo sistema tributário.
+            Entenda os pilares da mudança no sistema de impostos sobre o consumo.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -32,83 +31,77 @@ export default function TaxReformInfoSection() {
             <AlertTriangle className="h-5 w-5 text-amber-600" />
             <AlertTitle className="font-semibold">Ressalva Importante</AlertTitle>
             <AlertDescription>
-              A Reforma Tributária (EC nº 132/2023) está em fase de regulamentação. Detalhes como as alíquotas exatas ainda podem mudar. As informações abaixo baseiam-se nos textos mais recentes, considerando a transição gradual de 2026 a 2033.
+              A Reforma Tributária (EC nº 132/2023) está em fase de regulamentação. Detalhes como as alíquotas exatas ainda podem mudar. As informações abaixo baseiam-se nos textos mais recentes e nas propostas de regulamentação. A transição será gradual, de 2026 a 2033.
             </AlertDescription>
           </Alert>
           
-          <Accordion type="single" collapsible className="w-full text-left">
+          <Accordion type="multiple" defaultValue={["item-1", "item-2"]} className="w-full text-left">
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
-                <TableIcon className="mr-3 text-primary h-5 w-5" />
-                1. A "Tabela" Principal: Alíquota Padrão do IVA
+                <Scale className="mr-3 text-primary h-5 w-5" />
+                1. Unificação de Tributos: O IVA Dual (IBS e CBS)
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>Não haverá uma tabela com diferentes faixas de faturamento (exceto para o Simples Nacional). A regra geral será uma Alíquota Padrão única, aplicada sobre o valor da operação (o preço do bem ou serviço).</p>
+                <p>O pilar da reforma é a unificação de cinco impostos sobre o consumo em um sistema de Imposto sobre Valor Agregado (IVA) Dual:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                    <li><strong>Composição:</strong> Essa alíquota será a soma da CBS (federal) e do IBS (estadual/municipal).</li>
-                    <li><strong>Valor da Alíquota Padrão:</strong> Ainda não foi definida em lei. As análises do Ministério da Fazenda apontam para uma alíquota de referência em torno de 26,5% a 27,5%.</li>
-                    <li><strong>Lógica:</strong> Simplicidade. O mesmo percentual será aplicado a quase todos os produtos e serviços, com o imposto sendo não-cumulativo (o valor pago na compra vira crédito para abater na venda).</li>
+                    <li><strong>Contribuição sobre Bens e Serviços (CBS):</strong> Substituirá o PIS e a COFINS (tributos federais).</li>
+                    <li><strong>Imposto sobre Bens e Serviços (IBS):</strong> Substituirá o ICMS (estadual) e o ISS (municipal).</li>
                 </ul>
-                <div className="p-3 border-l-4 border-primary/50 bg-background rounded-r-md">
-                    <h4 className="font-bold text-foreground">Exemplo de Aplicação (Alíquota de 26,5%):</h4>
-                    <p className="mt-1">Venda de um serviço de consultoria: R$ 10.000,00</p>
-                    <p className="mt-1 font-semibold">Cálculo do IBS/CBS: R$ 10.000,00 x 26,5% = R$ 2.650,00</p>
-                </div>
+                <p>O IPI não será extinto de imediato, mas se tornará um "Imposto Seletivo" para desestimular o consumo de produtos prejudiciais à saúde e ao meio ambiente.</p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                 <ListChecks className="mr-3 text-primary h-5 w-5" />
-                2. A "Tabela" de Exceções: Regimes Diferenciados
+                 <Percent className="mr-3 text-primary h-5 w-5" />
+                 2. O Sistema de Alíquotas
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                 <p>Aqui sim teremos uma espécie de "tabela", não com faixas de valor, mas com listas de setores e produtos que terão tratamento favorecido.</p>
+                 <p>A complexidade de múltiplas tabelas é substituída por um sistema mais simples com três níveis principais de alíquotas:</p>
                  <Card className="mt-4">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="font-bold">Alíquota Aplicada</TableHead>
-                        <TableHead className="font-bold">Redução</TableHead>
-                        <TableHead className="font-bold">Setores e Produtos Beneficiados</TableHead>
+                        <TableHead className="font-bold w-[30%]">Tipo de Alíquota</TableHead>
+                        <TableHead className="font-bold w-[20%]">Valor Estimado</TableHead>
+                        <TableHead className="font-bold w-[50%]">Principais Setores e Produtos Beneficiados</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell className="font-semibold">Alíquota Reduzida em 60%</TableCell>
-                        <TableCell>Paga 40% da Alíquota Padrão</TableCell>
+                        <TableCell className="font-semibold">Alíquota Padrão</TableCell>
+                        <TableCell className="font-semibold">~26,5%</TableCell>
+                        <TableCell>Regra geral para a maioria dos produtos e serviços não listados nas exceções.</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-semibold">Redução de 60%</TableCell>
+                        <TableCell className="font-semibold text-primary">~10,6%</TableCell>
                         <TableCell>
-                          <ul className="list-disc pl-5 space-y-1">
-                            <li>Serviços de Educação (ensino infantil, fundamental, médio, superior, etc.)</li>
-                            <li>Serviços de Saúde (consultas, procedimentos, internações, etc.)</li>
-                            <li>Dispositivos Médicos e de Acessibilidade</li>
+                          <ul className="list-disc pl-5 space-y-1 text-sm">
+                            <li>Serviços de Educação e Saúde</li>
                             <li>Medicamentos e produtos de cuidados básicos à saúde menstrual</li>
-                            <li>Serviços de Transporte Público Coletivo (rodoviário, metroviário e ferroviário)</li>
-                            <li>Produtos Agropecuários, Pesqueiros, Florestais e Extrativistas Vegetais in natura</li>
-                            <li>Insumos Agropecuários e Aquícolas</li>
-                            <li>Produções Artísticas, Culturais, Jornalísticas e Audiovisuais Nacionais</li>
+                            <li>Serviços de Transporte Público Coletivo</li>
+                            <li>Produções Artísticas, Culturais e Jornalísticas Nacionais</li>
                           </ul>
                         </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-semibold">Alíquota Reduzida em 30%</TableCell>
-                        <TableCell>Paga 70% da Alíquota Padrão</TableCell>
-                        <TableCell>
-                          <ul className="list-disc pl-5 space-y-1">
-                             <li>Serviços de Profissão Intelectual, de Natureza Científica, Literária ou Artística (profissionais liberais como advogados, contadores, engenheiros, arquitetos, etc., desde que regulamentados por conselho)</li>
+                        <TableCell className="font-semibold">Redução de 30%</TableCell>
+                        <TableCell className="font-semibold text-primary">~18,6%</TableCell>
+                         <TableCell>
+                          <ul className="list-disc pl-5 space-y-1 text-sm">
+                             <li>Serviços de Profissão Intelectual (advogados, contadores, engenheiros, arquitetos, etc., desde que regulamentados)</li>
                           </ul>
                         </TableCell>
                       </TableRow>
-                      <TableRow>
+                       <TableRow>
                         <TableCell className="font-semibold">Alíquota Zero</TableCell>
-                        <TableCell>0%</TableCell>
+                        <TableCell className="font-semibold text-primary">0%</TableCell>
                         <TableCell>
-                          <ul className="list-disc pl-5 space-y-1">
-                            <li>Produtos da Cesta Básica Nacional de Alimentos (a ser definida em lei complementar)</li>
-                            <li>Medicamentos para tratamento de doenças graves (lista a ser definida)</li>
-                            <li>Serviços de Transporte Coletivo com características de transporte urbano ou metropolitano</li>
-                            <li>Veículos adquiridos por pessoas com deficiência e taxistas</li>
-                            <li>ProUni e serviços prestados por entidades de inovação (ICTs)</li>
+                          <ul className="list-disc pl-5 space-y-1 text-sm">
+                            <li>Produtos da Cesta Básica Nacional de Alimentos</li>
+                            <li>Medicamentos para tratamento de doenças graves</li>
+                            <li>Veículos para pessoas com deficiência e taxistas</li>
                           </ul>
                         </TableCell>
                       </TableRow>
@@ -120,54 +113,117 @@ export default function TaxReformInfoSection() {
             
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                <NotebookTabs className="mr-3 text-primary h-5 w-5" />
-                3. A Tabela do Simples Nacional
+                <CheckSquare className="mr-3 text-primary h-5 w-5" />
+                3. Créditos (Não Cumulatividade) e Split Payment
               </AccordionTrigger>
               <AccordionContent className="space-y-3 pt-2 text-base text-muted-foreground">
-                  <p>A estrutura de tabelas do Simples Nacional, com seus Anexos I a V e suas respectivas faixas de faturamento, foi mantida. A forma de calcular a alíquota efetiva continua a mesma.</p>
-                  <p><strong>O que muda?</strong> A composição interna da alíquota. Os percentuais que antes eram destinados a PIS, COFINS, ICMS e ISS serão substituídos por percentuais equivalentes de CBS e IBS. Para o empresário, o valor final do DAS, se ele optar por permanecer no regime padrão, não deve sofrer grande alteração.</p>
-                  <div className="p-3 border-l-4 border-primary/50 bg-background rounded-r-md">
-                    <h4 className="font-bold text-foreground">A Grande Novidade (Opção de Tributação Híbrida):</h4>
-                    <p className="mt-1">A principal mudança não é na tabela, mas na opcionalidade. A empresa do Simples poderá escolher:</p>
-                    <ul className="list-decimal pl-5 mt-2 space-y-1">
-                        <li><strong>Pagar tudo no DAS:</strong> Conforme a tabela do seu Anexo, como hoje.</li>
-                        <li><strong>Pagar IBS e CBS "por fora":</strong> Pagar os impostos sobre o lucro e a contribuição previdenciária (IRPJ, CSLL, CPP) via DAS (com uma alíquota reduzida) e pagar o IBS/CBS pela Alíquota Padrão (ex: 26,5%), com direito a tomar créditos.</li>
-                    </ul>
-                  </div>
+                  <p><strong>Não Cumulatividade Plena:</strong> A principal vantagem do IVA. O imposto pago na compra de insumos, produtos ou serviços para a empresa vira um crédito para abater do imposto devido na venda. Isso evita o "imposto em cascata".</p>
+                   <p><strong>Split Payment:</strong> Um novo sistema onde, no momento do pagamento eletrônico, o valor do imposto (IBS/CBS) é separado ("splitado") e enviado diretamente para o governo. A empresa recebe apenas o valor líquido da venda. O objetivo é reduzir a sonegação e garantir que o crédito que seu cliente irá tomar seja lastreado por um imposto efetivamente recolhido.</p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4">
               <AccordionTrigger className="text-lg font-semibold">
-                <Ban className="mr-3 text-primary h-5 w-5" />
-                4. A "Tabela" do Imposto Seletivo (IS) - o "Imposto do Pecado"
+                <Users className="mr-3 text-primary h-5 w-5" />
+                4. Impacto no Simples Nacional
               </AccordionTrigger>
-              <AccordionContent className="space-y-3 pt-2 text-base text-muted-foreground">
-                  <p>Este é um imposto novo que incidirá uma única vez sobre a produção, importação ou comercialização de bens e serviços prejudiciais à saúde ou ao meio ambiente. Não haverá uma tabela única, mas sim alíquotas específicas definidas por lei para cada produto.</p>
-                  <h4 className="font-bold text-foreground">Produtos Abrangidos (lista principal):</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Veículos (automóveis, aeronaves e embarcações)</li>
-                    <li>Produtos Fumígenos (cigarros, etc.)</li>
-                    <li>Bebidas Alcoólicas</li>
-                    <li>Bebidas Açucaradas</li>
-                    <li>Bens Minerais Extraídos (petróleo, minério de ferro)</li>
-                  </ul>
-                  <p><strong>Alíquotas:</strong> Ainda serão definidas em Lei Ordinária. A única baliza já fixada na Constituição é que a alíquota sobre a extração de minérios não poderá ultrapassar 1%. As demais serão definidas pelo Congresso.</p>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                  <p>O regime foi mantido, mas com uma escolha estratégica crucial para empresas que vendem para outras empresas (B2B):</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="p-4 bg-background">
+                      <h4 className="font-bold text-foreground">Opção 1: Regime Padrão</h4>
+                      <p className="text-sm mt-2">Continuar pagando tudo na guia única (DAS). É mais simples e a carga tributária direta não muda. Porém, o crédito de imposto que você gera para seu cliente PJ é pequeno, o que pode te deixar menos competitivo.</p>
+                    </Card>
+                     <Card className="p-4 bg-background">
+                      <h4 className="font-bold text-foreground">Opção 2: Modelo Híbrido</h4>
+                      <p className="text-sm mt-2">Pagar IBS e CBS por fora do DAS, com a alíquota padrão. Isso aumenta sua carga tributária, mas permite que seu cliente PJ tome o crédito integral do imposto, tornando sua empresa mais atraente como fornecedora.</p>
+                    </Card>
+                  </div>
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-5">
+
+             <AccordionItem value="item-5">
               <AccordionTrigger className="text-lg font-semibold">
-                <BrainCircuit className="mr-3 text-primary h-5 w-5" />
-                5. Resumo Estratégico para o Especialista
+                <Briefcase className="mr-3 text-primary h-5 w-5" />
+                5. Impacto no Lucro Presumido
               </AccordionTrigger>
               <AccordionContent className="space-y-3 pt-2 text-base text-muted-foreground">
-                  <p>Como seu consultor, destaco que a "tabela de tributação" deixou de ser um conceito estático. O entendimento do novo sistema exige focar em:</p>
-                  <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Alíquota Padrão:</strong> Saber o valor de referência (hoje estimado em ~26,5%).</li>
-                    <li><strong>Enquadramento em Exceções:</strong> Identificar se a sua atividade ou produto se encaixa em alguma das listas de alíquota reduzida ou zero.</li>
-                    <li><strong>Simples Nacional:</strong> A análise não é mais sobre a tabela, e sim sobre a decisão estratégica: continuar no regime padrão ou migrar para o híbrido para gerar mais crédito aos clientes?</li>
-                    <li><strong>Imposto Seletivo:</strong> Verificar se algum dos seus produtos está na "lista do pecado" e acompanhar a definição das alíquotas específicas.</li>
-                    <li><strong>Tabelas Operacionais:</strong> Ficar atento às novas tabelas técnicas, como a "Tabela de Código de Classificação Tributária do IBS e da CBS", que serão fundamentais para emitir corretamente as notas fiscais.</li>
-                  </ul>
+                  <p>Para empresas de serviço no Lucro Presumido, o impacto é direto. O PIS/COFINS (3,65%) e o ISS (2% a 5%) são substituídos pela alíquota padrão do IVA (~26,5%).</p>
+                  <p>Como prestadores de serviço geralmente têm poucas despesas com insumos para gerar créditos, a carga tributária sobre o faturamento tende a aumentar. O planejamento de preços e a busca por todas as oportunidades de crédito possíveis serão essenciais.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6">
+              <AccordionTrigger className="text-lg font-semibold">
+                <BookUser className="mr-3 text-primary h-5 w-5" />
+                 6. Exemplos Práticos de Cálculo
+              </AccordionTrigger>
+              <AccordionContent className="space-y-6 pt-2 text-base text-muted-foreground">
+                
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Exemplo 1: Empresa de Serviços no Simples Nacional</h4>
+                  <p className="text-sm mb-3">Cenário: Faturamento de R$ 50.000/mês, RBT12 de R$ 540.000, e R$ 8.000 em insumos geradores de crédito.</p>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cenário Futuro</TableHead>
+                        <TableHead className="text-right">Imposto da Empresa</TableHead>
+                        <TableHead className="text-right">Crédito p/ Cliente</TableHead>
+                        <TableHead>Competitividade B2B</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>
+                          <p className="font-semibold">Opção 1: Padrão (Tudo no DAS)</p>
+                          <p className="text-xs">Cálculo atual mantido.</p>
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">R$ 5.115,00</TableCell>
+                        <TableCell className="text-right">Baixo</TableCell>
+                        <TableCell className="text-destructive">Reduzida</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <p className="font-semibold">Opção 2: Híbrido (IVA por fora)</p>
+                          <p className="text-xs">IBS/CBS sobre faturamento, menos créditos de compras.</p>
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-destructive">R$ 14.120,00</TableCell>
+                        <TableCell className="text-right text-green-700">Pleno (R$ 13.250)</TableCell>
+                        <TableCell className="text-green-700">Alta</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Exemplo 2: Empresa de Serviços no Lucro Presumido</h4>
+                   <p className="text-sm mb-3">Cenário: Faturamento de R$ 300.000/trimestre e R$ 40.000 em insumos geradores de crédito.</p>
+                   <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Impostos</TableHead>
+                        <TableHead className="text-right">Antes da Reforma</TableHead>
+                        <TableHead className="text-right">Depois da Reforma</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                       <TableRow>
+                        <TableCell className="font-semibold">Impostos s/ Consumo (PIS/COFINS/ISS vs IVA)</TableCell>
+                        <TableCell className="text-right">R$ 25.950,00</TableCell>
+                        <TableCell className="text-right text-destructive">R$ 68.900,00</TableCell>
+                      </TableRow>
+                       <TableRow>
+                        <TableCell className="font-semibold">Impostos s/ Lucro (IRPJ/CSLL)</TableCell>
+                        <TableCell className="text-right">R$ 26.640,00</TableCell>
+                        <TableCell className="text-right">R$ 26.640,00</TableCell>
+                      </TableRow>
+                       <TableRow className="font-bold bg-muted/50">
+                        <TableCell>Carga Total Trimestral</TableCell>
+                        <TableCell className="text-right">R$ 52.590,00</TableCell>
+                        <TableCell className="text-right text-destructive">R$ 95.540,00</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>

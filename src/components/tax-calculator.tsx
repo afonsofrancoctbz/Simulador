@@ -45,6 +45,7 @@ import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
+import TaxReformInfoSection from './tax-reform-info-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -60,7 +61,7 @@ const CalculatorFormSchema = z.object({
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
-  b2bRevenuePercentage: z.coerce.number().min(0).max(100),
+  b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
 }).superRefine((data, ctx) => {
     const fiscalConfig = getFiscalParameters(); // Using current year for validation
     data.proLabores.forEach((proLabore, index) => {
@@ -244,7 +245,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }));
     
     return {
-        rbt12: values.rbt12,
+        rbt12: values.rbt12 ?? 0,
         domesticActivities,
         exportActivities,
         exportCurrency: values.exportCurrency,
@@ -938,6 +939,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 <CityComponent />
             </div>
         )}
+
+        <div className='mt-12'>
+            <TaxReformInfoSection />
+        </div>
 
         {renderResults()}
     </FormProvider>
