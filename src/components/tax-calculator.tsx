@@ -971,14 +971,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
 
-                    <div className="space-y-2">
-                        <div className='border-b pb-2'>
-                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                                <ListChecks className="h-5 w-5 text-primary" />
-                                3. Selecione o Plano Contabilizei
-                            </h3>
-                             <p className='text-muted-foreground text-sm mt-1'>Qual plano melhor se encaixa no seu perfil?</p>
-                        </div>
+                    <div>
+                      <div className='border-b pb-2 mb-2'>
+                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                              <ListChecks className="h-5 w-5 text-primary" />
+                              3. Selecione o Plano Contabilizei
+                          </h3>
+                          <p className='text-muted-foreground text-sm mt-1'>Qual plano melhor se encaixa no seu perfil?</p>
+                      </div>
                        <FormField
                           control={form.control}
                           name="selectedPlan"
@@ -992,7 +992,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                       >
                                           {planOptions.map(plan => {
                                               const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
-                                              const isRecommended = plan.value === 'expertsEssencial';
+                                              const isExperts = plan.value === 'expertsEssencial';
                                               return (
                                                   <FormItem key={plan.value} className="relative">
                                                       <FormControl>
@@ -1003,11 +1003,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                           className={cn(
                                                               "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center h-full",
                                                               field.value === plan.value && "border-primary",
-                                                              isRecommended && !isDisabled && "border-primary shadow-md",
+                                                              isExperts && !isDisabled && "border-primary shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
                                                           )}
                                                       >
-                                                          <span className="font-semibold text-sm">{plan.title}</span>
+                                                          <span className={cn("font-semibold text-sm", isExperts && "font-bold text-base")}>
+                                                              {plan.title}
+                                                          </span>
                                                           {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
                                                       </Label>
                                                   </FormItem>
