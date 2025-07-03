@@ -377,21 +377,26 @@ export default function TaxCalculator() {
                                 Esta é a lista de CNAEs utilizada para a simulação dos impostos.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 sm:p-6">
-                            {selectedCnaes.map(code => {
-                                const cnae = getCnaeData(code);
-                                if (!cnae) return null;
-                                return (
-                                    <div key={code} className="p-3 border rounded-lg bg-background">
-                                        <p className="font-semibold text-foreground text-sm">{cnae.code} - {cnae.description}</p>
-                                        <div className="flex flex-wrap gap-2 mt-2 text-xs">
-                                            <Badge variant="secondary">Anexo {cnae.annex}</Badge>
-                                            {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600">Sujeito ao Fator R</Badge>}
-                                            {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600">Atividade Regulamentada</Badge>}
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <CardContent className="px-4 sm:px-6 py-4">
+                            <ul className="space-y-3">
+                                {selectedCnaes.map(code => {
+                                    const cnae = getCnaeData(code);
+                                    if (!cnae) return null;
+                                    return (
+                                        <li key={code} className="p-3 border rounded-md bg-background flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm">
+                                            <div className="flex-grow">
+                                                <span className="font-semibold text-foreground">{cnae.code}</span>
+                                                <span className="text-muted-foreground ml-2">{cnae.description}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-2 sm:mt-0 sm:ml-4 flex-shrink-0">
+                                                <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
+                                                {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
+                                                {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
                         </CardContent>
                     </Card>
                 </div>
@@ -829,3 +834,5 @@ export default function TaxCalculator() {
     </FormProvider>
   );
 }
+
+    
