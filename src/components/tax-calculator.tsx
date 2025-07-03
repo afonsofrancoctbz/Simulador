@@ -988,26 +988,25 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                       <RadioGroup
                                           onValueChange={field.onChange}
                                           value={field.value}
-                                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
                                       >
                                           {planOptions.map(plan => {
                                               const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
                                               const isRecommended = plan.value === 'expertsEssencial';
                                               return (
-                                                  <FormItem key={plan.value} className="h-full relative">
+                                                  <FormItem key={plan.value} className="relative">
                                                       <FormControl>
                                                           <RadioGroupItem value={plan.value} id={plan.value} className="sr-only" disabled={isDisabled} />
                                                       </FormControl>
                                                       <Label
                                                           htmlFor={plan.value}
                                                           className={cn(
-                                                              "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer h-full transition-all text-center",
+                                                              "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center",
                                                               field.value === plan.value && "border-primary",
                                                               isRecommended && !isDisabled && "border-primary shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
                                                           )}
                                                       >
-                                                          {isRecommended && !isDisabled && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">Recomendado</Badge>}
                                                           <span className="font-semibold text-sm">{plan.title}</span>
                                                           <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                                                           {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
