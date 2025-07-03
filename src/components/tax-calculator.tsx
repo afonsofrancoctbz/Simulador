@@ -45,7 +45,6 @@ import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
-import TaxReformInfoSection from './tax-reform-info-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -54,7 +53,7 @@ const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
 const CalculatorFormSchema = z.object({
   city: z.string({ required_error: "Por favor, selecione uma cidade." }).optional(),
   selectedCnaes: z.array(z.string()).min(1, "Selecione ao menos uma atividade (CNAE)."),
-  rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
+  rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
@@ -83,7 +82,7 @@ const CalculatorFormSchema = z.object({
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
-    return totalRevenue > 0 || totalProLabore > 0 || data.rbt12 > 0;
+    return totalRevenue > 0 || totalProLabore > 0 || (data.rbt12 ?? 0) > 0;
 }, {
     message: "Informe ao menos um valor de faturamento para calcular.",
     path: ["revenues"],
@@ -939,10 +938,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 <CityComponent />
             </div>
         )}
-
-        <div className='mt-12'>
-            <TaxReformInfoSection />
-        </div>
 
         {renderResults()}
     </FormProvider>
