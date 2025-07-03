@@ -141,6 +141,9 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   const totalRevenue = domesticRevenue + exportRevenue;
 
+  // New logic: Use monthly revenue to estimate RBT12 if not provided.
+  const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+
   // --- 2. Pro-labore Taxes (per partner, then aggregated) ---
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
   
@@ -149,7 +152,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       .filter((c): c is CnaeData => !!c);
 
   // --- Guard Clause for Zero Revenue ---
-  if (totalRevenue === 0 && rbt12 === 0) {
+  if (totalRevenue === 0 && effectiveRbt12 === 0) {
     let cppFromAnnexIV = 0;
     
     const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
@@ -207,7 +210,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const allActivities = [...allDomesticActivities, ...allExportActivitiesWithBRL];
   
   const SUBLIMIT_SIMPLES = 3600000;
-  const rbt12ExceededSublimit = rbt12 > SUBLIMIT_SIMPLES;
+  const rbt12ExceededSublimit = effectiveRbt12 > SUBLIMIT_SIMPLES;
 
   // --- Fator R Calculation & Annex Determination ---
   const totalPayrollForFatorR = totalSalaryExpense + totalProLaboreBruto;
@@ -248,9 +251,9 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const annex = annexStr as Annex;
     const annexInfo = revenueByAnnex[annex];
     const annexTable = ANNEX_TABLES[annex];
-    const bracketIndex = _findBracketIndex(annexTable, rbt12);
+    const bracketIndex = _findBracketIndex(annexTable, effectiveRbt12);
     const bracket = annexTable[bracketIndex];
-    const effectiveRate = rbt12 > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : bracket.rate;
+    const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12) : bracket.rate;
     
     const { PIS = 0, COFINS = 0, ISS = 0 } = bracket.distribution;
     const isLastBracket = bracketIndex === annexTable.length - 1;

@@ -151,7 +151,9 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
     const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
     const totalRevenue = domesticRevenue + exportRevenue;
     
-    if (totalRevenue === 0 && rbt12 === 0) {
+    const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+    
+    if (totalRevenue === 0 && effectiveRbt12 === 0) {
       // Handle zero revenue case
       return {
         regime: isHybrid ? 'Simples Nacional Híbrido' : 'Simples Nacional Tradicional',
@@ -190,8 +192,8 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
         const annex = annexStr as Annex;
         const annexRevenue = revenueByAnnex[annex];
         const annexTable = ANNEX_TABLES[annex];
-        const bracket = _findBracket(annexTable, rbt12);
-        const effectiveRate = rbt12 > 0 ? (rbt12 * bracket.rate - bracket.deduction) / rbt12 : bracket.rate;
+        const bracket = _findBracket(annexTable, effectiveRbt12);
+        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
         
         totalDas += annexRevenue * effectiveRate;
 
@@ -221,8 +223,8 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
   
           let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
           const annexTable = ANNEX_TABLES[effectiveAnnex];
-          const bracket = _findBracket(annexTable, rbt12);
-          const effectiveRate = rbt12 > 0 ? (rbt12 * bracket.rate - bracket.deduction) / rbt12 : 0;
+          const bracket = _findBracket(annexTable, effectiveRbt12);
+          const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : 0;
           
           const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
           const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
