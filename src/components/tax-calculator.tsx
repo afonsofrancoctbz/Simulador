@@ -28,27 +28,13 @@ import { Separator } from './ui/separator';
 import { ResultCard } from './result-card';
 import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import CityInfoSection from './city-info-section';
-import CuritibaInfoSection from './curitiba-info-section';
-import RioInfoSection from './rio-info-section';
-import BeloHorizonteInfoSection from './belo-horizonte-info-section';
-import FlorianopolisInfoSection from './florianopolis-info-section';
-import SalvadorInfoSection from './salvador-info-section';
-import PortoAlegreInfoSection from './porto-alegre-info-section';
-import FortalezaInfoSection from './fortaleza-info-section';
-import RecifeInfoSection from './recife-info-section';
-import BrasiliaInfoSection from './brasilia-info-section';
-import GoianiaInfoSection from './goiania-info-section';
-import ManausInfoSection from './manaus-info-section';
-import CampinasInfoSection from './campinas-info-section';
-import JundiaiInfoSection from './jundiai-info-section';
-import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import RocSection from './roc-section';
+import CityInfoRenderer from './city-info-renderer';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -94,24 +80,6 @@ const CalculatorFormSchema = z.object({
 });
 
 type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
-
-const cityInfoComponents: { [key: string]: ComponentType } = {
-  'São Paulo - SP': CityInfoSection,
-  'Curitiba - PR': CuritibaInfoSection,
-  'Rio de Janeiro - RJ': RioInfoSection,
-  'Belo Horizonte - MG': BeloHorizonteInfoSection,
-  'Florianópolis - SC': FlorianopolisInfoSection,
-  'Salvador - BA': SalvadorInfoSection,
-  'Porto Alegre - RS': PortoAlegreInfoSection,
-  'Fortaleza - CE': FortalezaInfoSection,
-  'Recife - PE': RecifeInfoSection,
-  'Brasília - DF': BrasiliaInfoSection,
-  'Goiânia - GO': GoianiaInfoSection,
-  'Manaus - AM': ManausInfoSection,
-  'Campinas - SP': CampinasInfoSection,
-  'Jundiaí - SP': JundiaiInfoSection,
-  'Uberlândia - MG': UberlandiaInfoSection,
-};
 
 const planOptions = [
     { value: 'basico', title: 'Básico' },
@@ -322,7 +290,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             if (key.startsWith('domestic_')) domestic += revenue;
             else if (key.startsWith('export_')) exportRaw += revenue;
         }
-        const exportBRL = values.exportCurrency !== 'BRL' ? exportRaw * (values.exchangeRate || 1) : exportRaw;
+        const exportBRL = values.exportCurrency !== 'BRL' ? exportRaw * (values.exchangeRate || 1) : 1;
         const projectedAnnual = (domestic + exportBRL) * 12;
 
         if (projectedAnnual > SIMPLES_NACIONAL_LIMIT) {
@@ -366,7 +334,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       if (totalRevenue === 0 && totalProLabore === 0 && submissionValues.rbt12 === 0) {
         return;
       }
-      if (!('simplesNacionalSemFatorR' in calculatedResults)) return;
+      if (!('simplesNacionalBase' in calculatedResults)) return;
 
       setIsAdviceLoading(true);
       try {
@@ -384,8 +352,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
           totalSalaryExpense: values.totalSalaryExpense,
           totalProLabore: totalProLabore,
           numberOfPartners: values.numberOfPartners,
-          simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalSemFatorR.totalMonthlyCost,
-          simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalComFatorR.totalMonthlyCost,
+          simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalBase.totalMonthlyCost,
+          simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalOtimizado.totalMonthlyCost,
           lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
         };
         const aiResult = await getTaxOptimizationAdvice(aiInput);
@@ -420,19 +388,20 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
 
     const submissionValues = transformFormToSubmission(form.getValues());
-    const { selectedCnaes } = form.getValues();
+    const { selectedCnaes, numberOfPartners } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
-    if(year === 2025 && 'simplesNacionalSemFatorR' in results) {
-        const { simplesNacionalSemFatorR, simplesNacionalComFatorR, lucroPresumido } = results;
+    if(year === 2025 && 'simplesNacionalBase' in results) {
+        const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
         if (!isCommerceOnly) {
           scenarios.push({ ...lucroPresumido });
         }
-        scenarios.push({ ...simplesNacionalSemFatorR });
+        scenarios.push({ ...simplesNacionalBase });
 
-        if (simplesNacionalComFatorR.totalMonthlyCost !== simplesNacionalSemFatorR.totalMonthlyCost) {
-            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...simplesNacionalComFatorR, optimizationNote });
+        // Only show the optimized scenario if it's different from the base one
+        if (simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
+            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
+            scenarios.push({ ...simplesNacionalOtimizado, optimizationNote });
         }
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         if (!isCommerceOnly) {
@@ -570,12 +539,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         <CardContent className="p-4 space-y-2 text-base">
                             {(() => {
                                 const details = cheapestScenario;
-                                const totalWithheldTaxes = details.breakdown
-                                    .filter(item => ['INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name))
-                                    .reduce((sum, item) => sum + item.value, 0);
-
-                                const proLaboreLiquido = details.proLabore - totalWithheldTaxes;
-                                const lucroDisponivel = details.totalRevenue - details.totalTax - proLaboreLiquido - details.contabilizeiFee;
+                                const totalProLaboreLiquido = details.partnerTaxes.reduce((sum, p) => sum + p.proLaboreLiquido, 0);
+                                const lucroDisponivel = details.totalRevenue - details.totalTax - totalProLaboreLiquido - details.contabilizeiFee;
 
                                 return (
                                     <>
@@ -589,7 +554,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                         </div>
                                         <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
                                             <span className="text-muted-foreground">(-) Pró-labore (Líquido)</span>
-                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(proLaboreLiquido)}</span>
+                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(totalProLaboreLiquido)}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
                                             <span className="text-muted-foreground">(-) Mensalidade Contabilizei</span>
@@ -613,8 +578,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     );
   };
   
-  const CityComponent = selectedCity ? cityInfoComponents[selectedCity] : null;
-
   return (
     <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
@@ -1005,12 +968,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </div>
 
                     <div>
-                      <div className='border-b pb-2'>
+                      <div className='border-b pb-4 mb-2'>
                           <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                               <ListChecks className="h-5 w-5 text-primary" />
                               3. Selecione o Plano Contabilizei
                           </h3>
-                           <p className='text-muted-foreground text-sm mt-1'>Qual plano melhor se encaixa no seu perfil?</p>
+                           <p className='text-muted-foreground text-base mt-1'>Qual plano de contabilidade melhor se encaixa no seu perfil?</p>
                       </div>
                        <FormField
                           control={form.control}
@@ -1034,7 +997,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                       <Label
                                                           htmlFor={plan.value}
                                                           className={cn(
-                                                              "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center h-full",
+                                                              "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center h-full space-y-0",
                                                               field.value === plan.value && "border-primary",
                                                               isExperts && !isDisabled && "border-primary/70 shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
@@ -1077,11 +1040,9 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             initialSelectedCodes={selectedCnaes}
         />
         
-        {CityComponent && (
-            <div className="mt-12">
-                <CityComponent />
-            </div>
-        )}
+        <div className="mt-12">
+            <CityInfoRenderer city={selectedCity} />
+        </div>
 
         {results && (
           <div className="mt-12">

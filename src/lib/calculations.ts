@@ -485,8 +485,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   }
   
   return {
-    simplesNacionalComFatorR: { ...simplesNacionalOtimizado, order: 1 },
-    simplesNacionalSemFatorR: { ...simplesNacionalBase, order: 2 },
+    simplesNacionalOtimizado: { ...simplesNacionalOtimizado, order: 1 },
+    simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
