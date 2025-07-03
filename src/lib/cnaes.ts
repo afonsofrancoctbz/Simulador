@@ -191,6 +191,69 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '5911-1/02',
+    description: 'Produção de filmes para publicidade',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5911-1/99',
+    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5912-0/01',
+    description: 'Serviços de dublagem',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5912-0/02',
+    description: 'Serviços de mixagem sonora em produção audiovisual',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5912-0/99',
+    description: 'Atividades de pós-produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5913-8/00',
+    description: 'Distribuição cinematográfica, de vídeo e de programas de televisão',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5920-1/00',
+    description: 'Atividades de gravação de som e de edição de música',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
     code: '6201-5/01',
     description: 'Desenvolvimento de programas de computador sob encomenda',
     category: 'Tecnologia da Informação',
@@ -305,5 +368,59 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CAU. Exige registro da empresa e um Responsável Técnico arquiteto. A natureza jurídica não pode ser Empresário Individual.'
+  },
+  {
+    code: '7420-0/01',
+    description: 'Atividades de produção de fotografias, exceto aérea e submarina',
+    category: 'Fotografia e Design',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7490-1/05',
+    description: 'Agenciamento de profissionais para atividades esportivas, culturais e artísticas',
+    category: 'Agenciamento e Representação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7739-0/03',
+    description: 'Aluguel de palcos, coberturas e outras estruturas de uso temporário, exceto andaimes',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9001-9/02',
+    description: 'Produção musical',
+    category: 'Cultura e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9001-9/03',
+    description: 'Produção de espetáculos de dança',
+    category: 'Cultura e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9319-1/01',
+    description: 'Produção e promoção de eventos esportivos',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
   }
 ];
