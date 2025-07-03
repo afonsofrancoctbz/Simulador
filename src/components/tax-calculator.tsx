@@ -971,7 +971,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         <div className='border-b pb-4'>
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                                 <ListChecks className="h-5 w-5 text-primary" />
@@ -982,7 +982,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                           control={form.control}
                           name="selectedPlan"
                           render={({ field }) => (
-                              <FormItem className="space-y-3">
+                              <FormItem className="space-y-2">
                                   <FormLabel>Qual plano de contabilidade melhor se encaixa no seu perfil?</FormLabel>
                                   <FormControl>
                                       <RadioGroup
@@ -1001,14 +1001,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                       <Label
                                                           htmlFor={plan.value}
                                                           className={cn(
-                                                              "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer h-full transition-all text-center",
+                                                              "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer h-full transition-all text-center",
                                                               field.value === plan.value && "border-primary",
                                                               isRecommended && !isDisabled && "border-primary shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
                                                           )}
                                                       >
                                                           {isRecommended && !isDisabled && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">Recomendado</Badge>}
-                                                          <span className="font-semibold text-base">{plan.title}</span>
+                                                          <span className="font-semibold text-sm">{plan.title}</span>
                                                           <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                                                           {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
                                                       </Label>
