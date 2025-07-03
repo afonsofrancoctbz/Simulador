@@ -10,24 +10,28 @@ import { Info } from 'lucide-react';
 const ResultCardComponent = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
     const numSocios = formValues.numberOfPartners || 1;
     
-    const faturamentoTaxes = details.breakdown.filter(item => [
+    const isLucroPresumido = details.regime === 'Lucro Presumido';
+
+    const faturamentoGeralTaxes = !isLucroPresumido ? details.breakdown.filter(item => [
         'DAS (Guia Unificada)', 
         'DAS (Simples Nacional)',
         'IVA (CBS+IBS) fora do DAS',
-        'PIS', 
-        'COFINS', 
-        'ISS', 
-        'IRPJ', 
-        'CSLL', 
         'ISS (Fora do DAS)',
         'CBS',
         'IBS'
-    ].includes(item.name));
+    ].includes(item.name)) : [];
+
+    const faturamentoMensalTaxes = isLucroPresumido 
+        ? details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS'].includes(item.name)) 
+        : [];
+
+    const faturamentoTrimestralTaxes = isLucroPresumido
+        ? details.breakdown.filter(item => ['IRPJ', 'CSLL'].includes(item.name))
+        : [];
+    
     const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
 
     const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
-
-    const isLucroPresumido = details.regime === 'Lucro Presumido';
 
     const lucroPresumidoPercentages: { [key: string]: string } = {
       'PIS': '0,65%',
@@ -36,8 +40,8 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
       'ISS': '5,00%',
     };
 
-    const totalImpostosFaturamento = faturamentoTaxes.reduce((sum, item) => sum + item.value, 0);
-    const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamento / details.totalRevenue : 0;
+    const totalImpostosFaturamentoLP = [...faturamentoMensalTaxes, ...faturamentoTrimestralTaxes].reduce((sum, item) => sum + item.value, 0);
+    const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamentoLP / details.totalRevenue : 0;
 
     return (
         <Card className={cn(
@@ -70,35 +74,64 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                 <div className="space-y-2">
                      <div className="p-2 border rounded-md bg-background/80 space-y-1.5 text-sm">
                         
-                        {faturamentoTaxes.length > 0 && (
-                             <div className="space-y-1">
-                                <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Impostos s/ Faturamento</h4>
-                                {faturamentoTaxes.map((item, index) => (
-                                    <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
-                                        <span className="text-muted-foreground">
-                                            {item.name}
-                                            {isLucroPresumido && (
-                                                <span className='ml-1.5 font-bold text-primary'>
-                                                    {item.name === 'IRPJ' 
-                                                        ? formatPercent(details.totalRevenue > 0 ? item.value / details.totalRevenue : 0) 
-                                                        : (lucroPresumidoPercentages[item.name] || '')
-                                                    }
+                        {isLucroPresumido ? (
+                            <>
+                                {faturamentoMensalTaxes.length > 0 && (
+                                    <div className="space-y-1">
+                                        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Impostos s/ Faturamento Mensal</h4>
+                                        {faturamentoMensalTaxes.map((item, index) => (
+                                            <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
+                                                <span className="text-muted-foreground">
+                                                    {item.name}
+                                                    {lucroPresumidoPercentages[item.name] && <span className='ml-1.5 font-bold text-primary'>{lucroPresumidoPercentages[item.name]}</span>}
                                                 </span>
-                                            )}
-                                            {item.name === 'DAS (Guia Unificada)' && details.effectiveDasRate !== undefined && (
-                                                <span className='ml-1.5 font-bold text-primary'>{formatPercent(details.effectiveDasRate)}</span>
-                                            )}
-                                        </span>
-                                        <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                    </div>
-                                ))}
-                                {isLucroPresumido && (
-                                    <div className="flex justify-between items-center border-t border-solid pt-1 mt-1 font-semibold">
-                                        <span>Alíquota Efetiva Total</span>
-                                        <span className="text-primary">{formatPercent(aliquotaEfetivaFaturamento)}</span>
+                                                <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
-                            </div>
+                                {faturamentoTrimestralTaxes.length > 0 && (
+                                    <div className="space-y-1 pt-1.5">
+                                        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Impostos s/ Faturamento Trimestral</h4>
+                                        <p className="text-xs text-muted-foreground/80 -mt-1 mb-2">Valores provisionados mensalmente.</p>
+                                        {faturamentoTrimestralTaxes.map((item, index) => (
+                                            <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
+                                                <span className="text-muted-foreground">
+                                                    {item.name}
+                                                    <span className='ml-1.5 font-bold text-primary'>
+                                                        {item.name === 'IRPJ' 
+                                                            ? formatPercent(details.totalRevenue > 0 ? item.value / details.totalRevenue : 0) 
+                                                            : (lucroPresumidoPercentages[item.name] || '')
+                                                        }
+                                                    </span>
+                                                </span>
+                                                <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className="flex justify-between items-center border-t border-solid pt-1 mt-1 font-semibold">
+                                    <span>Alíquota Efetiva Total</span>
+                                    <span className="text-primary">{formatPercent(aliquotaEfetivaFaturamento)}</span>
+                                </div>
+                            </>
+                        ) : (
+                            faturamentoGeralTaxes.length > 0 && (
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Impostos s/ Faturamento</h4>
+                                    {faturamentoGeralTaxes.map((item, index) => (
+                                        <div key={index} className="flex justify-between items-center border-b border-dashed pb-0.5 last:border-b-0">
+                                            <span className="text-muted-foreground">
+                                                {item.name}
+                                                {item.name === 'DAS (Guia Unificada)' && details.effectiveDasRate !== undefined && (
+                                                    <span className='ml-1.5 font-bold text-primary'>{formatPercent(details.effectiveDasRate)}</span>
+                                                )}
+                                            </span>
+                                            <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
                         )}
                         
                         {folhaTaxes.length > 0 && (
