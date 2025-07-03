@@ -201,7 +201,9 @@ export function CnaeSelector({
                   <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
                    <div className="flex flex-wrap gap-2 mt-2">
                      <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
-                     <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">Anexo {cnae.annex}</Badge>
+                     <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                        Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
+                    </Badge>
                      {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
                    </div>
                 </button>

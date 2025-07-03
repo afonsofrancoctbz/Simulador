@@ -1653,9 +1653,11 @@ export const CNAE_DATA: CnaeData[] = [
     code: '6203-1/00',
     description: 'Desenvolvimento e licenciamento de programas de computador não customizáveis',
     category: 'Tecnologia da Informação',
-    annex: 'III',
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    notes: 'Esta atividade está sujeita ao Fator R. A tributação será no Anexo III se a folha de pagamento for 28% ou mais do faturamento; caso contrário, será no Anexo V.'
   },
   {
     code: '6204-0/00',
@@ -1773,7 +1775,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRECI. É obrigatório o registro da pessoa jurídica no conselho, o que requer um corretor responsável. A natureza jurídica não pode ser Empresário Individual.'
+    notes: 'Atividade regulamentada pelo CRECI. O registro da PJ é obrigatório e requer um corretor responsável. A natureza jurídica não pode ser Empresário Individual.'
   },
   {
     code: '6821-8/02',
@@ -1782,7 +1784,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRECI. É obrigatório o registro da pessoa jurídica no conselho, o que requer um corretor responsável. A natureza jurídica não pode ser Empresário Individual.'
+    notes: 'Atividade regulamentada pelo CRECI. O registro da PJ é obrigatório e requer um corretor responsável. A natureza jurídica não pode ser Empresário Individual.'
   },
   {
     code: '6822-6/00',
@@ -1791,7 +1793,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRECI e/ou CRA. Exige registro e Responsável Técnico. A locação de imóveis próprios não é regulamentada.'
+    notes: 'Atividade regulamentada pelo CRECI ou CRA. Exige registro e Responsável Técnico. A locação de imóveis próprios não é regulamentada.'
   },
   {
     code: '6911-7/01',
@@ -1800,7 +1802,7 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'IV',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pela OAB. É obrigatório o registro da sociedade na OAB. Natureza jurídica deve ser Sociedade Simples Pura ou Unipessoal de Advocacia.'
+    notes: 'Atividade regulamentada pela OAB. É obrigatório o registro da sociedade na OAB e deve ser composta apenas por advogados. Natureza jurídica deve ser Sociedade Simples Pura ou Unipessoal de Advocacia.'
   },
   {
     code: '6911-7/02',
