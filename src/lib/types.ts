@@ -92,15 +92,6 @@ export const TaxDetailsSchema = z.object({
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
 
-// Schema for the final calculation results (2025)
-export const CalculationResultsSchema = z.object({
-    simplesNacionalComFatorR: TaxDetailsSchema,
-    simplesNacionalSemFatorR: TaxDetailsSchema,
-    lucroPresumido: TaxDetailsSchema,
-});
-export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
-
-
 // Schemas for 2026 results
 export const TaxDetails2026Schema = TaxDetailsSchema.extend({});
 export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;
@@ -124,6 +115,7 @@ export interface CnaeData {
   presumedProfitRate: number;
   isRegulated?: boolean;
   notes?: string;
+  ivaReduction?: number;
 }
 
 export interface FeeBracket {

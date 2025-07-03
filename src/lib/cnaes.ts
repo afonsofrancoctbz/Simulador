@@ -10,6 +10,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico. Não pode ser MEI.'
   },
   {
@@ -20,6 +21,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo COREN. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -30,6 +32,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFONO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -40,6 +43,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRP. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -50,6 +54,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -60,6 +65,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -70,6 +76,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -80,6 +87,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -90,6 +98,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CBOO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
 
@@ -176,6 +185,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CAU. Exige registro da empresa e um Responsável Técnico arquiteto.'
   },
   {
@@ -186,6 +196,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e um Responsável Técnico engenheiro.'
   },
   {
@@ -275,7 +286,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '8599-6/04',
@@ -284,7 +296,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '8599-6/05',
@@ -293,7 +306,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '8599-6/99',
@@ -302,7 +316,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   
   // --- SERVIÇOS ADMINISTRATIVOS ---
@@ -334,6 +349,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pela OAB. É obrigatório o registro da sociedade na OAB e deve ser composta apenas por advogados.'
   },
   {
@@ -344,6 +360,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRC. Exige registro da empresa e um Responsável Técnico contador.'
   },
   {
@@ -462,7 +479,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '9001-9/03',
@@ -471,7 +489,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '9319-1/01',

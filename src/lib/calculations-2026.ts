@@ -34,6 +34,7 @@ const IBS_RATE = fiscalConfig.reforma_tributaria.ibs_rate;
 // --- DUPLICATED HELPERS (to avoid altering calculations.ts) ---
 
 function _findBracket(table: { max: number }[], value: number) {
+  if (!table || table.length === 0) return { max: 0 };
   if (value === 0) return table[0];
   for (const bracket of table) if (value <= bracket.max) return bracket;
   return table[table.length - 1];
@@ -97,8 +98,18 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const csll = presumedProfitBase * 0.09;
   
   // Reforma Tributária: PIS/COFINS -> CBS, ISS -> IBS
-  const cbs = domesticRevenue * CBS_RATE;
-  const ibs = domesticRevenue * IBS_RATE;
+  // Calculate total IVA considering reductions for each activity
+  const totalIva = domesticActivities.reduce((sum, activity) => {
+    const cnaeInfo = getCnaeData(activity.code);
+    const reduction = cnaeInfo?.ivaReduction ?? 0;
+    const effectiveIvaRate = IVA_RATE * (1 - reduction);
+    return sum + (activity.revenue * effectiveIvaRate);
+  }, 0);
+
+  // Split total IVA proportionally between CBS and IBS
+  const cbs = IVA_RATE > 0 ? totalIva * (CBS_RATE / IVA_RATE) : 0;
+  const ibs = IVA_RATE > 0 ? totalIva * (IBS_RATE / IVA_RATE) : 0;
+
 
   const companyRevenueTaxes = irpj + csll + cbs + ibs;
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
@@ -153,9 +164,6 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
       };
     }
 
-    const b2bRevenue = totalRevenue * (b2bRevenuePercentage / 100);
-    const b2cRevenue = totalRevenue - b2bRevenue;
-
     const allActivities = [...domesticActivities, ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate }))];
     const rbt12 = totalRevenue * 12;
     const totalPayrollForFatorR = totalSalaryExpense + totalProLaboreBruto;
@@ -181,30 +189,44 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
         const bracket = _findBracket(annexTable, rbt12);
         const effectiveRate = (rbt12 * bracket.rate - bracket.deduction) / rbt12;
         
-        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-        const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
-        
-        if (isHybrid) {
-            const b2bAnnexRevenue = b2bRevenue * (annexRevenue / totalRevenue);
-            const b2cAnnexRevenue = b2cRevenue * (annexRevenue / totalRevenue);
-            
-            // B2B pays IVA separately
-            ivaTaxes += b2bAnnexRevenue * IVA_RATE;
-            
-            // B2C pays full DAS
-            totalDas += b2cAnnexRevenue * effectiveRate;
-            
-            // The remaining part of DAS for B2B revenue
-            totalDas += b2bAnnexRevenue * (effectiveRate * (1 - ivaProportionInDas));
-
-        } else { // Traditional
-            totalDas += annexRevenue * effectiveRate;
-        }
+        totalDas += annexRevenue * effectiveRate;
 
         if (annex === 'IV') {
             const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
             cppFromAnnexIV += (totalSalaryExpense + totalProLaboreBruto) * cppRate * (annexRevenue / totalRevenue);
         }
+    }
+
+    if (isHybrid) {
+      // 1. Calculate the IVA that will be paid "por fora"
+      const totalIvaPorFora = domesticActivities.reduce((sum, activity) => {
+          const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
+          const cnaeInfo = getCnaeData(activity.code);
+          const reduction = cnaeInfo?.ivaReduction ?? 0;
+          const effectiveIvaRate = IVA_RATE * (1 - reduction);
+          return sum + (activityB2bRevenue * effectiveIvaRate);
+      }, 0);
+      
+      ivaTaxes = totalIvaPorFora;
+  
+      // 2. Calculate how much the DAS should be reduced
+      const dasReduction = domesticActivities.reduce((sum, activity) => {
+          const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
+          const cnaeInfo = getCnaeData(activity.code);
+          if (!cnaeInfo) return sum;
+  
+          let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
+          const annexTable = ANNEX_TABLES[effectiveAnnex];
+          const bracket = _findBracket(annexTable, rbt12);
+          const effectiveRate = totalRevenue > 0 ? (rbt12 * bracket.rate - bracket.deduction) / rbt12 : 0;
+          
+          const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+          const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
+          
+          return sum + (activityB2bRevenue * effectiveRate * ivaProportionInDas);
+      }, 0);
+      
+      totalDas -= dasReduction;
     }
     
     const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
@@ -221,7 +243,7 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
 
     const notes = [];
     if (isHybrid) {
-      notes.push(`Neste cenário, ${formatPercent(b2bRevenuePercentage/100)} do faturamento (B2B) paga IVA de ${formatPercent(IVA_RATE)} fora do DAS. O restante é tributado no Simples.`);
+      notes.push(`Neste cenário, ${formatPercent(b2bRevenuePercentage/100)} do faturamento (B2B) paga IVA fora do DAS. A alíquota do IVA pode ser reduzida dependendo da sua atividade.`);
     } else {
       notes.push("Regime padrão do Simples Nacional. O crédito de IVA gerado para clientes B2B é limitado à alíquota do DAS.");
     }
