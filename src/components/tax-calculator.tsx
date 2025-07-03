@@ -45,7 +45,6 @@ import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
-import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -109,6 +108,13 @@ const cityInfoComponents: { [key: string]: ComponentType } = {
   'Jundiaí - SP': JundiaiInfoSection,
   'Uberlândia - MG': UberlandiaInfoSection,
 };
+
+const planOptions = [
+    { value: 'expertsEssencial', title: 'Experts Essencial', description: 'Assessoria dedicada' },
+    { value: 'multibeneficios', title: 'Multibenefícios', description: 'Vantagens para você' },
+    { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades' },
+    { value: 'basico', title: 'Básico', description: 'Essencial para começar' },
+];
 
 export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
@@ -926,41 +932,30 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                 <ListChecks className="h-5 w-5 text-primary" />
                                 3. Selecione o Plano Contabilizei
                             </h3>
-                            <p className='text-base text-muted-foreground mt-1'>A mensalidade será calculada com base no plano escolhido.</p>
                         </div>
                         <FormField
                             control={form.control}
                             name="selectedPlan"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormControl>
-                                        <RadioGroup
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
-                                        >
-                                            {[
-                                                { value: 'basico', title: 'Básico', description: 'Essencial para começar' },
-                                                { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades' },
-                                                { value: 'multibeneficios', title: 'Multibenefícios', description: 'Benefícios para você' },
-                                                { value: 'expertsEssencial', title: 'Experts Essencial', description: 'Assessoria dedicada' },
-                                                { value: 'expertsPro', title: 'Experts Pro', description: 'Solução completa' },
-                                            ].map(plan => (
-                                                <FormItem key={plan.value}>
-                                                    <FormLabel htmlFor={plan.value} className={cn(
-                                                        "block w-full cursor-pointer rounded-lg border-2 p-4 text-center transition-colors h-full flex flex-col justify-center",
-                                                        field.value === plan.value ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"
-                                                    )}>
-                                                        <FormControl>
-                                                            <RadioGroupItem value={plan.value} id={plan.value} className="sr-only"/>
-                                                        </FormControl>
-                                                        <span className="font-bold text-lg text-foreground">{plan.title}</span>
-                                                        <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
-                                                    </FormLabel>
-                                                </FormItem>
+                                    <FormLabel>Plano de Contabilidade</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecione um plano" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {planOptions.map(plan => (
+                                                <SelectItem key={plan.value} value={plan.value}>
+                                                    {plan.title} - {plan.description}
+                                                </SelectItem>
                                             ))}
-                                        </RadioGroup>
-                                    </FormControl>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormDescription>
+                                        A mensalidade nos resultados será baseada no plano escolhido.
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}

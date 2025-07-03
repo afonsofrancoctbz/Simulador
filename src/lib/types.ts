@@ -22,7 +22,7 @@ export const ProLaboreFormSchema = z.object({
 });
 export type ProLaboreForm = z.infer<typeof ProLaboreFormSchema>;
 
-export const PlanEnumSchema = z.enum(['basico', 'padrao', 'multibeneficios', 'expertsEssencial', 'expertsPro']);
+export const PlanEnumSchema = z.enum(['basico', 'padrao', 'multibeneficios', 'expertsEssencial']);
 export type Plan = z.infer<typeof PlanEnumSchema>;
 
 
@@ -140,7 +140,6 @@ export interface FeeBracket {
         padrao: number;
         multibeneficios: number;
         expertsEssencial: number;
-        expertsPro: number;
     }
 }
 
