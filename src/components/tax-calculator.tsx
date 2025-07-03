@@ -301,49 +301,55 @@ export default function TaxCalculator() {
   const scenarios = useMemo(() => {
     if (!results) return [];
 
-    const { selectedCnaes, proLabores } = form.getValues();
+    const { selectedCnaes } = form.getValues();
     if (selectedCnaes.length === 0) return [];
     
-    const totalProLabore = proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
     const submissionValues = transformFormToSubmission(form.getValues());
     const totalRevenue = submissionValues.domesticActivities.reduce((sum, act) => sum + act.revenue, 0) + submissionValues.exportActivities.reduce((sum, act) => sum + act.revenue, 0);
-
+    const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
     if (totalRevenue === 0 && totalProLabore === 0) return [];
 
     const scenarios: TaxDetails[] = [];
-
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
 
-    // Scenario 1: Simples Nacional (Anexo V or standard)
-     scenarios.push({
-        ...results.simplesNacionalSemFatorR,
-        regime: 'Simples Nacional',
-        annex: hasAnnexVActivity ? 'Anexo V' : results.simplesNacionalSemFatorR.annex || 'Padrão'
-    });
-    
-    // Scenario 2: Simples Nacional (Anexo III optimized)
-    if (hasAnnexVActivity) {
-      const cenarioOtimizado = results.simplesNacionalComFatorR;
-      const proLaboreOtimizado = cenarioOtimizado.proLabore;
-      if (cenarioOtimizado.totalMonthlyCost < results.simplesNacionalSemFatorR.totalMonthlyCost) {
-          const optimizationNote = `Para alcançar este cenário, seu pró-labore total foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
-          scenarios.push({
-              ...cenarioOtimizado,
-              regime: 'Simples Nacional',
-              annex: 'Anexo III (Otimizado com Fator R)',
-              optimizationNote: optimizationNote
-          });
-      }
-    }
-    
-    // Scenario 3: Lucro Presumido
+    const cenarioBase = results.simplesNacionalSemFatorR;
+    const cenarioOtimizado = results.simplesNacionalComFatorR;
+
     scenarios.push({
         ...results.lucroPresumido,
         regime: 'Lucro Presumido',
     });
+
+    if (hasAnnexVActivity) {
+        if (cenarioBase.annex?.includes('V')) { 
+            scenarios.push({
+                ...cenarioBase,
+                regime: 'Simples Nacional',
+                annex: 'Anexo V',
+            });
+            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(cenarioOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
+            scenarios.push({
+                ...cenarioOtimizado,
+                regime: 'Simples Nacional',
+                annex: 'Anexo III (Com Fator R)',
+                optimizationNote: optimizationNote
+            });
+        } else {
+            scenarios.push({
+                ...cenarioBase,
+                regime: 'Simples Nacional',
+                annex: 'Anexo III (Com Fator R)',
+            });
+        }
+    } else {
+        scenarios.push({
+            ...cenarioBase,
+            regime: 'Simples Nacional',
+            annex: cenarioBase.annex || 'Padrão'
+        });
+    }
     
     return scenarios;
-
   }, [results, form]);
 
   const renderResults = () => {
@@ -367,32 +373,26 @@ export default function TaxCalculator() {
 
     const orderMap: Record<string, number> = {
         'Anexo III': 1,
-        'Anexo V': 2,
-        'Lucro Presumido': 3,
+        'Anexo IV': 2,
+        'Anexo V': 3,
+        'Lucro Presumido': 4,
     };
 
     const getOrderKey = (scenario: TaxDetails) => {
         if (scenario.regime.includes('Lucro Presumido')) return orderMap['Lucro Presumido'];
         if (scenario.annex?.includes('Anexo III')) return orderMap['Anexo III'];
+        if (scenario.annex?.includes('Anexo IV')) return orderMap['Anexo IV'];
         if (scenario.annex?.includes('Anexo V')) return orderMap['Anexo V'];
-        return 99; // Fallback
+        return 99;
     };
     
-    const uniqueScenarios = Array.from(new Map(scenarios.map(s => [`${s.regime}-${s.annex}`, s])).values());
-    const sortedForDisplay = [...uniqueScenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
+    const sortedForDisplay = [...scenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
 
     const submissionValues = transformFormToSubmission(form.getValues());
     const { selectedCnaes } = form.getValues();
 
     return (
         <div id="results-section" className="mt-16 w-full">
-            <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
-                <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
-                </p>
-            </div>
-
             {selectedCnaes && selectedCnaes.length > 0 && (
                  <div className="max-w-4xl mx-auto mb-12">
                     <div className="text-center mb-4">
@@ -429,6 +429,13 @@ export default function TaxCalculator() {
                 </div>
             )}
             
+            <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
+                <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
+                </p>
+            </div>
+
             <div className="flex flex-wrap justify-center items-stretch gap-8">
                 {sortedForDisplay.map(scenario => (
                      <ResultCard 
