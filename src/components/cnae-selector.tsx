@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search } from "lucide-react"
+import { Check, Search, PlusCircle, XCircle } from "lucide-react"
 
 import { CNAE_DATA } from "@/lib/cnaes"
 import { Badge } from "@/components/ui/badge"
@@ -17,11 +17,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
-import { CNAE_SERVICE_LIST } from "@/lib/cnae-groups"
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs"
+import { Textarea } from "./ui/textarea"
+import { Label } from "./ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { Separator } from "./ui/separator"
 
 const mainCategories = [
-  "Lista de Serviços",
   "Consultoria",
   "Desenvolvimento de Software",
   "Educação e Cursos",
@@ -67,19 +69,14 @@ export function CnaeSelector({
   const [search, setSearch] = React.useState("")
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(mainCategories[0])
   const [selectedCodes, setSelectedCodes] = React.useState<string[]>(initialSelectedCodes)
+  const [codesToPaste, setCodesToPaste] = React.useState("");
+  const { toast } = useToast();
 
   React.useEffect(() => {
     if (open) {
       setSelectedCodes(initialSelectedCodes)
     }
   }, [open, initialSelectedCodes])
-
-  const serviceListWithDetails = React.useMemo(() => {
-    return CNAE_SERVICE_LIST.map(service => {
-      const cnaeData = CNAE_DATA.find(c => c.code === service.code);
-      return { ...cnaeData, ...service };
-    })
-  }, []);
 
   const filteredCnaes = React.useMemo(() => {
     let results = CNAE_DATA
@@ -91,7 +88,7 @@ export function CnaeSelector({
           cnae.description.toLowerCase().includes(lowercasedSearch) ||
           cnae.category?.toLowerCase().includes(lowercasedSearch)
       )
-    } else if (selectedCategory && selectedCategory !== "Lista de Serviços") {
+    } else if (selectedCategory) {
       const internalCategories = categoryToInternalMap[selectedCategory] || []
       results = results.filter((cnae) => cnae.category && internalCategories.includes(cnae.category))
     } else {
@@ -137,6 +134,65 @@ export function CnaeSelector({
     const visibleCodes = new Set(filteredCnaes.map(c => c.code));
     setSelectedCodes(selectedCodes.filter(code => !visibleCodes.has(code)));
   };
+  
+  const handleAddPastedCnaes = () => {
+    const rawCodes = codesToPaste.match(/(\d{4}-?\d\/?\d{2})|(\d{7})/g) || [];
+    
+    if (rawCodes.length === 0) {
+      toast({
+        title: "Nenhum CNAE encontrado",
+        description: "O texto informado não contém códigos de CNAE válidos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const allCnaeCodes = CNAE_DATA.map(c => c.code);
+    let addedCount = 0;
+    let invalidCount = 0;
+    let duplicateCount = 0;
+    let limitReached = false;
+    
+    const newSelected = new Set(selectedCodes);
+
+    rawCodes.forEach(rawCode => {
+      if (newSelected.size >= MAX_SELECTION) {
+        limitReached = true;
+        return;
+      }
+      
+      const normalizedCode = rawCode.replace(/[^\d]/g, '');
+      const formattedCode = `${normalizedCode.slice(0, 4)}-${normalizedCode.slice(4, 5)}/${normalizedCode.slice(5, 7)}`;
+      
+      if (allCnaeCodes.includes(formattedCode)) {
+        if (newSelected.has(formattedCode)) {
+          duplicateCount++;
+        } else {
+          newSelected.add(formattedCode);
+          addedCount++;
+        }
+      } else {
+        invalidCount++;
+      }
+    });
+
+    setSelectedCodes(Array.from(newSelected));
+    
+    toast({
+      title: "Processamento Concluído",
+      description: `${addedCount} CNAEs adicionados. ${invalidCount} inválidos. ${duplicateCount} já estavam na lista.`,
+    });
+
+    if (limitReached) {
+       toast({
+        title: "Limite Atingido",
+        description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`,
+        variant: "destructive",
+      });
+    }
+
+    setCodesToPaste("");
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,86 +200,72 @@ export function CnaeSelector({
         <DialogHeader className="p-6 pb-2 shrink-0">
           <DialogTitle className="text-2xl font-bold text-center">Selecionar Atividades (CNAE)</DialogTitle>
           <DialogDescription className="text-center">
-            Selecione por Lista de Serviços, busque ou filtre por categoria. Você pode adicionar até {MAX_SELECTION} atividades.
+            Cole uma lista de CNAEs, busque ou filtre por categoria. Você pode adicionar até {MAX_SELECTION} atividades.
           </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 space-y-4 shrink-0">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Pesquisar: Atividade, código..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                if(selectedCategory) setSelectedCategory(null);
-              }}
-            />
-          </div>
-          <Tabs value={selectedCategory || ''} onValueChange={handleCategoryChange} className="w-full">
-            <TabsList className="h-auto flex-wrap justify-center gap-1">
-                {mainCategories.map((category) => (
-                    <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-                ))}
-            </TabsList>
-          </Tabs>
-        </div>
-        
-        {selectedCategory !== 'Lista de Serviços' && (
-            <div className="px-6 pt-4 flex items-center justify-between border-t mt-4 shrink-0">
-                <p className="text-sm text-muted-foreground">
-                    {filteredCnaes.length > 0
-                        ? `${filteredCnaes.length} resultados na visão atual.`
-                        : "Nenhum CNAE encontrado."}
-                </p>
-                {filteredCnaes.length > 0 && (
-                <div className="flex items-center gap-2">
-                    <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
-                        Selecionar todos
-                    </Button>
-                    <span className="text-muted-foreground/50">/</span>
-                    <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
-                        Limpar todos
+            <div className="space-y-2">
+                <Label htmlFor="cnae-paste">Adicionar CNAEs em massa</Label>
+                <div className="flex items-start gap-2">
+                    <Textarea
+                        id="cnae-paste"
+                        placeholder="Cole os códigos aqui, separados por vírgula, espaço ou quebra de linha. Ex: 6201-5/01, 7112000"
+                        value={codesToPaste}
+                        onChange={(e) => setCodesToPaste(e.target.value)}
+                        rows={3}
+                    />
+                    <Button type="button" onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="h-auto py-2 px-4 self-stretch">
+                        <PlusCircle className="mr-2 h-4 w-4"/>
+                        Adicionar
                     </Button>
                 </div>
-                )}
             </div>
-        )}
+
+            <Separator/>
+
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                placeholder="Ou pesquise por atividade, código..."
+                className="pl-9"
+                value={search}
+                onChange={(e) => {
+                    setSearch(e.target.value)
+                    if(selectedCategory) setSelectedCategory(null);
+                }}
+                />
+            </div>
+
+            <Tabs value={selectedCategory || ''} onValueChange={handleCategoryChange} className="w-full">
+                <TabsList className="h-auto flex-wrap justify-center gap-1">
+                    {mainCategories.map((category) => (
+                        <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+                    ))}
+                </TabsList>
+            </Tabs>
+        </div>
+        
+        <div className="px-6 pt-4 flex items-center justify-between border-t mt-4 shrink-0">
+            <p className="text-sm text-muted-foreground">
+                {filteredCnaes.length > 0
+                    ? `${filteredCnaes.length} resultados na visão atual.`
+                    : "Nenhum CNAE encontrado."}
+            </p>
+            {filteredCnaes.length > 0 && (
+            <div className="flex items-center gap-2">
+                <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
+                    Selecionar todos
+                </Button>
+                <span className="text-muted-foreground/50">/</span>
+                <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
+                    Limpar todos
+                </Button>
+            </div>
+            )}
+        </div>
 
         <ScrollArea className="flex-grow min-h-0 border-t">
-          {selectedCategory === 'Lista de Serviços' ? (
-             <div className="p-6 space-y-4">
-              {serviceListWithDetails.map((service) => (
-                <button
-                  key={service.code}
-                  className={cn(
-                    "w-full text-left p-4 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
-                    selectedCodes.includes(service.code) && "bg-primary/10 text-primary-foreground border-primary"
-                  )}
-                  onClick={() => handleToggleCnae(service.code)}
-                  disabled={!selectedCodes.includes(service.code) && selectedCodes.length >= MAX_SELECTION}
-                >
-                  {selectedCodes.includes(service.code) && (
-                    <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
-                      <Check className="h-4 w-4" />
-                    </div>
-                  )}
-                  <p className="font-semibold text-md pr-8">{service.description} ({service.code})</p>
-                  <p className="text-sm text-muted-foreground mt-1">{service.group} - Item {service.item}</p>
-                  <p className="text-sm text-muted-foreground italic mt-2">"{service.subItemDescription}"</p>
-
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {service.category && <Badge variant="secondary" className="text-xs">{service.category}</Badge>}
-                    {service.annex && <Badge variant={service.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
-                        Anexo {service.annex}{service.requiresFatorR ? ' (Fator R)' : ''}
-                    </Badge>}
-                    {service.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-2">
                 {filteredCnaes.length > 0 ? (
                 filteredCnaes.map((cnae) => (
@@ -261,7 +303,6 @@ export function CnaeSelector({
                 </div>
                 )}
             </div>
-          )}
         </ScrollArea>
         <DialogFooter className="p-4 border-t bg-background items-center justify-between flex-row shrink-0">
             <div className="text-sm text-muted-foreground">
