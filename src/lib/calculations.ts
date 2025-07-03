@@ -103,6 +103,31 @@ export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutpu
   };
 }
 
+function _calculatePartnerTaxes(proLabores: number[]): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
+    const partnerTaxes: PartnerTaxDetails[] = [];
+    let totalINSSRetido = 0;
+    let totalIRRFRetido = 0;
+
+    for (const proLabore of proLabores) {
+        const proLaboreTaxesPerPartner = calcularEncargosProLabore({
+            valorProLaboreBruto: proLabore,
+            configuracaoFiscal: fiscalConfig,
+        });
+        
+        partnerTaxes.push({
+            proLaboreBruto: proLaboreTaxesPerPartner.valorBruto,
+            inss: proLaboreTaxesPerPartner.valorINSSCalculado,
+            irrf: proLaboreTaxesPerPartner.valorIRRFCalculado,
+            proLaboreLiquido: proLaboreTaxesPerPartner.valorLiquido,
+        });
+        totalINSSRetido += proLaboreTaxesPerPartner.valorINSSCalculado;
+        totalIRRFRetido += proLaboreTaxesPerPartner.valorIRRFCalculado;
+    }
+
+    return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
+}
+
+
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores } = values;
 
@@ -112,24 +137,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const totalRevenue = domesticRevenue + exportRevenue;
 
   // --- 2. Pro-labore Taxes (per partner, then aggregated) ---
-  const partnerTaxes: PartnerTaxDetails[] = [];
-  let totalINSSRetido = 0;
-  let totalIRRFRetido = 0;
-  for (const proLabore of proLabores) {
-    const proLaboreTaxesPerPartner = calcularEncargosProLabore({
-      valorProLaboreBruto: proLabore,
-      configuracaoFiscal: fiscalConfig,
-    });
-    
-    partnerTaxes.push({
-      proLaboreBruto: proLaboreTaxesPerPartner.valorBruto,
-      inss: proLaboreTaxesPerPartner.valorINSSCalculado,
-      irrf: proLaboreTaxesPerPartner.valorIRRFCalculado,
-      proLaboreLiquido: proLaboreTaxesPerPartner.valorLiquido,
-    });
-    totalINSSRetido += proLaboreTaxesPerPartner.valorINSSCalculado;
-    totalIRRFRetido += proLaboreTaxesPerPartner.valorIRRFCalculado;
-  }
+  const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
   
   const allCnaesData = [...domesticActivities, ...exportActivities]
       .map(a => getCnaeData(a.code))
@@ -303,7 +311,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     } else if (uniqueAnnexesFromCnaes.length > 1) {
         mainAnnexLabel = 'Múltiplos Anexos';
     } else {
-        mainAnnexLabel = 'Nenhum'; 
+        mainAnnexLabel = 'Padrão'; 
     }
   }
 
@@ -344,23 +352,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   const totalRevenue = domesticRevenue + exportRevenueBRL;
 
-  const partnerTaxes: PartnerTaxDetails[] = [];
-  let totalINSSRetido = 0;
-  let totalIRRFRetido = 0;
-  for (const proLabore of proLabores) {
-    const { valorINSSCalculado, valorIRRFCalculado, valorLiquido, valorBruto } = calcularEncargosProLabore({
-      valorProLaboreBruto: proLabore,
-      configuracaoFiscal: fiscalConfig,
-    });
-    partnerTaxes.push({
-      proLaboreBruto: valorBruto,
-      inss: valorINSSCalculado,
-      irrf: valorIRRFCalculado,
-      proLaboreLiquido: valorLiquido,
-    });
-    totalINSSRetido += valorINSSCalculado;
-    totalIRRFRetido += valorIRRFCalculado;
-  }
+  const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
 
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
   const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
