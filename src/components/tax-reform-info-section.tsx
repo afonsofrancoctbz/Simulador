@@ -7,19 +7,20 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CheckCircle } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
     <div className="w-full max-w-5xl mx-auto my-12">
       <Card className="shadow-lg border-primary/20 bg-primary/5">
         <CardHeader className="text-center">
-          <CreditCard className="mx-auto h-8 w-8 text-primary mb-2" />
+          <CheckCircle className="mx-auto h-8 w-8 text-primary mb-2" />
           <CardTitle className="text-2xl font-bold text-primary">
-            Entenda o Split Payment da Reforma Tributária
+            Impactos da Reforma Tributária para Prestadores de Serviço
           </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
-            O "pagamento dividido" é um novo sistema de recolhimento de impostos que impactará o fluxo de caixa das empresas. Entenda como se preparar.
+            A Reforma Tributária brasileira vai trazer mudanças no atual sistema de tributação e impactos diretos para empresas prestadoras de serviços. A principal ponto é a unificação de tributos com uma alíquota única.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -27,124 +28,127 @@ export default function TaxReformInfoSection() {
 
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
-                O que muda com o split payment no pagamento de impostos?
+                1. Unificação dos principais tributos sobre consumo
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  O maior impacto previsto com o split payment está no fluxo de caixa da empresa. Hoje, o imposto que é pago pelo empreendedor é normalmente utilizado para ajudar a financiar suas atividades, entre o recebimento do cliente até o vencimento do imposto no mês seguinte. Já com o split payment, ele passa a ser retido pelos intermediários de pagamentos.
-                </p>
-                <p>
-                  Em uma transação sujeita ao split payment, o vendedor do produto ou prestador de serviço que só realizaria o pagamento dos impostos no dia 25 do mês seguinte já não terá mais esse cenário. Isso porque, após a implementação do split payment, ele receberá o valor líquido da transação, já descontado de CBS e IBS na hora da compra – ao invés de receber o valor cheio.
-                </p>
-                <div className="p-4 border-l-4 border-amber-400 bg-amber-50 text-amber-900 rounded-r-md">
-                    <p className="font-semibold">
-                        “A redução dos valores recebidos pelos produtos ou serviços vendidos ou prestados causa efeitos indiretos no fluxo de caixa das micro e pequenas empresas. Antes da proposta da nova Reforma Tributária, estes empreendedores poderiam utilizar o valor dos impostos para efetuar o pagamento de outras obrigações empresariais, como fornecedores e funcionários, até o vencimento dos impostos”
-                        <span className="block text-sm text-right mt-2">– Charles Gularte, vice-presidente executivo de serviços aos clientes da Contabilizei.</span>
-                    </p>
-                </div>
-                <p>
-                  Em termos práticos, o vendedor ou o prestador não receberá o valor total da nota fiscal, que engloba o valor do produto ou serviço mais CBS e IBS, mas sim o valor líquido sem a parcela de tributos. Esta sistemática reduz o montante recebido pelo vendedor e impede-o de aplicar o recurso dos impostos em outras despesas necessárias para a empresa, diminuindo as estratégias na gestão financeira das micros e pequenas que não possuem giro de caixa.
-                </p>
-                <p>Assim, podemos resumir os possíveis impactos do split payment na perspectiva do pequeno negócio:</p>
+                <p>Os impostos que incidem hoje sobre o consumo e a venda de mercadorias e serviços são:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Alteração no fluxo de caixa:</strong> o pagamento imediato dos impostos reduz os valores de entradas no fluxo de caixa das empresas, especialmente no curto prazo.</li>
-                  <li><strong>Necessidade de renegociar contratos:</strong> empresas podem precisar ajustar contratos com fornecedores e clientes para ajustar os prazos de pagamento.</li>
-                  <li><strong>Aumento dos custos operacionais:</strong> a necessidade de adaptar os sistemas de fluxo de caixa e adequação aos novos processos pode gerar custos adicionais.</li>
-                  <li><strong>Impacto na competitividade:</strong> as empresas, que não se adaptarem rapidamente às novas regras e realizarem as ações acima, podem perder competitividade no mercado diante da necessidade de aumentar preços.</li>
+                  <li>Programa de Integração Social (PIS)</li>
+                  <li>Cofins</li>
+                  <li>Imposto sobre Produtos Industrializados (IPI)</li>
+                  <li>Imposto sobre Circulação de Mercadorias e Prestação de Serviços (ICMS)</li>
+                  <li>Imposto Sobre Serviços de Qualquer Natureza (ISS)</li>
                 </ul>
+                <p>Esses tributos vão ser unificados em dois novos: a <strong>Contribuição sobre Bens e Serviço (CBS)</strong> e o <strong>Imposto Sobre Bens e Serviços (IBS)</strong>.</p>
+                <h4 className="font-semibold text-foreground pt-2">O que é o Imposto Sobre Valor Agregado?</h4>
+                <p>A CBS e o IBS, por sua vez, vão compor o IVA (Imposto sobre Valor Agregado). A CBS será de competência federal, substituindo o PIS, Cofins e IPI, enquanto o IBS será gerido por um Comitê Gestor e distribuído entre estados e municípios, substituindo o ICMS e o ISS.</p>
+                <p>Outro ponto de destaque é a ampliação do uso de créditos tributários. Será possível abater os impostos pagos na aquisição de bens e serviços no valor final de impostos a pagar, rompendo com a cumulatividade de impostos atual.</p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                Quais os benefícios do split payment?
+                2. Mudança no valor da carga tributária
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  Segundo Charles Gularte, o benefício desta proposta é um aumento de eficiência no processo de recolhimento e arrecadação de impostos, que viabiliza a liberação dos créditos de impostos para as empresas contratantes ou compradoras, e também vai contribuir para redução da sonegação e regularidade tributária das empresas.
-                </p>
+                <p>Após a sanção da lei regulamentadora, o governo estimou que a alíquota geral do IVA ficará em torno de <strong>28%</strong>. Esse valor deve ser regulado até 2031, com uma meta de chegar a 26,5%.</p>
+                <p>Na prática, as empresas enquadradas no Lucro Real e Lucro Presumido vão sentir diretamente o impacto dessa nova alíquota. Será possível abater os impostos pagos na aquisição de bens e serviços no valor final a pagar, o que significa que, apesar de um possível aumento na carga tributária bruta, a efetiva pode ser reduzida.</p>
+                <p>Já para as empresas enquadradas no Simples Nacional, a nova alíquota não vai ser aplicada. As alíquotas e a forma de apuração dos tributos permanecerão as mesmas, mas haverá impactos indiretos.</p>
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                Quem vai ser afetado pelo split payment?
+                3. Profissões com redução no valor da alíquota
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                 <p>
-                    Como comentamos acima, ainda há um processo de implementação para a adoção do split payment de forma gradual. Será um mecanismo que impactará todas as empresas ativas no Brasil (exceto MEI), independentemente de seu porte ou regime tributário.
-                 </p>
-                 <p>
-                    A novidade está na forma como os impostos serão recolhidos: diretamente no momento da liquidação financeira de cada transação. Isso muda a forma como as empresas lidam com suas obrigações tributárias, alcançando desde grandes corporações até negócios menores.
-                 </p>
-                 <p>
-                    Empresas que operam por meio de plataformas digitais e marketplaces também sentirão um impacto significativo, já que as plataformas digitais serão responsáveis por recolher os tributos diretamente das vendas realizadas em seus ambientes. Isso inclui desde a venda de mercadorias físicas até infoprodutos e serviços.
-                 </p>
-                 <p>
-                    No varejo, indústria e serviços, os pagamentos realizados pelos clientes por meios eletrônicos, incluindo desde maquininhas de cartão até a venda via e-commerce, devem ter a fatia do imposto recolhida diretamente, reforçando a questão do impacto no fluxo de caixa e, com isso, a necessidade de maior planejamento.
-                 </p>
-                 <p>
-                    Empresas do regime Simples Nacional também estarão sujeitas ao split payment, embora ainda existam dúvidas sobre como ele será aplicado, especialmente em relação às diferentes formas de tributação no regime possibilitadas pela Reforma Tributária.
-                 </p>
+                <p>A alíquota estimada do IVA de 28% terá reduções para certas profissões:</p>
+                 <ul className="list-disc pl-6 space-y-3">
+                    <li>
+                      <strong>Redução de 30% (Alíquota de 19,6%):</strong> Aplicável a profissionais liberais com profissões regulamentadas, como Arquitetos, Advogados e Engenheiros.
+                    </li>
+                    <li>
+                      <strong>Redução de 60% (Alíquota de 11,2%):</strong> Para serviços essenciais como educação, saúde (médicos, etc.), produções artísticas e alguns dispositivos médicos.
+                    </li>
+                 </ul>
+                 <p>Profissões do segmento de tecnologia e marketing, por exemplo, não foram beneficiadas com alíquotas reduzidas e ficarão com a alíquota cheia.</p>
               </AccordionContent>
             </AccordionItem>
-
+            
             <AccordionItem value="item-4">
               <AccordionTrigger className="text-lg font-semibold">
-                Como se preparar para mudanças no fluxo de caixa?
+                O que muda para as empresas do Simples Nacional?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  O split payment deixa claro a necessidade de planejamento financeiro por parte do empreendedor, considerando o imediato pagamento de impostos e o impacto no seu caixa. Além disso, é necessário considerar um possível impacto no capital de giro para garantir a liquidez da sua empresa. Abaixo, saiba o que fazer desde já para se adaptar ao split payment.
-                </p>
-                 <ul className="list-decimal pl-6 space-y-3">
-                    <li>
-                        <strong className="text-foreground/90">Mapeie seus pagamentos e os custos:</strong> Identifique todas as suas obrigações tributárias e os prazos de pagamento atuais. Também liste seus fornecedores e os prazos de pagamento.
-                    </li>
-                     <li>
-                        <strong className="text-foreground/90">Faça simulações com a nova forma de pagamento:</strong> Faça uma simulação do seu fluxo de caixa considerando a nova regra do Split Payment. Considere o valor total dos impostos pagos mensalmente e quanto tempo você tem atualmente para pagar esses impostos. Anote o valor. Agora, calcule qual será a diferença do valor resultante no seu fluxo de caixa com o desconto imediato dos impostos.
-                    </li>
-                    <li>
-                        <strong className="text-foreground/90">Negocie condições de pagamento:</strong> Pode ser necessário combinar novos prazos com fornecedores para manter sua margem de lucro adequada em diferentes períodos do mês a fim de cumprir as demais obrigações da empresa, como o pagamento de despesas e funcionários.
-                    </li>
-                    <li>
-                        <strong className="text-foreground/90">Considere fatores adicionais:</strong> Além dos novos desafios, o empreendedor deve considerar questões como a variação nas vendas e o impacto disso no montante de impostos a serem pagos e demais regras e oportunidades previstas na Reforma Tributária.
-                    </li>
-                </ul>
+                 <p>Para empresas do Simples Nacional, a carga tributária permanecerá inalterada. A principal novidade é a introdução do <strong>Simples Nacional Híbrido</strong>.</p>
+                 <p>Este novo modelo permite que empresas optem por recolher o IVA (IBS e CBS) separadamente da guia única (DAS). O objetivo é permitir que essas empresas gerem créditos tributários integrais para seus clientes PJ, assim como as empresas do Lucro Real e Presumido.</p>
+                 <p>A desvantagem é que, ao fazer isso, o prestador de serviços pagará mais impostos (a alíquota cheia do IVA), impactando seu lucro. A decisão exige um planejamento cuidadoso, avaliando o impacto no fluxo de caixa e na competitividade.</p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5">
               <AccordionTrigger className="text-lg font-semibold">
-                Exemplo prático de split payment
+                Exemplo prático: cenários para profissionais da saúde
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                    Para empresas que atuam no regime normal de tributação, a sistemática funciona da seguinte maneira:
-                </p>
-                <p>
-                    Imagine uma loja online que vende capas de celular através de um marketplace, com cada capa sendo vendida por R$ 50,00 e comprada do fornecedor por R$ 20,00. Considerando a alíquota padrão estimada do Imposto sobre Valor Agregado (IVA) de 28%, o vendedor deverá recolher R$ 8,40 em tributos sobre o valor que adicionou à capa (R$30,00). Isso ocorre porque os outros R$ 5,60 que completam a o tributo total sobre o preço final já foram recolhidos em etapas anteriores da cadeia produtiva.
-                </p>
-                <p>
-                    É importante ressaltar que o vendedor não receberá o valor total de R$ 50,00 pela venda, mas apenas R$ 41,40, pois o imposto de R$ 8,40 será retido pelo marketplace, que será o responsável de recolher e repassar o valor aos cofres públicos através do novo mecanismo de recolhimento.
-                </p>
-                <p>
-                    No sistema atual, o valor do imposto sobre a venda permanece no caixa da empresa, podendo ser utilizado nas operações financeiras ao longo do mês. Posteriormente, no mês seguinte, esse montante é pago de forma acumulada, juntamente com os impostos de todas as vendas realizadas no período, em uma data específica, conforme previsto pelo regime tributário adotado.
-                </p>
+              <AccordionContent className="space-y-6 pt-4 text-base text-muted-foreground">
+                <p>Vamos considerar um profissional da saúde (psicólogo, médico, etc.) com faturamento de <strong>R$ 15.000,00</strong> mensais, prestando serviços para Pessoas Jurídicas.</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Cenário 1: Simples Nacional Tradicional</h4>
+                  <p className="mb-3">Os impostos permanecem os mesmos (R$ 1.541,26), mas a geração de crédito para o cliente diminui drasticamente, o que pode reduzir a competitividade.</p>
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Descrição</TableHead><TableHead>Antes da Reforma</TableHead><TableHead>Após a Reforma</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      <TableRow><TableCell>Faturamento</TableCell><TableCell>R$ 15.000,00</TableCell><TableCell>R$ 15.000,00</TableCell></TableRow>
+                      <TableRow><TableCell>Valor em impostos no SN</TableCell><TableCell>R$ 1.541,26</TableCell><TableCell>R$ 1.541,26</TableCell></TableRow>
+                      <TableRow><TableCell>Lucro líquido</TableCell><TableCell>R$ 13.458,74</TableCell><TableCell>R$ 13.458,74</TableCell></TableRow>
+                      <TableRow><TableCell className="font-semibold">Crédito para o cliente</TableCell><TableCell className="font-semibold">R$ 1.387,50</TableCell><TableCell className="font-semibold text-destructive">R$ 441,90</TableCell></TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Cenário 2: Simples Nacional Híbrido</h4>
+                   <p className="mb-3">A empresa paga mais imposto (R$ 2.779,36) para gerar um crédito maior para o cliente (R$ 1.680,00), mantendo a competitividade, mas com lucro menor.</p>
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Descrição</TableHead><TableHead>Após a Reforma</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      <TableRow><TableCell>Faturamento</TableCell><TableCell>R$ 15.000,00</TableCell></TableRow>
+                      <TableRow><TableCell>Valor em impostos no SN Híbrido</TableCell><TableCell>R$ 2.779,36</TableCell></TableRow>
+                      <TableRow><TableCell>Lucro líquido</TableCell><TableCell>R$ 12.220,64</TableCell></TableRow>
+                      <TableRow><TableCell className="font-semibold">Crédito para o cliente</TableCell><TableCell className="font-semibold text-primary">R$ 1.680,00</TableCell></TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Cenário 3: Lucro Presumido</h4>
+                   <p className="mb-3">A carga tributária aumenta (R$ 3.179,72), mas gera o mesmo crédito competitivo (R$ 1.680,00) que o Simples Híbrido, porém com o menor lucro líquido entre os cenários pós-reforma.</p>
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Descrição</TableHead><TableHead>Antes da Reforma</TableHead><TableHead>Após a Reforma</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      <TableRow><TableCell>Faturamento</TableCell><TableCell>R$ 15.000,00</TableCell><TableCell>R$ 15.000,00</TableCell></TableRow>
+                      <TableRow><TableCell>Valor em impostos LP</TableCell><TableCell>R$ 2.887,22</TableCell><TableCell>R$ 3.179,72</TableCell></TableRow>
+                      <TableRow><TableCell>Lucro líquido</TableCell><TableCell>R$ 12.112,78</TableCell><TableCell>R$ 11.730,28</TableCell></TableRow>
+                      <TableRow><TableCell className="font-semibold">Crédito para o cliente</TableCell><TableCell className="font-semibold">R$ 1.387,50</TableCell><TableCell className="font-semibold text-primary">R$ 1.680,00</TableCell></TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-6">
               <AccordionTrigger className="text-lg font-semibold">
-                Como o split payment pode afetar o preço dos produtos?
+                Como escolher o melhor regime tributário?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                    Para começar, vale destacar que o objetivo principal do split payment não é aumentar os preços nem a arrecadação de impostos. Assim, os efeitos no preço dos produtos podem ser ocasionados pela necessidade das empresas de garantir um caixa com faturamento mais estável na liquidez diária, em oposição ao método adotado hoje para o pagamento de impostos que exige o valor dos impostos em caixa apenas uma vez por mês. 
-                </p>
-                <p>
-                    Como comentamos, isto deverá ser analisado pelo empreendedor no detalhe, pois é necessário se manter competitivo, garantindo um bom planejamento financeiro.
-                </p>
+                <p>A decisão é complexa e depende de fatores como:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li><strong>Seu tipo de cliente:</strong> Para quem presta serviços a Pessoas Físicas, o Simples Nacional Tradicional tende a ser melhor.</li>
+                  <li><strong>Perfil da clientela:</strong> Para clientes PJ, a análise é mais complexa. O Simples Nacional Híbrido ou Lucro Presumido se tornam mais competitivos pela geração de crédito, mas aumentam sua carga tributária.</li>
+                  <li><strong>Análise estratégica:</strong> É essencial avaliar o impacto no lucro, a possibilidade de renegociar preços e o cenário competitivo com o apoio de um contador.</li>
+                </ul>
+                <p className="font-semibold">Lembre-se: a transição será gradual. As mudanças para o Simples Nacional (incluindo o regime Híbrido) só entram em vigor em 2027.</p>
               </AccordionContent>
             </AccordionItem>
 
