@@ -73,16 +73,31 @@ export const FISCAL_CONFIG_2025 = {
   }
 };
 
+export const FISCAL_CONFIG_2026 = {
+    ...FISCAL_CONFIG_2025, // Inherit most rules
+    ano_vigencia: 2026,
+    reforma_tributaria: {
+        cbs_rate: 0.009, // 0.9%
+        ibs_rate: 0.001, // 0.1%
+        get iva_rate() {
+            return this.cbs_rate + this.ibs_rate;
+        }
+    }
+};
+
 export type FiscalConfig = typeof FISCAL_CONFIG_2025;
+export type FiscalConfig2026 = typeof FISCAL_CONFIG_2026;
 
 /**
  * In a real application, this function would fetch the configuration for a given year,
  * possibly from a database or a remote service, allowing for dynamic updates without
- * code changes. For this simulator, we will return the 2025 configuration.
+ * code changes.
  * @param year The fiscal year for which to retrieve parameters.
  * @returns The fiscal configuration object.
  */
-export const getFiscalParameters = (year: number = 2025) => {
-    // This could have logic to select configs for different years.
+export const getFiscalParameters = (year: number = 2025): FiscalConfig | FiscalConfig2026 => {
+    if (year === 2026) {
+        return FISCAL_CONFIG_2026;
+    }
     return FISCAL_CONFIG_2025;
 }

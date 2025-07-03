@@ -5,14 +5,15 @@ import { useEffect, useState, useMemo, type ComponentType } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema } from '@/lib/types';
+import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxFormValuesSchema, TaxDetails2026 } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
+import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
 
 
@@ -43,47 +44,13 @@ import CampinasInfoSection from './campinas-info-section';
 import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
+import { Slider } from './ui/slider';
 
 
-const fiscalConfig = getFiscalParameters();
-const MINIMUM_WAGE = fiscalConfig.salario_minimo;
+const fiscalConfig2025 = getFiscalParameters(2025);
+const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
 
-const calculatorFormSchema = z.object({
-  city: z.string().optional(),
-  selectedCnaes: z.array(z.string()).min(1, "Selecione pelo menos um CNAE."),
-  revenues: z.record(z.string(), z.coerce.number().optional()), // e.g. revenues['domestic_V']
-  exportCurrency: z.string(),
-  exchangeRate: z.coerce.number(),
-  totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
-  proLabores: z.array(ProLaboreFormSchema),
-  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
-}).superRefine((data, ctx) => {
-    data.proLabores.forEach((proLabore, index) => {
-      if (proLabore.value > 0 && proLabore.value < MINIMUM_WAGE) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
-              path: [`proLabores.${index}.value`],
-          });
-      }
-      if (proLabore.hasOtherInssContribution && (proLabore.otherContributionSalary === undefined || proLabore.otherContributionSalary <= 0)) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: 'Informe um valor de contribuição positivo.',
-              path: [`proLabores.${index}.otherContributionSalary`],
-          });
-      }
-    });
-}).refine(data => {
-    const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
-    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
-    return totalRevenue > 0 || totalProLabore > 0;
-}, {
-    message: "Informe ao menos um valor de faturamento ou pró-labore.",
-    path: ["revenues"],
-});
-
-type CalculatorFormValues = z.infer<typeof calculatorFormSchema>;
+type CalculatorFormValues = z.infer<typeof TaxFormValuesSchema>;
 
 const cityInfoComponents: { [key: string]: ComponentType } = {
   'São Paulo - SP': CityInfoSection,
@@ -103,8 +70,8 @@ const cityInfoComponents: { [key: string]: ComponentType } = {
   'Uberlândia - MG': UberlandiaInfoSection,
 };
 
-export default function TaxCalculator() {
-  const [results, setResults] = useState<CalculationResults | null>(null);
+export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
+  const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
   const [advice, setAdvice] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdviceLoading, setIsAdviceLoading] = useState(false);
@@ -112,8 +79,11 @@ export default function TaxCalculator() {
   const [isFetchingRate, setIsFetchingRate] = useState(false);
   const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
 
+  const fiscalConfig = getFiscalParameters(year);
+  const MINIMUM_WAGE = fiscalConfig.salario_minimo;
+
   const form = useForm<CalculatorFormValues>({
-    resolver: zodResolver(calculatorFormSchema),
+    resolver: zodResolver(TaxFormValuesSchema),
     defaultValues: {
       city: undefined,
       selectedCnaes: [],
@@ -123,6 +93,7 @@ export default function TaxCalculator() {
       totalSalaryExpense: 0,
       proLabores: [{ value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 }],
       numberOfPartners: 1,
+      b2bRevenuePercentage: 50,
     },
   });
 
@@ -141,7 +112,7 @@ export default function TaxCalculator() {
         });
         replace(newProLabores);
     }
-  }, [numberOfPartners, replace, form]);
+  }, [numberOfPartners, replace, form, MINIMUM_WAGE]);
 
 
   const selectedCnaes = form.watch("selectedCnaes");
@@ -177,6 +148,7 @@ export default function TaxCalculator() {
 
   useEffect(() => {
     fetchRates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCnaeConfirm = (codes: string[]) => {
@@ -240,6 +212,7 @@ export default function TaxCalculator() {
         totalSalaryExpense: values.totalSalaryExpense,
         proLabores: submissionProLabores,
         numberOfPartners: values.numberOfPartners,
+        b2bRevenuePercentage: values.b2bRevenuePercentage,
     };
   }
 
@@ -257,94 +230,54 @@ export default function TaxCalculator() {
 
     const submissionValues = transformFormToSubmission(values);
 
-    const calculatedResults = await calculateTaxesOnServer(submissionValues);
-    setResults(calculatedResults);
-    setIsLoading(false);
-    
-    const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
-    const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
-
-    if (totalRevenue === 0 && totalProLabore === 0) {
-      return; // No need to call AI if there's no financial activity
-    }
-
-    setIsAdviceLoading(true);
-    try {
-        const totalDomesticRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
-        const totalExportRevenue = submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
-
-        const activitiesSummary = [...submissionValues.domesticActivities, ...submissionValues.exportActivities]
-            .map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`)
-            .join(', ');
+    if(year === 2025) {
+      const calculatedResults = await calculateTaxesOnServer(submissionValues);
+      setResults(calculatedResults);
+      setIsLoading(false);
       
-      const aiInput: TaxOptimizationInput = {
-        activities: activitiesSummary,
-        totalDomesticRevenue,
-        totalExportRevenue,
-        totalSalaryExpense: values.totalSalaryExpense,
-        totalProLabore: totalProLabore,
-        numberOfPartners: values.numberOfPartners,
-        simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalSemFatorR.totalMonthlyCost,
-        simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalComFatorR.totalMonthlyCost,
-        lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
-      };
-      const aiResult = await getTaxOptimizationAdvice(aiInput);
-      setAdvice(aiResult.advice);
-    } catch (error) {
-      console.error("Error fetching AI advice:", error);
-      setAdvice("Não foi possível obter a recomendação da IA no momento.");
-    } finally {
-      setIsAdviceLoading(false);
+      const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
+      const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
+
+      if (totalRevenue === 0 && totalProLabore === 0) {
+        return;
+      }
+      if (!('simplesNacionalSemFatorR' in calculatedResults)) return;
+
+      setIsAdviceLoading(true);
+      try {
+          const totalDomesticRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
+          const totalExportRevenue = submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
+
+          const activitiesSummary = [...submissionValues.domesticActivities, ...submissionValues.exportActivities]
+              .map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`)
+              .join(', ');
+        
+        const aiInput: TaxOptimizationInput = {
+          activities: activitiesSummary,
+          totalDomesticRevenue,
+          totalExportRevenue,
+          totalSalaryExpense: values.totalSalaryExpense,
+          totalProLabore: totalProLabore,
+          numberOfPartners: values.numberOfPartners,
+          simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalSemFatorR.totalMonthlyCost,
+          simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalComFatorR.totalMonthlyCost,
+          lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
+        };
+        const aiResult = await getTaxOptimizationAdvice(aiInput);
+        setAdvice(aiResult.advice);
+      } catch (error) {
+        console.error("Error fetching AI advice:", error);
+        setAdvice("Não foi possível obter a recomendação da IA no momento.");
+      } finally {
+        setIsAdviceLoading(false);
+      }
+    } else { // Year is 2026
+      const calculatedResults = await calculateTaxes2026OnServer(submissionValues);
+      setResults(calculatedResults);
+      setIsLoading(false);
+      // AI advice is disabled for 2026 for now
     }
   }
-
-  const scenarios = useMemo(() => {
-    if (!results) return [];
-
-    const { selectedCnaes } = form.getValues();
-    if (selectedCnaes.length === 0) return [];
-    
-    const submissionValues = transformFormToSubmission(form.getValues());
-    const totalRevenue = submissionValues.domesticActivities.reduce((sum, act) => sum + act.revenue, 0) + submissionValues.exportActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
-    if (totalRevenue === 0 && totalProLabore === 0) return [];
-
-    const scenarios: TaxDetails[] = [];
-    const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-
-    const cenarioBase = results.simplesNacionalSemFatorR;
-    const cenarioOtimizado = results.simplesNacionalComFatorR;
-
-    scenarios.push({
-        ...results.lucroPresumido,
-        regime: 'Lucro Presumido',
-    });
-
-    if (hasAnnexVActivity && cenarioBase.annex?.includes('V')) {
-        // Show both Anexo V (default) and Anexo III (optimized)
-        scenarios.push({
-            ...cenarioBase,
-            regime: 'Simples Nacional',
-            annex: 'Anexo V',
-        });
-        const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(cenarioOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-        scenarios.push({
-            ...cenarioOtimizado,
-            regime: 'Simples Nacional',
-            annex: 'Anexo III (Com Fator R)',
-            optimizationNote: optimizationNote
-        });
-    } else {
-        // If no Anexo V or already in Anexo III, just show the base scenario
-        scenarios.push({
-            ...cenarioBase,
-            regime: 'Simples Nacional',
-            annex: cenarioBase.annex || 'Padrão'
-        });
-    }
-    
-    return scenarios;
-  }, [results, form]);
 
   const renderResults = () => {
     if (isLoading) {
@@ -357,55 +290,66 @@ export default function TaxCalculator() {
       );
     }
 
-    if (!results || scenarios.length === 0) {
+    if (!results) {
       return null;
     }
+
+    const submissionValues = transformFormToSubmission(form.getValues());
+    const { selectedCnaes } = form.getValues();
+
+    let scenarios: (TaxDetails | TaxDetails2026)[] = [];
+    if(year === 2025 && 'simplesNacionalSemFatorR' in results) {
+        const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
+        scenarios.push({ ...results.lucroPresumido, regime: 'Lucro Presumido' });
+        if (hasAnnexVActivity && results.simplesNacionalSemFatorR.annex?.includes('V')) {
+            scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: 'Anexo V' });
+            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
+            scenarios.push({ ...results.simplesNacionalComFatorR, regime: 'Simples Nacional', annex: 'Anexo III (Com Fator R)', optimizationNote });
+        } else {
+            scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: results.simplesNacionalSemFatorR.annex || 'Padrão' });
+        }
+    } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
+        scenarios = [results.lucroPresumido, results.simplesNacionalTradicional, results.simplesNacionalHibrido];
+    }
+
+    if (scenarios.length === 0) return null;
     
     const cheapestScenario = scenarios.length > 0
       ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
       : null;
 
-    const orderMap: Record<string, number> = {
-      'Anexo III (Com Fator R)': 1,
-      'Anexo V': 2,
-      'Lucro Presumido': 3,
-    };
-    
-    const getOrderKey = (scenario: TaxDetails) => {
-        if(scenario.regime === 'Lucro Presumido') return orderMap['Lucro Presumido'];
-        if(scenario.annex && scenario.annex in orderMap) return orderMap[scenario.annex];
-        if(scenario.annex && scenario.annex.includes('Anexo III')) return 1;
-        return 99; // Default for others like 'Múltiplos Anexos' or 'Anexo IV'
+    const orderMap2025: Record<string, number> = { 'Anexo III (Com Fator R)': 1, 'Anexo V': 2, 'Lucro Presumido': 3 };
+    const orderMap2026: Record<string, number> = { 'Simples Nacional Tradicional': 1, 'Simples Nacional Híbrido': 2, 'Lucro Presumido': 3 };
+
+    const getOrderKey = (scenario: TaxDetails | TaxDetails2026) => {
+        if (year === 2026) return orderMap2026[scenario.regime] ?? 99;
+        const key = scenario.annex ? `${scenario.regime} ${scenario.annex}`.replace('Simples Nacional ', '') : scenario.regime;
+        if (key in orderMap2025) return orderMap2025[key];
+        return 99;
     };
     
     const sortedForDisplay = [...scenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
-
-    const submissionValues = transformFormToSubmission(form.getValues());
-    const { selectedCnaes } = form.getValues();
 
     return (
         <div id="results-section" className="mt-16 w-full">
              <div className="max-w-4xl mx-auto mb-12">
                 <div className="text-center mb-4">
-                    <h3 className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
+                    <h3 className="font-semibold text-lg text-foreground flex items-center justify-center gap-2">
                         <ListChecks className="h-5 w-5 text-primary"/>
                         Resumo das Atividades Selecionadas
                     </h3>
                 </div>
-                <ul className="border rounded-md p-3 bg-muted/20">
-                    {selectedCnaes.map((code, index) => {
+                <ul className="border rounded-lg p-3 bg-muted/20 divide-y divide-border/50">
+                    {selectedCnaes.map((code) => {
                         const cnae = getCnaeData(code);
                         if (!cnae) return null;
                         return (
-                             <li key={code} className={cn(
-                                "flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 text-sm py-2",
-                                index < selectedCnaes.length - 1 && "border-b border-border/50"
-                            )}>
+                             <li key={code} className="flex flex-col sm:flex-row items-start justify-between gap-x-4 gap-y-1 py-2 first:pt-0 last:pb-0">
                                 <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-foreground">{cnae.code}</p>
-                                    <p className="text-muted-foreground break-words">{cnae.description}</p>
+                                    <p className="text-muted-foreground text-sm">{cnae.description}</p>
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center mt-1 sm:mt-0">
+                                <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center">
                                     <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
                                     {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
                                     {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
@@ -476,7 +420,7 @@ export default function TaxCalculator() {
                 </div>
             )}
             
-            {advice && (
+            {advice && year === 2025 && (
                 <div className="mt-12 max-w-5xl mx-auto">
                     <Alert variant="default" className="bg-primary/5 border-primary/20">
                         <Lightbulb className="h-5 w-5 text-primary" />
@@ -639,8 +583,7 @@ export default function TaxCalculator() {
                                     {fields.map((item, index) => (
                                         <div key={item.id} className="p-4 border rounded-lg bg-muted/20">
                                             <h4 className="font-semibold text-foreground mb-4">Sócio {index + 1}</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 items-start">
-                                                {/* Pro-labore Input */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-start">
                                                 <FormField
                                                     control={form.control}
                                                     name={`proLabores.${index}.value`}
@@ -671,7 +614,6 @@ export default function TaxCalculator() {
                                                     }}
                                                 />
 
-                                                {/* Other Contribution Section */}
                                                 <div className="space-y-4">
                                                     <FormField
                                                         control={form.control}
@@ -703,7 +645,7 @@ export default function TaxCalculator() {
                                                                 field.onChange(Number(digitsOnly) / 100);
                                                             };
                                                             return(
-                                                            <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible')}>
+                                                            <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible h-0')}>
                                                                 <FormLabel>Salário de Contribuição</FormLabel>
                                                                 <FormControl>
                                                                     <Input
@@ -759,6 +701,35 @@ export default function TaxCalculator() {
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                             </Button>
                         </div>
+
+                        {year === 2026 && (
+                          <FormField
+                            control={form.control}
+                            name="b2bRevenuePercentage"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className='flex items-center gap-2'><Percent className='h-4 w-4 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
+                                <div className='flex items-center gap-4'>
+                                  <FormControl>
+                                    <Slider
+                                      min={0}
+                                      max={100}
+                                      step={1}
+                                      onValueChange={(value) => field.onChange(value[0])}
+                                      defaultValue={[field.value ?? 50]}
+                                      className='flex-1'
+                                    />
+                                  </FormControl>
+                                  <span className='font-bold text-primary w-16 text-center'>{field.value ?? 50}%</span>
+                                </div>
+                                <FormDescription>
+                                  Informe qual a porcentagem do seu faturamento que vem de vendas para outras empresas (Pessoa Jurídica).
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
                         
                         {revenueGroups.length > 0 && <Separator />}
 

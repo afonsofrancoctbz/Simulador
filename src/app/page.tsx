@@ -7,26 +7,44 @@ import AppHeader from '@/components/app-header';
 import DigitalCertificateSection from '@/components/digital-certificate-section';
 import PjAccountSection from '@/components/pj-account-section';
 import MultibenefitsSection from '@/components/multibenefits-section';
+import TaxReformInfoSection from '@/components/tax-reform-info-section';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Home() {
   return (
     <>
       <AppHeader />
       <main>
-        <section id="calculator" className="bg-slate-50/70">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
-            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
-            </p>
-          </div>
-        </section>
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="-mt-16">
-              <TaxCalculator />
+        <Tabs defaultValue="2025" className="w-full">
+          <section className="bg-slate-50/70 border-b">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center">
+              <TabsList className="mb-8">
+                <TabsTrigger value="2025">Cenário Atual (2025)</TabsTrigger>
+                <TabsTrigger value="2026">Reforma Tributária (Simulação 2026)</TabsTrigger>
+              </TabsList>
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
+              <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto pb-16 lg:pb-24">
+                Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
+              </p>
             </div>
-        </div>
+          </section>
+
+          <TabsContent value="2025">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="-mt-16">
+                  <TaxCalculator key="2025" year={2025} />
+                </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="2026">
+            <TaxReformInfoSection />
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="lg:-mt-8">
+                  <TaxCalculator key="2026" year={2026} />
+                </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <section className="py-16 lg:py-24 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">

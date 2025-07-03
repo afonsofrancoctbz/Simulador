@@ -32,6 +32,31 @@ export const TaxFormValuesSchema = z.object({
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
+  b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
+}).superRefine((data, ctx) => {
+    data.proLabores.forEach((proLabore, index) => {
+      if (proLabore.value > 0 && proLabore.value < MINIMUM_WAGE) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+              path: [`proLabores.${index}.value`],
+          });
+      }
+      if (proLabore.hasOtherInssContribution && (proLabore.otherContributionSalary === undefined || proLabore.otherContributionSalary <= 0)) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Informe um valor de contribuição positivo.',
+              path: [`proLabores.${index}.otherContributionSalary`],
+          });
+      }
+    });
+}).refine(data => {
+    const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
+    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
+    return totalRevenue > 0 || totalProLabore > 0;
+}, {
+    message: "Informe ao menos um valor de faturamento ou pró-labore.",
+    path: ["revenues"],
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
@@ -74,13 +99,25 @@ export const TaxDetailsSchema = z.object({
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
 
-// Schema for the final calculation results
+// Schema for the final calculation results (2025)
 export const CalculationResultsSchema = z.object({
     simplesNacionalComFatorR: TaxDetailsSchema,
     simplesNacionalSemFatorR: TaxDetailsSchema,
     lucroPresumido: TaxDetailsSchema,
 });
 export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
+
+
+// Schemas for 2026 results
+export const TaxDetails2026Schema = TaxDetailsSchema.extend({});
+export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;
+
+export const CalculationResults2026Schema = z.object({
+    simplesNacionalTradicional: TaxDetails2026Schema,
+    simplesNacionalHibrido: TaxDetails2026Schema,
+    lucroPresumido: TaxDetails2026Schema,
+});
+export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
 
 
 export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
@@ -112,7 +149,7 @@ export interface FeeBracket {
 export interface ProLaboreInput {
   proLaboreBruto: number;
   otherContributionSalary?: number;
-  configuracaoFiscal: FiscalConfig;
+  configuracaoFiscal: FiscalConfig | z.infer<typeof import("@/config/fiscal").FiscalConfig2026>;
 }
 
 export interface ProLaboreOutput {
