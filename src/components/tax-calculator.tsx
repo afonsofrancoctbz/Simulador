@@ -8,8 +8,8 @@ import { z } from "zod";
 import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent, AlertTriangle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
-import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026, PlanEnumSchema } from '@/lib/types';
+import { getCnaeData, _calculatePartnerTaxes } from '@/lib/calculations';
+import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026, PlanEnumSchema, TaxDetailsSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -48,6 +48,7 @@ import { Slider } from './ui/slider';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
+import RocSection from './roc-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -395,18 +396,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if(year === 2025 && 'simplesNacionalSemFatorR' in results) {
-        const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-        scenarios.push({ ...results.lucroPresumido });
-        
-        scenarios.push({ ...results.simplesNacionalSemFatorR });
-        
-        if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR && results.simplesNacionalComFatorR.proLabore > simplesNacionalBase.proLabore) {
-            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...results.simplesNacionalComFatorR, optimizationNote });
-        } else if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR) {
-             scenarios.push({ ...results.simplesNacionalComFatorR });
+        const { simplesNacionalSemFatorR, simplesNacionalComFatorR, lucroPresumido } = results;
+        scenarios.push({ ...lucroPresumido });
+        scenarios.push({ ...simplesNacionalSemFatorR });
+
+        if (simplesNacionalComFatorR.totalMonthlyCost !== simplesNacionalSemFatorR.totalMonthlyCost) {
+            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
+            scenarios.push({ ...simplesNacionalComFatorR, optimizationNote });
         }
-        
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         scenarios = [results.lucroPresumido, results.simplesNacionalTradicional, results.simplesNacionalHibrido];
     }
@@ -460,7 +457,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 {sortedForDisplay.map(scenario => (
                      <ResultCard 
                         key={`${scenario.regime}-${scenario.annex}`} 
-                        details={scenario} 
+                        details={scenario as TaxDetailsSchema} 
                         isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
                         formValues={submissionValues}
                     />
@@ -1004,18 +1001,16 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                       <Label
                                                           htmlFor={plan.value}
                                                           className={cn(
-                                                              "flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer h-full transition-all",
+                                                              "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer h-full transition-all text-center",
                                                               field.value === plan.value && "border-primary",
-                                                              isRecommended && !isDisabled && "border-primary shadow-lg scale-105",
+                                                              isRecommended && !isDisabled && "border-primary shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
                                                           )}
                                                       >
                                                           {isRecommended && !isDisabled && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">Recomendado</Badge>}
-                                                          <div className='text-center'>
-                                                              <span className="font-bold text-lg">{plan.title}</span>
-                                                              <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
-                                                          </div>
-                                                          {isDisabled && <p className="text-xs text-destructive mt-2 text-center">Não disponível para Comércio</p>}
+                                                          <span className="font-semibold text-base">{plan.title}</span>
+                                                          <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
+                                                          {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
                                                       </Label>
                                                   </FormItem>
                                               );
@@ -1050,6 +1045,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             <div className="mt-12">
                 <CityComponent />
             </div>
+        )}
+
+        {results && (
+          <div className="mt-12">
+            <RocSection />
+          </div>
         )}
 
         {renderResults()}
