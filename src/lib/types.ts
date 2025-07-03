@@ -22,6 +22,9 @@ export const ProLaboreFormSchema = z.object({
 });
 export type ProLaboreForm = z.infer<typeof ProLaboreFormSchema>;
 
+export const PlanEnumSchema = z.enum(['basico', 'padrao', 'multibeneficios', 'expertsEssencial', 'expertsPro']);
+export type Plan = z.infer<typeof PlanEnumSchema>;
+
 
 // Schema for the main form input passed to calculation functions
 export const TaxFormValuesSchema = z.object({
@@ -34,6 +37,7 @@ export const TaxFormValuesSchema = z.object({
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
+  selectedPlan: PlanEnumSchema.default('expertsEssencial'),
 }).superRefine((data, ctx) => {
     data.proLabores.forEach((proLabore, index) => {
       if (proLabore.value > 0 && proLabore.value < MINIMUM_WAGE) {

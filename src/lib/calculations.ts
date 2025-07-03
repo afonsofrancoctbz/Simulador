@@ -134,7 +134,7 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[]): { partnerTaxes: Pa
 
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12 } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12, selectedPlan } = values;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -164,7 +164,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const companyTaxes = cppFromAnnexIV;
     const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
     const totalTax = companyTaxes + totalWithheldTaxes;
-    const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
+    const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+    const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     const totalMonthlyCost = totalTax + fee;
 
@@ -300,7 +301,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const totalTax = companyTaxes + totalWithheldTaxes;
   
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-  const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
+  const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
 
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
@@ -351,7 +352,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 }
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
   const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
   
   // --- Revenue Calculation ---
@@ -369,7 +370,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       const companyPayrollTaxes = inssPatronal;
       const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
       const totalTax = companyPayrollTaxes + totalWithheldTaxes;
-      const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
+      const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+      const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
       
       const totalMonthlyCost = totalTax + fee;
 
@@ -419,7 +421,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const totalTax = totalCompanyTaxes + totalWithheldTaxes;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-  const contabilizeiFee = feeBracket?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
+  const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
 
   const totalMonthlyCost = totalTax + contabilizeiFee;
 

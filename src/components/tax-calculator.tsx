@@ -9,7 +9,7 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026 } from '@/lib/types';
+import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026, PlanEnumSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -45,6 +45,7 @@ import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -61,6 +62,7 @@ const CalculatorFormSchema = z.object({
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
+  selectedPlan: PlanEnumSchema.default('expertsEssencial'),
 }).superRefine((data, ctx) => {
     const fiscalConfig = getFiscalParameters(); // Using current year for validation
     data.proLabores.forEach((proLabore, index) => {
@@ -133,6 +135,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       proLabores: [{ value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 }],
       numberOfPartners: 1,
       b2bRevenuePercentage: 50,
+      selectedPlan: 'expertsEssencial',
     },
   });
 
@@ -244,6 +247,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }));
     
     return {
+        selectedPlan: values.selectedPlan,
         rbt12: values.rbt12 ?? 0,
         domesticActivities,
         exportActivities,
@@ -764,7 +768,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                         />
                                     </FormControl>
                                     <FormDescription className='text-sm'>
-                                        Soma da receita bruta da sua empresa no mercado interno e externo. Essencial para o cálculo do Simples Nacional.
+                                        Deixe R$ 0,00 se estiver abrindo a empresa agora. A calculadora estimará o valor.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -915,12 +919,60 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         )}
                         {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
+
+                    <div className="space-y-6">
+                        <div className='border-b pb-4'>
+                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                                <ListChecks className="h-5 w-5 text-primary" />
+                                3. Selecione o Plano Contabilizei
+                            </h3>
+                            <p className='text-base text-muted-foreground mt-1'>A mensalidade será calculada com base no plano escolhido.</p>
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="selectedPlan"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+                                        >
+                                            {[
+                                                { value: 'basico', title: 'Básico', description: 'Essencial para começar' },
+                                                { value: 'padrao', title: 'Padrão', description: 'Mais funcionalidades' },
+                                                { value: 'multibeneficios', title: 'Multibenefícios', description: 'Benefícios para você' },
+                                                { value: 'expertsEssencial', title: 'Experts Essencial', description: 'Assessoria dedicada' },
+                                                { value: 'expertsPro', title: 'Experts Pro', description: 'Solução completa' },
+                                            ].map(plan => (
+                                                <FormItem key={plan.value}>
+                                                    <FormLabel htmlFor={plan.value} className={cn(
+                                                        "block w-full cursor-pointer rounded-lg border-2 p-4 text-center transition-colors h-full flex flex-col justify-center",
+                                                        field.value === plan.value ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"
+                                                    )}>
+                                                        <FormControl>
+                                                            <RadioGroupItem value={plan.value} id={plan.value} className="sr-only"/>
+                                                        </FormControl>
+                                                        <span className="font-bold text-lg text-foreground">{plan.title}</span>
+                                                        <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
                 </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6">
                 <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
-                  3. Analisar e Otimizar Impostos
+                  4. Analisar e Otimizar Impostos
                 </Button>
             </CardFooter>
         </Card>

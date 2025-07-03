@@ -83,7 +83,7 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[]): { partnerTaxes: Pa
 // --- CALCULATION LOGIC FOR 2026 ---
 
 function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
   const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
   
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -118,7 +118,8 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 
   const companyRevenueTaxes = irpj + csll + cbs + ibs;
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
-  const fee = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans.expertsEssencial;
+  const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+  const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   const totalMonthlyCost = totalTax + fee;
 
   return {
@@ -142,7 +143,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 }
 
 function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
-    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0, rbt12 } = values;
+    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0, rbt12, selectedPlan } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
@@ -152,17 +153,19 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
     const totalRevenue = domesticRevenue + exportRevenue;
     
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+    const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+    const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     if (totalRevenue === 0 && effectiveRbt12 === 0) {
       // Handle zero revenue case
       return {
         regime: isHybrid ? 'Simples Nacional Híbrido' : 'Simples Nacional Tradicional',
         totalTax: totalINSSRetido + totalIRRFRetido,
-        totalMonthlyCost: totalINSSRetido + totalIRRFRetido + CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial,
+        totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
         totalRevenue: 0,
         proLabore: totalProLaboreBruto,
         effectiveRate: 0,
-        contabilizeiFee: CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial,
+        contabilizeiFee: fee,
         breakdown: [
           { name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido },
           { name: "IRRF s/ Pró-labore", value: totalIRRFRetido }
@@ -235,7 +238,6 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
       totalDas -= dasReduction;
     }
     
-    const fee = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue)?.plans.expertsEssencial ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans.expertsEssencial;
     const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + fee;
 
