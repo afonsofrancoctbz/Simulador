@@ -8,147 +8,189 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
     <div className="w-full max-w-5xl mx-auto my-12">
       <Card className="shadow-lg border-primary/20 bg-primary/5">
         <CardHeader className="text-center">
-          <CheckCircle className="mx-auto h-8 w-8 text-primary mb-2" />
+          <AlertTriangle className="mx-auto h-8 w-8 text-primary mb-2" />
           <CardTitle className="text-2xl font-bold text-primary">
-            Impactos da Reforma Tributária para Prestadores de Serviço
+            IBS e CBS: Detalhes da Reforma Tributária
           </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
-            A Reforma Tributária brasileira vai trazer mudanças no atual sistema de tributação e impactos diretos para empresas prestadoras de serviços. A principal ponto é a unificação de tributos com uma alíquota única.
+            Entenda os principais pontos da Proposta de Lei Complementar (PLP 68/2024) que regulamenta os novos tributos sobre o consumo.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Accordion type="single" collapsible className="w-full text-left">
-
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
-                1. Unificação dos principais tributos sobre consumo
+                1. Fato Gerador
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>Os impostos que incidem hoje sobre o consumo e a venda de mercadorias e serviços são:</p>
+                <p>O IBS e a CBS incidem sobre todas as operações onerosas que tenham por objeto bens e serviços. As operações sobre as quais incidem o IBS e a CBS compreendem o fornecimento de bens e serviços e podem decorrer de qualquer ato ou negócio jurídico.</p>
+                <p>Para fins de segurança jurídica, o PLP 68/2024 incluiu um rol exemplificativo dos atos e negócios jurídicos sujeitos ao IBS e à CBS:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Programa de Integração Social (PIS)</li>
-                  <li>Cofins</li>
-                  <li>Imposto sobre Produtos Industrializados (IPI)</li>
-                  <li>Imposto sobre Circulação de Mercadorias e Prestação de Serviços (ICMS)</li>
-                  <li>Imposto Sobre Serviços de Qualquer Natureza (ISS)</li>
+                  <li>Alienação, inclusive compra e venda, troca ou permuta e dação em pagamento;</li>
+                  <li>Locação;</li>
+                  <li>Licenciamento, concessão, cessão;</li>
+                  <li>Empréstimo;</li>
+                  <li>Doação onerosa;</li>
+                  <li>Instituição onerosa de direitos reais;</li>
+                  <li>Arrendamento, inclusive mercantil; e</li>
+                  <li>Prestação de serviços.</li>
                 </ul>
-                <p>Esses tributos vão ser unificados em dois novos: a <strong>Contribuição sobre Bens e Serviço (CBS)</strong> e o <strong>Imposto Sobre Bens e Serviços (IBS)</strong>.</p>
-                <h4 className="font-semibold text-foreground pt-2">O que é o Imposto Sobre Valor Agregado?</h4>
-                <p>A CBS e o IBS, por sua vez, vão compor o IVA (Imposto sobre Valor Agregado). A CBS será de competência federal, substituindo o PIS, Cofins e IPI, enquanto o IBS será gerido por um Comitê Gestor e distribuído entre estados e municípios, substituindo o ICMS e o ISS.</p>
-                <p>Outro ponto de destaque é a ampliação do uso de créditos tributários. Será possível abater os impostos pagos na aquisição de bens e serviços no valor final de impostos a pagar, rompendo com a cumulatividade de impostos atual.</p>
+                <p>Todo fornecimento que não tenha por objeto um bem material ou imaterial, inclusive direito, será considerado como uma operação com serviço.</p>
+                <p>O IBS e a CBS também incidem sobre determinadas operações não onerosas, ou realizadas a valor inferior ao de mercado, como o fornecimento de bens e serviços para uso e consumo pessoal do próprio contribuinte, de empregados e administradores. Não são considerados de uso e consumo pessoal aqueles utilizados exclusivamente na atividade econômica do contribuinte.</p>
+                <p>Além das imunidades constitucionais, não há incidência sobre os serviços prestados por pessoas físicas na qualidade de empregados, administradores ou membros de conselhos. A transferência de bens entre estabelecimentos do contribuinte, a transmissão de participação societária e operações de fusão, cisão e incorporação também não sofrem incidência.</p>
+                <p>Rendimentos financeiros e operações com títulos não sofrem incidência, exceto no regime específico de serviços financeiros.</p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                2. Mudança no valor da carga tributária
+                2. Momento da Ocorrência do Fato Gerador
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>Após a sanção da lei regulamentadora, o governo estimou que a alíquota geral do IVA ficará em torno de <strong>28%</strong>. Esse valor deve ser regulado até 2031, com uma meta de chegar a 26,5%.</p>
-                <p>Na prática, as empresas enquadradas no Lucro Real e Lucro Presumido vão sentir diretamente o impacto dessa nova alíquota. Será possível abater os impostos pagos na aquisição de bens e serviços no valor final a pagar, o que significa que, apesar de um possível aumento na carga tributária bruta, a efetiva pode ser reduzida.</p>
-                <p>Já para as empresas enquadradas no Simples Nacional, a nova alíquota não vai ser aplicada. As alíquotas e a forma de apuração dos tributos permanecerão as mesmas, mas haverá impactos indiretos.</p>
+                <p>Como regra geral, o fato gerador ocorre no momento do fornecimento ou do pagamento, o que ocorrer primeiro.</p>
+                <p>Para operações de execução continuada (água, energia, comunicação, etc.), o fato gerador ocorre quando o pagamento se torna devido.</p>
+                <p>Na prestação de serviço de transporte iniciado no País, o fato gerador ocorre no início do transporte. Nos demais serviços, ocorre no término da prestação.</p>
               </AccordionContent>
             </AccordionItem>
-            
+
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                3. Profissões com redução no valor da alíquota
+                3. Local da Operação
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>A alíquota estimada do IVA de 28% terá reduções para certas profissões:</p>
-                 <ul className="list-disc pl-6 space-y-3">
-                    <li>
-                      <strong>Redução de 30% (Alíquota de 19,6%):</strong> Aplicável a profissionais liberais com profissões regulamentadas, como Arquitetos, Advogados e Engenheiros.
-                    </li>
-                    <li>
-                      <strong>Redução de 60% (Alíquota de 11,2%):</strong> Para serviços essenciais como educação, saúde (médicos, etc.), produções artísticas e alguns dispositivos médicos.
-                    </li>
-                 </ul>
-                 <p>Profissões do segmento de tecnologia e marketing, por exemplo, não foram beneficiadas com alíquotas reduzidas e ficarão com a alíquota cheia.</p>
+                <p>O local da operação define o destino para fins de alíquota e arrecadação do IBS. Varia conforme o tipo de fornecimento:</p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-semibold text-foreground/80">Tipo/Objeto do Fornecimento</TableHead>
+                      <TableHead className="font-semibold text-foreground/80">Local da Operação</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Bem móvel material</TableCell>
+                      <TableCell>Local da entrega ou disponibilização do bem ao destinatário</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Bem imóvel, ou serviços/direitos relacionados a bem imóvel</TableCell>
+                      <TableCell>Local onde o imóvel estiver situado</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço prestado fisicamente sobre a pessoa física ou fruído presencialmente</TableCell>
+                      <TableCell>Local da prestação do serviço</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço de planejamento de eventos (feiras, congressos, etc.)</TableCell>
+                      <TableCell>Local do evento</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço sobre bem móvel material</TableCell>
+                      <TableCell>Local da prestação do serviço</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço de transporte de passageiros</TableCell>
+                      <TableCell>Local de início do transporte</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço de transporte de carga</TableCell>
+                      <TableCell>Local da entrega ou disponibilização do bem ao destinatário</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço de exploração de rodovia (pedágio)</TableCell>
+                      <TableCell>Proporcional à extensão da rodovia em cada território</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Serviço de comunicação (com meio físico)</TableCell>
+                      <TableCell>Local da recepção dos serviços</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Demais serviços e bens imateriais</TableCell>
+                      <TableCell>Local do domicílio principal do destinatário</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+                <p>O domicílio principal do destinatário é definido pelo seu cadastro, considerando habitação permanente (PF) ou o local do estabelecimento que recebe o serviço (PJ).</p>
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-4">
               <AccordionTrigger className="text-lg font-semibold">
-                O que muda para as empresas do Simples Nacional?
+                4. Base de Cálculo
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                 <p>Para empresas do Simples Nacional, a carga tributária permanecerá inalterada. A principal novidade é a introdução do <strong>Simples Nacional Híbrido</strong>.</p>
-                 <p>Este novo modelo permite que empresas optem por recolher o IVA (IBS e CBS) separadamente da guia única (DAS). O objetivo é permitir que essas empresas gerem créditos tributários integrais para seus clientes PJ, assim como as empresas do Lucro Real e Presumido.</p>
-                 <p>A desvantagem é que, ao fazer isso, o prestador de serviços pagará mais impostos (a alíquota cheia do IVA), impactando seu lucro. A decisão exige um planejamento cuidadoso, avaliando o impacto no fluxo de caixa e na competitividade.</p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-5">
-              <AccordionTrigger className="text-lg font-semibold">
-                Exemplo prático: cenários para profissionais da saúde
-              </AccordionTrigger>
-              <AccordionContent className="space-y-6 pt-4 text-base text-muted-foreground">
-                <p>Vamos considerar um profissional da saúde (psicólogo, médico, etc.) com faturamento de <strong>R$ 15.000,00</strong> mensais, prestando serviços para Pessoas Jurídicas.</p>
-                
-                <div>
-                  <h4 className="font-semibold text-foreground mb-2">Cenário 1: Simples Nacional Tradicional</h4>
-                  <p className="mb-3">Os impostos permanecem os mesmos (R$ 1.541,26), mas a geração de crédito para o cliente diminui drasticamente, o que pode reduzir a competitividade.</p>
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Descrição</TableHead><TableHead>Antes da Reforma</TableHead><TableHead>Após a Reforma</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      <TableRow><TableCell>Faturamento</TableCell><TableCell>R$ 15.000,00</TableCell><TableCell>R$ 15.000,00</TableCell></TableRow>
-                      <TableRow><TableCell>Valor em impostos no SN</TableCell><TableCell>R$ 1.541,26</TableCell><TableCell>R$ 1.541,26</TableCell></TableRow>
-                      <TableRow><TableCell>Lucro líquido</TableCell><TableCell>R$ 13.458,74</TableCell><TableCell>R$ 13.458,74</TableCell></TableRow>
-                      <TableRow><TableCell className="font-semibold">Crédito para o cliente</TableCell><TableCell className="font-semibold">R$ 1.387,50</TableCell><TableCell className="font-semibold text-destructive">R$ 441,90</TableCell></TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-foreground mb-2">Cenário 2: Simples Nacional Híbrido</h4>
-                   <p className="mb-3">A empresa paga mais imposto (R$ 2.779,36) para gerar um crédito maior para o cliente (R$ 1.680,00), mantendo a competitividade, mas com lucro menor.</p>
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Descrição</TableHead><TableHead>Após a Reforma</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      <TableRow><TableCell>Faturamento</TableCell><TableCell>R$ 15.000,00</TableCell></TableRow>
-                      <TableRow><TableCell>Valor em impostos no SN Híbrido</TableCell><TableCell>R$ 2.779,36</TableCell></TableRow>
-                      <TableRow><TableCell>Lucro líquido</TableCell><TableCell>R$ 12.220,64</TableCell></TableRow>
-                      <TableRow><TableCell className="font-semibold">Crédito para o cliente</TableCell><TableCell className="font-semibold text-primary">R$ 1.680,00</TableCell></TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-foreground mb-2">Cenário 3: Lucro Presumido</h4>
-                   <p className="mb-3">A carga tributária aumenta (R$ 3.179,72), mas gera o mesmo crédito competitivo (R$ 1.680,00) que o Simples Híbrido, porém com o menor lucro líquido entre os cenários pós-reforma.</p>
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Descrição</TableHead><TableHead>Antes da Reforma</TableHead><TableHead>Após a Reforma</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      <TableRow><TableCell>Faturamento</TableCell><TableCell>R$ 15.000,00</TableCell><TableCell>R$ 15.000,00</TableCell></TableRow>
-                      <TableRow><TableCell>Valor em impostos LP</TableCell><TableCell>R$ 2.887,22</TableCell><TableCell>R$ 3.179,72</TableCell></TableRow>
-                      <TableRow><TableCell>Lucro líquido</TableCell><TableCell>R$ 12.112,78</TableCell><TableCell>R$ 11.730,28</TableCell></TableRow>
-                      <TableRow><TableCell className="font-semibold">Crédito para o cliente</TableCell><TableCell className="font-semibold">R$ 1.387,50</TableCell><TableCell className="font-semibold text-primary">R$ 1.680,00</TableCell></TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                <p>A base de cálculo é o valor integral da operação, incluindo acréscimos, juros, multas e outros tributos, exceto o próprio IBS e CBS, IPI, descontos incondicionais e, durante a transição, ICMS, ISS, PIS e COFINS.</p>
+                <p>Em alguns casos (operações sem valor, com valor indeterminado, ou entre partes relacionadas), a base de cálculo será o valor de mercado.</p>
               </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="item-6">
+            <AccordionItem value="item-5">
               <AccordionTrigger className="text-lg font-semibold">
-                Como escolher o melhor regime tributário?
+                5. Alíquotas
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>A decisão é complexa e depende de fatores como:</p>
+                <p>As alíquotas da CBS (federal) e do IBS (estadual/municipal) serão fixadas por lei específica de cada ente. Cada estado e município definirá sua própria alíquota de IBS, que deverá ser a mesma para todas as operações, salvo regimes especiais.</p>
+                <p>A alíquota final do IBS em uma operação será a soma das alíquotas do estado e do município de destino.</p>
+                <p>Caso um ente não defina sua alíquota, será aplicada uma alíquota de referência.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6">
+              <AccordionTrigger className="text-lg font-semibold">
+                6. Sujeitos Passivos (Contribuintes e Responsáveis)
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <h4 className="font-semibold text-foreground pt-2">Contribuintes</h4>
+                <p>O contribuinte do IBS e da CBS é o fornecedor que realiza operações no desenvolvimento de atividade econômica de modo habitual. Fornecedores do exterior que realizam operações no país também são contribuintes. O contribuinte deve se inscrever no regime regular, a menos que opte pelo Simples Nacional ou MEI.</p>
+                <p>Condomínios e consórcios não são contribuintes, mas podem optar por se inscrever.</p>
+                <h4 className="font-semibold text-foreground pt-2">Responsáveis</h4>
+                <p>Plataformas digitais são responsáveis pelo recolhimento do imposto nas operações que intermediam, substituindo o fornecedor (se este for estrangeiro) ou de forma solidária (se o fornecedor nacional não registrar a operação).</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7">
+              <AccordionTrigger className="text-lg font-semibold">
+                7. Pagamento do IBS e da CBS
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>O PLP 68/2024 prevê as seguintes modalidades de pagamento:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Seu tipo de cliente:</strong> Para quem presta serviços a Pessoas Físicas, o Simples Nacional Tradicional tende a ser melhor.</li>
-                  <li><strong>Perfil da clientela:</strong> Para clientes PJ, a análise é mais complexa. O Simples Nacional Híbrido ou Lucro Presumido se tornam mais competitivos pela geração de crédito, mas aumentam sua carga tributária.</li>
-                  <li><strong>Análise estratégica:</strong> É essencial avaliar o impacto no lucro, a possibilidade de renegociar preços e o cenário competitivo com o apoio de um contador.</li>
+                  <li>Compensação com créditos de IBS e CBS.</li>
+                  <li>Pagamento direto pelo sujeito passivo.</li>
+                  <li>Recolhimento na liquidação financeira (split payment).</li>
+                  <li>Recolhimento pelo próprio adquirente.</li>
+                  <li>Recolhimento por um responsável tributário.</li>
                 </ul>
-                <p className="font-semibold">Lembre-se: a transição será gradual. As mudanças para o Simples Nacional (incluindo o regime Híbrido) só entram em vigor em 2027.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8">
+              <AccordionTrigger className="text-lg font-semibold">
+                8. Não Cumulatividade (Sistema de Créditos)
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>O contribuinte do regime regular pode se creditar do IBS e CBS pagos na aquisição de bens e serviços. O crédito é vedado apenas na aquisição de bens e serviços de uso ou consumo pessoal (ex: joias, bebidas, armas).</p>
+                <p>Operações imunes ou isentas não geram crédito para a etapa seguinte. Na exportação, o crédito das aquisições é mantido. O prazo para utilizar os créditos é de cinco anos, e eles são intransferíveis, exceto em casos de sucessão empresarial (fusão, cisão, etc.).</p>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-9">
+              <AccordionTrigger className="text-lg font-semibold">
+                9. Simples Nacional
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>A empresa optante pelo Simples Nacional poderá escolher apurar o IBS e a CBS pelo regime regular (fora da guia do Simples).</p>
+                <p>Se mantiver o recolhimento via Simples Nacional:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Não poderá se apropriar de créditos de IBS e CBS em suas compras.</li>
+                  <li>Permitirá que seus clientes do regime regular se apropriem de créditos correspondentes ao valor do IBS e CBS efetivamente pagos na guia do Simples Nacional.</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
 
