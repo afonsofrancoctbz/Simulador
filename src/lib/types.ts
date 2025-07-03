@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { FiscalConfig } from "./config/fiscal";
+import type { FiscalConfig } from "@/config/fiscal";
 import { getFiscalParameters } from "@/config/fiscal";
 import { formatCurrencyBRL } from "./utils";
 

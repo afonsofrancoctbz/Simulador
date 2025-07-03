@@ -116,18 +116,19 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   let totalINSSRetido = 0;
   let totalIRRFRetido = 0;
   for (const proLabore of proLabores) {
-    const { valorINSSCalculado, valorIRRFCalculado, valorLiquido, valorBruto } = calcularEncargosProLabore({
+    const proLaboreTaxesPerPartner = calcularEncargosProLabore({
       valorProLaboreBruto: proLabore,
       configuracaoFiscal: fiscalConfig,
     });
+    
     partnerTaxes.push({
-      proLaboreBruto: valorBruto,
-      inss: valorINSSCalculado,
-      irrf: valorIRRFCalculado,
-      proLaboreLiquido: valorLiquido,
+      proLaboreBruto: proLaboreTaxesPerPartner.valorBruto,
+      inss: proLaboreTaxesPerPartner.valorINSSCalculado,
+      irrf: proLaboreTaxesPerPartner.valorIRRFCalculado,
+      proLaboreLiquido: proLaboreTaxesPerPartner.valorLiquido,
     });
-    totalINSSRetido += valorINSSCalculado;
-    totalIRRFRetido += valorIRRFCalculado;
+    totalINSSRetido += proLaboreTaxesPerPartner.valorINSSCalculado;
+    totalIRRFRetido += proLaboreTaxesPerPartner.valorIRRFCalculado;
   }
   
   const allCnaesData = [...domesticActivities, ...exportActivities]
@@ -164,14 +165,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     } else if (uniqueAnnexes.length > 1) {
         annexLabel = 'Múltiplos Anexos';
     } else {
-        const uniqueAnnexesFromCnaes = [...new Set(allCnaesData.map(c => c.annex))];
-        if (uniqueAnnexesFromCnaes.length === 1) {
-            annexLabel = `Anexo ${uniqueAnnexesFromCnaes[0]}`;
-        } else if (uniqueAnnexesFromCnaes.length > 1) {
-            annexLabel = 'Múltiplos Anexos';
-        } else {
-            annexLabel = 'Nenhum'; 
-        }
+        annexLabel = 'Padrão'; 
     }
 
     return {
