@@ -376,12 +376,18 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     if(year === 2025 && 'simplesNacionalSemFatorR' in results) {
         const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
         scenarios.push({ ...results.lucroPresumido, regime: 'Lucro Presumido' });
-        if (hasAnnexVActivity && results.simplesNacionalSemFatorR.annex?.includes('V')) {
-            scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: 'Anexo V' });
+        
+        if (hasAnnexVActivity) {
+            scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: 'Anexo V (Fator R não aplicado)' });
             const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
             scenarios.push({ ...results.simplesNacionalComFatorR, regime: 'Simples Nacional', annex: 'Anexo III (Otimizado com Fator R)', optimizationNote });
         } else {
-            scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: results.simplesNacionalSemFatorR.annex || 'Padrão' });
+            const baseScenario = results.simplesNacionalSemFatorR;
+            let annexLabel = baseScenario.annex || 'Padrão';
+            if (!annexLabel.includes('Múltiplos')) {
+                annexLabel += ' (Não sujeito ao Fator R)';
+            }
+            scenarios.push({ ...baseScenario, regime: 'Simples Nacional', annex: annexLabel });
         }
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         scenarios = [results.lucroPresumido, results.simplesNacionalTradicional, results.simplesNacionalHibrido];
@@ -393,7 +399,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
       : null;
 
-    const orderMap2025: Record<string, number> = { 'Anexo III (Otimizado com Fator R)': 1, 'Anexo V': 2, 'Lucro Presumido': 3 };
+    const orderMap2025: Record<string, number> = { 'Anexo III (Otimizado com Fator R)': 1, 'Anexo V (Fator R não aplicado)': 2, 'Lucro Presumido': 3 };
     const orderMap2026: Record<string, number> = { 'Simples Nacional Tradicional': 1, 'Simples Nacional Híbrido': 2, 'Lucro Presumido': 3 };
 
     const getOrderKey = (scenario: TaxDetails | TaxDetails2026) => {
@@ -1024,4 +1030,3 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
-
