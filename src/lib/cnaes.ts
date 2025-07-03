@@ -2,46 +2,11 @@ import { type CnaeData } from './types';
 
 export const CNAE_DATA: CnaeData[] = [
   {
-    code: '0161-0/03',
-    description: 'Serviço de preparação de terreno, cultivo e colheita',
-    category: 'Agropecuária e Pesca',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '0162-8/03',
-    description: 'Serviço de manejo de animais',
-    category: 'Agropecuária e Pesca',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '0322-1/07',
-    description: 'Atividades de apoio à aquicultura em água doce',
-    category: 'Agropecuária e Pesca',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '1099-6/04',
-    description: 'Fabricação de gelo comum',
-    category: 'Indústria e Fabricação',
-    annex: 'II',
-    presumedProfitRate: 0.08,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
     code: '3250-7/06',
     description: 'Serviços de prótese dentária',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -50,28 +15,11 @@ export const CNAE_DATA: CnaeData[] = [
     code: '3250-7/09',
     description: 'Serviço de laboratório óptico',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CBOO (Conselho Brasileiro de Óptica e Optometria). Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '3312-1/02',
-    description: 'Manutenção e reparação de aparelhos e instrumentos de medida, teste e controle',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '3312-1/03',
-    description: 'Manutenção e reparação de aparelhos eletromédicos e eletroterapêuticos e equipamentos de irradiação',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
     code: '3312-1/04',
@@ -500,7 +448,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '4399-1/01',
     description: 'Administração de obras',
     category: 'Construção Civil',
-    annex: 'IV',
+    annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA ou CAU. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -1692,7 +1640,8 @@ export const CNAE_DATA: CnaeData[] = [
     code: '6319-4/00',
     description: 'Portais provedores de conteúdo e outros serviços de informação na internet',
     category: 'Tecnologia da Informação',
-    annex: 'III',
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: false
   },
@@ -1717,11 +1666,10 @@ export const CNAE_DATA: CnaeData[] = [
     code: '6612-6/05',
     description: 'Agentes de investimentos em aplicações financeiras',
     category: 'Serviços Financeiros e Imobiliários',
-    annex: 'V',
-    requiresFatorR: true,
+    annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Esta atividade é impedida no Simples Nacional. A empresa deve ser registrada na CVM e constituída como Sociedade Simples. Existem restrições de atividades e sociedades conflitantes.'
+    notes: 'Atividade regulamentada pela CVM. É obrigatório o registro da PJ.'
   },
   {
     code: '6619-3/02',
@@ -1787,15 +1735,6 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CRECI. O registro da PJ é obrigatório e requer um corretor responsável. A natureza jurídica não pode ser Empresário Individual.'
   },
   {
-    code: '6822-6/00',
-    description: 'Gestão e administração da propriedade imobiliária',
-    category: 'Serviços Financeiros e Imobiliários',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRECI ou CRA. Exige registro e Responsável Técnico. A locação de imóveis próprios não é regulamentada.'
-  },
-  {
     code: '6911-7/01',
     description: 'Serviços advocatícios',
     category: 'Atividades Jurídicas e Contábeis',
@@ -1808,8 +1747,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '6911-7/02',
     description: 'Atividades auxiliares da justiça',
     category: 'Atividades Jurídicas e Contábeis',
-    annex: 'V',
-    requiresFatorR: true,
+    annex: 'III',
     presumedProfitRate: 0.32,
     isRegulated: true
   },
@@ -2683,43 +2621,6 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa, um Responsável Técnico médico, endereço comercial, e não pode ser Empresário Individual.'
   },
   {
-    code: '8610-1/02',
-    description: 'Atividades de atendimento em pronto-socorro e unidades hospitalares para atendimento a urgências',
-    category: 'Saúde e Bem-estar',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa, um Responsável Técnico médico com RQE, endereço comercial e não pode ser Empresário Individual.'
-  },
-  {
-    code: '8621-6/01',
-    description: 'UTI móvel',
-    category: 'Saúde e Bem-estar',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: false,
-    notes: 'Atenção: Validar endereço e se a atividade é realizada no local.'
-  },
-  {
-    code: '8621-6/02',
-    description: 'Serviços móveis de atendimento a urgências, exceto por UTI móvel',
-    category: 'Saúde e Bem-estar',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: false,
-    notes: 'Atenção: Validar endereço e se a atividade é realizada no local.'
-  },
-  {
-    code: '8622-4/00',
-    description: 'Serviços de remoção de pacientes, exceto os serviços móveis de atendimento a urgências',
-    category: 'Saúde e Bem-estar',
-    annex: 'III',
-    presumedProfitRate: 0.32,
-    isRegulated: false,
-    notes: 'Atenção: Validar endereço e se a atividade é realizada no local.'
-  },
-  {
     code: '8630-5/01',
     description: 'Atividade médica ambulatorial com recursos para realização de procedimentos cirúrgicos',
     category: 'Saúde e Bem-estar',
@@ -3030,16 +2931,6 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atenção: Este CNAE não pode constar em empresa registrada no CREMESP.'
   },
   {
-    code: '8690-9/02',
-    description: 'Atividades de bancos de leite humano',
-    category: 'Saúde e Bem-estar',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRM (Conselho Regional de Medicina).'
-  },
-  {
     code: '8690-9/03',
     description: 'Atividades de acupuntura',
     category: 'Saúde e Bem-estar',
@@ -3064,16 +2955,6 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: false,
     notes: 'Atenção: Necessário confirmar Objeto Social.'
-  },
-  {
-    code: '8711-5/01',
-    description: 'Clínicas e residências geriátricas',
-    category: 'Saúde e Bem-estar',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRM. Pode exigir RQE e Responsável Técnico.'
   },
   {
     code: '8711-5/02',
@@ -3464,3 +3345,5 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atenção: Necessário confirmar Objeto Social.'
   }
 ];
+
+```
