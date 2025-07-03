@@ -171,7 +171,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const watchedRevenues = form.watch("revenues");
   const watchedExchangeRate = form.watch("exchangeRate");
   const watchedExportCurrency = form.watch("exportCurrency");
-
+  const selectedCnaes = form.watch("selectedCnaes");
+  
   const projectedAnnualRevenue = useMemo(() => {
     let domestic = 0;
     let exportRaw = 0;
@@ -192,8 +193,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const SIMPLES_NACIONAL_LIMIT = 4800000;
   const showSimplesLimitWarning = (rbt12Value ?? 0) === 0 && projectedAnnualRevenue > SIMPLES_NACIONAL_LIMIT;
 
-
-  const selectedCnaes = form.watch("selectedCnaes");
   const exportCurrency = form.watch("exportCurrency");
   const selectedCity = form.watch("city");
   
@@ -314,6 +313,35 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   }
 
   async function onSubmit(values: CalculatorFormValues) {
+    // Business rule: Do not serve Anexo I/II companies with projected revenue > 4.8M
+    if ((values.rbt12 ?? 0) === 0) {
+        let domestic = 0;
+        let exportRaw = 0;
+        for (const key in values.revenues) {
+            const revenue = values.revenues[key] || 0;
+            if (key.startsWith('domestic_')) domestic += revenue;
+            else if (key.startsWith('export_')) exportRaw += revenue;
+        }
+        const exportBRL = values.exportCurrency !== 'BRL' ? exportRaw * (values.exchangeRate || 1) : exportRaw;
+        const projectedAnnual = (domestic + exportBRL) * 12;
+
+        if (projectedAnnual > SIMPLES_NACIONAL_LIMIT) {
+            const hasAnexoIorII = values.selectedCnaes.some(code => {
+                const cnae = getCnaeData(code);
+                return cnae?.annex === 'I' || cnae?.annex === 'II';
+            });
+            if (hasAnexoIorII) {
+                toast({
+                    title: "Não atendemos este perfil",
+                    description: "No momento, não atendemos empresas de Comércio ou Indústria (Anexo I ou II) com faturamento anual superior a R$ 4,8 milhões.",
+                    variant: "destructive",
+                    duration: 10000,
+                });
+                return;
+            }
+        }
+    }
+    
     setIsLoading(true);
     setResults(null);
     setAdvice(null);
@@ -397,7 +425,9 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if(year === 2025 && 'simplesNacionalSemFatorR' in results) {
         const { simplesNacionalSemFatorR, simplesNacionalComFatorR, lucroPresumido } = results;
-        scenarios.push({ ...lucroPresumido });
+        if (!isCommerceOnly) {
+          scenarios.push({ ...lucroPresumido });
+        }
         scenarios.push({ ...simplesNacionalSemFatorR });
 
         if (simplesNacionalComFatorR.totalMonthlyCost !== simplesNacionalSemFatorR.totalMonthlyCost) {
@@ -405,7 +435,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             scenarios.push({ ...simplesNacionalComFatorR, optimizationNote });
         }
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
-        scenarios = [results.lucroPresumido, results.simplesNacionalTradicional, results.simplesNacionalHibrido];
+        if (!isCommerceOnly) {
+          scenarios.push(results.lucroPresumido);
+        }
+        scenarios.push(results.simplesNacionalTradicional, results.simplesNacionalHibrido);
     }
 
     if (scenarios.length === 0) return null;
@@ -972,23 +1005,23 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </div>
 
                     <div>
-                      <div className='border-b pb-2 mb-2'>
+                      <div className='border-b pb-2'>
                           <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                               <ListChecks className="h-5 w-5 text-primary" />
                               3. Selecione o Plano Contabilizei
                           </h3>
-                          <p className='text-muted-foreground text-sm mt-1'>Qual plano melhor se encaixa no seu perfil?</p>
+                           <p className='text-muted-foreground text-sm mt-1'>Qual plano melhor se encaixa no seu perfil?</p>
                       </div>
                        <FormField
                           control={form.control}
                           name="selectedPlan"
                           render={({ field }) => (
-                              <FormItem>
+                              <FormItem className='pt-2'>
                                   <FormControl>
                                       <RadioGroup
                                           onValueChange={field.onChange}
                                           value={field.value}
-                                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 pt-2"
+                                          className="grid grid-cols-2 md:grid-cols-4 gap-2"
                                       >
                                           {planOptions.map(plan => {
                                               const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
@@ -1001,13 +1034,16 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                       <Label
                                                           htmlFor={plan.value}
                                                           className={cn(
-                                                              "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center h-full",
+                                                              "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all text-center h-full",
                                                               field.value === plan.value && "border-primary",
-                                                              isExperts && !isDisabled && "border-primary shadow-md",
+                                                              isExperts && !isDisabled && "border-primary/70 shadow-md",
                                                               isDisabled && "cursor-not-allowed opacity-50 bg-muted/50"
                                                           )}
                                                       >
-                                                          <span className={cn("font-semibold text-sm", isExperts && "font-bold text-base")}>
+                                                          <span className={cn(
+                                                              "font-semibold text-sm", 
+                                                              isExperts && "font-bold text-base"
+                                                            )}>
                                                               {plan.title}
                                                           </span>
                                                           {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
