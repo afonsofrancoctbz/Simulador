@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, type ComponentType } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent, AlertTriangle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
@@ -162,6 +162,31 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
   }, [numberOfPartners, replace, form, MINIMUM_WAGE]);
 
+  const rbt12Value = form.watch("rbt12");
+  const watchedRevenues = form.watch("revenues");
+  const watchedExchangeRate = form.watch("exchangeRate");
+  const watchedExportCurrency = form.watch("exportCurrency");
+
+  const projectedAnnualRevenue = useMemo(() => {
+    let domestic = 0;
+    let exportRaw = 0;
+
+    for (const key in watchedRevenues) {
+        const revenue = watchedRevenues[key] || 0;
+        if (key.startsWith('domestic_')) {
+            domestic += revenue;
+        } else if (key.startsWith('export_')) {
+            exportRaw += revenue;
+        }
+    }
+    
+    const exportBRL = watchedExportCurrency !== 'BRL' ? exportRaw * watchedExchangeRate : exportRaw;
+    return (domestic + exportBRL) * 12;
+  }, [watchedRevenues, watchedExchangeRate, watchedExportCurrency]);
+  
+  const SIMPLES_NACIONAL_LIMIT = 4800000;
+  const showSimplesLimitWarning = (rbt12Value ?? 0) === 0 && projectedAnnualRevenue > SIMPLES_NACIONAL_LIMIT;
+
 
   const selectedCnaes = form.watch("selectedCnaes");
   const exportCurrency = form.watch("exportCurrency");
@@ -317,7 +342,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         setAdvice(aiResult.advice);
       } catch (error) {
         console.error("Error fetching AI advice:", error);
-        setAdvice("Não foi possível obter a recomendação da IA no momento.");
+        setAdvice("Não foi possível obter la recomendação da IA no momento.");
       } finally {
         setIsAdviceLoading(false);
       }
@@ -777,6 +802,15 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                         Deixe R$ 0,00 se estiver abrindo a empresa agora. A calculadora estimará o valor.
                                     </FormDescription>
                                     <FormMessage />
+                                    {showSimplesLimitWarning && (
+                                        <Alert variant="destructive" className="mt-2">
+                                            <AlertTriangle className="h-4 w-4" />
+                                            <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
+                                            <AlertDescription>
+                                                Com base no faturamento mensal informado, sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões do Simples Nacional. Empresas que ultrapassam esse limite devem ser desenquadradas do regime.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
                                 </FormItem>
                                 );
                             }} />
@@ -990,3 +1024,4 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
+
