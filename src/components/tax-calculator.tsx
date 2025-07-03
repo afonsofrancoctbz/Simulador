@@ -391,9 +391,6 @@ export default function TaxCalculator() {
                         <ListChecks className="h-5 w-5 text-primary"/>
                         Resumo das Atividades Selecionadas
                     </h3>
-                    <p className="text-sm text-muted-foreground">
-                        Esta é a lista de CNAEs utilizada para a simulação dos impostos.
-                    </p>
                 </div>
                 <ul className="border rounded-md p-3 bg-muted/20">
                     {selectedCnaes.map((code, index) => {
@@ -640,9 +637,10 @@ export default function TaxCalculator() {
                                 <FormLabel>Pró-labore e Vínculos dos Sócios</FormLabel>
                                 <div className="space-y-6">
                                     {fields.map((item, index) => (
-                                        <div key={item.id} className="p-4 border rounded-lg space-y-4 bg-muted/20">
-                                            <h4 className="font-semibold text-foreground">Sócio {index + 1}</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                                        <div key={item.id} className="p-4 border rounded-lg bg-muted/20">
+                                            <h4 className="font-semibold text-foreground mb-4">Sócio {index + 1}</h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 items-start">
+                                                {/* Pro-labore Input */}
                                                 <FormField
                                                     control={form.control}
                                                     name={`proLabores.${index}.value`}
@@ -672,56 +670,62 @@ export default function TaxCalculator() {
                                                         );
                                                     }}
                                                 />
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`proLabores.${index}.otherContributionSalary`}
-                                                    render={({ field }) => {
-                                                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                            const { value } = e.target;
-                                                            const digitsOnly = value.replace(/\D/g, '');
-                                                            field.onChange(Number(digitsOnly) / 100);
-                                                        };
-                                                        return(
-                                                        <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible')}>
-                                                            <FormLabel>Salário de Contribuição (Outro Vínculo)</FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="text"
-                                                                    inputMode="decimal"
-                                                                    placeholder="0,00"
-                                                                    onChange={handleChange}
-                                                                    onBlur={field.onBlur}
-                                                                    value={field.value ? formatBRL(field.value) : ''}
-                                                                    name={field.name}
-                                                                    ref={field.ref}
-                                                                />
-                                                            </FormControl>
-                                                            <FormDescription className="text-sm">Seu salário base de contribuição.</FormDescription>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                        )
-                                                    }}
-                                                />
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`proLabores.${index}.hasOtherInssContribution`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 md:col-span-2 bg-background">
-                                                            <div className="space-y-0.5">
-                                                                <FormLabel>Possui outro vínculo com recolhimento de INSS?</FormLabel>
-                                                                <FormDescription className='text-sm'>
-                                                                    Marque se você já recolhe INSS como CLT ou em outra empresa (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
+
+                                                {/* Other Contribution Section */}
+                                                <div className="space-y-4">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`proLabores.${index}.hasOtherInssContribution`}
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background">
+                                                                <div className="space-y-0.5">
+                                                                    <FormLabel>Outro vínculo INSS?</FormLabel>
+                                                                    <FormDescription className='text-xs'>
+                                                                        Se já contribui como CLT, etc.
+                                                                    </FormDescription>
+                                                                </div>
+                                                                <FormControl>
+                                                                    <Switch
+                                                                        checked={field.value}
+                                                                        onCheckedChange={field.onChange}
+                                                                    />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`proLabores.${index}.otherContributionSalary`}
+                                                        render={({ field }) => {
+                                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                const { value } = e.target;
+                                                                const digitsOnly = value.replace(/\D/g, '');
+                                                                field.onChange(Number(digitsOnly) / 100);
+                                                            };
+                                                            return(
+                                                            <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible')}>
+                                                                <FormLabel>Salário de Contribuição</FormLabel>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="text"
+                                                                        inputMode="decimal"
+                                                                        placeholder="0,00"
+                                                                        onChange={handleChange}
+                                                                        onBlur={field.onBlur}
+                                                                        value={field.value ? formatBRL(field.value) : ''}
+                                                                        name={field.name}
+                                                                        ref={field.ref}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormDescription className="text-xs">
+                                                                    Salário base no outro vínculo (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
                                                                 </FormDescription>
-                                                            </div>
-                                                            <FormControl>
-                                                                <Switch
-                                                                    checked={field.value}
-                                                                    onCheckedChange={field.onChange}
-                                                                />
-                                                            </FormControl>
-                                                        </FormItem>
-                                                    )}
-                                                />
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                            )
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
