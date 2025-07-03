@@ -53,6 +53,7 @@ const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
 const CalculatorFormSchema = z.object({
   city: z.string({ required_error: "Por favor, selecione uma cidade." }).optional(),
   selectedCnaes: z.array(z.string()).min(1, "Selecione ao menos uma atividade (CNAE)."),
+  rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
@@ -81,9 +82,9 @@ const CalculatorFormSchema = z.object({
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
-    return totalRevenue > 0 || totalProLabore > 0;
+    return totalRevenue > 0 || totalProLabore > 0 || data.rbt12 > 0;
 }, {
-    message: "Informe ao menos um valor de faturamento ou pró-labore para calcular.",
+    message: "Informe ao menos um valor de faturamento para calcular.",
     path: ["revenues"],
 });
 
@@ -124,6 +125,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     defaultValues: {
       city: undefined,
       selectedCnaes: [],
+      rbt12: 0,
       revenues: {},
       exportCurrency: 'BRL',
       exchangeRate: 1,
@@ -242,6 +244,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }));
     
     return {
+        rbt12: values.rbt12,
         domesticActivities,
         exportActivities,
         exportCurrency: values.exportCurrency,
@@ -275,7 +278,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
       const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
 
-      if (totalRevenue === 0 && totalProLabore === 0) {
+      if (totalRevenue === 0 && totalProLabore === 0 && submissionValues.rbt12 === 0) {
         return;
       }
       if (!('simplesNacionalSemFatorR' in calculatedResults)) return;
@@ -739,6 +742,35 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                             </Button>
                         </div>
 
+                        <FormField control={form.control} name="rbt12" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
+                                <FormItem>
+                                    <FormLabel>Faturamento dos Últimos 12 Meses (RBT12)</FormLabel>
+                                    <FormControl>
+                                        <Input 
+                                            type="text" 
+                                            inputMode="decimal"
+                                            placeholder="Ex: 250.000,00"
+                                            onChange={handleChange}
+                                            onBlur={field.onBlur}
+                                            value={field.value ? formatBRL(field.value) : ''}
+                                            name={field.name}
+                                            ref={field.ref}
+                                        />
+                                    </FormControl>
+                                    <FormDescription className='text-sm'>
+                                        Soma da receita bruta da sua empresa no mercado interno e externo. Essencial para o cálculo do Simples Nacional.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                );
+                            }} />
+
                         {year === 2026 && (
                           <FormField
                             control={form.control}
@@ -788,7 +820,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                     };
                                                     return (
                                                     <FormItem>
-                                                        <FormLabel>Faturamento (Anexo {annex})</FormLabel>
+                                                        <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
                                                         <FormControl>
                                                             <Input
                                                                 type="text"
@@ -860,7 +892,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                     };
                                                     return (
                                                     <FormItem>
-                                                        <FormLabel>Faturamento (Anexo {annex})</FormLabel>
+                                                        <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
                                                         <FormControl>
                                                             <Input
                                                                 type="text"

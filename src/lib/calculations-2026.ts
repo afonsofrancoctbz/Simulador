@@ -34,9 +34,14 @@ const IBS_RATE = fiscalConfig.reforma_tributaria.ibs_rate;
 // --- DUPLICATED HELPERS (to avoid altering calculations.ts) ---
 
 function _findBracket(table: { max: number }[], value: number) {
-  if (!table || table.length === 0) return { max: 0 };
-  if (value === 0) return table[0];
-  for (const bracket of table) if (value <= bracket.max) return bracket;
+  if (value === 0) {
+    return table[0];
+  }
+  for (const bracket of table) {
+    if (value <= bracket.max) {
+      return bracket;
+    }
+  }
   return table[table.length - 1];
 }
 
@@ -137,7 +142,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 }
 
 function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
-    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0 } = values;
+    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0, rbt12 } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
@@ -146,7 +151,7 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
     const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
     const totalRevenue = domesticRevenue + exportRevenue;
     
-    if (totalRevenue === 0) {
+    if (totalRevenue === 0 && rbt12 === 0) {
       // Handle zero revenue case
       return {
         regime: isHybrid ? 'Simples Nacional Híbrido' : 'Simples Nacional Tradicional',
@@ -165,7 +170,6 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
     }
 
     const allActivities = [...domesticActivities, ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate }))];
-    const rbt12 = totalRevenue * 12;
     const totalPayrollForFatorR = totalSalaryExpense + totalProLaboreBruto;
     const fatorR = totalRevenue > 0 ? totalPayrollForFatorR / totalRevenue : 0;
     
@@ -187,7 +191,7 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
         const annexRevenue = revenueByAnnex[annex];
         const annexTable = ANNEX_TABLES[annex];
         const bracket = _findBracket(annexTable, rbt12);
-        const effectiveRate = (rbt12 * bracket.rate - bracket.deduction) / rbt12;
+        const effectiveRate = rbt12 > 0 ? (rbt12 * bracket.rate - bracket.deduction) / rbt12 : bracket.rate;
         
         totalDas += annexRevenue * effectiveRate;
 
@@ -218,7 +222,7 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
           let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
           const annexTable = ANNEX_TABLES[effectiveAnnex];
           const bracket = _findBracket(annexTable, rbt12);
-          const effectiveRate = totalRevenue > 0 ? (rbt12 * bracket.rate - bracket.deduction) / rbt12 : 0;
+          const effectiveRate = rbt12 > 0 ? (rbt12 * bracket.rate - bracket.deduction) / rbt12 : 0;
           
           const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
           const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;

@@ -25,6 +25,7 @@ export type ProLaboreForm = z.infer<typeof ProLaboreFormSchema>;
 
 // Schema for the main form input passed to calculation functions
 export const TaxFormValuesSchema = z.object({
+  rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   domesticActivities: z.array(CnaeItemSchema),
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
@@ -102,6 +103,14 @@ export const CalculationResults2026Schema = z.object({
     lucroPresumido: TaxDetails2026Schema,
 });
 export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
+
+
+export const CalculationResultsSchema = z.object({
+  simplesNacionalComFatorR: TaxDetailsSchema,
+  simplesNacionalSemFatorR: TaxDetailsSchema,
+  lucroPresumido: TaxDetailsSchema,
+});
+export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
 
 
 export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';

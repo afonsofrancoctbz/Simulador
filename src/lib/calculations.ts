@@ -134,7 +134,7 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[]): { partnerTaxes: Pa
 
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12 } = values;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -149,7 +149,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       .filter((c): c is CnaeData => !!c);
 
   // --- Guard Clause for Zero Revenue ---
-  if (totalRevenue === 0) {
+  if (totalRevenue === 0 && rbt12 === 0) {
     let cppFromAnnexIV = 0;
     
     const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
@@ -205,8 +205,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const allDomesticActivities = domesticActivities.map(a => ({ ...a, type: 'domestic' as const }));
   const allExportActivitiesWithBRL = exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const }));
   const allActivities = [...allDomesticActivities, ...allExportActivitiesWithBRL];
-  const rbt12 = totalRevenue * 12;
-
+  
   const SUBLIMIT_SIMPLES = 3600000;
   const rbt12ExceededSublimit = rbt12 > SUBLIMIT_SIMPLES;
 
@@ -251,7 +250,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const annexTable = ANNEX_TABLES[annex];
     const bracketIndex = _findBracketIndex(annexTable, rbt12);
     const bracket = annexTable[bracketIndex];
-    const effectiveRate = totalRevenue > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : 0;
+    const effectiveRate = rbt12 > 0 ? ((rbt12 * bracket.rate - bracket.deduction) / rbt12) : bracket.rate;
     
     const { PIS = 0, COFINS = 0, ISS = 0 } = bracket.distribution;
     const isLastBracket = bracketIndex === annexTable.length - 1;
