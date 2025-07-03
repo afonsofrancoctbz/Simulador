@@ -20,7 +20,13 @@ import {
 import { formatCurrencyBRL, formatPercent } from './utils';
 
 const fiscalConfig = getFiscalParameters(2026);
-const ANNEX_TABLES = fiscalConfig.simples_nacional;
+const ANNEX_TABLES = {
+  I: fiscalConfig.simples_nacional.anexoI,
+  II: fiscalConfig.simples_nacional.anexoII,
+  III: fiscalConfig.simples_nacional.anexoIII,
+  IV: fiscalConfig.simples_nacional.anexoIV,
+  V: fiscalConfig.simples_nacional.anexoV,
+};
 const IVA_RATE = fiscalConfig.reforma_tributaria.iva_rate;
 const CBS_RATE = fiscalConfig.reforma_tributaria.cbs_rate;
 const IBS_RATE = fiscalConfig.reforma_tributaria.ibs_rate;
@@ -171,7 +177,7 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
     for (const annexStr in revenueByAnnex) {
         const annex = annexStr as Annex;
         const annexRevenue = revenueByAnnex[annex];
-        const annexTable = ANNEX_TABLES[annex as keyof typeof ANNEX_TABLES];
+        const annexTable = ANNEX_TABLES[annex];
         const bracket = _findBracket(annexTable, rbt12);
         const effectiveRate = (rbt12 * bracket.rate - bracket.deduction) / rbt12;
         
