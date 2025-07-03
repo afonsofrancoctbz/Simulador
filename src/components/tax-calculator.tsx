@@ -9,7 +9,7 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxFormValuesSchema, TaxDetails2026 } from '@/lib/types';
+import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026 } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -50,7 +50,44 @@ import { Slider } from './ui/slider';
 const fiscalConfig2025 = getFiscalParameters(2025);
 const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
 
-type CalculatorFormValues = z.infer<typeof TaxFormValuesSchema>;
+const CalculatorFormSchema = z.object({
+  city: z.string({ required_error: "Por favor, selecione uma cidade." }).optional(),
+  selectedCnaes: z.array(z.string()).min(1, "Selecione ao menos uma atividade (CNAE)."),
+  revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
+  exportCurrency: z.string(),
+  exchangeRate: z.coerce.number(),
+  totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
+  proLabores: z.array(ProLaboreFormSchema),
+  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
+  b2bRevenuePercentage: z.coerce.number().min(0).max(100),
+}).superRefine((data, ctx) => {
+    const fiscalConfig = getFiscalParameters(); // Using current year for validation
+    data.proLabores.forEach((proLabore, index) => {
+      if (proLabore.value > 0 && proLabore.value < fiscalConfig.salario_minimo) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(fiscalConfig.salario_minimo)}.`,
+              path: [`proLabores.${index}.value`],
+          });
+      }
+      if (proLabore.hasOtherInssContribution && (proLabore.otherContributionSalary === undefined || proLabore.otherContributionSalary <= 0)) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Informe um valor de contribuição positivo.',
+              path: [`proLabores.${index}.otherContributionSalary`],
+          });
+      }
+    });
+}).refine(data => {
+    const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
+    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
+    return totalRevenue > 0 || totalProLabore > 0;
+}, {
+    message: "Informe ao menos um valor de faturamento ou pró-labore para calcular.",
+    path: ["revenues"],
+});
+
+type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
 
 const cityInfoComponents: { [key: string]: ComponentType } = {
   'São Paulo - SP': CityInfoSection,
@@ -83,7 +120,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const MINIMUM_WAGE = fiscalConfig.salario_minimo;
 
   const form = useForm<CalculatorFormValues>({
-    resolver: zodResolver(TaxFormValuesSchema),
+    resolver: zodResolver(CalculatorFormSchema),
     defaultValues: {
       city: undefined,
       selectedCnaes: [],
@@ -304,7 +341,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         if (hasAnnexVActivity && results.simplesNacionalSemFatorR.annex?.includes('V')) {
             scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: 'Anexo V' });
             const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...results.simplesNacionalComFatorR, regime: 'Simples Nacional', annex: 'Anexo III (Com Fator R)', optimizationNote });
+            scenarios.push({ ...results.simplesNacionalComFatorR, regime: 'Simples Nacional', annex: 'Anexo III (Otimizado com Fator R)', optimizationNote });
         } else {
             scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: results.simplesNacionalSemFatorR.annex || 'Padrão' });
         }
@@ -318,7 +355,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
       : null;
 
-    const orderMap2025: Record<string, number> = { 'Anexo III (Com Fator R)': 1, 'Anexo V': 2, 'Lucro Presumido': 3 };
+    const orderMap2025: Record<string, number> = { 'Anexo III (Otimizado com Fator R)': 1, 'Anexo V': 2, 'Lucro Presumido': 3 };
     const orderMap2026: Record<string, number> = { 'Simples Nacional Tradicional': 1, 'Simples Nacional Híbrido': 2, 'Lucro Presumido': 3 };
 
     const getOrderKey = (scenario: TaxDetails | TaxDetails2026) => {

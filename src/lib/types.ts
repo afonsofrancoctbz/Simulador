@@ -50,13 +50,6 @@ export const TaxFormValuesSchema = z.object({
           });
       }
     });
-}).refine(data => {
-    const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
-    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
-    return totalRevenue > 0 || totalProLabore > 0;
-}, {
-    message: "Informe ao menos um valor de faturamento ou pró-labore.",
-    path: ["revenues"],
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
