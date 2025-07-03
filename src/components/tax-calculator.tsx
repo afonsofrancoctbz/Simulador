@@ -9,7 +9,7 @@ import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, Refresh
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails } from '@/lib/types';
+import { type CalculationResults, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -42,6 +42,7 @@ import ManausInfoSection from './manaus-info-section';
 import CampinasInfoSection from './campinas-info-section';
 import JundiaiInfoSection from './jundiai-info-section';
 import UberlandiaInfoSection from './uberlandia-info-section';
+import { Switch } from './ui/switch';
 
 
 const fiscalConfig = getFiscalParameters();
@@ -54,7 +55,7 @@ const calculatorFormSchema = z.object({
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
-  proLabores: z.array(z.object({ value: z.coerce.number().min(0, "O valor deve ser positivo.")})),
+  proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
 }).superRefine((data, ctx) => {
     data.proLabores.forEach((proLabore, index) => {
@@ -63,6 +64,13 @@ const calculatorFormSchema = z.object({
               code: z.ZodIssueCode.custom,
               message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
               path: [`proLabores.${index}.value`],
+          });
+      }
+      if (proLabore.hasOtherInssContribution && (proLabore.otherContributionSalary === undefined || proLabore.otherContributionSalary <= 0)) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Informe um valor de contribuição positivo.',
+              path: [`proLabores.${index}.otherContributionSalary`],
           });
       }
     });
@@ -113,7 +121,7 @@ export default function TaxCalculator() {
       exportCurrency: 'BRL',
       exchangeRate: 1,
       totalSalaryExpense: 0,
-      proLabores: [{ value: MINIMUM_WAGE }],
+      proLabores: [{ value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 }],
       numberOfPartners: 1,
     },
   });
@@ -129,8 +137,7 @@ export default function TaxCalculator() {
     const currentProLabores = form.getValues('proLabores');
     if (currentProLabores.length !== numberOfPartners) {
         const newProLabores = Array.from({ length: numberOfPartners }, (_, i) => {
-            // Preserve existing value if available, otherwise default
-            return currentProLabores[i] || { value: MINIMUM_WAGE };
+            return currentProLabores[i] || { value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 };
         });
         replace(newProLabores);
     }
@@ -218,6 +225,12 @@ export default function TaxCalculator() {
             }
         }
     }
+
+    const submissionProLabores = values.proLabores.map(p => ({
+        ...p,
+        value: p.value || MINIMUM_WAGE,
+        otherContributionSalary: p.hasOtherInssContribution ? (p.otherContributionSalary || 0) : 0,
+    }));
     
     return {
         domesticActivities,
@@ -225,7 +238,7 @@ export default function TaxCalculator() {
         exportCurrency: values.exportCurrency,
         exchangeRate: values.exportCurrency !== 'BRL' ? (values.exchangeRate ?? 1) : 1,
         totalSalaryExpense: values.totalSalaryExpense,
-        proLabores: values.proLabores.map(p => p.value || MINIMUM_WAGE),
+        proLabores: submissionProLabores,
         numberOfPartners: values.numberOfPartners,
     };
   }
@@ -249,7 +262,7 @@ export default function TaxCalculator() {
     setIsLoading(false);
     
     const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
-    const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl, 0);
+    const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
 
     if (totalRevenue === 0 && totalProLabore === 0) {
       return; // No need to call AI if there's no financial activity
@@ -299,43 +312,35 @@ export default function TaxCalculator() {
 
     const scenarios: TaxDetails[] = [];
 
-    const lucroPresumidoScenario = {
-        ...results.lucroPresumido,
-        regime: 'Lucro Presumido',
-    };
-
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
 
+    // Scenario 1: Simples Nacional (Anexo V or standard)
+     scenarios.push({
+        ...results.simplesNacionalSemFatorR,
+        regime: 'Simples Nacional',
+        annex: hasAnnexVActivity ? 'Anexo V' : results.simplesNacionalSemFatorR.annex || 'Padrão'
+    });
+    
+    // Scenario 2: Simples Nacional (Anexo III optimized)
     if (hasAnnexVActivity) {
-        scenarios.push({
-            ...results.simplesNacionalSemFatorR,
-            regime: 'Simples Nacional',
-            annex: 'Anexo V'
-        });
-
-        const cenarioOtimizado = results.simplesNacionalComFatorR;
-        const proLaboreOtimizado = cenarioOtimizado.proLabore;
-        const optimizationNote = `Para alcançar este cenário, seu pró-labore total foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
-        
-        scenarios.push({
-            ...cenarioOtimizado,
-            regime: 'Simples Nacional',
-            annex: 'Anexo III (Otimizado com Fator R)',
-            optimizationNote: optimizationNote
-        });
-        
-        scenarios.push(lucroPresumidoScenario);
-
-    } else { // Annex III, IV, or others
-        const mainAnnex = results.simplesNacionalSemFatorR.annex || 'Padrão';
-        const situacaoAtual = {
-            ...results.simplesNacionalSemFatorR,
-            regime: `Simples Nacional`,
-            annex: mainAnnex
-        };
-        scenarios.push(situacaoAtual);
-        scenarios.push(lucroPresumidoScenario);
+      const cenarioOtimizado = results.simplesNacionalComFatorR;
+      const proLaboreOtimizado = cenarioOtimizado.proLabore;
+      if (cenarioOtimizado.totalMonthlyCost < results.simplesNacionalSemFatorR.totalMonthlyCost) {
+          const optimizationNote = `Para alcançar este cenário, seu pró-labore total foi recalculado para ${formatCurrencyBRL(proLaboreOtimizado)}, garantindo um Fator R de 28% e uma tributação mais vantajosa.`;
+          scenarios.push({
+              ...cenarioOtimizado,
+              regime: 'Simples Nacional',
+              annex: 'Anexo III (Otimizado com Fator R)',
+              optimizationNote: optimizationNote
+          });
+      }
     }
+    
+    // Scenario 3: Lucro Presumido
+    scenarios.push({
+        ...results.lucroPresumido,
+        regime: 'Lucro Presumido',
+    });
     
     return scenarios;
 
@@ -362,22 +367,19 @@ export default function TaxCalculator() {
 
     const orderMap: Record<string, number> = {
         'Anexo III': 1,
-        'Anexo IV': 2,
-        'Anexo V': 3,
-        'Lucro Presumido': 4,
+        'Anexo V': 2,
+        'Lucro Presumido': 3,
     };
 
     const getOrderKey = (scenario: TaxDetails) => {
         if (scenario.regime.includes('Lucro Presumido')) return orderMap['Lucro Presumido'];
-        if (scenario.annex?.includes('III')) return orderMap['Anexo III'];
-        if (scenario.annex?.includes('IV')) return orderMap['Anexo IV'];
-        if (scenario.annex?.includes('V')) return orderMap['Anexo V'];
-        if (scenario.regime.includes('Simples')) return orderMap['Anexo III'];
-        return 99;
+        if (scenario.annex?.includes('Anexo III')) return orderMap['Anexo III'];
+        if (scenario.annex?.includes('Anexo V')) return orderMap['Anexo V'];
+        return 99; // Fallback
     };
-
-    const sortedForDisplay = [...scenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
-
+    
+    const uniqueScenarios = Array.from(new Map(scenarios.map(s => [`${s.regime}-${s.annex}`, s])).values());
+    const sortedForDisplay = [...uniqueScenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
 
     const submissionValues = transformFormToSubmission(form.getValues());
     const { selectedCnaes } = form.getValues();
@@ -412,10 +414,10 @@ export default function TaxCalculator() {
                                     index < selectedCnaes.length - 1 && "border-b border-border/50"
                                 )}>
                                     <div className="flex-1">
-                                        <span className="font-semibold text-foreground">{cnae.code}</span>
-                                        <span className="text-muted-foreground ml-2">{cnae.description}</span>
+                                        <p className="font-semibold text-foreground">{cnae.code}</p>
+                                        <p className="text-muted-foreground">{cnae.description}</p>
                                     </div>
-                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                    <div className="flex items-center gap-2 flex-shrink-0 mt-1">
                                         <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
                                         {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
                                         {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
@@ -432,7 +434,7 @@ export default function TaxCalculator() {
                      <ResultCard 
                         key={`${scenario.regime}-${scenario.annex}`} 
                         details={scenario} 
-                        isCheapest={cheapestScenario !== null && scenario === cheapestScenario && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
+                        isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
                         formValues={submissionValues}
                     />
                 ))}
@@ -637,46 +639,102 @@ export default function TaxCalculator() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <div className="md:col-span-3 space-y-2">
-                                <FormLabel>Pró-labore Mensal por Sócio</FormLabel>
-                                <FormDescription className='text-sm !mt-0'>
-                                    Salário mensal de cada sócio. Se o valor for R$ 0,00, será considerado o salário mínimo ({formatCurrencyBRL(MINIMUM_WAGE)}) para o cálculo.
-                                </FormDescription>
-                                <div className={cn(
-                                    "grid grid-cols-1 gap-x-6 gap-y-4 pt-2",
-                                    numberOfPartners > 1 && "md:grid-cols-2 lg:grid-cols-3"
-                                )}>
+                            <div className="md:col-span-3 space-y-4">
+                                <FormLabel>Pró-labore e Vínculos dos Sócios</FormLabel>
+                                <div className="space-y-6">
                                     {fields.map((item, index) => (
-                                      <FormField
-                                        key={item.id}
-                                        control={form.control}
-                                        name={`proLabores.${index}.value`}
-                                        render={({ field }) => {
-                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                const { value } = e.target;
-                                                const digitsOnly = value.replace(/\D/g, '');
-                                                field.onChange(Number(digitsOnly) / 100);
-                                            };
-                                            return (
-                                                <FormItem>
-                                                  {numberOfPartners > 1 && <FormLabel>Sócio {index + 1}</FormLabel>}
-                                                  <FormControl>
-                                                    <Input
-                                                      type="text"
-                                                      inputMode="decimal"
-                                                      placeholder={formatBRL(MINIMUM_WAGE)}
-                                                      onChange={handleChange}
-                                                      onBlur={field.onBlur}
-                                                      value={field.value ? formatBRL(field.value) : ''}
-                                                      name={field.name}
-                                                      ref={field.ref}
+                                        <div key={item.id} className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                                            <h4 className="font-semibold text-foreground">Sócio {index + 1}</h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <FormField
+                                                    key={item.id}
+                                                    control={form.control}
+                                                    name={`proLabores.${index}.value`}
+                                                    render={({ field }) => {
+                                                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                            const { value } = e.target;
+                                                            const digitsOnly = value.replace(/\D/g, '');
+                                                            field.onChange(Number(digitsOnly) / 100);
+                                                        };
+                                                        return (
+                                                            <FormItem>
+                                                            <FormLabel>Pró-labore Mensal</FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                type="text"
+                                                                inputMode="decimal"
+                                                                placeholder={formatBRL(MINIMUM_WAGE)}
+                                                                onChange={handleChange}
+                                                                onBlur={field.onBlur}
+                                                                value={field.value ? formatBRL(field.value) : ''}
+                                                                name={field.name}
+                                                                ref={field.ref}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                            </FormItem>
+                                                        );
+                                                    }}
+                                                />
+                                                <div />
+
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`proLabores.${index}.hasOtherInssContribution`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 md:col-span-2 bg-background">
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel>Possui outro vínculo com recolhimento de INSS?</FormLabel>
+                                                                <FormDescription className='text-sm'>
+                                                                    Marque se você já recolhe INSS como CLT ou em outra empresa (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
+                                                                </FormDescription>
+                                                            </div>
+                                                            <FormControl>
+                                                                <Switch
+                                                                    checked={field.value}
+                                                                    onCheckedChange={field.onChange}
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+
+                                                {form.watch(`proLabores.${index}.hasOtherInssContribution`) && (
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`proLabores.${index}.otherContributionSalary`}
+                                                        render={({ field }) => {
+                                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                const { value } = e.target;
+                                                                const digitsOnly = value.replace(/\D/g, '');
+                                                                field.onChange(Number(digitsOnly) / 100);
+                                                            };
+                                                            return(
+                                                            <FormItem className="md:col-span-2">
+                                                                <FormLabel>Salário de Contribuição no outro vínculo (R$)</FormLabel>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="text"
+                                                                        inputMode="decimal"
+                                                                        placeholder="0,00"
+                                                                        onChange={handleChange}
+                                                                        onBlur={field.onBlur}
+                                                                        value={field.value ? formatBRL(field.value) : ''}
+                                                                        name={field.name}
+                                                                        ref={field.ref}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormDescription className='text-sm'>
+                                                                    Informe o valor total do seu salário base de contribuição em outras fontes.
+                                                                </FormDescription>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                            )
+                                                        }}
                                                     />
-                                                  </FormControl>
-                                                  <FormMessage />
-                                                </FormItem>
-                                            );
-                                        }}
-                                      />
+                                                )}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -852,7 +910,3 @@ export default function TaxCalculator() {
     </FormProvider>
   );
 }
-
-    
-
-    

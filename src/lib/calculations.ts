@@ -15,6 +15,7 @@ import {
   type ProLaboreInput,
   type ProLaboreOutput,
   type PartnerTaxDetails,
+  type ProLaboreForm,
 } from './types';
 import { formatCurrencyBRL, formatPercent } from './utils';
 
@@ -64,9 +65,9 @@ export function getCnaeData(code: string): CnaeData | undefined {
 }
 
 export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutput {
-  const { valorProLaboreBruto, configuracaoFiscal } = input;
+  const { proLaboreBruto, otherContributionSalary = 0, configuracaoFiscal } = input;
 
-  if (valorProLaboreBruto <= 0) {
+  if (proLaboreBruto <= 0) {
     return {
       valorBruto: 0,
       baseCalculoINSS: 0,
@@ -79,21 +80,24 @@ export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutpu
   }
 
   const tetoINSS = configuracaoFiscal.teto_inss;
-  const baseCalculoINSS = Math.min(valorProLaboreBruto, tetoINSS);
-
+  
+  // Logic for "duplo vínculo" (double contribution)
+  const remainingContributionRoom = Math.max(0, tetoINSS - otherContributionSalary);
+  const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
+  
   const valorINSSCalculado = baseCalculoINSS * configuracaoFiscal.aliquota_inss_prolabore;
   
-  const baseCalculoIRRF = valorProLaboreBruto - valorINSSCalculado;
+  const baseCalculoIRRF = proLaboreBruto - valorINSSCalculado;
 
   const irrfBracket = _findBracket(configuracaoFiscal.tabela_irrf, baseCalculoIRRF);
   const valorIRRFCalculado = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
 
-  const valorLiquido = valorProLaboreBruto - valorINSSCalculado - valorIRRFCalculado;
+  const valorLiquido = proLaboreBruto - valorINSSCalculado - valorIRRFCalculado;
   
-  const aliquotaEfetivaINSS = valorProLaboreBruto > 0 ? valorINSSCalculado / valorProLaboreBruto : 0;
+  const aliquotaEfetivaINSS = proLaboreBruto > 0 ? valorINSSCalculado / proLaboreBruto : 0;
 
   return {
-    valorBruto: valorProLaboreBruto,
+    valorBruto: proLaboreBruto,
     baseCalculoINSS,
     aliquotaEfetivaINSS,
     valorINSSCalculado,
@@ -103,14 +107,15 @@ export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutpu
   };
 }
 
-function _calculatePartnerTaxes(proLabores: number[]): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
+function _calculatePartnerTaxes(proLabores: ProLaboreForm[]): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     const partnerTaxes: PartnerTaxDetails[] = [];
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
 
     for (const proLabore of proLabores) {
         const proLaboreTaxesPerPartner = calcularEncargosProLabore({
-            valorProLaboreBruto: proLabore,
+            proLaboreBruto: proLabore.value,
+            otherContributionSalary: proLabore.hasOtherInssContribution ? proLabore.otherContributionSalary : 0,
             configuracaoFiscal: fiscalConfig,
         });
         
@@ -345,7 +350,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores } = values;
-  const totalProLaboreBruto = proLabores.reduce((a, b) => a + b, 0);
+  const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
   
   // --- Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -439,7 +444,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 }
 
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
-  const totalProLaboreBruto = values.proLabores.reduce((a, b) => a + b, 0);
+  const totalProLaboreBruto = values.proLabores.reduce((acc, p) => acc + p.value, 0);
 
   const lucroPresumido = calculateLucroPresumido(values);
   const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, 'Simples Nacional');
@@ -463,7 +468,12 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
           if (requiredTotalProLabore > totalProLaboreBruto) {
               const optimizedProLaborePerPartner = requiredTotalProLabore / values.numberOfPartners;
-              const optimizedProLabores = Array(values.numberOfPartners).fill(optimizedProLaborePerPartner);
+              
+              const optimizedProLabores = values.proLabores.map(p => ({
+                ...p, // Preserve the partner's "duplo vínculo" information
+                value: optimizedProLaborePerPartner
+              }));
+
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
               simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional com Fator R');
           } else {

@@ -14,6 +14,15 @@ export const CnaeItemSchema = z.object({
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
+// Schema for an individual pro-labore input from the form
+export const ProLaboreFormSchema = z.object({
+  value: z.coerce.number().min(0, "O valor deve ser positivo."),
+  hasOtherInssContribution: z.boolean().default(false),
+  otherContributionSalary: z.coerce.number().min(0, "O valor deve ser positivo.").optional(),
+});
+export type ProLaboreForm = z.infer<typeof ProLaboreFormSchema>;
+
+
 // Schema for the main form input passed to calculation functions
 export const TaxFormValuesSchema = z.object({
   domesticActivities: z.array(CnaeItemSchema),
@@ -21,7 +30,7 @@ export const TaxFormValuesSchema = z.object({
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
-  proLabores: z.array(z.coerce.number().min(0, "O valor deve ser positivo.")),
+  proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
@@ -60,7 +69,7 @@ export const TaxDetailsSchema = z.object({
     annex: z.string().optional(),
     annualSavings: z.number().optional(),
     optimizationNote: z.string().optional(),
-    partnerTaxes: z.array(PartnerTaxDetailsSchema), // Changed to array
+    partnerTaxes: z.array(PartnerTaxDetailsSchema),
 });
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
@@ -101,8 +110,9 @@ export interface FeeBracket {
 }
 
 export interface ProLaboreInput {
-  valorProLaboreBruto: number;
-  configuracaoFiscal: FiscalConfig; // Objeto com os parâmetros do ano (tabelas, tetos)
+  proLaboreBruto: number;
+  otherContributionSalary?: number;
+  configuracaoFiscal: FiscalConfig;
 }
 
 export interface ProLaboreOutput {
