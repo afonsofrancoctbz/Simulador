@@ -9,15 +9,12 @@ import {
   type CalculationResults2026,
   type TaxFormValues,
   type TaxDetails2026,
-  type CnaeData,
   type Annex,
-  type FeeBracket,
-  type ProLaboreInput,
-  type ProLaboreOutput,
   type PartnerTaxDetails,
   type ProLaboreForm,
 } from './types';
 import { formatCurrencyBRL, formatPercent } from './utils';
+import { _findBracket, _findFeeBracket, getCnaeData, _calculatePartnerTaxes } from './calculations';
 
 const fiscalConfig = getFiscalParameters(2026);
 const ANNEX_TABLES = {
@@ -31,55 +28,6 @@ const IVA_RATE = fiscalConfig.reforma_tributaria.iva_rate;
 const CBS_RATE = fiscalConfig.reforma_tributaria.cbs_rate;
 const IBS_RATE = fiscalConfig.reforma_tributaria.ibs_rate;
 
-// --- DUPLICATED HELPERS (to avoid altering calculations.ts) ---
-
-function _findBracket(table: { max: number }[], value: number) {
-  if (value === 0) {
-    return table[0];
-  }
-  for (const bracket of table) {
-    if (value <= bracket.max) {
-      return bracket;
-    }
-  }
-  return table[table.length - 1];
-}
-
-function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
-    return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
-}
-
-export function getCnaeData(code: string): CnaeData | undefined {
-  return CNAE_DATA.find(c => c.code === code);
-}
-
-function _calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutput {
-  const { proLaboreBruto, otherContributionSalary = 0, configuracaoFiscal } = input;
-  if (proLaboreBruto <= 0) return { valorBruto: 0, baseCalculoINSS: 0, aliquotaEfetivaINSS: 0, valorINSSCalculado: 0, baseCalculoIRRF: 0, valorIRRFCalculado: 0, valorLiquido: 0 };
-  const tetoINSS = configuracaoFiscal.teto_inss;
-  const remainingContributionRoom = Math.max(0, tetoINSS - otherContributionSalary);
-  const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
-  const valorINSSCalculado = baseCalculoINSS * configuracaoFiscal.aliquota_inss_prolabore;
-  const baseCalculoIRRF = proLaboreBruto - valorINSSCalculado;
-  const irrfBracket = _findBracket(configuracaoFiscal.tabela_irrf, baseCalculoIRRF);
-  const valorIRRFCalculado = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
-  const valorLiquido = proLaboreBruto - valorINSSCalculado - valorIRRFCalculado;
-  const aliquotaEfetivaINSS = proLaboreBruto > 0 ? valorINSSCalculado / proLaboreBruto : 0;
-  return { valorBruto: proLaboreBruto, baseCalculoINSS, aliquotaEfetivaINSS, valorINSSCalculado, baseCalculoIRRF, valorIRRFCalculado, valorLiquido };
-}
-
-function _calculatePartnerTaxes(proLabores: ProLaboreForm[]): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
-    const partnerTaxes: PartnerTaxDetails[] = [];
-    let totalINSSRetido = 0, totalIRRFRetido = 0;
-    for (const proLabore of proLabores) {
-        const proLaboreTaxesPerPartner = _calcularEncargosProLabore({ proLaboreBruto: proLabore.value, otherContributionSalary: proLabore.hasOtherInssContribution ? proLabore.otherContributionSalary : 0, configuracaoFiscal: fiscalConfig });
-        partnerTaxes.push({ proLaboreBruto: proLaboreTaxesPerPartner.valorBruto, inss: proLaboreTaxesPerPartner.valorINSSCalculado, irrf: proLaboreTaxesPerPartner.valorIRRFCalculado, proLaboreLiquido: proLaboreTaxesPerPartner.valorLiquido });
-        totalINSSRetido += proLaboreTaxesPerPartner.valorINSSCalculado;
-        totalIRRFRetido += proLaboreTaxesPerPartner.valorIRRFCalculado;
-    }
-    return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
-}
-
 // --- CALCULATION LOGIC FOR 2026 ---
 
 function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
@@ -90,7 +38,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   const totalRevenue = domesticRevenue + exportRevenueBRL;
 
-  const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
+  const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
   const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
 
@@ -142,11 +90,11 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   };
 }
 
-function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
+function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0, rbt12, selectedPlan } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
 
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores);
+    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
@@ -272,12 +220,12 @@ function _calculateSimples(values: TaxFormValues, isHybrid: boolean): TaxDetails
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
   const lucroPresumido = calculateLucroPresumido2026(values);
-  const simplesNacionalTradicional = _calculateSimples(values, false);
-  const simplesNacionalHibrido = _calculateSimples(values, true);
+  const simplesNacionalTradicional = _calculateSimples2026(values, false);
+  const simplesNacionalHibrido = _calculateSimples2026(values, true);
   
   return {
-    simplesNacionalTradicional,
-    simplesNacionalHibrido,
-    lucroPresumido,
+    simplesNacionalTradicional: { ...simplesNacionalTradicional, order: 1 },
+    simplesNacionalHibrido: { ...simplesNacionalHibrido, order: 2 },
+    lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }

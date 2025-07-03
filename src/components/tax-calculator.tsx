@@ -375,20 +375,15 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if(year === 2025 && 'simplesNacionalSemFatorR' in results) {
         const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-        scenarios.push({ ...results.lucroPresumido, regime: 'Lucro Presumido' });
+        scenarios.push({ ...results.lucroPresumido });
         
-        if (hasAnnexVActivity) {
-            scenarios.push({ ...results.simplesNacionalSemFatorR, regime: 'Simples Nacional', annex: 'Anexo V (Fator R não aplicado)' });
+        scenarios.push({ ...results.simplesNacionalSemFatorR, annex: results.simplesNacionalSemFatorR.fatorR === undefined ? `${results.simplesNacionalSemFatorR.annex} (Não sujeito ao Fator R)` : `${results.simplesNacionalSemFatorR.annex} (Fator R não aplicado)` });
+        
+        if (hasAnnexVActivity && results.simplesNacionalComFatorR.fatorR) {
             const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(results.simplesNacionalComFatorR.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...results.simplesNacionalComFatorR, regime: 'Simples Nacional', annex: 'Anexo III (Otimizado com Fator R)', optimizationNote });
-        } else {
-            const baseScenario = results.simplesNacionalSemFatorR;
-            let annexLabel = baseScenario.annex || 'Padrão';
-            if (!annexLabel.includes('Múltiplos')) {
-                annexLabel += ' (Não sujeito ao Fator R)';
-            }
-            scenarios.push({ ...baseScenario, regime: 'Simples Nacional', annex: annexLabel });
+            scenarios.push({ ...results.simplesNacionalComFatorR, annex: `${results.simplesNacionalComFatorR.annex} (Otimizado com Fator R)`, optimizationNote });
         }
+        
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         scenarios = [results.lucroPresumido, results.simplesNacionalTradicional, results.simplesNacionalHibrido];
     }
@@ -398,18 +393,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     const cheapestScenario = scenarios.length > 0
       ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
       : null;
-
-    const orderMap2025: Record<string, number> = { 'Anexo III (Otimizado com Fator R)': 1, 'Anexo V (Fator R não aplicado)': 2, 'Lucro Presumido': 3 };
-    const orderMap2026: Record<string, number> = { 'Simples Nacional Tradicional': 1, 'Simples Nacional Híbrido': 2, 'Lucro Presumido': 3 };
-
-    const getOrderKey = (scenario: TaxDetails | TaxDetails2026) => {
-        if (year === 2026) return orderMap2026[scenario.regime] ?? 99;
-        const key = scenario.annex ? `${scenario.regime} ${scenario.annex}`.replace('Simples Nacional ', '') : scenario.regime;
-        if (key in orderMap2025) return orderMap2025[key];
-        return 99;
-    };
     
-    const sortedForDisplay = [...scenarios].sort((a, b) => getOrderKey(a) - getOrderKey(b));
+    const sortedForDisplay = [...scenarios].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
     return (
         <div id="results-section" className="mt-16 w-full">

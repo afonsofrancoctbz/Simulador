@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 import type { FiscalConfig } from "@/config/fiscal";
 import { getFiscalParameters } from "@/config/fiscal";
@@ -93,6 +94,7 @@ export const TaxDetailsSchema = z.object({
     annualSavings: z.number().optional(),
     optimizationNote: z.string().optional(),
     partnerTaxes: z.array(PartnerTaxDetailsSchema),
+    order: z.number().optional(),
 });
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
@@ -146,7 +148,7 @@ export interface FeeBracket {
 export interface ProLaboreInput {
   proLaboreBruto: number;
   otherContributionSalary?: number;
-  configuracaoFiscal: FiscalConfig | z.infer<typeof import("@/config/fiscal").FiscalConfig2026>;
+  configuracaoFiscal: FiscalConfig;
 }
 
 export interface ProLaboreOutput {
