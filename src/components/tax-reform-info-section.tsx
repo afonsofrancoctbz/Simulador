@@ -17,10 +17,10 @@ export default function TaxReformInfoSection() {
         <CardHeader className="text-center">
           <Info className="mx-auto h-8 w-8 text-primary mb-2" />
           <CardTitle className="text-2xl font-bold text-primary">
-            Entenda a Reforma Tributária (Simulação 2026)
+            Entenda a Reforma Tributária e a CBS (Simulação 2026)
           </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
-            Aprovada no Brasil, a reforma não altera diretamente o regime do Simples Nacional, mas traz pontos de atenção para empresas B2B.
+            Acompanhe o que muda com a Contribuição sobre Bens e Serviços (CBS) e como ela impactará sua empresa, incluindo o Simples Nacional.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -28,69 +28,71 @@ export default function TaxReformInfoSection() {
 
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
-                Quais as principais mudanças?
+                O que é o tributo CBS e qual a diferença para o IBS?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                 <p>
-                  Um dos principais focos da Reforma Tributária está na unificação dos cinco principais tributos sobre consumo de bens e serviços (ISS, ICMS, IPI, PIS, COFINS) no chamado <strong>Imposto sobre Valor Agregado (IVA)</strong>.
+                  A <strong>Contribuição sobre Bens e Serviços (CBS)</strong> é um dos dois tributos que formam o novo Imposto sobre Valor Agregado (IVA). O objetivo da CBS é unificar e substituir os tributos federais sobre o consumo: <strong>PIS, COFINS e IPI</strong>.
                 </p>
                 <p>
-                  O IVA será "dual", composto pela <strong>Contribuição sobre Bens e Serviços (CBS)</strong>, que unifica os tributos federais (PIS, COFINS, IPI), e pelo <strong>Imposto sobre Bens e Serviços (IBS)</strong>, que unifica os tributos estaduais e municipais (ICMS, ISS).
+                  Já o <strong>Imposto sobre Bens e Serviços (IBS)</strong> é o outro componente do IVA, que substitui os impostos de competência estadual (ICMS) e municipal (ISS).
                 </p>
                 <p>
-                  A principal característica do IVA é a <strong>não cumulatividade plena</strong>, que evita a cobrança de imposto em cascata, permitindo que os impostos pagos em cada etapa da cadeia produtiva sejam compensados nas fases seguintes.
+                  Juntos, CBS e IBS possuem as mesmas características: incidem sobre todas as operações de venda de bens e serviços de forma não cumulativa, ou seja, o imposto pago na etapa anterior pode ser usado como crédito na etapa seguinte.
+                </p>
+                 <p>
+                  Para empresas do <strong>Simples Nacional</strong>, a mudança principal é que os impostos atuais (PIS, COFINS, ISS, etc.) serão substituídos por CBS e IBS dentro da guia DAS, mas a carga tributária total não deve aumentar no modelo tradicional. No entanto, a reforma prevê um modelo <strong>híbrido</strong> opcional, onde a empresa do Simples pode recolher a CBS e o IBS fora da DAS para gerar mais créditos aos seus clientes B2B.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                O que muda para o Simples Nacional?
+                Quando a CBS e a Reforma entram em vigor?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  O Simples Nacional mantém sua essência. O recolhimento continuará via DAS, e os tributos substituídos (PIS, COFINS, ISS, etc.) serão agrupados como CBS e IBS dentro da guia, <strong>sem aumento da carga tributária total</strong> no modelo tradicional.
+                 <p>
+                  A transição será gradual e longa, começando em 2026, após um período de regulamentação em 2024 e 2025.
                 </p>
-                <p>
-                  A principal mudança está na <strong>geração de créditos tributários</strong> para clientes. Empresas do Simples que vendem para outras empresas (B2B) do Lucro Presumido ou Lucro Real passarão a conceder créditos de IBS e CBS. No entanto, o crédito será baseado no valor efetivamente pago no DAS (que é reduzido), e não na alíquota cheia como acontecia com PIS/COFINS, o que pode diminuir a atratividade de seus serviços.
-                </p>
+                <ul className="list-disc pl-6 space-y-2">
+                    <li><strong>2026:</strong> Início da fase de testes. Empresas do Lucro Presumido e Real começam a destacar nas notas fiscais valores simbólicos de <strong>0,9% para CBS</strong> e <strong>0,1% para IBS</strong>, sem alteração no valor final a ser pago.</li>
+                    <li><strong>2027:</strong> A CBS entra em vigor plenamente, <strong>extinguindo o PIS e a COFINS</strong>. As alíquotas do IPI são zeradas (exceto para produtos da Zona Franca de Manaus). O Simples Nacional passa a operar no novo sistema, com a opção pelo regime híbrido. Também entra em vigor o Imposto Seletivo.</li>
+                    <li><strong>2029-2032:</strong> O ICMS e o ISS são reduzidos gradualmente, enquanto o IBS tem sua alíquota aumentada na mesma proporção.</li>
+                    <li><strong>2033:</strong> O novo sistema tributário entra em vigor integralmente com a substituição completa do ICMS e ISS pelo IBS.</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                O que é o Simples Nacional Híbrido?
+                Qual será a alíquota da CBS e do IVA?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                 <p>
-                  Para manter a competitividade, empresas B2B do Simples Nacional terão uma opção: o <strong>regime híbrido</strong>. Elas poderão optar por recolher a CBS e o IBS fora do DAS, pela alíquota padrão do IVA, para suas vendas a outras empresas.
+                  A alíquota exata do IVA (soma de CBS e IBS) ainda não foi definida, mas as estimativas do governo giram em torno de <strong>26,5% a 28%</strong>.
                 </p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Vantagem:</strong> Permite gerar um crédito fiscal integral para o cliente, tornando seu serviço mais competitivo.</li>
-                  <li><strong>Desvantagem:</strong> Aumenta a carga tributária para a própria empresa do Simples, pois ela pagará a alíquota cheia de CBS/IBS sobre essa parte do faturamento.</li>
-                </ul>
                 <p>
-                  Para empresas que vendem para pessoas físicas (B2C) ou exportam, o regime tradicional do Simples Nacional continua sendo a melhor opção, pois seus clientes não utilizam créditos.
+                  Uma projeção divide essa alíquota em aproximadamente <strong>9,3% para a CBS</strong> (federal) e <strong>18,7% para o IBS</strong> (estadual/municipal). É importante notar que estes são valores estimados e podem mudar.
+                </p>
+                <p>
+                  A legislação prevê alíquotas reduzidas e regimes específicos para setores essenciais como saúde, educação, cultura, e para profissionais liberais com atividades regulamentadas, além de isenções para itens da cesta básica.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
              <AccordionItem value="item-4">
               <AccordionTrigger className="text-lg font-semibold">
-                Como acontece a transição?
+                Como será o cálculo e o recolhimento?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                 <p>
-                  A transição será gradual, começando em 2026.
+                  O princípio fundamental do IVA é a <strong>não cumulatividade</strong>. O imposto é aplicado apenas ao valor "agregado" em cada etapa.
                 </p>
-                <ul className="list-disc pl-6 space-y-2">
-                    <li><strong>2026:</strong> Início de uma fase de testes para empresas do Lucro Presumido e Real, com alíquotas de 0,9% para CBS e 0,1% para IBS, que podem ser compensadas.</li>
-                    <li><strong>2027:</strong> A CBS entra em vigor plenamente, extinguindo PIS e COFINS. A opção pelo regime híbrido do Simples Nacional passa a valer.</li>
-                    <li><strong>2029-2032:</strong> ICMS e ISS são gradualmente reduzidos.</li>
-                    <li><strong>2033:</strong> O novo sistema tributário entra em vigor integralmente com a substituição completa de ICMS e ISS pelo IBS.</li>
-                </ul>
-                 <p className="text-sm mt-3">
-                  <strong>Nota do Simulador:</strong> Esta simulação para 2026 utiliza as alíquotas de teste (0,9% CBS e 0,1% IBS) para ilustrar os possíveis cenários e ajudar no planejamento estratégico.
+                <p>
+                  <strong>Exemplo simplificado:</strong> Uma indústria vende uma cadeira por R$ 50,00 para um varejista, pagando R$ 4,65 de CBS (9,3% sobre R$ 50). O varejista vende essa cadeira por R$ 100,00. Ele não pagará o imposto sobre os R$ 100, mas sim sobre os R$ 50 que ele agregou ao preço. Assim, ele também pagará R$ 4,65 de CBS. O total de imposto recolhido na cadeia é de R$ 9,30, que corresponde à alíquota sobre o preço final ao consumidor.
+                </p>
+                <p>
+                  O recolhimento será modernizado com o <strong>"split payment"</strong>. No momento da transação, o sistema automaticamente divide o pagamento: uma parte para a empresa (valor do produto/serviço) e outra parte (valor do imposto) que é transferida diretamente ao governo. Isso visa simplificar o processo e combater a sonegação.
                 </p>
               </AccordionContent>
             </AccordionItem>
