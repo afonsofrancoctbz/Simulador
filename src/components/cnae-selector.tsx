@@ -21,7 +21,6 @@ import { Tabs, TabsList, TabsTrigger } from "./ui/tabs"
 import { Textarea } from "./ui/textarea"
 import { Label } from "./ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { Separator } from "./ui/separator"
 
 const mainCategories = [
   "Consultoria",
@@ -196,49 +195,52 @@ export function CnaeSelector({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-2 shrink-0">
-          <DialogTitle className="text-2xl font-bold text-center">Selecionar Atividades (CNAE)</DialogTitle>
-          <DialogDescription className="text-center">
-            Cole uma lista de CNAEs, busque ou filtre por categoria. Você pode adicionar até {MAX_SELECTION} atividades.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+        <div className="p-6 border-b shrink-0 space-y-4">
+            <DialogHeader className="p-0 text-left space-y-1">
+                <DialogTitle className="text-2xl font-bold">Selecionar Atividades (CNAE)</DialogTitle>
+                <DialogDescription>
+                    Cole uma lista, busque por código/descrição ou filtre por categoria. Máximo de {MAX_SELECTION} atividades.
+                </DialogDescription>
+            </DialogHeader>
 
-        <div className="px-6 space-y-4 shrink-0">
-            <div className="space-y-2">
-                <Label htmlFor="cnae-paste">Adicionar CNAEs em massa</Label>
-                <div className="flex items-start gap-2">
-                    <Textarea
-                        id="cnae-paste"
-                        placeholder="Cole os códigos aqui, separados por vírgula, espaço ou quebra de linha. Ex: 6201-5/01, 7112000"
-                        value={codesToPaste}
-                        onChange={(e) => setCodesToPaste(e.target.value)}
-                        rows={3}
-                    />
-                    <Button type="button" onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="h-auto py-2 px-4 self-stretch">
-                        <PlusCircle className="mr-2 h-4 w-4"/>
-                        Adicionar
-                    </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="cnae-paste">Adicionar CNAEs em massa</Label>
+                    <div className="flex items-start gap-2">
+                        <Textarea
+                            id="cnae-paste"
+                            placeholder="Cole os códigos aqui. Ex: 6201-5/01, 7112000"
+                            value={codesToPaste}
+                            onChange={(e) => setCodesToPaste(e.target.value)}
+                            rows={2}
+                        />
+                        <Button type="button" onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="h-auto py-2 px-4 self-stretch">
+                            <PlusCircle className="mr-2 h-4 w-4"/>
+                            Adicionar
+                        </Button>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="cnae-search">Ou pesquise por atividade</Label>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                        id="cnae-search"
+                        placeholder="Ex: consultoria, engenharia, 7112-0/00..."
+                        className="pl-9"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value)
+                            if(selectedCategory) setSelectedCategory(null);
+                        }}
+                        />
+                    </div>
                 </div>
             </div>
 
-            <Separator/>
-
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                placeholder="Ou pesquise por atividade, código..."
-                className="pl-9"
-                value={search}
-                onChange={(e) => {
-                    setSearch(e.target.value)
-                    if(selectedCategory) setSelectedCategory(null);
-                }}
-                />
-            </div>
-
             <Tabs value={selectedCategory || ''} onValueChange={handleCategoryChange} className="w-full">
-                <TabsList className="h-auto flex-wrap justify-center gap-1">
+                <TabsList className="h-auto flex-wrap justify-start gap-1">
                     {mainCategories.map((category) => (
                         <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
                     ))}
@@ -246,64 +248,66 @@ export function CnaeSelector({
             </Tabs>
         </div>
         
-        <div className="px-6 pt-4 flex items-center justify-between border-t mt-4 shrink-0">
-            <p className="text-sm text-muted-foreground">
-                {filteredCnaes.length > 0
-                    ? `${filteredCnaes.length} resultados na visão atual.`
-                    : "Nenhum CNAE encontrado."}
-            </p>
-            {filteredCnaes.length > 0 && (
-            <div className="flex items-center gap-2">
-                <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
-                    Selecionar todos
-                </Button>
-                <span className="text-muted-foreground/50">/</span>
-                <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
-                    Limpar todos
-                </Button>
-            </div>
-            )}
-        </div>
-
-        <ScrollArea className="flex-grow min-h-0 border-t">
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {filteredCnaes.length > 0 ? (
-                filteredCnaes.map((cnae) => (
-                    <button
-                    key={cnae.code}
-                    className={cn(
-                        "w-full text-left p-3 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
-                        selectedCodes.includes(cnae.code) && "bg-accent/80 text-accent-foreground ring-2 ring-ring"
-                    )}
-                    onClick={() => handleToggleCnae(cnae.code)}
-                    disabled={!selectedCodes.includes(cnae.code) && selectedCodes.length >= MAX_SELECTION}
-                    >
-                    {selectedCodes.includes(cnae.code) && (
-                        <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
-                        <Check className="h-4 w-4" />
-                        </div>
-                    )}
-                    <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
-                        <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
-                            Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
-                        </Badge>
-                        {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
-                    </div>
-                    </button>
-                ))
-                ) : (
-                <div className="text-center text-muted-foreground py-16 col-span-2">
-                    <p>
-                    {search.length > 1 || selectedCategory
-                        ? "Nenhum CNAE encontrado com os filtros atuais."
-                        : "Busque por um termo ou selecione uma categoria para ver os CNAEs."}
-                    </p>
+        <div className="flex-grow min-h-0 flex flex-col">
+            <div className="px-6 py-3 flex items-center justify-between border-b shrink-0 bg-muted/30">
+                <p className="text-sm text-muted-foreground">
+                    {filteredCnaes.length > 0
+                        ? `${filteredCnaes.length} resultados na visão atual.`
+                        : "Nenhum CNAE encontrado."}
+                </p>
+                {filteredCnaes.length > 0 && (
+                <div className="flex items-center gap-2">
+                    <Button size="sm" variant="link" onClick={handleSelectAllVisible} className="p-0 h-auto">
+                        Selecionar todos
+                    </Button>
+                    <span className="text-muted-foreground/50">/</span>
+                    <Button size="sm" variant="link" className="text-destructive hover:text-destructive/80 p-0 h-auto" onClick={handleDeselectAllVisible}>
+                        Limpar todos
+                    </Button>
                 </div>
                 )}
             </div>
-        </ScrollArea>
+
+            <ScrollArea className="flex-grow">
+                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {filteredCnaes.length > 0 ? (
+                    filteredCnaes.map((cnae) => (
+                        <button
+                        key={cnae.code}
+                        className={cn(
+                            "w-full text-left p-3 border rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors",
+                            selectedCodes.includes(cnae.code) && "bg-accent/80 text-accent-foreground ring-2 ring-ring"
+                        )}
+                        onClick={() => handleToggleCnae(cnae.code)}
+                        disabled={!selectedCodes.includes(cnae.code) && selectedCodes.length >= MAX_SELECTION}
+                        >
+                        {selectedCodes.includes(cnae.code) && (
+                            <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
+                            <Check className="h-4 w-4" />
+                            </div>
+                        )}
+                        <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
+                            <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                                Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
+                            </Badge>
+                            {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
+                        </div>
+                        </button>
+                    ))
+                    ) : (
+                    <div className="text-center text-muted-foreground py-16 col-span-full">
+                        <p>
+                        {search.length > 1 || selectedCategory
+                            ? "Nenhum CNAE encontrado com os filtros atuais."
+                            : "Busque por um termo ou selecione uma categoria para ver os CNAEs."}
+                        </p>
+                    </div>
+                    )}
+                </div>
+            </ScrollArea>
+        </div>
         <DialogFooter className="p-4 border-t bg-background items-center justify-between flex-row shrink-0">
             <div className="text-sm text-muted-foreground">
                 {selectedCodes.length} de {MAX_SELECTION} selecionados
