@@ -267,6 +267,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }));
     
     return {
+        selectedCnaes: values.selectedCnaes,
         selectedPlan: values.selectedPlan,
         rbt12: values.rbt12 ?? 0,
         domesticActivities,

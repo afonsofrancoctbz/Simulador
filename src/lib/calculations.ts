@@ -134,7 +134,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12, selectedPlan } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12, selectedPlan, selectedCnaes } = values;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -147,20 +147,21 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   // --- 2. Pro-labore Taxes (per partner, then aggregated) ---
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
   
-  const allCnaesData = [...domesticActivities, ...exportActivities]
-      .map(a => getCnaeData(a.code))
+  const allCnaesData = selectedCnaes
+      .map(code => getCnaeData(code))
       .filter((c): c is CnaeData => !!c);
+
+  const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
+
+  // --- 4. Calculate CPP for Anexo IV (if applicable) ---
+  let cppFromAnnexIV = 0;
+  if (hasAnnexIV && (totalSalaryExpense + totalProLaboreBruto > 0)) {
+    const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.base;
+    cppFromAnnexIV = (totalSalaryExpense + totalProLaboreBruto) * cppRate;
+  }
 
   // --- Guard Clause for Zero Revenue ---
   if (totalRevenue === 0 && effectiveRbt12 === 0) {
-    let cppFromAnnexIV = 0;
-    
-    const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
-    if (hasAnnexIV && (totalSalaryExpense + totalProLaboreBruto > 0)) {
-        const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.base;
-        cppFromAnnexIV = (totalSalaryExpense + totalProLaboreBruto) * cppRate;
-    }
-    
     const companyTaxes = cppFromAnnexIV;
     const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
     const totalTax = companyTaxes + totalWithheldTaxes;
@@ -230,6 +231,10 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     notes.push(`Seu "Fator R" é de ${formatPercent(fatorR)}. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
   }
 
+  if (hasAnnexIV) {
+      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal - 20%) sobre a folha de pagamento, fora do DAS.`);
+  }
+
   // --- Group Revenue & Calculate DAS ---
   const revenueByAnnex = allActivities.reduce((acc, activity) => {
     const cnaeInfo = getCnaeData(activity.code);
@@ -245,7 +250,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   }, {} as Record<Annex, { domestic: number; export: number }>);
   
   let totalDas = 0;
-  let cppFromAnnexIV = 0;
   let totalIssSeparado = 0;
   
   for (const annexStr in revenueByAnnex) {
@@ -282,17 +286,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     dasForExport -= exportExemptionValue;
     
     totalDas += dasForDomestic + dasForExport;
-    
-    if (annex === 'IV' && (totalSalaryExpense + totalProLaboreBruto > 0)) {
-      const annexIVRevenue = (annexInfo.domestic || 0) + (annexInfo.export || 0);
-      const proportionAnnexIV = totalRevenue > 0 ? annexIVRevenue / totalRevenue : 0;
-      const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.base;
-      cppFromAnnexIV += (totalSalaryExpense + totalProLaboreBruto) * cppRate * proportionAnnexIV;
-      
-      if (!notes.some(n => n.includes("Anexo IV paga a CPP"))) {
-          notes.push("Anexo IV paga a CPP (INSS Patronal - 20%) fora do DAS, proporcional à sua receita.");
-      }
-    }
   }
 
   // --- 5. Assemble Final Results ---
