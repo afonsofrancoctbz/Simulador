@@ -5,7 +5,6 @@ import TaxCalculator from '@/components/tax-calculator';
 import AppFooter from '@/components/app-footer';
 import AppHeader from '@/components/app-header';
 import DigitalCertificateSection from '@/components/digital-certificate-section';
-import RocSection from '@/components/roc-section';
 import PjAccountSection from '@/components/pj-account-section';
 import MultibenefitsSection from '@/components/multibenefits-section';
 import TaxReformInfoSection from '@/components/tax-reform-info-section';
@@ -50,12 +49,6 @@ export default function Home() {
         <section className="py-16 lg:py-24 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <DigitalCertificateSection />
-          </div>
-        </section>
-
-        <section className="py-16 lg:py-24 bg-slate-50/70">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <RocSection />
           </div>
         </section>
 

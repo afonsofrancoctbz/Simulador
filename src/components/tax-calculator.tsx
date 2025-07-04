@@ -34,6 +34,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
+import RocSection from './roc-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -331,12 +332,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             }
 
             setResults(calculatedResults);
-            setIsLoading(false);
             
             const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
             const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
 
             if (totalRevenue === 0 && totalProLabore === 0 && submissionValues.rbt12 === 0) {
+                 setIsLoading(false);
                 return;
             }
             if (!('simplesNacionalBase' in calculatedResults)) {
@@ -345,6 +346,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     description: "Os resultados do cálculo são inválidos. Tente novamente.",
                     variant: "destructive"
                 });
+                 setIsLoading(false);
                 return;
             }
 
@@ -383,9 +385,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 description: "Ocorreu um erro inesperado ao calcular os impostos. Por favor, tente novamente.",
                 variant: "destructive",
             });
-            setIsLoading(false);
             setResults(null);
             setAdvice(null);
+        } finally {
+            setIsLoading(false);
         }
     } else { // Year is 2026
         try {
@@ -396,7 +399,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             }
             
             setResults(calculatedResults);
-            setIsLoading(false);
         } catch (e) {
             console.error("Erro ao calcular impostos (2026):", e);
             toast({
@@ -404,9 +406,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 description: "Ocorreu um erro inesperado ao calcular os impostos. Por favor, tente novamente.",
                 variant: "destructive",
             });
-            setIsLoading(false);
             setResults(null);
             setAdvice(null);
+        } finally {
+             setIsLoading(false);
         }
     }
   }
@@ -427,7 +430,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
 
     const submissionValues = transformFormToSubmission(form.getValues());
-    const { selectedCnaes, numberOfPartners } = form.getValues();
+    const { selectedCnaes } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if(year === 2025 && 'simplesNacionalBase' in results) {
@@ -1006,8 +1009,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
 
-                    <div>
-                      <div className='border-b pb-2 mb-2'>
+                    <div className="space-y-2">
+                      <div className='pb-2'>
                           <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                               <ListChecks className="h-5 w-5 text-primary" />
                               3. Selecione o Plano Contabilizei
@@ -1043,8 +1046,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                           )}
                                                       >
                                                           <span className={cn(
-                                                              "font-semibold text-sm", 
-                                                              isExperts && "font-bold text-base"
+                                                              "font-semibold", 
+                                                              isExperts ? "font-bold text-base" : "text-sm"
                                                             )}>
                                                               {plan.title}
                                                           </span>
