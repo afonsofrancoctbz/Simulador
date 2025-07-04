@@ -33,7 +33,6 @@ import { Slider } from './ui/slider';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
-import RocSection from './roc-section';
 import CityInfoRenderer from './city-info-renderer';
 
 
@@ -323,52 +322,92 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     const submissionValues = transformFormToSubmission(values);
 
-    if(year === 2025) {
-      const calculatedResults = await calculateTaxesOnServer(submissionValues);
-      setResults(calculatedResults);
-      setIsLoading(false);
-      
-      const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
-      const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
+    if (year === 2025) {
+        try {
+            const calculatedResults = await calculateTaxesOnServer(submissionValues);
 
-      if (totalRevenue === 0 && totalProLabore === 0 && submissionValues.rbt12 === 0) {
-        return;
-      }
-      if (!('simplesNacionalBase' in calculatedResults)) return;
+            if (!calculatedResults) {
+                throw new Error("A API de cálculo não retornou resultados.");
+            }
 
-      setIsAdviceLoading(true);
-      try {
-          const totalDomesticRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
-          const totalExportRevenue = submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
+            setResults(calculatedResults);
+            setIsLoading(false);
+            
+            const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
+            const totalProLabore = submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0);
 
-          const activitiesSummary = [...submissionValues.domesticActivities, ...submissionValues.exportActivities]
-              .map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`)
-              .join(', ');
-        
-        const aiInput: TaxOptimizationInput = {
-          activities: activitiesSummary,
-          totalDomesticRevenue,
-          totalExportRevenue,
-          totalSalaryExpense: values.totalSalaryExpense,
-          totalProLabore: totalProLabore,
-          numberOfPartners: values.numberOfPartners,
-          simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalBase.totalMonthlyCost,
-          simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalOtimizado.totalMonthlyCost,
-          lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
-        };
-        const aiResult = await getTaxOptimizationAdvice(aiInput);
-        setAdvice(aiResult.advice);
-      } catch (error) {
-        console.error("Error fetching AI advice:", error);
-        setAdvice("Não foi possível obter la recomendação da IA no momento.");
-      } finally {
-        setIsAdviceLoading(false);
-      }
+            if (totalRevenue === 0 && totalProLabore === 0 && submissionValues.rbt12 === 0) {
+                return;
+            }
+            if (!('simplesNacionalBase' in calculatedResults)) {
+                toast({
+                    title: "Erro ao Processar",
+                    description: "Os resultados do cálculo são inválidos. Tente novamente.",
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            setIsAdviceLoading(true);
+            try {
+                const totalDomesticRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
+                const totalExportRevenue = submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
+
+                const activitiesSummary = [...submissionValues.domesticActivities, ...submissionValues.exportActivities]
+                    .map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`)
+                    .join(', ');
+              
+              const aiInput: TaxOptimizationInput = {
+                activities: activitiesSummary,
+                totalDomesticRevenue,
+                totalExportRevenue,
+                totalSalaryExpense: values.totalSalaryExpense,
+                totalProLabore: totalProLabore,
+                numberOfPartners: values.numberOfPartners,
+                simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalBase.totalMonthlyCost,
+                simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalOtimizado.totalMonthlyCost,
+                lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
+              };
+              const aiResult = await getTaxOptimizationAdvice(aiInput);
+              setAdvice(aiResult.advice);
+            } catch (error) {
+              console.error("Error fetching AI advice:", error);
+              setAdvice("Não foi possível obter a recomendação da IA no momento.");
+            } finally {
+              setIsAdviceLoading(false);
+            }
+        } catch(e) {
+            console.error("Erro ao calcular impostos (2025):", e);
+            toast({
+                title: "Erro no Cálculo",
+                description: "Ocorreu um erro inesperado ao calcular os impostos. Por favor, tente novamente.",
+                variant: "destructive",
+            });
+            setIsLoading(false);
+            setResults(null);
+            setAdvice(null);
+        }
     } else { // Year is 2026
-      const calculatedResults = await calculateTaxes2026OnServer(submissionValues);
-      setResults(calculatedResults);
-      setIsLoading(false);
-      // AI advice is disabled for 2026 for now
+        try {
+            const calculatedResults = await calculateTaxes2026OnServer(submissionValues);
+            
+            if (!calculatedResults) {
+                throw new Error("A API de cálculo para 2026 não retornou resultados.");
+            }
+            
+            setResults(calculatedResults);
+            setIsLoading(false);
+        } catch (e) {
+            console.error("Erro ao calcular impostos (2026):", e);
+            toast({
+                title: "Erro no Cálculo (2026)",
+                description: "Ocorreu um erro inesperado ao calcular os impostos. Por favor, tente novamente.",
+                variant: "destructive",
+            });
+            setIsLoading(false);
+            setResults(null);
+            setAdvice(null);
+        }
     }
   }
 
@@ -968,12 +1007,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </div>
 
                     <div>
-                      <div className='border-b pb-4 mb-2'>
+                      <div className='border-b pb-2 mb-2'>
                           <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                               <ListChecks className="h-5 w-5 text-primary" />
                               3. Selecione o Plano Contabilizei
                           </h3>
-                           <p className='text-muted-foreground text-base mt-1'>Qual plano de contabilidade melhor se encaixa no seu perfil?</p>
+                           <p className='text-muted-foreground text-sm mt-1'>Qual plano de contabilidade melhor se encaixa no seu perfil?</p>
                       </div>
                        <FormField
                           control={form.control}
@@ -1009,7 +1048,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                             )}>
                                                               {plan.title}
                                                           </span>
-                                                          {isDisabled && <p className="text-xs text-destructive mt-1 text-center">Não disponível para Comércio</p>}
                                                       </Label>
                                                   </FormItem>
                                               );
@@ -1043,6 +1081,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         <div className="mt-12">
             <CityInfoRenderer city={selectedCity} />
         </div>
+
+        {results && <div className="mt-12"><RocSection /></div>}
 
         {renderResults()}
     </FormProvider>
