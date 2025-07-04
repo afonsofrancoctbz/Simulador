@@ -321,7 +321,7 @@ export const CNAE_DATA: CnaeData[] = [
     ivaReduction: 0.6
   },
   
-  // --- SERVIÇOS ADMINISTRATIVOS ---
+  // --- SERVIÇOS ADMINISTRATIVOS E DE APOIO ---
   {
     code: '8211-3/00',
     description: 'Serviços combinados de escritório e apoio administrativo',
@@ -334,6 +334,24 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '8219-9/99',
     description: 'Preparação de documentos e serviços especializados de apoio administrativo não especificados anteriormente',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8230-0/01',
+    description: 'Serviços de organização de feiras, congressos, exposições e festas',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8230-0/02',
+    description: 'Casas de festas e eventos',
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
@@ -373,7 +391,7 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true
   },
-  
+
   // --- REPRESENTAÇÃO COMERCIAL ---
   {
     code: '4512-9/01',
@@ -414,6 +432,126 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
+  },
+
+  // --- ATIVIDADES ARTÍSTICAS, CRIATIVAS E DE ESPETÁCULOS ---
+  {
+    code: '9001-9/01',
+    description: 'Produção teatral',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/02',
+    description: 'Produção musical',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/03',
+    description: 'Produção de espetáculos de dança',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/04',
+    description: 'Produção de espetáculos circenses, de marionetes e similares',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/05',
+    description: 'Produção de espetáculos de rodeios, vaquejadas e similares',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/06',
+    description: 'Atividades de sonorização e de iluminação',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/99',
+    description: 'Artes cênicas, espetáculos e atividades complementares',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  
+  // --- ALUGUÉIS E GESTÃO DE ATIVOS ---
+  {
+    code: '7739-0/01',
+    description: 'Aluguel de máquinas para extração de minérios e petróleo, sem operador',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7739-0/02',
+    description: 'Aluguel de equipamentos científicos, médicos e hospitalares, sem operador',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7739-0/03',
+    description: 'Aluguel de palcos, coberturas e outras estruturas de uso temporário, exceto andaimes',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7739-0/99',
+    description: 'Aluguel de outras máquinas e equipamentos comerciais e industriais',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7740-3/00',
+    description: 'Gestão de ativos intangíveis não financeiros',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada. O enquadramento no Anexo III depende do Fator R.'
   },
 
   // --- DIVERSOS ---
@@ -463,35 +601,6 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: false
-  },
-  {
-    code: '7739-0/03',
-    description: 'Aluguel de palcos, coberturas e outras estruturas de uso temporário, exceto andaimes',
-    category: 'Turismo e Eventos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '9001-9/02',
-    description: 'Produção musical',
-    category: 'Cultura e Eventos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
-    code: '9001-9/03',
-    description: 'Produção de espetáculos de dança',
-    category: 'Cultura e Eventos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
   },
   {
     code: '9319-1/01',
