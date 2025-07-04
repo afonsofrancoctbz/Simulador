@@ -388,17 +388,6 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
-    code: '3250-7/06',
-    description: 'Serviços de prótese dentária',
-    category: 'Saúde e Bem-estar',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
     code: '3250-7/09',
     description: 'Serviço de laboratório óptico',
     category: 'Saúde e Bem-estar',
@@ -408,6 +397,30 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CBOO. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  
+  // --- ODONTOLOGIA ---
+  {
+    code: '8630-5/04',
+    description: 'Atividade odontológica',
+    category: 'Odontologia',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '3250-7/06',
+    description: 'Serviços de prótese dentária',
+    category: 'Odontologia',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
 
   // --- TECNOLOGIA DA INFORMAÇÃO ---

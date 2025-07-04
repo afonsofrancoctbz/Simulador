@@ -36,6 +36,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import RocSection from './roc-section';
 import HealthInfoSection from './health-info-section';
+import OdontologyInfoSection from './odontology-info-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -74,7 +75,7 @@ const CalculatorFormSchema = z.object({
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
-    return totalRevenue > 0 || totalProLabore > 0 || (data.rbt12 ?? 0) > 0;
+    return totalRevenue > 0 || totalProLabore > 0 || (data.rbt12 ?? 0) > 0 || data.selectedCnaes.length > 0;
 }, {
     message: "Informe ao menos um valor de faturamento para calcular.",
     path: ["revenues"],
@@ -192,6 +193,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         return selectedCnaes.some(code => {
             const cnae = getCnaeData(code);
             return cnae?.category === 'Saúde e Bem-estar' || cnae?.category === 'Veterinária';
+        });
+    }, [selectedCnaes]);
+
+    const hasOdontologyCnae = useMemo(() => {
+        return selectedCnaes.some(code => {
+            const cnae = getCnaeData(code);
+            return cnae?.category === 'Odontologia';
         });
     }, [selectedCnaes]);
 
@@ -1099,8 +1107,18 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 <HealthInfoSection />
             </div>
         )}
+
+        {hasOdontologyCnae && (
+            <div className="mt-12">
+                <OdontologyInfoSection />
+            </div>
+        )}
         
-        {results && <div className="mt-12"><RocSection /></div>}
+        {results && (
+          <div className="mt-12">
+            <RocSection />
+          </div>
+        )}
 
         {renderResults()}
     </FormProvider>
