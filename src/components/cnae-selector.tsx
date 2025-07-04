@@ -196,7 +196,7 @@ export function CnaeSelector({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-2 shrink-0">
           <DialogTitle className="text-2xl font-bold text-center">Selecionar Atividades (CNAE)</DialogTitle>
           <DialogDescription className="text-center">
@@ -266,7 +266,7 @@ export function CnaeSelector({
         </div>
 
         <ScrollArea className="flex-grow min-h-0 border-t">
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {filteredCnaes.length > 0 ? (
                 filteredCnaes.map((cnae) => (
                     <button
