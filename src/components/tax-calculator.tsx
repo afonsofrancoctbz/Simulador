@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import RocSection from './roc-section';
+import HealthInfoSection from './health-info-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -186,6 +187,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCommerceOnly, form]);
+
+    const hasHealthOrVetCnae = useMemo(() => {
+        return selectedCnaes.some(code => {
+            const cnae = getCnaeData(code);
+            return cnae?.category === 'Saúde e Bem-estar' || cnae?.category === 'Veterinária';
+        });
+    }, [selectedCnaes]);
 
   const fetchRates = async () => {
     setIsFetchingRate(true);
@@ -1086,6 +1094,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             <CityInfoRenderer city={selectedCity} />
         </div>
 
+        {hasHealthOrVetCnae && (
+            <div className="mt-12">
+                <HealthInfoSection />
+            </div>
+        )}
+        
         {results && <div className="mt-12"><RocSection /></div>}
 
         {renderResults()}

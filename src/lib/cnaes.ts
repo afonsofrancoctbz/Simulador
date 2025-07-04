@@ -2,6 +2,61 @@ import { type CnaeData } from './types';
 
 export const CNAE_DATA: CnaeData[] = [
   // --- SAÚDE E BEM-ESTAR ---
+   {
+    code: '7500-1/00',
+    description: 'Atividades veterinárias',
+    category: 'Veterinária',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CRMV. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8610-1/01',
+    description: 'Atividades de atendimento hospitalar, exceto pronto-socorro e unidades para atendimento a urgências',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8610-1/02',
+    description: 'Atividades de atendimento em pronto-socorro e unidades hospitalares para atendimento a urgências',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8630-5/01',
+    description: 'Atividade médica ambulatorial com recursos para realização de procedimentos cirúrgicos',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8630-5/02',
+    description: 'Atividade médica ambulatorial com recursos para realização de exames complementares',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
   {
     code: '8630-5/03',
     description: 'Atividade médica ambulatorial restrita a consultas',
@@ -12,6 +67,204 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico. Não pode ser MEI.'
+  },
+   {
+    code: '8630-5/06',
+    description: 'Serviços de vacinação e imunização humana',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8630-5/07',
+    description: 'Atividades de reprodução humana assistida',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8630-5/99',
+    description: 'Atividades de atenção ambulatorial não especificadas anteriormente',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/01',
+    description: 'Laboratórios de anatomia patológica e citológica',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/02',
+    description: 'Laboratórios clínicos',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/03',
+    description: 'Serviços de diálise e nefrologia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/04',
+    description: 'Serviços de tomografia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/05',
+    description: 'Serviços de diagnóstico por imagem com uso de radiação ionizante, exceto tomografia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/06',
+    description: 'Serviços de ressonância magnética',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/07',
+    description: 'Serviços de diagnóstico por imagem sem uso de radiação ionizante, exceto ressonância magnética',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/08',
+    description: 'Serviços de diagnóstico por registro gráfico - ECG, EEG e outros exames análogos',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/09',
+    description: 'Serviços de diagnóstico por métodos ópticos - endoscopia e outros exames análogos',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/10',
+    description: 'Serviços de quimioterapia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/11',
+    description: 'Serviços de radioterapia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/12',
+    description: 'Serviços de hemoterapia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/13',
+    description: 'Serviços de litotripsia',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/14',
+    description: 'Serviços de bancos de células e tecidos humanos',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8640-2/99',
+    description: 'Atividades de serviços de complementação diagnóstica e terapêutica não especificadas anteriormente',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
     code: '8650-0/01',
@@ -26,14 +279,14 @@ export const CNAE_DATA: CnaeData[] = [
   },
   {
     code: '8650-0/02',
-    description: 'Atividades de fonoaudiologia',
+    description: 'Atividades de profissionais da nutrição',
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CREFONO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
     code: '8650-0/03',
@@ -70,14 +323,69 @@ export const CNAE_DATA: CnaeData[] = [
   },
   {
     code: '8650-0/06',
-    description: 'Atividades de nutrição',
+    description: 'Atividades de fonoaudiologia',
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CREFONO. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8650-0/99',
+    description: 'Atividades de profissionais da área de saúde não especificadas anteriormente',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada. O conselho (CRM, COFEN, CRF) depende da área de atuação.'
+  },
+  {
+    code: '8690-9/02',
+    description: 'Atividades de bancos de leite humano',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8711-5/01',
+    description: 'Clínicas e residências geriátricas',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8711-5/02',
+    description: 'Instituições de longa permanência para idosos',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8712-3/00',
+    description: 'Atividades de fornecimento de infra-estrutura de apoio e assistência a paciente no domicílio',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
     code: '3250-7/06',
@@ -343,7 +651,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '8230-0/01',
     description: 'Serviços de organização de feiras, congressos, exposições e festas',
-    category: 'Serviços Administrativos e de Apoio',
+    category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -352,7 +660,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '8230-0/02',
     description: 'Casas de festas e eventos',
-    category: 'Serviços Administrativos e de Apoio',
+    category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -552,6 +860,18 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada. O enquadramento no Anexo III depende do Fator R.'
+  },
+
+  // --- ESPORTES E LAZER ---
+  {
+    code: '9313-1/00',
+    description: 'Atividades de condicionamento físico',
+    category: 'Esportes e Lazer',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREF. Exige registro da empresa e indicação de Responsável Técnico.'
   },
 
   // --- DIVERSOS ---
