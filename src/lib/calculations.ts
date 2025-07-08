@@ -446,13 +446,13 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const lucroPresumido = calculateLucroPresumido(values);
   const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, 'Simples Nacional');
 
-  let simplesNacionalOtimizado = { ...simplesNacionalBase, regime: 'Simples Nacional com Fator R' };
+  let simplesNacionalOtimizado: TaxDetails | null = null;
 
   const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
   
   if (hasAnnexVActivity) {
       const totalRevenue = simplesNacionalBase.totalRevenue;
-      if (totalRevenue > 0 && simplesNacionalBase.fatorR && simplesNacionalBase.fatorR < 0.28) {
+      if (totalRevenue > 0 && simplesNacionalBase.fatorR != null && simplesNacionalBase.fatorR < 0.28) {
           const requiredPayroll = totalRevenue * 0.28;
           const currentPayrollForFatorR = values.totalSalaryExpense;
           let requiredTotalProLabore = requiredPayroll - currentPayrollForFatorR;
@@ -472,14 +472,18 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               }));
 
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
-              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional com Fator R');
+              const optimizedResult = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional Otimizado');
+              
+              if(optimizedResult.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
+                simplesNacionalOtimizado = optimizedResult;
+              }
           }
       }
   }
   
   return {
-    simplesNacionalOtimizado: { ...simplesNacionalOtimizado, order: 1 },
     simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }

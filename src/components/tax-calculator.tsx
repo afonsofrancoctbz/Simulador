@@ -36,6 +36,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
+import RocSection from './roc-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -375,19 +376,21 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     .map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`)
                     .join(', ');
               
-              const aiInput: TaxOptimizationInput = {
-                activities: activitiesSummary,
-                totalDomesticRevenue,
-                totalExportRevenue,
-                totalSalaryExpense: values.totalSalaryExpense,
-                totalProLabore: totalProLabore,
-                numberOfPartners: values.numberOfPartners,
-                simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalBase.totalMonthlyCost,
-                simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalOtimizado.totalMonthlyCost,
-                lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
-              };
-              const aiResult = await getTaxOptimizationAdvice(aiInput);
-              setAdvice(aiResult.advice);
+              if (calculatedResults.simplesNacionalOtimizado) {
+                 const aiInput: TaxOptimizationInput = {
+                    activities: activitiesSummary,
+                    totalDomesticRevenue,
+                    totalExportRevenue,
+                    totalSalaryExpense: values.totalSalaryExpense,
+                    totalProLabore: totalProLabore,
+                    numberOfPartners: values.numberOfPartners,
+                    simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalBase.totalMonthlyCost,
+                    simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalOtimizado.totalMonthlyCost,
+                    lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
+                  };
+                  const aiResult = await getTaxOptimizationAdvice(aiInput);
+                  setAdvice(aiResult.advice);
+              }
             } catch (error) {
               console.error("Error fetching AI advice:", error);
               setAdvice("Não foi possível obter a recomendação da IA no momento.");
@@ -449,18 +452,23 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     const { selectedCnaes } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
-    if(year === 2025 && 'simplesNacionalBase' in results) {
+    if (year === 2025 && 'simplesNacionalBase' in results) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
-        if (!isCommerceOnly) {
-          scenarios.push({ ...lucroPresumido });
-        }
-        scenarios.push({ ...simplesNacionalBase });
+        
+        const scenariosToShow : (TaxDetails | TaxDetails2026)[] = [];
 
-        // Only show the optimized scenario if it's different from the base one
-        if (simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
-            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenarios.push({ ...simplesNacionalOtimizado, optimizationNote });
+        if (!isCommerceOnly) {
+            scenariosToShow.push(lucroPresumido);
         }
+        
+        scenariosToShow.push(simplesNacionalBase);
+        
+        if (simplesNacionalOtimizado) {
+            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
+            scenariosToShow.push({ ...simplesNacionalOtimizado, optimizationNote });
+        }
+        
+        scenarios = scenariosToShow;
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         if (!isCommerceOnly) {
           scenarios.push(results.lucroPresumido);
@@ -1113,6 +1121,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </div>
         )}
         
+        {results && <div className="mt-12"><RocSection /></div>}
+
         {renderResults()}
     </FormProvider>
   );

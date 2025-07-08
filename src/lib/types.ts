@@ -113,7 +113,7 @@ export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema
 
 
 export const CalculationResultsSchema = z.object({
-  simplesNacionalOtimizado: TaxDetailsSchema,
+  simplesNacionalOtimizado: TaxDetailsSchema.nullable(),
   simplesNacionalBase: TaxDetailsSchema,
   lucroPresumido: TaxDetailsSchema,
 });
