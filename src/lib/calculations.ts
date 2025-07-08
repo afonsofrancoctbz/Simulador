@@ -1,4 +1,5 @@
 
+
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CNAE_DATA,
@@ -472,11 +473,9 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               }));
 
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
-              const optimizedResult = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional Otimizado');
               
-              if(optimizedResult.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
-                simplesNacionalOtimizado = optimizedResult;
-              }
+              // Always calculate and return the optimized scenario for comparison
+              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional Otimizado');
           }
       }
   }
