@@ -36,7 +36,6 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
-import RocSection from './roc-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -1050,7 +1049,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                       <RadioGroup
                                           onValueChange={field.onChange}
                                           value={field.value}
-                                          className="grid grid-cols-2 md:grid-cols-4 gap-2"
+                                          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
                                       >
                                           {planOptions.map(plan => {
                                               const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
@@ -1121,8 +1120,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </div>
         )}
         
-        {results && <div className="mt-12"><RocSection /></div>}
-
         {renderResults()}
     </FormProvider>
   );
