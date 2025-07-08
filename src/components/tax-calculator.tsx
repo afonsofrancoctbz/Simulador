@@ -34,7 +34,6 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
-import RocSection from './roc-section';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
 
@@ -1114,12 +1113,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </div>
         )}
         
-        {results && (
-          <div className="mt-12">
-            <RocSection />
-          </div>
-        )}
-
         {renderResults()}
     </FormProvider>
   );
