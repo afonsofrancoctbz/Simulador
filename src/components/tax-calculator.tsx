@@ -36,6 +36,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
+import RocSection from './roc-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -448,7 +449,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
 
     const submissionValues = transformFormToSubmission(form.getValues());
-    const { selectedCnaes } = form.getValues();
+    const { selectedCnaes, numberOfPartners: numSocios } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
@@ -462,7 +463,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         
         scenariosToShow.push(simplesNacionalBase);
         
-        if (simplesNacionalOtimizado) {
+        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
             const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
             scenariosToShow.push({ ...simplesNacionalOtimizado, optimizationNote });
         }
@@ -531,7 +532,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 ))}
             </div>
 
-            {cheapestScenario && cheapestScenario.partnerTaxes.length > 1 && (
+            {cheapestScenario && numSocios > 1 && (
                 <div className="mt-12 max-w-4xl mx-auto">
                     <Card className="shadow-lg border-primary/10">
                         <CardHeader>
@@ -1033,7 +1034,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </div>
 
                     <div className="space-y-2">
-                      <div className='pb-2'>
+                      <div className='border-b pb-4'>
                           <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                               <ListChecks className="h-5 w-5 text-primary" />
                               3. Selecione o Plano Contabilizei
