@@ -2,7 +2,7 @@ import { type CnaeData } from './types';
 
 export const CNAE_DATA: CnaeData[] = [
   // --- SAÚDE E BEM-ESTAR ---
-   {
+  {
     code: '7500-1/00',
     description: 'Atividades veterinárias',
     category: 'Veterinária',
@@ -68,7 +68,7 @@ export const CNAE_DATA: CnaeData[] = [
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico. Não pode ser MEI.'
   },
-   {
+  {
     code: '8630-5/06',
     description: 'Serviços de vacinação e imunização humana',
     category: 'Saúde e Bem-estar',
@@ -105,7 +105,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/01',
     description: 'Laboratórios de anatomia patológica e citológica',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -116,7 +116,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/02',
     description: 'Laboratórios clínicos',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -138,7 +138,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/04',
     description: 'Serviços de tomografia',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -149,7 +149,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/05',
     description: 'Serviços de diagnóstico por imagem com uso de radiação ionizante, exceto tomografia',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -160,7 +160,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/06',
     description: 'Serviços de ressonância magnética',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -171,7 +171,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/07',
     description: 'Serviços de diagnóstico por imagem sem uso de radiação ionizante, exceto ressonância magnética',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -182,7 +182,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/08',
     description: 'Serviços de diagnóstico por registro gráfico - ECG, EEG e outros exames análogos',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -193,7 +193,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/09',
     description: 'Serviços de diagnóstico por métodos ópticos - endoscopia e outros exames análogos',
     category: 'Saúde e Bem-estar',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -400,7 +400,7 @@ export const CNAE_DATA: CnaeData[] = [
     description: 'Atividades de podologia',
     category: 'Saúde e Bem-estar',
     annex: 'III',
-    requiresFatorR: false,
+    requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
@@ -582,7 +582,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '7111-1/00',
     description: 'Serviços de arquitetura',
     category: 'Engenharia, Arquitetura e Design',
-    annex: 'III',
+    annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -1134,7 +1134,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CRA.'
+    notes: 'Atividade regulamentada pelo CRA.'
   },
   {
     code: '8230-0/02',
@@ -1453,6 +1453,105 @@ export const CNAE_DATA: CnaeData[] = [
   
   // --- ALUGUÉIS E GESTÃO DE ATIVOS ---
   {
+    code: '7721-7/00',
+    description: 'Aluguel de equipamentos recreativos e esportivos',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7722-5/00',
+    description: 'Aluguel de fitas de vídeo, DVDs e similares',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7723-3/00',
+    description: 'Aluguel de objetos do vestuário, jóias e acessórios',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7729-2/01',
+    description: 'Aluguel de aparelhos de jogos eletrônicos',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7729-2/02',
+    description: 'Aluguel de móveis, utensílios e aparelhos de uso doméstico e pessoal; instrumentos musicais',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7729-2/03',
+    description: 'Aluguel de material médico',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7729-2/99',
+    description: 'Aluguel de outros objetos pessoais e domésticos não especificados anteriormente',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7731-4/00',
+    description: 'Aluguel de máquinas e equipamentos agrícolas sem operador',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7732-2/01',
+    description: 'Aluguel de máquinas e equipamentos para construção sem operador, exceto andaimes',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7732-2/02',
+    description: 'Aluguel de andaimes',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7733-1/00',
+    description: 'Aluguel de máquinas e equipamentos para escritório',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
     code: '7739-0/01',
     description: 'Aluguel de máquinas para extração de minérios e petróleo, sem operador',
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
@@ -1500,15 +1599,6 @@ export const CNAE_DATA: CnaeData[] = [
   },
 
   // --- ESPORTES E LAZER ---
-  {
-    code: '8591-1/00',
-    description: 'Ensino de esportes',
-    category: 'Esportes e Lazer',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRate: 0.32,
-    isRegulated: false
-  },
   {
     code: '9311-5/00',
     description: 'Gestão de instalações de esportes',
@@ -1574,26 +1664,7 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
 
-  // --- DIVERSOS ---
-  {
-    code: '4399-1/01',
-    description: 'Administração de obras',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA ou CAU. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '4751-2/02',
-    description: 'Recarga de cartuchos para equipamentos de informática',
-    category: 'Serviços de Tecnologia',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: false
-  },
+  // --- SERVIÇOS FINANCEIROS E IMOBILIÁRIOS ---
   {
     code: '6612-6/05',
     description: 'Agentes de investimentos em aplicações financeiras',
@@ -1672,9 +1743,21 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
   },
   {
+    code: '6822-6/00',
+    description: 'Gestão e administração da propriedade imobiliária',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CRECI/CRA.'
+  },
+  
+  // --- FOTOGRAFIA E AUDIOVISUAL ---
+  {
     code: '7420-0/01',
     description: 'Atividades de produção de fotografias, exceto aérea e submarina',
-    category: 'Fotografia e Design',
+    category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1683,7 +1766,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '7420-0/02',
     description: 'Atividades de produção de fotografias aéreas e submarinas',
-    category: 'Fotografia e Design',
+    category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1692,7 +1775,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '7420-0/03',
     description: 'Laboratórios fotográficos',
-    category: 'Fotografia e Design',
+    category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1701,7 +1784,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '7420-0/04',
     description: 'Filmagem de festas e eventos',
-    category: 'Fotografia e Design',
+    category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1710,12 +1793,131 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '7420-0/05',
     description: 'Serviços de microfilmagem',
-    category: 'Fotografia e Design',
+    category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: false
   },
+  {
+    code: '5911-1/99',
+    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5912-0/01',
+    description: 'Serviços de dublagem',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5912-0/02',
+    description: 'Serviços de mixagem sonora em produção audiovisual',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5912-0/99',
+    description: 'Atividades de pós-produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5913-8/00',
+    description: 'Distribuição cinematográfica, de vídeo e de programas de televisão',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5914-6/00',
+    description: 'Atividades de exibição cinematográfica',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5920-1/00',
+    description: 'Atividades de gravação de som e de edição de música',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5911-1/01',
+    description: 'Estúdios cinematográficos',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5811-5/00',
+    description: 'Edição de livros',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5812-3/01',
+    description: 'Edição de jornais diários',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5812-3/02',
+    description: 'Edição de jornais não diários',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5813-1/00',
+    description: 'Edição de revistas',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5819-1/00',
+    description: 'Edição de cadastros, listas e de outros produtos gráficos',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  
+  // --- DIVERSOS ---
   {
     code: '7490-1/01',
     description: 'Serviços de tradução, interpretação e similares',
@@ -1780,36 +1982,6 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: false
-  },
-  {
-    code: '9511-8/00',
-    description: 'Reparação e manutenção de computadores e de equipamentos periféricos',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
-  },
-  {
-    code: '9512-6/00',
-    description: 'Reparação e manutenção de equipamentos de comunicação',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
-  },
-  {
-    code: '9521-5/00',
-    description: 'Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e doméstico',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRate: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
   },
   {
     code: '9529-1/01',
@@ -1974,79 +2146,552 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: false
   },
+  
+  // --- MANUTENÇÃO E REPARO TÉCNICO ---
   {
-    code: '5911-1/99',
-    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
-    category: 'Mídia e Audiovisual',
+    code: '3312-1/02',
+    description: 'Manutenção e reparação de aparelhos e instrumentos de medida, teste e controle',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5912-0/01',
-    description: 'Serviços de dublagem',
-    category: 'Mídia e Audiovisual',
+    code: '3312-1/03',
+    description: 'Manutenção e reparação de aparelhos eletromédicos e eletroterapêuticos e equipamentos de irradiação',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5912-0/02',
-    description: 'Serviços de mixagem sonora em produção audiovisual',
-    category: 'Mídia e Audiovisual',
+    code: '3312-1/04',
+    description: 'Manutenção e reparação de equipamentos e instrumentos ópticos',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5912-0/99',
-    description: 'Atividades de pós-produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
-    category: 'Mídia e Audiovisual',
+    code: '3313-9/01',
+    description: 'Manutenção e reparação de geradores, transformadores e motores elétricos',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5913-8/00',
-    description: 'Distribuição cinematográfica, de vídeo e de programas de televisão',
-    category: 'Mídia e Audiovisual',
+    code: '3313-9/02',
+    description: 'Manutenção e reparação de baterias e acumuladores elétricos, exceto para veículos',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5914-6/00',
-    description: 'Atividades de exibição cinematográfica',
-    category: 'Mídia e Audiovisual',
+    code: '3313-9/99',
+    description: 'Manutenção e reparação de máquinas, aparelhos e materiais elétricos não especificados anteriormente',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5920-1/00',
-    description: 'Atividades de gravação de som e de edição de música',
-    category: 'Mídia e Audiovisual',
+    code: '3314-7/01',
+    description: 'Manutenção e reparação de máquinas motrizes não-elétricas',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
-    code: '5911-1/01',
-    description: 'Estúdios cinematográficos',
-    category: 'Mídia e Audiovisual',
+    code: '3314-7/02',
+    description: 'Manutenção e reparação de equipamentos hidráulicos e pneumáticos, exceto válvulas',
+    category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   },
-  // COMÉRCIO VAREJISTA (ANEXO I)
+  {
+    code: '3314-7/03',
+    description: 'Manutenção e reparação de válvulas industriais',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/04',
+    description: 'Manutenção e reparação de compressores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/05',
+    description: 'Manutenção e reparação de equipamentos de transmissão para fins industriais',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/06',
+    description: 'Manutenção e reparação de máquinas, aparelhos e equipamentos para instalações térmicas',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/07',
+    description: 'Manutenção e reparação de máquinas e aparelhos de refrigeração e ventilação para uso industrial e comercial',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/08',
+    description: 'Manutenção e reparação de máquinas, equipamentos e aparelhos para transporte e elevação de cargas',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/09',
+    description: 'Manutenção e reparação de máquinas de escrever, calcular e de outros equipamentos não-eletrônicos para escritório',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/10',
+    description: 'Manutenção e reparação de máquinas e equipamentos para uso geral não especificados anteriormente',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/11',
+    description: 'Manutenção e reparação de máquinas e equipamentos para agricultura e pecuária',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/12',
+    description: 'Manutenção e reparação de tratores agrícolas',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/13',
+    description: 'Manutenção e reparação de máquinas-ferramenta',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/14',
+    description: 'Manutenção e reparação de máquinas e equipamentos para a prospecção e extração de petróleo',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/15',
+    description: 'Manutenção e reparação de máquinas e equipamentos para uso na extração mineral, exceto na extração de petróleo',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/16',
+    description: 'Manutenção e reparação de tratores, exceto agrícolas',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/17',
+    description: 'Manutenção e reparação de máquinas e equipamentos de terraplenagem, pavimentação e construção, exceto tratores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/18',
+    description: 'Manutenção e reparação de máquinas para a indústria metalúrgica, exceto máquinas-ferramenta',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/19',
+    description: 'Manutenção e reparação de máquinas e equipamentos para as indústrias de alimentos, bebidas e fumo',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/20',
+    description: 'Manutenção e reparação de máquinas e equipamentos para a indústria têxtil, do vestuário, do couro e calçados',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/21',
+    description: 'Manutenção e reparação de máquinas e aparelhos para a indústria de celulose, papel e papelão e artefatos',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/22',
+    description: 'Manutenção e reparação de máquinas e aparelhos para a indústria do plástico',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3314-7/99',
+    description: 'Manutenção e reparação de outras máquinas e equipamentos para usos industriais não especificados anteriormente',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3315-5/00',
+    description: 'Manutenção e reparação de veículos ferroviários',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3316-3/01',
+    description: 'Manutenção e reparação de aeronaves, exceto a manutenção na pista',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3316-3/02',
+    description: 'Manutenção de aeronaves na pista',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3317-1/01',
+    description: 'Manutenção e reparação de embarcações e estruturas flutuantes',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3317-1/02',
+    description: 'Manutenção e reparação de embarcações para esporte e lazer',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3319-8/00',
+    description: 'Manutenção e reparação de equipamentos e produtos não especificados anteriormente',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '3321-0/00',
+    description: 'Instalação de máquinas e equipamentos industriais',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '9511-8/00',
+    description: 'Reparação e manutenção de computadores e de equipamentos periféricos',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9512-6/00',
+    description: 'Reparação e manutenção de equipamentos de comunicação',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9521-5/00',
+    description: 'Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e doméstico',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  
+  // --- CONSTRUÇÃO CIVIL ---
+  {
+    code: '4399-1/01',
+    description: 'Administração de obras',
+    category: 'Construção Civil',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA ou CAU. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '4211-1/02',
+    description: 'Pintura para sinalização em pistas rodoviárias e aeroportos',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4221-9/03',
+    description: 'Manutenção de redes de distribuição de energia elétrica',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4221-9/05',
+    description: 'Manutenção de estações e redes de telecomunicações',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4313-4/00',
+    description: 'Obras de terraplenagem',
+    category: 'Construção Civil',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4321-5/00',
+    description: 'Instalação e manutenção elétrica',
+    category: 'Construção Civil',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4322-3/01',
+    description: 'Instalações hidráulicas, sanitárias e de gás',
+    category: 'Construção Civil',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4322-3/02',
+    description: 'Instalação e manutenção de sistemas centrais de ar condicionado, de ventilação e refrigeração',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4322-3/03',
+    description: 'Instalações de sistema de prevenção contra incêndio',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4329-1/01',
+    description: 'Instalação de painéis publicitários',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4329-1/02',
+    description: 'Instalação de equipamentos para orientação à navegação marítima, fluvial e lacustre',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4329-1/03',
+    description: 'Instalação, manutenção e reparação de elevadores, escadas e esteiras rolantes',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4329-1/04',
+    description: 'Montagem e instalação de sistemas e equipamentos de iluminação e sinalização em vias públicas, portos e aeroportos',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4329-1/05',
+    description: 'Tratamentos térmicos, acústicos ou de vibração',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA/CAU.'
+  },
+  {
+    code: '4399-1/02',
+    description: 'Montagem e desmontagem de andaimes e outras estruturas temporárias',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+
+  // --- COMÉRCIO VAREJISTA (ANEXO I) ---
   {
     code: '4530-7/03',
     description: 'Comércio a varejo de peças e acessórios novos para veículos automotores',
@@ -2138,63 +2783,9 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
-    code: '4721-1/02',
-    description: 'Padaria e confeitaria com predominância de revenda',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRate: 0.08,
-    isRegulated: false
-  },
-  {
-    code: '4721-1/03',
-    description: 'Comércio varejista de laticínios e frios',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRate: 0.08,
-    isRegulated: false
-  },
-  {
-    code: '4721-1/04',
-    description: 'Comércio varejista de doces, balas, bombons e semelhantes',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRate: 0.08,
-    isRegulated: false
-  },
-  {
-    code: '4723-7/00',
-    description: 'Comércio varejista de bebidas',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRate: 0.08,
-    isRegulated: false
-  },
-  {
-    code: '4724-5/00',
-    description: 'Comércio varejista de hortifrutigranjeiros',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRate: 0.08,
-    isRegulated: false
-  },
-  {
     code: '4729-6/01',
     description: 'Tabacaria',
     category: 'Comércio Varejista',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRate: 0.08,
-    isRegulated: false
-  },
-  {
-    code: '4729-6/99',
-    description: 'Comércio varejista de produtos alimentícios em geral ou especializado em produtos alimentícios não especificados anteriormente',
-    category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
     presumedProfitRate: 0.08,
@@ -2542,7 +3133,17 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.08,
     isRegulated: false
   },
-  // COMÉRCIO ATACADISTA
+  {
+    code: '4751-2/02',
+    description: 'Recarga de cartuchos para equipamentos de informática',
+    category: 'Serviços de Tecnologia',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  
+  // --- COMÉRCIO ATACADISTA ---
   {
     code: '4530-7/02',
     description: 'Comércio por atacado de pneumáticos e câmaras-de-ar',
@@ -2561,7 +3162,8 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.08,
     isRegulated: false
   },
-  // HOSPEDAGEM E ALIMENTAÇÃO
+  
+  // --- HOSPEDAGEM E ALIMENTAÇÃO ---
   {
     code: '5611-2/01',
     description: 'Restaurantes e similares',
@@ -2617,48 +3219,57 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
-    code: '5811-5/00',
-    description: 'Edição de livros',
-    category: 'Mídia e Audiovisual',
-    annex: 'III',
+    code: '4721-1/02',
+    description: 'Padaria e confeitaria com predominância de revenda',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
-    code: '5812-3/01',
-    description: 'Edição de jornais diários',
-    category: 'Mídia e Audiovisual',
-    annex: 'III',
+    code: '4721-1/03',
+    description: 'Comércio varejista de laticínios e frios',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
-    code: '5812-3/02',
-    description: 'Edição de jornais não diários',
-    category: 'Mídia e Audiovisual',
-    annex: 'III',
+    code: '4721-1/04',
+    description: 'Comércio varejista de doces, balas, bombons e semelhantes',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
-    code: '5813-1/00',
-    description: 'Edição de revistas',
-    category: 'Mídia e Audiovisual',
-    annex: 'III',
+    code: '4723-7/00',
+    description: 'Comércio varejista de bebidas',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
-    code: '5819-1/00',
-    description: 'Edição de cadastros, listas e de outros produtos gráficos',
-    category: 'Mídia e Audiovisual',
-    annex: 'III',
+    code: '4724-5/00',
+    description: 'Comércio varejista de hortifrutigranjeiros',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4729-6/99',
+    description: 'Comércio varejista de produtos alimentícios em geral ou especializado em produtos alimentícios não especificados anteriormente',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
     isRegulated: false
   }
 ];
