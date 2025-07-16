@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast"
 const mainCategories = [
   "Consultoria",
   "Desenvolvimento de Software",
-  "Educação e Cursos",
+  "Educação",
   "Administração",
   "Advocacia",
   "Engenharia",
@@ -34,23 +34,23 @@ const mainCategories = [
   "Publicidade",
   "Turismo",
   "Arquitetura",
-  "Corretagem de imóveis",
+  "Corretagem de Imóveis",
 ]
 
-const categoryToInternalMap: Record<string, string[]> = {
-  Consultoria: ["Consultoria e Gestão Empresarial"],
-  "Desenvolvimento de Software": ["Tecnologia da Informação"],
-  "Educação e Cursos": ["Educação e Treinamento"],
-  Administração: ["Serviços Administrativos e de Apoio"],
-  Advocacia: ["Atividades Jurídicas e Contábeis"],
-  Engenharia: ["Engenharia, Arquitetura e Design", "Construção Civil", "Manutenção e Reparo Técnico"],
-  Tecnologia: ["Tecnologia da Informação"],
-  "Serviços Médicos": ["Saúde e Bem-estar", "Veterinária"],
-  Publicidade: ["Publicidade e Marketing"],
-  Turismo: ["Turismo e Eventos", "Hospedagem e Alimentação"],
-  Arquitetura: ["Engenharia, Arquitetura e Design"],
-  "Corretagem de imóveis": ["Serviços Financeiros e Imobiliários"],
-}
+const categoryToCnaeMap: Record<string, string[]> = {
+    Consultoria: ["6911-7/01", "6612-6/05", "7020-4/00", "7319-0/04", "6204-0/00", "6920-6/02"],
+    "Desenvolvimento de Software": ["6201-5/01", "6203-1/00", "6202-3/00"],
+    Educação: ["8511-2/00", "8512-1/00", "8513-9/00", "8520-1/00", "8531-7/00", "8532-5/00", "8533-3/00", "8541-4/00", "8542-2/00", "8550-3/02", "8599-6/03", "8599-6/04", "8599-6/99"],
+    Administração: ["8211-3/00", "8219-9/99"],
+    Advocacia: ["6911-7/01"],
+    Engenharia: ["7112-0/00", "7119-7/03", "7119-7/99"],
+    Tecnologia: ["6204-0/00", "6202-3/00", "6209-1/00", "6201-5/01", "6203-1/00", "6201-5/02"],
+    "Serviços Médicos": ["8630-5/03", "8630-5/02", "8610-1/02", "8630-5/01", "8610-1/01"],
+    Publicidade: ["7311-4/00", "7319-0/02", "7319-0/03", "7319-0/04", "7319-0/99"],
+    Turismo: ["7912-1/00", "7911-2/00", "7990-2/00"],
+    Arquitetura: ["7111-1/00", "7119-7/03", "7119-7/99"],
+    "Corretagem de Imóveis": ["6821-8/01", "6821-8/02", "6822-6/00"],
+};
 
 const MAX_SELECTION = 20;
 
@@ -88,8 +88,8 @@ export function CnaeSelector({
           cnae.category?.toLowerCase().includes(lowercasedSearch)
       )
     } else if (selectedCategory) {
-      const internalCategories = categoryToInternalMap[selectedCategory] || []
-      results = results.filter((cnae) => cnae.category && internalCategories.includes(cnae.category))
+      const cnaesForCategory = categoryToCnaeMap[selectedCategory] || []
+      results = results.filter((cnae) => cnaesForCategory.includes(cnae.code))
     } else {
       return []
     }
