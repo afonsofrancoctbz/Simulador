@@ -17,7 +17,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8610-1/01',
     description: 'Atividades de atendimento hospitalar, exceto pronto-socorro e unidades para atendimento a urgências',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -28,7 +28,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8610-1/02',
     description: 'Atividades de atendimento em pronto-socorro e unidades hospitalares para atendimento a urgências',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -39,7 +39,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/01',
     description: 'Atividade médica ambulatorial com recursos para realização de procedimentos cirúrgicos',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -50,7 +50,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/02',
     description: 'Atividade médica ambulatorial com recursos para realização de exames complementares',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -61,7 +61,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/03',
     description: 'Atividade médica ambulatorial restrita a consultas',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -72,7 +72,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/06',
     description: 'Serviços de vacinação e imunização humana',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -83,7 +83,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/07',
     description: 'Atividades de reprodução humana assistida',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -94,7 +94,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/99',
     description: 'Atividades de atenção ambulatorial não especificadas anteriormente',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -105,7 +105,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/01',
     description: 'Laboratórios de anatomia patológica e citológica',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -116,7 +116,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/02',
     description: 'Laboratórios clínicos',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -127,7 +127,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/03',
     description: 'Serviços de diálise e nefrologia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -138,7 +138,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/04',
     description: 'Serviços de tomografia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -149,7 +149,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/05',
     description: 'Serviços de diagnóstico por imagem com uso de radiação ionizante, exceto tomografia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -160,7 +160,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/06',
     description: 'Serviços de ressonância magnética',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -171,7 +171,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/07',
     description: 'Serviços de diagnóstico por imagem sem uso de radiação ionizante, exceto ressonância magnética',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -182,7 +182,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/08',
     description: 'Serviços de diagnóstico por registro gráfico - ECG, EEG e outros exames análogos',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -193,7 +193,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/09',
     description: 'Serviços de diagnóstico por métodos ópticos - endoscopia e outros exames análogos',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -204,7 +204,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/10',
     description: 'Serviços de quimioterapia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -215,7 +215,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/11',
     description: 'Serviços de radioterapia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -226,7 +226,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/12',
     description: 'Serviços de hemoterapia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -237,7 +237,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/13',
     description: 'Serviços de litotripsia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -248,7 +248,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/14',
     description: 'Serviços de bancos de células e tecidos humanos',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -259,7 +259,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8640-2/99',
     description: 'Atividades de serviços de complementação diagnóstica e terapêutica não especificadas anteriormente',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -270,7 +270,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8650-0/01',
     description: 'Atividades de enfermagem',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -281,7 +281,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8650-0/02',
     description: 'Atividades de profissionais da nutrição',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -292,7 +292,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8650-0/03',
     description: 'Atividades de psicologia e psicanálise',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -303,7 +303,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8650-0/04',
     description: 'Atividades de fisioterapia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -314,7 +314,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8650-0/05',
     description: 'Atividades de terapia ocupacional',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -325,12 +325,23 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8650-0/06',
     description: 'Atividades de fonoaudiologia',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFONO. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8650-0/07',
+    description: 'Atividades de terapia de nutrição enteral e parenteral',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
     code: '8650-0/99',
@@ -344,15 +355,65 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada. O conselho (CRM, COFEN, CRF) depende da área de atuação.'
   },
   {
+    code: '8660-7/00',
+    description: 'Atividades de apoio à gestão de saúde',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8690-9/01',
+    description: 'Atividades de práticas integrativas e complementares em saúde humana',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
     code: '8690-9/02',
     description: 'Atividades de bancos de leite humano',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '8690-9/03',
+    description: 'Atividades de acupuntura',
+    category: 'Saúde e Bem-estar',
+    annex: 'III',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8690-9/04',
+    description: 'Atividades de podologia',
+    category: 'Saúde e Bem-estar',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8690-9/99',
+    description: 'Outras atividades de atenção à saúde humana não especificadas anteriormente',
+    category: 'Saúde e Bem-estar',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '8711-5/01',
@@ -369,8 +430,8 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8711-5/02',
     description: 'Instituições de longa permanência para idosos',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
-    requiresFatorR: true,
+    annex: 'III',
+    requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
@@ -380,8 +441,8 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8712-3/00',
     description: 'Atividades de fornecimento de infra-estrutura de apoio e assistência a paciente no domicílio',
     category: 'Saúde e Bem-estar',
-    annex: 'V',
-    requiresFatorR: true,
+    annex: 'III',
+    requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
@@ -404,7 +465,7 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8630-5/04',
     description: 'Atividade odontológica',
     category: 'Odontologia',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -497,13 +558,31 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: false
   },
+  {
+    code: '6391-7/00',
+    description: 'Agências de notícias',
+    category: 'Tecnologia da Informação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '6399-2/00',
+    description: 'Outras atividades de prestação de serviços de informação não especificadas anteriormente',
+    category: 'Tecnologia da Informação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
 
   // --- ENGENHARIA, ARQUITETURA E DESIGN ---
   {
     code: '7111-1/00',
     description: 'Serviços de arquitetura',
     category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
+    annex: 'III',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
@@ -522,8 +601,73 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e um Responsável Técnico engenheiro.'
   },
   {
+    code: '7119-7/01',
+    description: 'Serviços de cartografia, topografia e geodésia',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+  },
+  {
+    code: '7119-7/02',
+    description: 'Atividades de estudos geológicos',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+  },
+  {
     code: '7119-7/03',
     description: 'Serviços de desenho técnico relacionados à arquitetura e engenharia',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.3
+  },
+  {
+    code: '7119-7/04',
+    description: 'Serviços de perícia técnica relacionados à segurança do trabalho',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+  },
+  {
+    code: '7119-7/99',
+    description: 'Atividades técnicas relacionadas à engenharia e arquitetura não especificadas anteriormente',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+  },
+  {
+    code: '7120-1/00',
+    description: 'Testes e análises técnicas',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+  },
+  {
+    code: '7410-2/02',
+    description: 'Design de interiores',
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
@@ -531,14 +675,22 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
-    code: '7410-2/02',
-    description: 'Design de interiores',
+    code: '7410-2/03',
+    description: 'Design de produto',
     category: 'Engenharia, Arquitetura e Design',
-    annex: 'IV',
-    requiresFatorR: false,
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRate: 0.32,
-    isRegulated: false,
-    notes: 'Apesar de poder ser Simples Nacional Anexo IV, é mais comum a tributação no Anexo III.'
+    isRegulated: false
+  },
+  {
+    code: '7410-2/99',
+    description: 'Atividades de design não especificadas anteriormente',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
   },
   
   // --- CONSULTORIA E GESTÃO ---
@@ -552,11 +704,68 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
+  {
+    code: '7210-0/00',
+    description: 'Pesquisa e desenvolvimento experimental em ciências físicas e naturais',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA ou CONEP (para pesquisas em humanos).'
+  },
+  {
+    code: '7220-7/00',
+    description: 'Pesquisa e desenvolvimento experimental em ciências sociais e humanas',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7320-3/00',
+    description: 'Pesquisas de mercado e de opinião pública',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CRA.'
+  },
+  {
+    code: '7490-1/03',
+    description: 'Serviços de agronomia e de consultoria às atividades agrícolas e pecuárias',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
 
   // --- PUBLICIDADE E MARKETING ---
   {
     code: '7311-4/00',
     description: 'Agências de publicidade',
+    category: 'Publicidade e Marketing',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7312-2/00',
+    description: 'Agenciamento de espaços para publicidade exceto em veículos de comunicação',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7319-0/01',
+    description: 'Criação de estandes para feiras e exposições',
     category: 'Publicidade e Marketing',
     annex: 'V',
     requiresFatorR: true,
@@ -591,6 +800,15 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '7319-0/99',
+    description: 'Outras atividades de publicidade não especificadas anteriormente',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
     code: '5911-1/02',
     description: 'Produção de filmes para publicidade',
     category: 'Publicidade e Marketing',
@@ -601,6 +819,166 @@ export const CNAE_DATA: CnaeData[] = [
   },
 
   // --- EDUCAÇÃO E TREINAMENTO ---
+  {
+    code: '8511-2/00',
+    description: 'Educação infantil – creche',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8512-1/00',
+    description: 'Educação infantil – pré-escola',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8513-9/00',
+    description: 'Ensino fundamental',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8520-1/00',
+    description: 'Ensino médio',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8531-7/00',
+    description: 'Educação superior – graduação',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8532-5/00',
+    description: 'Educação superior – graduação e pós-graduação',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8533-3/00',
+    description: 'Educação superior – pós-graduação e extensão',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8541-4/00',
+    description: 'Educação profissional de nível técnico',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8542-2/00',
+    description: 'Educação profissional de nível tecnológico',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8550-3/02',
+    description: 'Atividades de apoio à educação, exceto caixas escolares',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8591-1/00',
+    description: 'Ensino de esportes',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8592-9/01',
+    description: 'Ensino de dança',
+    category: 'Educação e Treinamento',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8592-9/02',
+    description: 'Ensino de artes cênicas, exceto dança',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8592-9/03',
+    description: 'Ensino de música',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8592-9/99',
+    description: 'Ensino de arte e cultura não especificado anteriormente',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '8593-7/00',
+    description: 'Ensino de idiomas',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
   {
     code: '8599-6/03',
     description: 'Treinamento em informática',
@@ -635,8 +1013,8 @@ export const CNAE_DATA: CnaeData[] = [
     code: '8599-6/99',
     description: 'Outras atividades de ensino não especificadas anteriormente',
     category: 'Educação e Treinamento',
-    annex: 'V',
-    requiresFatorR: true,
+    annex: 'III',
+    requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
@@ -650,7 +1028,8 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Regulamentado pelo CRA.'
   },
   {
     code: '8219-9/99',
@@ -662,8 +1041,104 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '8220-2/00',
+    description: 'Atividades de teleatendimento',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8291-1/00',
+    description: 'Atividades de cobrança e informações cadastrais',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8299-7/01',
+    description: 'Medição de consumo de energia elétrica, gás e água',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8299-7/03',
+    description: 'Serviços de gravação de carimbos, exceto confecção',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8299-7/07',
+    description: 'Salas de acesso à internet',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8299-7/99',
+    description: 'Outras atividades de serviços prestados principalmente às empresas não especificadas anteriormente',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+
+  // --- TURISMO E EVENTOS ---
+  {
+    code: '7911-2/00',
+    description: 'Agências de viagens',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CADASTUR.'
+  },
+  {
+    code: '7912-1/00',
+    description: 'Operadores turísticos',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CADASTUR.'
+  },
+  {
+    code: '7990-2/00',
+    description: 'Serviços de reservas e outros serviços de turismo não especificados anteriormente',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CADASTUR.'
+  },
+  {
     code: '8230-0/01',
     description: 'Serviços de organização de feiras, congressos, exposições e festas',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CRA.'
+  },
+  {
+    code: '8230-0/02',
+    description: 'Casas de festas e eventos',
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
@@ -671,8 +1146,8 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
-    code: '8230-0/02',
-    description: 'Casas de festas e eventos',
+    code: '9319-1/01',
+    description: 'Produção e promoção de eventos esportivos',
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
@@ -712,6 +1187,15 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true
   },
+  {
+    code: '6911-7/03',
+    description: 'Agente de propriedade industrial',
+    category: 'Atividades Jurídicas e Contábeis',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
 
   // --- REPRESENTAÇÃO COMERCIAL ---
   {
@@ -735,8 +1219,118 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
   },
   {
-    code: '4619-2/00',
-    description: 'Representantes comerciais e agentes do comércio de mercadorias em geral não especializado',
+    code: '4542-1/01',
+    description: 'Representantes comerciais e agentes do comércio de motocicletas e motonetas, peças e acessórios',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4611-7/00',
+    description: 'Representantes comerciais e agentes do comércio de matérias-primas agrícolas e animais vivos',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4612-5/00',
+    description: 'Representantes comerciais e agentes do comércio de combustíveis, minerais, produtos siderúrgicos e químicos',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4613-3/00',
+    description: 'Representantes comerciais e agentes do comércio de madeira, material de construção e ferragens',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4614-1/00',
+    description: 'Representantes comerciais e agentes do comércio de máquinas, equipamentos, embarcações e aeronaves',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4615-0/00',
+    description: 'Representantes comerciais e agentes do comércio de eletrodomésticos, móveis e artigos de uso doméstico',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4616-8/00',
+    description: 'Representantes comerciais e agentes do comércio de têxteis, vestuário, calçados e artigos de viagem',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4617-6/00',
+    description: 'Representantes comerciais e agentes do comércio de produtos alimentícios, bebidas e fumo',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4618-4/01',
+    description: 'Representantes comerciais e agentes do comércio de medicamentos, cosméticos e produtos de perfumaria',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4618-4/02',
+    description: 'Representantes comerciais e agentes do comércio de instrumentos e materiais odonto-médico-hospitalares',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4618-4/03',
+    description: 'Representantes comerciais e agentes do comércio de jornais, revistas e outras publicações',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE.'
+  },
+  {
+    code: '4618-4/99',
+    description: 'Outros representantes comerciais e agentes do comércio especializado em produtos não especificados anteriormente',
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
@@ -745,8 +1339,8 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
   },
   {
-    code: '4618-4/99',
-    description: 'Outros representantes comerciais e agentes do comércio especializado em produtos não especificados',
+    code: '4619-2/00',
+    description: 'Representantes comerciais e agentes do comércio de mercadorias em geral não especializado',
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
@@ -826,6 +1420,36 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false,
     ivaReduction: 0.6
   },
+  {
+    code: '9002-7/01',
+    description: 'Atividades de artistas plásticos, jornalistas independentes e escritores',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9002-7/02',
+    description: 'Restauração de obras de arte',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9003-5/00',
+    description: 'Gestão de espaços para artes cênicas, espetáculos e outras atividades artísticas',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
   
   // --- ALUGUÉIS E GESTÃO DE ATIVOS ---
   {
@@ -872,10 +1496,28 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada. O enquadramento no Anexo III depende do Fator R.'
+    notes: 'Atividade regulamentada pelo CRA. O enquadramento no Anexo III depende do Fator R.'
   },
 
   // --- ESPORTES E LAZER ---
+  {
+    code: '8591-1/00',
+    description: 'Ensino de esportes',
+    category: 'Esportes e Lazer',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9311-5/00',
+    description: 'Gestão de instalações de esportes',
+    category: 'Esportes e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
   {
     code: '9313-1/00',
     description: 'Atividades de condicionamento físico',
@@ -884,7 +1526,52 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREF. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CREF/CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '9319-1/99',
+    description: 'Outras atividades esportivas não especificadas anteriormente',
+    category: 'Esportes e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9329-8/02',
+    description: 'Exploração de boliches',
+    category: 'Esportes e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9329-8/03',
+    description: 'Exploração de jogos de sinuca, bilhar e similares',
+    category: 'Esportes e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9329-8/04',
+    description: 'Exploração de jogos eletrônicos recreativos',
+    category: 'Esportes e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9329-8/99',
+    description: 'Outras atividades de recreação e lazer não especificadas anteriormente',
+    category: 'Esportes e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
   },
 
   // --- DIVERSOS ---
@@ -918,6 +1605,73 @@ export const CNAE_DATA: CnaeData[] = [
     notes: 'Atividade regulamentada pela CVM. É obrigatório o registro da PJ.'
   },
   {
+    code: '6619-3/02',
+    description: 'Correspondentes de instituições financeiras',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade passível de registro no Bacen.'
+  },
+  {
+    code: '6621-5/01',
+    description: 'Peritos e avaliadores de seguros',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '6621-5/02',
+    description: 'Auditoria e consultoria atuarial',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '6622-3/00',
+    description: 'Corretores e agentes de seguros, de planos de previdência complementar e de saúde',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pela SUSEP, exige RT no contrato social.'
+  },
+  {
+    code: '6629-1/00',
+    description: 'Atividades auxiliares dos seguros, da previdência complementar e dos planos de saúde não especificadas anteriormente',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '6821-8/01',
+    description: 'Corretagem na compra e venda e avaliação de imóveis',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
+  },
+  {
+    code: '6821-8/02',
+    description: 'Corretagem no aluguel de imóveis',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
+  },
+  {
     code: '7420-0/01',
     description: 'Atividades de produção de fotografias, exceto aérea e submarina',
     category: 'Fotografia e Design',
@@ -925,6 +1679,70 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: false
+  },
+  {
+    code: '7420-0/02',
+    description: 'Atividades de produção de fotografias aéreas e submarinas',
+    category: 'Fotografia e Design',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7420-0/03',
+    description: 'Laboratórios fotográficos',
+    category: 'Fotografia e Design',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7420-0/04',
+    description: 'Filmagem de festas e eventos',
+    category: 'Fotografia e Design',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7420-0/05',
+    description: 'Serviços de microfilmagem',
+    category: 'Fotografia e Design',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7490-1/01',
+    description: 'Serviços de tradução, interpretação e similares',
+    category: 'Serviços Profissionais e Técnicos',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7490-1/02',
+    description: 'Escafandria e mergulho',
+    category: 'Serviços Profissionais e Técnicos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '7490-1/04',
+    description: 'Atividades de intermediação e agenciamento de serviços e negócios em geral, exceto imobiliários',
+    category: 'Agenciamento e Representação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado por CRA ou CORE.'
   },
   {
     code: '7490-1/05',
@@ -936,9 +1754,221 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
-    code: '9319-1/01',
-    description: 'Produção e promoção de eventos esportivos',
-    category: 'Turismo e Eventos',
+    code: '7490-1/99',
+    description: 'Outras atividades profissionais, científicas e técnicas não especificadas anteriormente',
+    category: 'Serviços Profissionais e Técnicos',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentação depende da atividade específica (ex: CONEP para pesquisas com humanos).'
+  },
+  {
+    code: '8011-1/02',
+    description: 'Serviços de adestramento de cães de guarda',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '8030-7/00',
+    description: 'Atividades de investigação particular',
+    category: 'Serviços Pessoais',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9511-8/00',
+    description: 'Reparação e manutenção de computadores e de equipamentos periféricos',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9512-6/00',
+    description: 'Reparação e manutenção de equipamentos de comunicação',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9521-5/00',
+    description: 'Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e doméstico',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9529-1/01',
+    description: 'Reparação de calçados, bolsas e artigos de viagem',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9529-1/02',
+    description: 'Chaveiros',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9529-1/03',
+    description: 'Reparação de relógios',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9529-1/04',
+    description: 'Reparação de bicicletas, triciclos e outros veículos não-motorizados',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9529-1/05',
+    description: 'Reparação de artigos do mobiliário',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9529-1/06',
+    description: 'Reparação de jóias',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9529-1/99',
+    description: 'Reparação e manutenção de outros objetos e equipamentos pessoais e domésticos não especificados anteriormente',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9601-7/01',
+    description: 'Lavanderias',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9601-7/02',
+    description: 'Tinturarias',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9601-7/03',
+    description: 'Toalheiros',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9602-5/01',
+    description: 'Cabeleireiros, manicure e pedicure',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9602-5/02',
+    description: 'Atividades de Estética e outros serviços de cuidados com a beleza',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado se possuir procedimentos invasivos (CRBM, CRO, COFEN, CRM, etc.).'
+  },
+  {
+    code: '9609-2/02',
+    description: 'Agências matrimoniais',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9609-2/05',
+    description: 'Atividades de sauna e banhos',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9609-2/06',
+    description: 'Serviços de tatuagem e colocação de piercing',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9609-2/07',
+    description: 'Alojamento de animais domésticos',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9609-2/08',
+    description: 'Higiene e embelezamento de animais domésticos',
+    category: 'Serviços Pessoais',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9609-2/99',
+    description: 'Outras atividades de serviços pessoais não especificadas anteriormente',
+    category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -990,6 +2020,15 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '5914-6/00',
+    description: 'Atividades de exibição cinematográfica',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
     code: '5920-1/00',
     description: 'Atividades de gravação de som e de edição de música',
     category: 'Mídia e Audiovisual',
@@ -998,7 +2037,187 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: false
   },
+  {
+    code: '5911-1/01',
+    description: 'Estúdios cinematográficos',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
   // COMÉRCIO VAREJISTA (ANEXO I)
+  {
+    code: '4530-7/03',
+    description: 'Comércio a varejo de peças e acessórios novos para veículos automotores',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4530-7/04',
+    description: 'Comércio a varejo de peças e acessórios usados para veículos automotores',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4530-7/05',
+    description: 'Comércio a varejo de pneumáticos e câmaras-de-ar',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4541-2/06',
+    description: 'Comércio a varejo de peças e acessórios novos para motocicletas e motonetas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4541-2/07',
+    description: 'Comércio a varejo de peças e acessórios usados para motocicletas e motonetas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4711-3/01',
+    description: 'Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios – hipermercados',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4711-3/02',
+    description: 'Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios – supermercados',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4712-1/00',
+    description: 'Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios – minimercados, mercearias e armazéns',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4713-0/02',
+    description: 'Lojas de variedades, exceto lojas de departamentos ou magazines',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4713-0/04',
+    description: 'Lojas de departamentos ou magazines, exceto lojas francas (Duty free)',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4721-1/02',
+    description: 'Padaria e confeitaria com predominância de revenda',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4721-1/03',
+    description: 'Comércio varejista de laticínios e frios',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4721-1/04',
+    description: 'Comércio varejista de doces, balas, bombons e semelhantes',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4723-7/00',
+    description: 'Comércio varejista de bebidas',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4724-5/00',
+    description: 'Comércio varejista de hortifrutigranjeiros',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4729-6/01',
+    description: 'Tabacaria',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4729-6/99',
+    description: 'Comércio varejista de produtos alimentícios em geral ou especializado em produtos alimentícios não especificados anteriormente',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4743-1/00',
+    description: 'Comércio varejista de vidros',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4744-0/02',
+    description: 'Comércio varejista de madeira e artefatos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
   {
     code: '4744-0/99',
     description: 'Comércio varejista de materiais de construção em geral',
@@ -1018,8 +2237,125 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '4752-1/00',
+    description: 'Comércio varejista especializado de equipamentos de telefonia e comunicação',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4753-9/00',
     description: 'Comércio varejista especializado de eletrodomésticos e equipamentos de áudio e vídeo',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4754-7/01',
+    description: 'Comércio varejista de móveis',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4754-7/02',
+    description: 'Comércio varejista de artigos de colchoaria',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4754-7/03',
+    description: 'Comércio varejista de artigos de iluminação',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4755-5/01',
+    description: 'Comércio varejista de tecidos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4755-5/02',
+    description: 'Comercio varejista de artigos de armarinho',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4755-5/03',
+    description: 'Comércio varejista de artigos de cama, mesa e banho',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4756-3/00',
+    description: 'Comércio varejista especializado de instrumentos musicais e acessórios',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4757-1/00',
+    description: 'Comércio varejista especializado de peças e acessórios para aparelhos eletroeletrônicos para uso doméstico, exceto informática e comunicação',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4759-8/01',
+    description: 'Comércio varejista de artigos de tapeçaria, cortinas e persianas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4759-8/99',
+    description: 'Comércio varejista de outros artigos de uso doméstico não especificados anteriormente',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4761-0/01',
+    description: 'Comércio varejista de livros',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4761-0/02',
+    description: 'Comércio varejista de jornais e revistas',
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
@@ -1036,8 +2372,116 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '4762-8/00',
+    description: 'Comércio varejista de discos, CDs, DVDs e fitas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4763-6/01',
+    description: 'Comércio varejista de brinquedos e artigos recreativos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4763-6/02',
+    description: 'Comércio varejista de artigos esportivos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4763-6/03',
+    description: 'Comércio varejista de bicicletas e triciclos peças e acessórios',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4763-6/04',
+    description: 'Comércio varejista de artigos de caça, pesca e camping',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4772-5/00',
+    description: 'Comércio varejista de cosméticos, produtos de perfumaria e de higiene pessoal',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4774-1/00',
+    description: 'Comércio varejista de artigos de óptica',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4781-4/00',
     description: 'Comércio varejista de artigos do vestuário e acessórios',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4782-2/01',
+    description: 'Comércio varejista de calçados',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4782-2/02',
+    description: 'Comércio varejista de artigos de viagem',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4783-1/02',
+    description: 'Comércio varejista de artigos de relojoaria',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4785-7/01',
+    description: 'Comércio varejista de antigüidades',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4785-7/99',
+    description: 'Comércio varejista de outros artigos usados',
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
@@ -1051,6 +2495,170 @@ export const CNAE_DATA: CnaeData[] = [
     annex: 'I',
     requiresFatorR: false,
     presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/02',
+    description: 'Comércio varejista de plantas e flores naturais',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/03',
+    description: 'Comércio varejista de objetos de arte',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/07',
+    description: 'Comércio varejista de equipamentos para escritório',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/08',
+    description: 'Comércio varejista de artigos fotográficos e para filmagem',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/99',
+    description: 'Comércio varejista de outros produtos não especificados anteriormente',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  // COMÉRCIO ATACADISTA
+  {
+    code: '4530-7/02',
+    description: 'Comércio por atacado de pneumáticos e câmaras-de-ar',
+    category: 'Comércio Atacadista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4541-2/02',
+    description: 'Comércio por atacado de peças e acessórios para motocicletas e motonetas',
+    category: 'Comércio Atacadista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  // HOSPEDAGEM E ALIMENTAÇÃO
+  {
+    code: '5611-2/01',
+    description: 'Restaurantes e similares',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5611-2/03',
+    description: 'Lanchonetes, casas de chá, de sucos e similares',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5611-2/04',
+    description: 'Bares e outros estabelecimentos especializados em servir bebidas, sem entretenimento',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5620-1/01',
+    description: 'Fornecimento de alimentos preparados preponderantemente para empresas',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5620-1/03',
+    description: 'Cantinas – serviços de alimentação privativos',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5620-1/04',
+    description: 'Fornecimento de alimentos preparados preponderantemente para consumo domiciliar',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5811-5/00',
+    description: 'Edição de livros',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5812-3/01',
+    description: 'Edição de jornais diários',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5812-3/02',
+    description: 'Edição de jornais não diários',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5813-1/00',
+    description: 'Edição de revistas',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5819-1/00',
+    description: 'Edição de cadastros, listas e de outros produtos gráficos',
+    category: 'Mídia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
     isRegulated: false
   }
 ];
