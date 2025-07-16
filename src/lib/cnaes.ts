@@ -43,6 +43,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM.'
   },
   {
@@ -53,6 +54,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM.'
   },
   {
@@ -63,6 +65,7 @@ export const CNAE_DATA: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRate: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM.'
   },
   {
@@ -382,7 +385,7 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada. O conselho (CRM, COFEN, CRF) depende da área de atuação.'
+    notes: 'Atividade regulamentada. O conselho (CRM, COFEN, CRF) depende da área de atuação. RT necessário.'
   },
   {
     code: '8660-7/00',
@@ -591,7 +594,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '6391-7/00',
     description: 'Agências de notícias',
-    category: 'Tecnologia da Informação',
+    category: 'Comunicação',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1010,6 +1013,24 @@ export const CNAE_DATA: CnaeData[] = [
     ivaReduction: 0.6
   },
   {
+    code: '8599-6/01',
+    description: 'Formação de condutores',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+  },
+  {
+    code: '8599-6/02',
+    description: 'Cursos de pilotagem',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+  },
+  {
     code: '8599-6/03',
     description: 'Treinamento em informática',
     category: 'Educação e Treinamento',
@@ -1060,6 +1081,15 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CRA.'
+  },
+  {
+    code: '8219-9/01',
+    description: 'Fotocópias',
+    category: 'Serviços Administrativos e de Apoio',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
   },
   {
     code: '8219-9/99',
@@ -1184,6 +1214,61 @@ export const CNAE_DATA: CnaeData[] = [
     presumedProfitRate: 0.32,
     isRegulated: false
   },
+  {
+    code: '5211-7/02',
+    description: 'Guarda-móveis',
+    category: 'Serviços Diversos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5320-2/01',
+    description: 'Serviços de malote não realizados pelo Correio Nacional',
+    category: 'Logística e Transporte',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5320-2/02',
+    description: 'Serviços de entrega rápida',
+    category: 'Logística e Transporte',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9101-5/00',
+    description: 'Atividades de bibliotecas e arquivos',
+    category: 'Cultura e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9102-3/01',
+    description: 'Atividades de museus e de exploração de lugares e prédios históricos e atrações similares',
+    category: 'Cultura e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '9102-3/02',
+    description: 'Restauração e conservação de lugares e prédios históricos',
+    category: 'Cultura e Lazer',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+
 
   // --- ATIVIDADES JURÍDICAS E CONTÁBEIS ---
   {
@@ -1453,7 +1538,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '9002-7/01',
     description: 'Atividades de artistas plásticos, jornalistas independentes e escritores',
-    category: 'Atividades artísticas, criativas e de espetáculos',
+    category: 'Comunicação',
     annex: 'V',
     requiresFatorR: true,
     presumedProfitRate: 0.32,
@@ -1463,7 +1548,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '9002-7/02',
     description: 'Restauração de obras de arte',
-    category: 'Atividades artísticas, criativas e de espetáculos',
+    category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1473,7 +1558,7 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '9003-5/00',
     description: 'Gestão de espaços para artes cênicas, espetáculos e outras atividades artísticas',
-    category: 'Atividades artísticas, criativas e de espetáculos',
+    category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
     presumedProfitRate: 0.32,
@@ -1482,6 +1567,15 @@ export const CNAE_DATA: CnaeData[] = [
   },
   
   // --- ALUGUÉIS E GESTÃO DE ATIVOS ---
+  {
+    code: '7711-0/00',
+    description: 'Locação de automóveis sem condutor',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
   {
     code: '7721-7/00',
     description: 'Aluguel de equipamentos recreativos e esportivos',
@@ -1904,50 +1998,50 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '5811-5/00',
     description: 'Edição de livros',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
+    category: 'Comunicação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
     code: '5812-3/01',
     description: 'Edição de jornais diários',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
+    category: 'Comunicação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
     code: '5812-3/02',
     description: 'Edição de jornais não diários',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
+    category: 'Comunicação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
     code: '5813-1/00',
     description: 'Edição de revistas',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
+    category: 'Comunicação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   {
     code: '5819-1/00',
     description: 'Edição de cadastros, listas e de outros produtos gráficos',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
+    category: 'Comunicação',
+    annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRate: 0.08,
     isRegulated: false
   },
   
-  // --- DIVERSOS ---
+  // --- SERVIÇOS PROFISSIONAIS E TÉCNICOS ---
   {
     code: '7490-1/01',
     description: 'Serviços de tradução, interpretação e similares',
@@ -2568,6 +2662,92 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: true,
     notes: 'Regulamentado pelo CREA.'
   },
+  {
+    code: '4520-0/01',
+    description: 'Serviços de manutenção e reparação mecânica de veículos automotores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4520-0/02',
+    description: 'Serviços de lanternagem ou funilaria e pintura de veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false,
+  },
+  {
+    code: '4520-0/03',
+    description: 'Serviços de manutenção e reparação elétrica de veículos automotores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4520-0/04',
+    description: 'Serviços de alinhamento e balanceamento de veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4520-0/05',
+    description: 'Serviços de lavagem, lubrificação e polimento de veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4520-0/06',
+    description: 'Serviços de borracharia para veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4520-0/07',
+    description: 'Serviços de instalação, manutenção e reparação de acessórios para veículos automotores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4520-0/08',
+    description: 'Serviços de capotaria',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4543-9/00',
+    description: 'Manutenção e reparação de motocicletas e motonetas',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
+  },
+
   
   // --- CONSTRUÇÃO CIVIL ---
   {
@@ -2763,6 +2943,15 @@ export const CNAE_DATA: CnaeData[] = [
 
   // --- COMÉRCIO VAREJISTA (ANEXO I) ---
   {
+    code: '4511-1/01',
+    description: 'Comércio a varejo de automóveis, camionetas e utilitários novos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4530-7/03',
     description: 'Comércio a varejo de peças e acessórios novos para veículos automotores',
     category: 'Comércio Varejista',
@@ -2783,6 +2972,24 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '4530-7/05',
     description: 'Comércio a varejo de pneumáticos e câmaras-de-ar',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4541-2/03',
+    description: 'Comércio a varejo de motocicletas e motonetas novas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4541-2/04',
+    description: 'Comércio a varejo de motocicletas e motonetas usadas',
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
@@ -2862,6 +3069,42 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '4722-9/02',
+    description: 'Peixaria',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4729-6/02',
+    description: 'Comércio varejista de mercadorias em lojas de conveniência',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4741-5/00',
+    description: 'Comércio varejista de tintas e materiais para pintura',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4742-3/00',
+    description: 'Comércio varejista de material elétrico',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4743-1/00',
     description: 'Comércio varejista de vidros',
     category: 'Comércio Varejista',
@@ -2871,8 +3114,53 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '4744-0/01',
+    description: 'Comércio varejista de ferragens e ferramentas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4744-0/02',
     description: 'Comércio varejista de madeira e artefatos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4744-0/03',
+    description: 'Comércio varejista de materiais hidráulicos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4744-0/04',
+    description: 'Comércio varejista de cal, areia, pedra britada, tijolos e telhas',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4744-0/05',
+    description: 'Comércio varejista de materiais de construção não especificados anteriormente',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4744-0/06',
+    description: 'Comércio varejista de pedras para revestimento',
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
@@ -3078,8 +3366,35 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '4763-6/05',
+    description: 'Comércio varejista de embarcações e outros veículos recreativos; peças e acessórios',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4771-7/04',
+    description: 'Comércio varejista de medicamentos veterinários',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4772-5/00',
     description: 'Comércio varejista de cosméticos, produtos de perfumaria e de higiene pessoal',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4773-3/00',
+    description: 'Comércio varejista de artigos médicos e ortopédicos',
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
@@ -3177,6 +3492,24 @@ export const CNAE_DATA: CnaeData[] = [
     isRegulated: false
   },
   {
+    code: '4789-0/05',
+    description: 'Comércio varejista de produtos saneantes domissanitários',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/06',
+    description: 'Comércio varejista de fogos de artifício e artigos pirotécnicos',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4789-0/07',
     description: 'Comércio varejista de equipamentos para escritório',
     category: 'Comércio Varejista',
@@ -3188,6 +3521,15 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '4789-0/08',
     description: 'Comércio varejista de artigos fotográficos e para filmagem',
+    category: 'Comércio Varejista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '4789-0/09',
+    description: 'Comércio varejista de armas e munições',
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
@@ -3215,6 +3557,15 @@ export const CNAE_DATA: CnaeData[] = [
   
   // --- COMÉRCIO ATACADISTA ---
   {
+    code: '4530-7/01',
+    description: 'Comércio por atacado de peças e acessórios novos para veículos automotores',
+    category: 'Comércio Atacadista',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
     code: '4530-7/02',
     description: 'Comércio por atacado de pneumáticos e câmaras-de-ar',
     category: 'Comércio Atacadista',
@@ -3234,6 +3585,69 @@ export const CNAE_DATA: CnaeData[] = [
   },
   
   // --- HOSPEDAGEM E ALIMENTAÇÃO ---
+  {
+    code: '5510-8/01',
+    description: 'Hotéis',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5510-8/02',
+    description: 'Apart-hotéis',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5510-8/03',
+    description: 'Motéis',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5590-6/01',
+    description: 'Albergues, exceto assistenciais',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5590-6/02',
+    description: 'Campings',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5590-6/03',
+    description: 'Pensões (alojamento)',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '5590-6/99',
+    description: 'Outros alojamentos não especificados anteriormente',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRate: 0.32,
+    isRegulated: false
+  },
   {
     code: '5611-2/01',
     description: 'Restaurantes e similares',
@@ -3264,6 +3678,15 @@ export const CNAE_DATA: CnaeData[] = [
   {
     code: '5620-1/01',
     description: 'Fornecimento de alimentos preparados preponderantemente para empresas',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRate: 0.08,
+    isRegulated: false
+  },
+  {
+    code: '5620-1/02',
+    description: 'Serviços de alimentação para eventos e recepções – bufê',
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
