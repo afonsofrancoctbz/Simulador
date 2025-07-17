@@ -104,8 +104,8 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                 <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
                     {details.regime === 'Lucro Presumido' ? (
                         <>
-                          {renderTaxGroup('IMPOSTOS S/ FATURAMENTO', lucroPresumidoImpostosFaturamento)}
                           {renderTaxGroup('IMPOSTOS S/ LUCRO PRESUMIDO', lucroPresumidoImpostosLucro)}
+                          {renderTaxGroup('IMPOSTOS S/ FATURAMENTO', lucroPresumidoImpostosFaturamento)}
                         </>
                     ) : (
                         renderTaxGroup('IMPOSTOS', simplesNacionalImpostos)

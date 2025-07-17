@@ -329,7 +329,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
   
   let cpp = 0;
-  if (hasAnexoIV && monthlyPayroll > 0) {
+  if (monthlyPayroll > 0) {
       cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
   }
   
@@ -461,5 +461,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
 
 
