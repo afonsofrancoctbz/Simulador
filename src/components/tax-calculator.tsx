@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo, type ComponentType } from 'react';
@@ -35,7 +36,6 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
-import { TaxAnalysisReport } from './tax-analysis-report';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -555,10 +555,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         </AlertDescription>
                     </Alert>
                 </div>
-            )}
-            
-            {year === 2025 && 'simplesNacionalBase' in results && (
-                <TaxAnalysisReport results={results} />
             )}
             
       </div>
