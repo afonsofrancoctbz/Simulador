@@ -134,8 +134,8 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 }
 
 
-function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12, fp12, selectedPlan, selectedCnaes } = values;
+function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, monthlyPayroll: number, regimeName: string): TaxDetails {
+  const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, fp12, selectedPlan, selectedCnaes } = values;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -151,8 +151,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
   
-  const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
-
   // --- 3. RBT12, FP12, and Fator R Calculation ---
   // Use provided RBT12/FP12, or estimate proportionally for new companies.
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
@@ -462,9 +460,10 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const totalProLaboreBruto = values.proLabores.reduce((acc, p) => acc + p.value, 0);
+  const monthlyPayroll = values.totalSalaryExpense + totalProLaboreBruto;
 
   const lucroPresumido = calculateLucroPresumido(values);
-  const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, 'Simples Nacional');
+  const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, monthlyPayroll, 'Simples Nacional');
 
   let simplesNacionalOtimizado: TaxDetails | null = null;
 
@@ -492,9 +491,9 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               }));
 
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
+              const optimizedMonthlyPayroll = values.totalSalaryExpense + requiredTotalProLabore;
               
-              // Always calculate and return the optimized scenario for comparison
-              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, 'Simples Nacional Otimizado');
+              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, optimizedMonthlyPayroll, 'Simples Nacional Otimizado');
           }
       }
   }
