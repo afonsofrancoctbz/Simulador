@@ -187,7 +187,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
           regime: 'Simples Nacional', totalTax, totalMonthlyCost, totalRevenue,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee,
           breakdown: [
-              { name: 'CPP (INSS Patronal - 20%)', value: cppFromAnnexIV },
+              { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
               { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
               { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido }
           ].filter(i => i.value > 0),
@@ -292,7 +292,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   const breakdown = [
     { name: `DAS`, value: totalDas },
-    { name: `CPP (INSS Patronal - 20%)`, value: cppFromAnnexIV },
+    { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV },
     { name: `ISS (Fora do DAS)`, value: totalIssSeparado },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
@@ -358,7 +358,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
   const csll = presumedProfitBase * 0.09;
   
-  const cpp = monthlyPayroll > 0 
+  const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
+  
+  const cpp = hasAnexoIV
     ? monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base 
     : 0;
   
@@ -377,7 +379,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `ISS`, value: iss },
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
-    { name: `CPP (INSS Patronal - 20%)`, value: cpp },
+    { name: `CPP (INSS Patronal)`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];

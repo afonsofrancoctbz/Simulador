@@ -16,7 +16,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const lucroPresumidoImpostosLucro = details.breakdown.filter(item => ['IRPJ', 'CSLL'].includes(item.name));
     const simplesNacionalImpostos = details.breakdown.filter(item => item.name.includes('DAS'));
     
-    const encargosFolha = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].includes(item.name));
+    const encargosFolha = details.breakdown.filter(item => ['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].includes(item.name));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
     const getTaxEffectiveRateOnRevenue = (taxValue: number) => {
