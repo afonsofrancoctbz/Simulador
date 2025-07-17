@@ -32,9 +32,9 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     
         if (name.startsWith('DAS')) {
             percentage = formatPercent(details.effectiveDasRate ?? 0);
-        } else if (name.startsWith('INSS s/ Pró-labore')) {
+        } else if (name === 'INSS s/ Pró-labore') {
             percentage = formatPercent(0.11);
-        } else if (name.startsWith('CPP')) {
+        } else if (name === 'CPP (INSS Patronal)') {
             percentage = formatPercent(0.20);
         } else if (name === 'IRPJ') {
              percentage = getTaxEffectiveRateOnRevenue(value);
@@ -152,7 +152,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     <div className="text-2xl font-bold text-primary">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
-                    <p className="text-xs text-muted-foreground">(Impostos + Encargos + Mensalidade)</p>
+                    <p className="text-xs text-muted-foreground">(Impostos + Mensalidade)</p>
                 </div>
             </CardFooter>
         </Card>

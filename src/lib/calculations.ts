@@ -358,11 +358,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
   const csll = presumedProfitBase * 0.09;
   
-  const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
-  
-  const cpp = hasAnexoIV
-    ? monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base 
-    : 0;
+  const cpp = 0; // CPP não deve ser calculada aqui conforme imagem de referência.
   
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
@@ -379,7 +375,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `ISS`, value: iss },
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
-    { name: `CPP (INSS Patronal)`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
