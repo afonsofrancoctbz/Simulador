@@ -46,6 +46,7 @@ const CalculatorFormSchema = z.object({
   city: z.string({ required_error: "Por favor, selecione uma cidade." }).optional(),
   selectedCnaes: z.array(z.string()).min(1, "Selecione ao menos uma atividade (CNAE)."),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
+  fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
@@ -109,6 +110,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       city: undefined,
       selectedCnaes: [],
       rbt12: 0,
+      fp12: 0,
       revenues: {},
       exportCurrency: 'BRL',
       exchangeRate: 1,
@@ -286,6 +288,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         selectedCnaes: values.selectedCnaes,
         selectedPlan: values.selectedPlan,
         rbt12: values.rbt12 ?? 0,
+        fp12: values.fp12 ?? 0,
         domesticActivities,
         exportActivities,
         exportCurrency: values.exportCurrency,
@@ -850,43 +853,73 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                             </Button>
                         </div>
 
-                        <FormField control={form.control} name="rbt12" render={({ field }) => {
-                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const { value } = e.target;
-                                    const digitsOnly = value.replace(/\D/g, '');
-                                    field.onChange(Number(digitsOnly) / 100);
-                                };
-                                return (
-                                <FormItem>
-                                    <FormLabel>Faturamento dos Últimos 12 Meses (RBT12)</FormLabel>
-                                    <FormControl>
-                                        <Input 
-                                            type="text" 
-                                            inputMode="decimal"
-                                            placeholder="Ex: 250.000,00"
-                                            onChange={handleChange}
-                                            onBlur={field.onBlur}
-                                            value={field.value ? formatBRL(field.value) : ''}
-                                            name={field.name}
-                                            ref={field.ref}
-                                        />
-                                    </FormControl>
-                                    <FormDescription className='text-sm'>
-                                        Deixe R$ 0,00 se estiver abrindo a empresa agora. A calculadora estimará o valor.
-                                    </FormDescription>
-                                    <FormMessage />
-                                    {showSimplesLimitWarning && (
-                                        <Alert variant="destructive" className="mt-2">
-                                            <AlertTriangle className="h-4 w-4" />
-                                            <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
-                                            <AlertDescription>
-                                                Com base no faturamento mensal informado, sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões do Simples Nacional. Empresas que ultrapassam esse limite devem ser desenquadradas do regime.
-                                            </AlertDescription>
-                                        </Alert>
-                                    )}
-                                </FormItem>
-                                );
-                            }} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <FormField control={form.control} name="rbt12" render={({ field }) => {
+                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                        const { value } = e.target;
+                                        const digitsOnly = value.replace(/\D/g, '');
+                                        field.onChange(Number(digitsOnly) / 100);
+                                    };
+                                    return (
+                                    <FormItem>
+                                        <FormLabel>Faturamento dos Últimos 12 Meses (RBT12)</FormLabel>
+                                        <FormControl>
+                                            <Input 
+                                                type="text" 
+                                                inputMode="decimal"
+                                                placeholder="Ex: 250.000,00"
+                                                onChange={handleChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value ? formatBRL(field.value) : ''}
+                                                name={field.name}
+                                                ref={field.ref}
+                                            />
+                                        </FormControl>
+                                        <FormDescription className='text-sm'>
+                                            Deixe R$ 0,00 se estiver abrindo a empresa agora. A calculadora estimará o valor.
+                                        </FormDescription>
+                                        <FormMessage />
+                                        {showSimplesLimitWarning && (
+                                            <Alert variant="destructive" className="mt-2">
+                                                <AlertTriangle className="h-4 w-4" />
+                                                <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
+                                                <AlertDescription>
+                                                    Com base no faturamento mensal informado, sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões do Simples Nacional. Empresas que ultrapassam esse limite devem ser desenquadradas do regime.
+                                                </AlertDescription>
+                                            </Alert>
+                                        )}
+                                    </FormItem>
+                                    );
+                                }} />
+                             <FormField control={form.control} name="fp12" render={({ field }) => {
+                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                        const { value } = e.target;
+                                        const digitsOnly = value.replace(/\D/g, '');
+                                        field.onChange(Number(digitsOnly) / 100);
+                                    };
+                                    return (
+                                    <FormItem>
+                                        <FormLabel>Folha de Pagamento dos Últimos 12 Meses (FP12)</FormLabel>
+                                        <FormControl>
+                                            <Input 
+                                                type="text" 
+                                                inputMode="decimal"
+                                                placeholder="Ex: 70.000,00"
+                                                onChange={handleChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value ? formatBRL(field.value) : ''}
+                                                name={field.name}
+                                                ref={field.ref}
+                                            />
+                                        </FormControl>
+                                        <FormDescription className='text-sm'>
+                                            Soma de salários, pró-labore e encargos (INSS, FGTS) do último ano.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                    );
+                                }} />
+                        </div>
 
                         {year === 2026 && (
                           <FormField

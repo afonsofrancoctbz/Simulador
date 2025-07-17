@@ -135,15 +135,12 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, regimeName: string): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12, selectedPlan, selectedCnaes } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, rbt12, fp12, selectedPlan, selectedCnaes } = values;
 
   // --- 1. Revenue Calculation ---
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
   const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
   const totalRevenue = domesticRevenue + exportRevenue;
-
-  // New logic: Use monthly revenue to estimate RBT12 if not provided.
-  const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
   // --- 2. Pro-labore Taxes (per partner, then aggregated) ---
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
@@ -153,16 +150,44 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       .filter((c): c is CnaeData => !!c);
 
   const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
+  
+  const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
+
+  // --- 3. RBT12, FP12, and Fator R Calculation ---
+  // Use provided RBT12/FP12, or estimate proportionally for new companies.
+  const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+  const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12; // FP12 includes salaries, pro-labore, and all payroll charges. For simplicity here we estimate based on monthly values if FP12 is not provided.
+  const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
+
 
   // --- 4. Calculate CPP for Anexo IV (if applicable) ---
   let cppFromAnnexIV = 0;
-  if (hasAnnexIV && (totalSalaryExpense + totalProLaboreBruto > 0)) {
+  if (hasAnnexIV && monthlyPayroll > 0) {
     const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.base;
-    cppFromAnnexIV = (totalSalaryExpense + totalProLaboreBruto) * cppRate;
+    cppFromAnnexIV = monthlyPayroll * cppRate;
   }
 
-  // --- Guard Clause for Zero Revenue ---
-  if (totalRevenue === 0 && effectiveRbt12 === 0) {
+  // --- Guard Clause for Zero Revenue and Payroll ---
+  if (totalRevenue === 0 && effectiveRbt12 === 0 && monthlyPayroll === 0) {
+    const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+    const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
+    
+    return {
+      regime: regimeName,
+      totalTax: 0,
+      totalMonthlyCost: fee,
+      totalRevenue: 0,
+      proLabore: 0,
+      effectiveRate: 0,
+      contabilizeiFee: fee,
+      breakdown: [],
+      partnerTaxes: [],
+      annex: 'N/A',
+    };
+  }
+  
+  // --- Guard Clause for Zero Revenue with Payroll (Anexo IV case) ---
+  if (totalRevenue === 0 && effectiveRbt12 === 0 && monthlyPayroll > 0) {
     const companyTaxes = cppFromAnnexIV;
     const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
     const totalTax = companyTaxes + totalWithheldTaxes;
@@ -215,18 +240,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const SUBLIMIT_SIMPLES = 3600000;
   const rbt12ExceededSublimit = effectiveRbt12 > SUBLIMIT_SIMPLES;
 
-  // --- Fator R Calculation & Annex Determination ---
-  const totalPayrollForFatorR = totalSalaryExpense + totalProLaboreBruto;
-  const fatorR = totalRevenue > 0 ? totalPayrollForFatorR / totalRevenue : 0;
+  // --- Annex Determination (Fator R) ---
+  const hasAnnexVActivity = allActivities.some(a => getCnaeData(a.code)?.requiresFatorR);
   
-  const revenueAnnexV = allActivities
-    .filter(a => getCnaeData(a.code)?.requiresFatorR)
-    .reduce((sum, act) => sum + act.revenue, 0);
-  
-  const isFatorRApplicable = revenueAnnexV > 0;
   let effectiveAnnexForV: Annex = 'V';
   
-  if (isFatorRApplicable) {
+  if (hasAnnexVActivity) {
     const useAnnexIIIForV = fatorR >= 0.28;
     effectiveAnnexForV = useAnnexIIIForV ? 'III' : 'V';
     notes.push(`Seu "Fator R" é de ${formatPercent(fatorR)}. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
@@ -241,7 +260,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const cnaeInfo = getCnaeData(activity.code);
     if (!cnaeInfo) return acc;
     let effectiveAnnex: Annex = cnaeInfo.annex;
-    if (cnaeInfo.annex === 'V' && isFatorRApplicable) {
+    if (cnaeInfo.requiresFatorR) {
       effectiveAnnex = effectiveAnnexForV;
     }
     if (!acc[effectiveAnnex]) acc[effectiveAnnex] = { domestic: 0, export: 0 };
@@ -334,7 +353,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     totalMonthlyCost,
     totalRevenue,
     proLabore: totalProLaboreBruto,
-    fatorR: isFatorRApplicable ? fatorR : undefined,
+    fatorR: hasAnnexVActivity ? fatorR : undefined,
     annex: mainAnnexLabel,
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
     effectiveDasRate,

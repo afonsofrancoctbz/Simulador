@@ -31,6 +31,7 @@ export type Plan = z.infer<typeof PlanEnumSchema>;
 export const TaxFormValuesSchema = z.object({
   selectedCnaes: z.array(z.string()),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
+  fp12: z.coerce.number().min(0, "O valor deve ser positivo."),
   domesticActivities: z.array(CnaeItemSchema),
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
