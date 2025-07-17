@@ -12,18 +12,19 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
-    const faturamentoTaxes = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS', 'DAS'].some(tax => item.name.includes(tax)));
-    const lucroTaxes = details.breakdown.filter(item => ['IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
-    const folhaTaxes = details.breakdown.filter(item => ['CPP s/ Pró-labore', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
+    const faturamentoTaxes = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS', 'DAS', 'IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
+    const lucroPresumidoFaturamento = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS'].some(tax => item.name.includes(tax)));
+    const lucroPresumidoLucro = details.breakdown.filter(item => ['IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
+    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
-    const getTaxEffectiveRate = (taxValue: number) => {
+    const getTaxEffectiveRateOnRevenue = (taxValue: number) => {
         if (details.totalRevenue > 0) {
             return formatPercent(taxValue / details.totalRevenue);
         }
         return null;
     };
-
+    
     const parseTaxName = (name: string, value: number) => {
         let baseName = name;
         let percentage: string | null = null;
@@ -32,11 +33,18 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
             percentage = formatPercent(details.effectiveDasRate ?? 0);
         } else if (name.startsWith('INSS s/ Pró-labore')) {
             percentage = formatPercent(0.11);
-        } else if (name.startsWith('CPP s/ Pró-labore')) {
-            percentage = formatPercent(0.288);
-        } else {
-             const rate = getTaxEffectiveRate(value);
-             if (rate) percentage = rate;
+        } else if (name.startsWith('CPP')) {
+            percentage = formatPercent(0.20);
+        } else if (name === 'IRPJ') {
+             percentage = getTaxEffectiveRateOnRevenue(value);
+        } else if (name === 'CSLL') {
+            percentage = getTaxEffectiveRateOnRevenue(value);
+        } else if (name === 'PIS') {
+            percentage = formatPercent(0.0065);
+        } else if (name === 'COFINS') {
+            percentage = formatPercent(0.03);
+        } else if (name === 'ISS') {
+            percentage = formatPercent(0.05); // Assuming 5%, could be dynamic
         }
         
         return { baseName, percentage };
@@ -93,8 +101,14 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                 </div>
 
                 <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
-                    {renderTaxGroup('Impostos s/ Faturamento', faturamentoTaxes)}
-                    {renderTaxGroup('Impostos s/ Lucro Presumido', lucroTaxes)}
+                    {details.regime === 'Lucro Presumido' ? (
+                        <>
+                          {renderTaxGroup('Impostos s/ Faturamento', lucroPresumidoFaturamento)}
+                          {renderTaxGroup('Impostos s/ Lucro Presumido', lucroPresumidoLucro)}
+                        </>
+                    ) : (
+                        renderTaxGroup('Impostos s/ Faturamento', faturamentoTaxes)
+                    )}
                     {renderTaxGroup('Encargos s/ Folha e Pró-labore', folhaTaxes)}
                     {renderTaxGroup('Outros Custos', outrosCustos)}
                 </div>
