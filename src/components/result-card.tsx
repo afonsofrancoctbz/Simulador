@@ -31,7 +31,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
     
     const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
 
-    const proLaboreLabel = details.optimizationNote ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
+    const proLaboreLabel = details.regime.includes("Otimizado") || details.annex === 'Anexo III (Com Fator R)' ? 'Pró-labore (Otimizado)' : 'Pró-labore por Sócio';
 
     const lucroPresumidoPercentages: { [key: string]: string } = {
       'PIS': '0,65%',
@@ -55,7 +55,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                  isCheapest ? 'bg-primary/5' : ''
             )}>
                 <CardTitle className="text-xl font-bold text-foreground">{details.regime}</CardTitle>
-                {details.annex && <CardDescription className='font-semibold text-primary/90 text-base'>{details.annex}</CardDescription>}
+                {details.annex && details.regime !== 'Lucro Presumido' && <CardDescription className='font-semibold text-primary/90 text-base'>{details.annex}</CardDescription>}
             </CardHeader>
 
             <CardContent className="flex-grow p-3 space-y-2 flex flex-col">
@@ -178,7 +178,8 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                             : 'bg-amber-100 text-amber-900 border border-amber-200'
                     )}>
                         <span className="font-semibold">Fator R: <span className="font-bold text-primary">{formatPercent(details.fatorR)}</span></span>
-                        <p className="text-xs mt-0.5">{details.fatorR >= 0.28 ? '✅ Cenário otimizado' : '⚠️ Alíquota maior aplicada'}</p>
+                         {details.optimizationNote && details.fatorR < 0.28 && <p className="text-xs mt-0.5">⚠️ Alíquota maior aplicada</p>}
+                         {details.optimizationNote && details.fatorR >= 0.28 && <p className="text-xs mt-0.5">✅ Cenário otimizado</p>}
                     </div>
                 )}
 

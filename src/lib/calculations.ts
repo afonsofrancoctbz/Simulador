@@ -238,13 +238,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const rbt12ExceededSublimit = effectiveRbt12 > SUBLIMIT_SIMPLES;
 
   // --- Annex Determination (Fator R) ---
-  const hasAnnexVActivity = allActivities.some(a => getCnaeData(a.code)?.requiresFatorR);
+  const hasAnnexVActivity = allCnaesData.some(a => a.requiresFatorR);
   
-  let effectiveAnnexForV: Annex = 'V';
+  const useAnnexIIIForV = hasAnnexVActivity && fatorR >= 0.28;
+  const effectiveAnnexForV: Annex = useAnnexIIIForV ? 'III' : 'V';
   
   if (hasAnnexVActivity) {
-    const useAnnexIIIForV = fatorR >= 0.28;
-    effectiveAnnexForV = useAnnexIIIForV ? 'III' : 'V';
     notes.push(`Seu "Fator R" é de ${formatPercent(fatorR)}. ${useAnnexIIIForV ? 'Suas atividades do Anexo V serão tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V serão tributadas pelas alíquotas do Anexo V.'}`);
   }
 
@@ -315,34 +314,38 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
-  const annexKeys = Object.keys(revenueByAnnex) as Annex[];
   let mainAnnexLabel: string;
-  if(annexKeys.length === 1) {
-    mainAnnexLabel = `Anexo ${annexKeys[0]}`;
-  } else if (annexKeys.length > 1) {
-    mainAnnexLabel = 'Múltiplos Anexos';
-  } else {
-    // Fallback if no revenue was provided but we got here somehow.
-    const uniqueAnnexesFromCnaes = [...new Set(allCnaesData.map(c => c.annex))];
-    if (uniqueAnnexesFromCnaes.length === 1) {
-        mainAnnexLabel = `Anexo ${uniqueAnnexesFromCnaes[0]}`;
-    } else if (uniqueAnnexesFromCnaes.length > 1) {
-        mainAnnexLabel = 'Múltiplos Anexos';
-    } else {
-        mainAnnexLabel = 'Padrão'; 
-    }
-  }
-
-  let regimeName = 'Simples Nacional';
-  let fatorRNote: string | undefined = undefined;
+  let regimeName: string;
+  let optimizationNote: string | undefined = undefined;
 
   if (hasAnnexVActivity) {
-    const isOptimized = fatorR >= 0.28;
-    mainAnnexLabel = isOptimized ? 'Anexo III (Com Fator R)' : 'Anexo V (Sem Fator R)';
-    fatorRNote = isOptimized ? 'Cenário otimizado' : 'A alíquota maior é aplicada pois o Fator R está abaixo de 28%';
+      if (useAnnexIIIForV) {
+          mainAnnexLabel = "Anexo III (Com Fator R)";
+          regimeName = "Simples Nacional - Anexo III (Com Fator R)";
+          optimizationNote = `Cenário otimizado. Seu Fator R de ${formatPercent(fatorR)} é >= 28%, enquadrando no Anexo III.`;
+      } else {
+          mainAnnexLabel = "Anexo V";
+          regimeName = "Simples Nacional - Anexo V";
+          optimizationNote = `A alíquota maior é aplicada pois o Fator R de ${formatPercent(fatorR)} está abaixo de 28%.`;
+      }
+  } else {
+      const annexKeys = Object.keys(revenueByAnnex) as Annex[];
+      if(annexKeys.length === 1) {
+        mainAnnexLabel = `Anexo ${annexKeys[0]}`;
+      } else if (annexKeys.length > 1) {
+        mainAnnexLabel = 'Múltiplos Anexos';
+      } else {
+        const uniqueAnnexesFromCnaes = [...new Set(allCnaesData.map(c => c.annex))];
+        if (uniqueAnnexesFromCnaes.length === 1) {
+            mainAnnexLabel = `Anexo ${uniqueAnnexesFromCnaes[0]}`;
+        } else if (uniqueAnnexesFromCnaes.length > 1) {
+            mainAnnexLabel = 'Múltiplos Anexos';
+        } else {
+            mainAnnexLabel = 'Padrão'; 
+        }
+      }
+      regimeName = `Simples Nacional - ${mainAnnexLabel}`;
   }
-  
-  regimeName = `Simples Nacional - ${mainAnnexLabel}`;
 
 
   const breakdown = [
@@ -369,7 +372,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     breakdown: breakdown.filter(item => item.value > 0.001), // Filter out zero or negligible values
     notes,
     partnerTaxes,
-    optimizationNote: fatorRNote,
+    optimizationNote: optimizationNote,
   };
 }
 
@@ -477,20 +480,19 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, monthlyPayroll);
 
   let simplesNacionalOtimizado: TaxDetails | null = null;
-
-  const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
   
-  // If the base calculation for an Annex V activity resulted in an Annex V calculation (Fator R < 28%),
-  // then we calculate the optimized scenario.
-  if (hasAnnexVActivity && simplesNacionalBase.annex === 'Anexo V (Sem Fator R)') {
+  const allCnaesData = values.selectedCnaes.map(code => getCnaeData(code)).filter((c): c is CnaeData => !!c);
+  const hasAnnexVActivity = allCnaesData.some(c => c.requiresFatorR);
+  
+  const fatorRBase = simplesNacionalBase.fatorR;
+  
+  if (hasAnnexVActivity && fatorRBase !== undefined && fatorRBase < 0.28) {
       const totalRevenue = simplesNacionalBase.totalRevenue;
       if (totalRevenue > 0) {
           const requiredPayroll = totalRevenue * 0.28;
-          const currentPayrollForFatorR = values.totalSalaryExpense;
-          let requiredTotalProLabore = requiredPayroll - currentPayrollForFatorR;
-
+          let requiredTotalProLabore = requiredPayroll - values.totalSalaryExpense;
           const minProLaboreTotal = fiscalConfig2025.salario_minimo * values.numberOfPartners;
-          
+
           if (requiredTotalProLabore < minProLaboreTotal) {
             requiredTotalProLabore = minProLaboreTotal;
           }
@@ -504,15 +506,22 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               }));
 
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
-              const optimizedMonthlyPayroll = values.totalSalaryExpense + requiredTotalProLabore;
               
-              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, optimizedMonthlyPayroll);
+              const optimizedMonthlyPayroll = values.totalSalaryExpense + requiredTotalProLabore;
+
+              const fp12Otimizado = values.fp12 > 0 ? (values.fp12 - totalProLaboreBruto + requiredTotalProLabore) : optimizedMonthlyPayroll * 12;
+
+              simplesNacionalOtimizado = _calculateSimplesNacional(
+                { ...optimizedValues, fp12: fp12Otimizado }, 
+                requiredTotalProLabore, 
+                optimizedMonthlyPayroll
+              );
           }
       }
   }
   
   return {
-    simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
+    simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2 : 1 },
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
