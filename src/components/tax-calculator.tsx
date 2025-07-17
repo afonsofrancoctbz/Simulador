@@ -36,6 +36,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
+import { PartnerProfitCard } from './partner-profit-card';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -157,7 +158,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         }
     }
     
-    const exportBRL = watchedExportCurrency !== 'BRL' ? exportRaw * watchedExchangeRate : exportRaw;
+    const exportBRL = watchedExportCurrency !== 'BRL' ? exportRaw * watchedExchangeRate : 1;
     return (domestic + exportBRL) * 12;
   }, [watchedRevenues, watchedExchangeRate, watchedExportCurrency]);
   
@@ -527,15 +528,22 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 </p>
             </div>
 
-            <div className="flex flex-wrap justify-center items-stretch gap-8">
-                {sortedForDisplay.map(scenario => (
-                     <ResultCard 
-                        key={scenario.regime} 
-                        details={scenario as TaxDetailsSchema} 
-                        isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
-                        formValues={submissionValues}
+            <div className="flex flex-wrap justify-center items-start gap-8">
+                <div className="flex flex-wrap justify-center items-stretch gap-8">
+                    {sortedForDisplay.map(scenario => (
+                        <ResultCard 
+                            key={scenario.regime} 
+                            details={scenario as TaxDetailsSchema} 
+                            isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
+                        />
+                    ))}
+                </div>
+                {cheapestScenario && (
+                    <PartnerProfitCard
+                        details={cheapestScenario as TaxDetailsSchema}
+                        numPartners={submissionValues.numberOfPartners}
                     />
-                ))}
+                )}
             </div>
 
             {advice && year === 2025 && (
