@@ -4,7 +4,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrencyBRL } from "@/lib/utils";
 import type { TaxDetails } from "@/lib/types";
-import { DollarSign, Separator } from "lucide-react";
+import { DollarSign } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export function ProfitStatementCard({ details }: { details: TaxDetails }) {
   if (!details || details.totalRevenue <= 0) {
@@ -58,4 +59,3 @@ export function ProfitStatementCard({ details }: { details: TaxDetails }) {
     </Card>
   );
 }
-
