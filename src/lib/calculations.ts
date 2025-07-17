@@ -1,4 +1,5 @@
 
+
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CNAE_DATA,
@@ -136,7 +137,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, fp12, selectedPlan, selectedCnaes } = values;
 
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-  const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+  const exportRevenue = exportActivities.reduce((sum, act) => act.revenue, 0) * exchangeRate;
   const totalRevenue = domesticRevenue + exportRevenue;
 
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
@@ -180,7 +181,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
           regime: 'Simples Nacional', totalTax, totalMonthlyCost, totalRevenue,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee,
           breakdown: [
-              { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
+              { name: 'CPP s/ Pró-labore', value: cppFromAnnexIV },
               { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
               { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido }
           ].filter(i => i.value > 0),
@@ -287,7 +288,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   const breakdown = [
     { name: `DAS`, value: totalDas },
-    { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV },
+    { name: `CPP s/ Pró-labore`, value: cppFromAnnexIV },
     { name: `ISS (Fora do DAS)`, value: totalIssSeparado },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
@@ -337,37 +338,51 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const notes: string[] = [];
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. No Lucro Presumido, IRPJ e CSLL incidem sobre essa receita.");
   
-  // Base de presunção de 32% para serviços
-  const presumedProfitBase = totalRevenue * 0.32;
-  
-  const IRPJ_ADDITIONAL_MONTHLY_THRESHOLD = 20000;
-  const irpjAdicionalMensal = Math.max(0, presumedProfitBase - IRPJ_ADDITIONAL_MONTHLY_THRESHOLD) * 0.10;
-  const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
-  const csll = presumedProfitBase * 0.09;
-  
   const pis = domesticRevenue * 0.0065; 
   const cofins = domesticRevenue * 0.03; 
   const iss = domesticRevenue * fiscalConfig2025.aliquota_iss_padrao; 
 
+  const allCnaesData = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is CnaeData => !!c);
+  
+  const presumedProfitBase = allActivities.reduce((sum, activity) => {
+    const cnaeInfo = getCnaeData(activity.code);
+    return sum + (activity.revenue * (cnaeInfo?.presumedProfitRate ?? 0.32));
+  }, 0);
+
+  const presumedProfitBaseMonthly = presumedProfitBase;
+  const IRPJ_ADDITIONAL_MONTHLY_THRESHOLD = 20000;
+  const irpjAdicionalMensal = Math.max(0, presumedProfitBaseMonthly - IRPJ_ADDITIONAL_MONTHLY_THRESHOLD) * 0.10;
+  const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
+  const csll = presumedProfitBase * 0.09;
+  
+  const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
+  let cpp = 0;
+  
+  const hasAnnexIVActivity = allCnaesData.some(c => c.annex === 'IV');
+  if (hasAnnexIVActivity) {
+    cpp = totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total;
+    notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento, mesmo no Lucro Presumido.`);
+  }
+
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
+  const companyPayrollTaxes = cpp;
 
-  // The CPP is not calculated for most service companies under Lucro Presumido
-  // It only applies to activities from Anexo IV, which is not the case for the reference image.
-  // Therefore, it's removed from the main calculation. A more complex logic could check CNAE.
-  
-  const totalTax = companyRevenueTaxes + totalWithheldTaxes;
+  const totalTax = companyRevenueTaxes + totalWithheldTaxes + companyPayrollTaxes;
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
-  const companyCosts = companyRevenueTaxes + totalProLaboreBruto + contabilizeiFee;
+  const companyCosts = companyRevenueTaxes + companyPayrollTaxes + totalProLaboreBruto + contabilizeiFee;
   const netProfit = totalRevenue - companyCosts;
 
+  const allActivities = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
+  
   const breakdown = [
     { name: `PIS`, value: pis },
     { name: `COFINS`, value: cofins },
     { name: `ISS`, value: iss },
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
+    { name: `CPP s/ Pró-labore`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];

@@ -12,9 +12,9 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
-    const faturamentoTaxes = details.breakdown.filter(item => ['DAS', 'PIS', 'COFINS', 'ISS'].some(tax => item.name.includes(tax)));
+    const faturamentoTaxes = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS', 'DAS'].some(tax => item.name.includes(tax)));
     const lucroTaxes = details.breakdown.filter(item => ['IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
-    const folhaTaxes = details.breakdown.filter(item => ['CPP', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
+    const folhaTaxes = details.breakdown.filter(item => ['CPP s/ Pró-labore', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
     const getTaxEffectiveRate = (taxValue: number) => {
@@ -25,26 +25,44 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     };
 
     const parseTaxName = (name: string, value: number) => {
-        const match = name.match(/^(.*?)(\s\(.*\))?$/);
         let baseName = name;
-        let percentage = null;
+        let percentage: string | null = null;
     
-        if (match) {
-            baseName = match[1];
-        }
-
-        if (baseName.includes('IRPJ') || baseName.includes('CSLL')) {
-            percentage = getTaxEffectiveRate(value);
-        } else if (name.startsWith('DAS')) {
+        if (name.startsWith('DAS')) {
             percentage = formatPercent(details.effectiveDasRate ?? 0);
         } else if (name.startsWith('INSS s/ Pró-labore')) {
-            percentage = '(11,00%)'
+            percentage = formatPercent(0.11);
+        } else if (name.startsWith('CPP s/ Pró-labore')) {
+            percentage = formatPercent(0.288);
+        } else {
+             const rate = getTaxEffectiveRate(value);
+             if (rate) percentage = rate;
         }
         
-        return {
-            baseName: baseName,
-            percentage: percentage
-        };
+        return { baseName, percentage };
+    };
+
+    const renderTaxGroup = (title: string, items: { name: string; value: number }[]) => {
+        if (items.length === 0) return null;
+        return (
+            <div className="space-y-1.5">
+                <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">
+                    {title}
+                </h4>
+                {items.map((item, index) => {
+                    const { baseName, percentage } = parseTaxName(item.name, item.value);
+                    return (
+                        <div key={index} className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground">
+                                {baseName}
+                                {percentage && <span className='ml-1.5 font-bold text-primary'>({percentage})</span>}
+                            </span>
+                            <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                        </div>
+                    );
+                })}
+            </div>
+        );
     };
 
     return (
@@ -62,9 +80,8 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                  {details.annex && <CardDescription className='font-semibold text-primary/90 text-base mt-1'>{details.annex}</CardDescription>}
             </CardHeader>
 
-            <CardContent className="flex-grow p-4 pt-2 space-y-4 flex flex-col text-sm">
-                
-                <div className="p-4 border rounded-lg bg-muted/20 space-y-2">
+            <CardContent className="flex-grow p-4 pt-2 space-y-4 flex flex-col">
+                <div className="p-4 border rounded-lg bg-muted/20 space-y-2 text-sm">
                      <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Faturamento Mensal</span>
                         <span className="font-bold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
@@ -75,71 +92,11 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     </div>
                 </div>
 
-                <div className="p-4 border rounded-lg bg-background/30 space-y-3 flex-grow">
-                    {faturamentoTaxes.length > 0 && (
-                        <div className="space-y-1.5">
-                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">
-                                Impostos s/ Faturamento
-                            </h4>
-                            {faturamentoTaxes.map((item, index) => {
-                                const { baseName, percentage } = parseTaxName(item.name, item.value);
-                                return (
-                                <div key={index} className="flex justify-between items-center">
-                                    <span className="text-muted-foreground">
-                                        {baseName}
-                                        {percentage && <span className='ml-1.5 font-bold text-primary'>({percentage})</span>}
-                                    </span>
-                                    <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                </div>
-                            )})}
-                        </div>
-                    )}
-                    
-                    {lucroTaxes.length > 0 && (
-                         <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Impostos s/ Lucro Presumido</h4>
-                            {lucroTaxes.map((item, index) => {
-                                const { baseName, percentage } = parseTaxName(item.name, item.value);
-                                return (
-                                <div key={index} className="flex justify-between items-center">
-                                    <span className="text-muted-foreground">
-                                        {baseName}
-                                        {percentage && <span className='ml-1.5 font-bold text-primary'>({percentage})</span>}
-                                    </span>
-                                    <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                </div>
-                            )})}
-                        </div>
-                    )}
-
-                    {folhaTaxes.length > 0 && (
-                         <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Encargos s/ Folha e Pró-labore</h4>
-                            {folhaTaxes.map((item, index) => {
-                                const { baseName, percentage } = parseTaxName(item.name, item.value);
-                                return (
-                                <div key={index} className="flex justify-between items-center">
-                                    <span className="text-muted-foreground">
-                                        {baseName}
-                                        {percentage && <span className='ml-1.5 font-bold text-primary'>{percentage}</span>}
-                                    </span>
-                                    <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                </div>
-                            )})}
-                        </div>
-                    )}
-
-                     {outrosCustos.length > 0 && (
-                         <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Outros Custos</h4>
-                            {outrosCustos.map((item, index) => (
-                                <div key={index} className="flex justify-between items-center">
-                                    <span className="text-muted-foreground">{item.name}</span>
-                                    <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
+                    {renderTaxGroup('Impostos s/ Faturamento', faturamentoTaxes)}
+                    {renderTaxGroup('Impostos s/ Lucro Presumido', lucroTaxes)}
+                    {renderTaxGroup('Encargos s/ Folha e Pró-labore', folhaTaxes)}
+                    {renderTaxGroup('Outros Custos', outrosCustos)}
                 </div>
 
                 {details.fatorR !== undefined && (
@@ -156,12 +113,12 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     </div>
                 )}
                 
-                {details.notes && details.notes.map((note, index) => (
-                     <div key={index} className="flex items-start gap-3 p-3 text-xs rounded-lg bg-sky-50 text-sky-900 border border-sky-200">
+                {details.notes && details.notes.length > 0 && (
+                    <div className="flex items-start gap-3 p-3 text-xs rounded-lg bg-sky-50 text-sky-900 border border-sky-200">
                         <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                        <p>{note}</p>
+                        <p>{details.notes.join(' ')}</p>
                     </div>
-                ))}
+                )}
             </CardContent>
 
             <CardFooter className={cn(
