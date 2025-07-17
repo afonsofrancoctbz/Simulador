@@ -8,19 +8,27 @@ import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { CheckCircle, Info, Trophy } from 'lucide-react';
 
 const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
-
     const isCheapest = details.order === 1 && details.totalMonthlyCost > 0;
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
     const faturamentoTaxes = details.breakdown.filter(item => [
-        'DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'ISS (Fora do DAS)'
+        'DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'
     ].some(tax => item.name.includes(tax)));
-
-    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
-
-    const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
     
+    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
+    
+    const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
+
+    const parseTaxName = (name: string) => {
+        const match = name.match(/^(.*?)(\s\(.*\))?$/);
+        if (!match) return { baseName: name, percentage: null };
+        return {
+            baseName: match[1],
+            percentage: match[2] || null
+        };
+    };
+
     return (
         <Card className={cn(
             "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2 bg-card", 
@@ -38,7 +46,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
             <CardContent className="flex-grow p-4 pt-2 space-y-4 flex flex-col text-sm">
                 
-                <div className="p-3 border rounded-lg bg-muted/20 space-y-2">
+                <div className="p-4 border-b rounded-t-lg bg-muted/20 space-y-2">
                      <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Faturamento Mensal</span>
                         <span className="font-bold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
@@ -49,39 +57,46 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     </div>
                 </div>
 
-                <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
+                <div className="p-4 border rounded-lg bg-background/30 space-y-3 flex-grow">
                     {faturamentoTaxes.length > 0 && (
                         <div className="space-y-1.5">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs">Impostos s/ Faturamento</h4>
-                            {faturamentoTaxes.map((item, index) => (
+                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Impostos s/ Faturamento</h4>
+                            {faturamentoTaxes.map((item, index) => {
+                                const { baseName, percentage } = parseTaxName(item.name);
+                                return (
                                 <div key={index} className="flex justify-between items-center">
                                     <span className="text-muted-foreground">
-                                        {item.name}
+                                        {baseName}
                                         {item.name.includes('DAS') && details.effectiveDasRate !== undefined && (
                                             <span className='ml-1.5 font-bold text-primary'>{formatPercent(details.effectiveDasRate)}</span>
                                         )}
                                     </span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
-                            ))}
+                            )})}
                         </div>
                     )}
                     
                     {folhaTaxes.length > 0 && (
                          <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs">Encargos s/ Folha e Pró-labore</h4>
-                            {folhaTaxes.map((item, index) => (
+                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Encargos s/ Folha e Pró-labore</h4>
+                            {folhaTaxes.map((item, index) => {
+                                const { baseName, percentage } = parseTaxName(item.name);
+                                return (
                                 <div key={index} className="flex justify-between items-center">
-                                    <span className="text-muted-foreground">{item.name}</span>
+                                    <span className="text-muted-foreground">
+                                        {baseName}
+                                        {percentage && <span className='ml-1.5 font-bold text-primary'>{percentage}</span>}
+                                    </span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
-                            ))}
+                            )})}
                         </div>
                     )}
 
                      {outrosCustos.length > 0 && (
                          <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs">Outros Custos</h4>
+                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Outros Custos</h4>
                             {outrosCustos.map((item, index) => (
                                 <div key={index} className="flex justify-between items-center">
                                     <span className="text-muted-foreground">{item.name}</span>
