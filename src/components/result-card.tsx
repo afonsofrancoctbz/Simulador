@@ -7,43 +7,24 @@ import type { TaxDetails } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { Banknote, ChevronsDown, ChevronsUp, HandCoins } from 'lucide-react';
 
-const ResultCardComponent = ({ details, isCheapest, numPartners }: { details: TaxDetails, isCheapest: boolean, numPartners: number }) => {
+const ResultCardComponent = ({ details, numPartners }: { details: TaxDetails, numPartners: number }) => {
 
     const isLucroPresumido = details.regime.includes('Lucro Presumido');
 
-    const faturamentoGeralTaxes = !isLucroPresumido ? details.breakdown.filter(item => [
-        'DAS (Guia Unificada)', 
-        'DAS (Simples Nacional)',
-        'IVA (CBS+IBS) fora do DAS',
-        'ISS (Fora do DAS)',
-        'CBS',
-        'IBS'
-    ].includes(item.name)) : [];
+    // Separa os impostos por tipo para exibição em blocos distintos
+    const faturamentoGeralTaxes = details.breakdown.filter(item => [
+        'DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'
+    ].some(tax => item.name.includes(tax)));
 
-    const faturamentoMensalTaxes = isLucroPresumido 
-        ? details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS'].includes(item.name)) 
-        : [];
+    const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
 
-    const faturamentoTrimestralTaxes = isLucroPresumido
-        ? details.breakdown.filter(item => ['IRPJ', 'CSLL'].includes(item.name))
-        : [];
-    
-    const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore (11%)', 'IRRF s/ Pró-labore'].includes(item.name));
-    const outrosCustos = details.breakdown.filter(item => ['Mensalidade Contabilizei'].includes(item.name));
-
-    const lucroPresumidoPercentages: { [key: string]: string } = {
-      'PIS': '0,65%',
-      'COFINS': '3,00%',
-      'ISS': '5,00%',
-      'CSLL': '2,88%',
-    };
-
-    const totalImpostosFaturamentoLP = [...faturamentoMensalTaxes, ...faturamentoTrimestralTaxes].reduce((sum, item) => sum + item.value, 0);
-    const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamentoLP / details.totalRevenue : 0;
-    
+    // Calcula os valores para o resumo dos sócios
     const inssProLabore = details.breakdown.find(item => item.name.includes('INSS s/ Pró-labore'))?.value ?? 0;
     const irrfProLabore = details.breakdown.find(item => item.name.includes('IRRF s/ Pró-labore'))?.value ?? 0;
     const totalDescontosProLabore = inssProLabore + irrfProLabore;
+    const liquidoPorSocio = numPartners > 0 ? (details.proLabore - totalDescontosProLabore) / numPartners : 0;
+
+    const isCheapest = details.order === 1 && details.totalMonthlyCost > 0;
 
     return (
         <Card className={cn(
@@ -68,99 +49,32 @@ const ResultCardComponent = ({ details, isCheapest, numPartners }: { details: Ta
                 </div>
                 
                 <div className="p-3 border rounded-md bg-background/80 space-y-4">
-                    {isLucroPresumido ? (
-                        <>
-                            {faturamentoMensalTaxes.length > 0 && (
-                                <div className="space-y-1">
-                                    <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Impostos s/ Faturamento Mensal</h4>
-                                    {faturamentoMensalTaxes.map((item, index) => (
-                                        <div key={index} className="flex justify-between items-center">
-                                            <span className="text-muted-foreground">
-                                                {item.name}
-                                                {lucroPresumidoPercentages[item.name] && <span className='ml-1.5 font-bold text-primary/90'>{lucroPresumidoPercentages[item.name]}</span>}
-                                            </span>
-                                            <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                        </div>
-                                    ))}
+                    {faturamentoGeralTaxes.length > 0 && (
+                        <div className="space-y-1">
+                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Impostos s/ Faturamento</h4>
+                            {faturamentoGeralTaxes.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center">
+                                    <span className="text-muted-foreground">
+                                        {item.name}
+                                        {item.name.includes('DAS') && details.effectiveDasRate !== undefined && (
+                                            <span className='ml-1.5 font-bold text-primary/90'>{formatPercent(details.effectiveDasRate)}</span>
+                                        )}
+                                    </span>
+                                    <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
-                            )}
-                            {faturamentoTrimestralTaxes.length > 0 && (
-                                <div className="space-y-1 pt-2 mt-2 border-t border-dashed">
-                                    <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Impostos s/ Faturamento Trimestral</h4>
-                                    <p className="text-xs text-muted-foreground/80 -mt-1 mb-1.5">Valores provisionados mensalmente.</p>
-                                    {faturamentoTrimestralTaxes.map((item, index) => (
-                                        <div key={index} className="flex justify-between items-center">
-                                            <span className="text-muted-foreground">
-                                                {item.name}
-                                                <span className='ml-1.5 font-bold text-primary/90'>
-                                                    {item.name === 'IRPJ' 
-                                                        ? formatPercent(details.totalRevenue > 0 ? item.value / details.totalRevenue : 0) 
-                                                        : (lucroPresumidoPercentages[item.name] || '')
-                                                    }
-                                                </span>
-                                            </span>
-                                            <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                             <div className="flex justify-between items-center border-t border-solid pt-2 mt-2 font-semibold">
-                                <span>Alíquota Efetiva Total</span>
-                                <span className="text-primary">{formatPercent(aliquotaEfetivaFaturamento)}</span>
-                            </div>
-                        </>
-                    ) : (
-                        faturamentoGeralTaxes.length > 0 && (
-                            <div className="space-y-1">
-                                <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Impostos s/ Faturamento</h4>
-                                {faturamentoGeralTaxes.map((item, index) => (
-                                    <div key={index} className="flex justify-between items-center">
-                                        <span className="text-muted-foreground">
-                                            {item.name}
-                                            {item.name.includes('DAS') && details.effectiveDasRate !== undefined && (
-                                                <span className='ml-1.5 font-bold text-primary/90'>{formatPercent(details.effectiveDasRate)}</span>
-                                            )}
-                                        </span>
-                                        <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )
+                            ))}
+                        </div>
                     )}
-
+                    
                     {folhaTaxes.length > 0 && (
                          <div className="space-y-1 pt-2 mt-2 border-t border-dashed">
                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Encargos s/ Folha e Pró-labore</h4>
-                            {folhaTaxes.map((item, index) => {
-                                const match = item.name.match(/(\d+(\.\d+)?%)/);
-                                return (
-                                    <div key={index} className="flex justify-between items-center">
-                                        <span className="text-muted-foreground">
-                                            {match ? (
-                                                <>
-                                                    {item.name.split(match[0])[0]}
-                                                    <span className='font-bold text-primary/90'>{match[0]}</span>
-                                                    {item.name.split(match[0])[1]}
-                                                </>
-                                            ) : (
-                                                item.name
-                                            )}
-                                        </span>
-                                        <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    )}
-                     {outrosCustos.length > 0 && (
-                        <div className="space-y-1 pt-2 mt-2 border-t border-dashed">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Outros Custos</h4>
-                             {outrosCustos.map((item, index) => (
-                                 <div key={index} className="flex justify-between items-center">
+                            {folhaTaxes.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center">
                                     <span className="text-muted-foreground">{item.name}</span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
-                             ))}
+                            ))}
                         </div>
                     )}
                 </div>
@@ -175,38 +89,37 @@ const ResultCardComponent = ({ details, isCheapest, numPartners }: { details: Ta
                         Fator R: {formatPercent(details.fatorR)}
                     </div>
                 )}
-
-                 <div className="mt-auto pt-4 space-y-4 text-sm">
-                    <div className="space-y-1 p-3 border rounded-md bg-background/80">
-                        <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Resumo para os Sócios</h4>
-                        <div className='flex justify-between items-center'>
-                            <span className="text-muted-foreground flex items-center gap-2"><HandCoins className='h-4 w-4'/>Pró-labore Bruto</span>
-                            <span className="font-medium">{formatCurrencyBRL(details.proLabore)}</span>
-                        </div>
-                        <div className='flex justify-between items-center text-destructive'>
-                            <span className="flex items-center gap-2"><ChevronsDown className='h-4 w-4'/>Total Descontos</span>
-                            <span className="font-medium">- {formatCurrencyBRL(totalDescontosProLabore)}</span>
-                        </div>
-                        <div className='flex justify-between items-center text-green-700 font-bold border-t mt-1.5 pt-1.5'>
-                            <span className="flex items-center gap-2"><ChevronsUp className='h-4 w-4'/>Líquido por Sócio</span>
-                            <span>{formatCurrencyBRL( (details.proLabore - totalDescontosProLabore) / numPartners)}</span>
-                        </div>
+                
+                <div className="p-3 border rounded-md bg-background/80 space-y-1">
+                    <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Resumo para os Sócios</h4>
+                    <div className='flex justify-between items-center'>
+                        <span className="text-muted-foreground flex items-center gap-2"><HandCoins className='h-4 w-4'/>Pró-labore Bruto</span>
+                        <span className="font-medium">{formatCurrencyBRL(details.proLabore)}</span>
                     </div>
-                    {details.netProfit !== undefined && (
-                        <div className="space-y-1 p-3 border rounded-md bg-background/80">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Demonstrativo de Lucro</h4>
-                            <div className='flex justify-between items-center'>
-                                <span className="text-muted-foreground">Lucro Líquido Empresa</span>
-                                <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
-                            </div>
-                            <div className='flex justify-between items-center font-bold text-green-700 border-t mt-1.5 pt-1.5'>
-                                <span>Distribuição de Lucros</span>
-                                <span>{formatCurrencyBRL(details.netProfit)}</span>
-                            </div>
-                            <p className='text-xs text-muted-foreground pt-2'>*A distribuição de lucros é isenta de IR para o sócio, conforme Lei 9.249/95.</p>
-                        </div>
-                    )}
+                    <div className='flex justify-between items-center text-destructive'>
+                        <span className="flex items-center gap-2"><ChevronsDown className='h-4 w-4'/>Total Descontos</span>
+                        <span className="font-medium">- {formatCurrencyBRL(totalDescontosProLabore)}</span>
+                    </div>
+                    <div className='flex justify-between items-center text-green-700 font-bold border-t mt-1.5 pt-1.5'>
+                        <span className="flex items-center gap-2"><ChevronsUp className='h-4 w-4'/>Líquido por Sócio</span>
+                        <span>{formatCurrencyBRL(liquidoPorSocio)}</span>
+                    </div>
                 </div>
+
+                {details.netProfit !== undefined && (
+                    <div className="p-3 border rounded-md bg-background/80 space-y-1">
+                        <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Demonstrativo de Lucro</h4>
+                        <div className='flex justify-between items-center'>
+                            <span className="text-muted-foreground">Lucro Líquido Empresa</span>
+                            <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
+                        </div>
+                        <div className='flex justify-between items-center font-bold text-green-700 border-t mt-1.5 pt-1.5'>
+                            <span>Distribuição de Lucros</span>
+                            <span>{formatCurrencyBRL(details.netProfit)}</span>
+                        </div>
+                        <p className='text-xs text-muted-foreground pt-2'>*A distribuição de lucros é isenta de IR para o sócio, conforme Lei 9.249/95.</p>
+                    </div>
+                )}
                 
             </CardContent>
 

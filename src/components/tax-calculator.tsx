@@ -8,7 +8,7 @@ import { z } from "zod";
 import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent, AlertTriangle } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
-import { getCnaeData, _calculatePartnerTaxes } from '@/lib/calculations';
+import { getCnaeData } from '@/lib/calculations';
 import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026, PlanEnumSchema, TaxDetailsSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
@@ -36,8 +36,6 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
-import { PartnerProfitCard } from './partner-profit-card';
-
 
 const fiscalConfig2025 = getFiscalParameters(2025);
 const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
@@ -158,7 +156,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         }
     }
     
-    const exportBRL = watchedExportCurrency !== 'BRL' ? exportRaw * watchedExchangeRate : 1;
+    const exportBRL = watchedExportCurrency !== 'BRL' ? exportRaw * watchedExchangeRate : exportRaw;
     return (domestic + exportBRL) * 12;
   }, [watchedRevenues, watchedExchangeRate, watchedExportCurrency]);
   
@@ -311,7 +309,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             if (key.startsWith('domestic_')) domestic += revenue;
             else if (key.startsWith('export_')) exportRaw += revenue;
         }
-        const exportBRL = values.exportCurrency !== 'BRL' ? exportRaw * (values.exchangeRate || 1) : 1;
+        const exportBRL = values.exportCurrency !== 'BRL' ? exportRaw * (values.exchangeRate || 1) : exportRaw;
         const projectedAnnual = (domestic + exportBRL) * 12;
 
         if (projectedAnnual > SIMPLES_NACIONAL_LIMIT) {
@@ -466,11 +464,11 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
         scenariosToShow.push(simplesNacionalBase);
         
-        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
+        if (simplesNacionalOtimizado) {
             scenariosToShow.push(simplesNacionalOtimizado);
         }
         
-        scenarios = scenariosToShow;
+        scenarios = scenariosToShow.filter(Boolean); // Remove nulls
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         if (!isCommerceOnly) {
           scenarios.push(results.lucroPresumido);
@@ -479,10 +477,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
 
     if (scenarios.length === 0) return null;
-    
-    const cheapestScenario = scenarios.length > 0
-      ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
-      : null;
     
     const sortedForDisplay = [...scenarios].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
@@ -524,11 +518,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </div>
 
             <div className="flex flex-wrap justify-center items-stretch gap-8">
-                {sortedForDisplay.map(scenario => (
+                {sortedForDisplay.map((scenario, index) => (
                      <ResultCard 
-                        key={scenario.regime} 
-                        details={scenario as TaxDetailsSchema} 
-                        isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
+                        key={scenario.regime + index} 
+                        details={scenario as TaxDetails} 
                         numPartners={numPartners}
                     />
                 ))}
