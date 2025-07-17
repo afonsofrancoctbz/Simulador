@@ -464,11 +464,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             scenariosToShow.push(lucroPresumido);
         }
         
-        scenariosToShow.push(simplesNacionalBase);
-        
-        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
-            const optimizationNote = `Para este cenário, o pró-labore total foi recalculado para ${formatCurrencyBRL(simplesNacionalOtimizado.proLabore)} para atingir o Fator R e tributar no Anexo III.`;
-            scenariosToShow.push({ ...simplesNacionalOtimizado, optimizationNote });
+        // Always show the base scenario. If there is an optimized one, show it too.
+        // Otherwise, the base one is the only Simples option.
+        if (simplesNacionalOtimizado) {
+            scenariosToShow.push(simplesNacionalBase);
+            scenariosToShow.push(simplesNacionalOtimizado);
+        } else {
+             scenariosToShow.push(simplesNacionalBase);
         }
         
         scenarios = scenariosToShow;
@@ -527,7 +529,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             <div className="flex flex-wrap justify-center items-stretch gap-8">
                 {sortedForDisplay.map(scenario => (
                      <ResultCard 
-                        key={`${scenario.regime}-${scenario.annex}`} 
+                        key={scenario.regime} 
                         details={scenario as TaxDetailsSchema} 
                         isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
                         formValues={submissionValues}
@@ -1067,13 +1069,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </div>
 
                     <div className="space-y-2">
-                      <div className='border-b pb-4'>
-                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                              <ListChecks className="h-5 w-5 text-primary" />
-                              3. Selecione o Plano Contabilizei
-                          </h3>
-                           <p className='text-muted-foreground text-sm mt-1'>Qual plano de contabilidade melhor se encaixa no seu perfil?</p>
-                      </div>
+                        <div className='border-b pb-4'>
+                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                                <ListChecks className="h-5 w-5 text-primary" />
+                                3. Selecione o Plano Contabilizei
+                            </h3>
+                            <p className='text-muted-foreground text-sm mt-1'>Qual plano de contabilidade melhor se encaixa no seu perfil?</p>
+                        </div>
                        <FormField
                           control={form.control}
                           name="selectedPlan"

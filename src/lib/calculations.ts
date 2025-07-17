@@ -134,7 +134,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 }
 
 
-function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, monthlyPayroll: number, regimeName: string): TaxDetails {
+function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, monthlyPayroll: number): TaxDetails {
   const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, fp12, selectedPlan, selectedCnaes } = values;
 
   // --- 1. Revenue Calculation ---
@@ -152,9 +152,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const hasAnnexIV = allCnaesData.some(c => c.annex === 'IV');
   
   // --- 3. RBT12, FP12, and Fator R Calculation ---
-  // Use provided RBT12/FP12, or estimate proportionally for new companies.
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-  const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12; // FP12 includes salaries, pro-labore, and all payroll charges. For simplicity here we estimate based on monthly values if FP12 is not provided.
+  const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
   const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
 
 
@@ -171,7 +170,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     return {
-      regime: regimeName,
+      regime: 'Simples Nacional',
       totalTax: 0,
       totalMonthlyCost: fee,
       totalRevenue: 0,
@@ -211,7 +210,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     }
 
     return {
-      regime: regimeName,
+      regime: `Simples Nacional - ${annexLabel}`,
       totalTax,
       totalMonthlyCost,
       totalRevenue: 0,
@@ -334,6 +333,17 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     }
   }
 
+  let regimeName = 'Simples Nacional';
+  let fatorRNote: string | undefined = undefined;
+
+  if (hasAnnexVActivity) {
+    const isOptimized = fatorR >= 0.28;
+    mainAnnexLabel = isOptimized ? 'Anexo III (Com Fator R)' : 'Anexo V (Sem Fator R)';
+    fatorRNote = isOptimized ? 'Cenário otimizado' : 'A alíquota maior é aplicada pois o Fator R está abaixo de 28%';
+  }
+  
+  regimeName = `Simples Nacional - ${mainAnnexLabel}`;
+
 
   const breakdown = [
     { name: 'DAS (Guia Unificada)', value: totalDas },
@@ -358,7 +368,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     contabilizeiFee: contabilizeiFee,
     breakdown: breakdown.filter(item => item.value > 0.001), // Filter out zero or negligible values
     notes,
-    partnerTaxes
+    partnerTaxes,
+    optimizationNote: fatorRNote,
   };
 }
 
@@ -463,15 +474,17 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const monthlyPayroll = values.totalSalaryExpense + totalProLaboreBruto;
 
   const lucroPresumido = calculateLucroPresumido(values);
-  const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, monthlyPayroll, 'Simples Nacional');
+  const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, monthlyPayroll);
 
   let simplesNacionalOtimizado: TaxDetails | null = null;
 
   const hasAnnexVActivity = [...values.domesticActivities, ...values.exportActivities].some(a => getCnaeData(a.code)?.requiresFatorR);
   
-  if (hasAnnexVActivity) {
+  // If the base calculation for an Annex V activity resulted in an Annex V calculation (Fator R < 28%),
+  // then we calculate the optimized scenario.
+  if (hasAnnexVActivity && simplesNacionalBase.annex === 'Anexo V (Sem Fator R)') {
       const totalRevenue = simplesNacionalBase.totalRevenue;
-      if (totalRevenue > 0 && simplesNacionalBase.fatorR != null && simplesNacionalBase.fatorR < 0.28) {
+      if (totalRevenue > 0) {
           const requiredPayroll = totalRevenue * 0.28;
           const currentPayrollForFatorR = values.totalSalaryExpense;
           let requiredTotalProLabore = requiredPayroll - currentPayrollForFatorR;
@@ -493,7 +506,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               const optimizedValues: TaxFormValues = { ...values, proLabores: optimizedProLabores };
               const optimizedMonthlyPayroll = values.totalSalaryExpense + requiredTotalProLabore;
               
-              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, optimizedMonthlyPayroll, 'Simples Nacional Otimizado');
+              simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues, requiredTotalProLabore, optimizedMonthlyPayroll);
           }
       }
   }
