@@ -1,5 +1,6 @@
 
 
+
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CNAE_DATA,
@@ -383,7 +384,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
 
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  // **CORRECTION**: Use the total CPP rate (28.8%) for Lucro Presumido
   const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total : 0;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
@@ -427,7 +427,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const IRPJ_ADDITIONAL_THRESHOLD = 20000 * 3; // Trimestral
   const quarterlyPresumedProfit = presumedProfitBase * 3;
-  let irpj = (presumedProfitBase * 0.15) + (Math.max(0, quarterlyPresumedProfit - IRPJ_ADDITIONAL_THRESHOLD) / 3 * 0.10);
+  const irpjAdicionalAnual = Math.max(0, quarterlyPresumedProfit - IRPJ_ADDITIONAL_THRESHOLD) * 0.10;
+  let irpj = (presumedProfitBase * 0.15) + (irpjAdicionalAnual / 3);
   
   const csll = presumedProfitBase * 0.09;
   const pis = domesticRevenue * 0.0065; 
@@ -446,8 +447,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const breakdown = [
     { name: `PIS (${formatPercent(0.0065)})`, value: pis }, { name: `COFINS (${formatPercent(0.03)})`, value: cofins },
-    { name: `ISS (${formatPercent(fiscalConfig2025.aliquota_iss_padrao)})`, value: iss }, { name: "IRPJ", value: irpj },
-    { name: "CSLL", value: csll }, { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)})`, value: inssPatronal },
+    { name: `ISS (${formatPercent(fiscalConfig2025.aliquota_iss_padrao)})`, value: iss }, { name: `IRPJ`, value: irpj },
+    { name: `CSLL`, value: csll }, { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)})`, value: inssPatronal },
     { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];

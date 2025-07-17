@@ -12,21 +12,13 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
-    const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
-    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
+    const faturamentoTaxes = details.breakdown.filter(item => ['DAS', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
+    const folhaTaxes = details.breakdown.filter(item => ['CPP', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
     const parseTaxName = (name: string) => {
         const match = name.match(/^(.*?)(\s\(.*\))?$/);
         if (!match) return { baseName: name, percentage: null };
-
-        // Specific override for DAS rate
-        if (name.includes('DAS') && details.effectiveDasRate !== undefined) {
-            return {
-                baseName: 'DAS',
-                percentage: `(${formatPercent(details.effectiveDasRate)})`
-            };
-        }
 
         return {
             baseName: match[1],
