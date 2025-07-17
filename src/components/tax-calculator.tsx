@@ -170,6 +170,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   
   const revenueGroups = useMemo(() => {
     const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is CnaeData => !!c);
+    // Group by original Annex, not effective Annex after Fator R
     const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
     return annexes;
   }, [selectedCnaes]);
@@ -469,8 +470,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         // Always add the base Simples Nacional scenario
         scenariosToShow.push(simplesNacionalBase);
         
-        // Add the optimized scenario only if it exists
-        if (simplesNacionalOtimizado) {
+        // Add the optimized scenario only if it exists and is different from the base
+        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
             scenariosToShow.push(simplesNacionalOtimizado);
         }
         
@@ -916,7 +917,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                             />
                                         </FormControl>
                                         <FormDescription className='text-sm'>
-                                            Soma de salários, pró-labore e encargos (INSS, FGTS) do último ano.
+                                            Soma de salários e pró-labore do último ano (sem encargos).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -1161,3 +1162,4 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
+
