@@ -36,7 +36,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
-import { PartnerProfitCard } from './partner-profit-card';
+import { PartnerDetailsCard } from './partner-details-card';
 
 const fiscalConfig2025 = getFiscalParameters(2025);
 const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
@@ -448,7 +448,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       return null;
     }
 
-    const { selectedCnaes: selectedCnaesCodes, numberOfPartners: numPartners } = form.getValues();
+    const { selectedCnaes: selectedCnaesCodes } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
@@ -519,12 +519,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 ))}
             </div>
 
-            {cheapestScenario && (
-                <div className="mt-12 max-w-sm mx-auto">
-                    <PartnerProfitCard details={cheapestScenario as TaxDetails} numPartners={numPartners} />
-                </div>
-            )}
-
             {advice && year === 2025 && (
                 <div className="mt-12 max-w-5xl mx-auto">
                     <Alert variant="default" className="bg-primary/5 border-primary/20">
@@ -541,6 +535,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                             )}
                         </AlertDescription>
                     </Alert>
+                </div>
+            )}
+
+            {cheapestScenario && (
+                <div className="mt-12 w-full">
+                    <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
                 </div>
             )}
             

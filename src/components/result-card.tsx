@@ -15,7 +15,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
         'DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'
     ].some(tax => item.name.includes(tax)));
 
-    const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
+    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
     
     const isCheapest = details.order === 1 && details.totalMonthlyCost > 0;
 
@@ -80,21 +80,6 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                             : 'bg-amber-100 text-amber-900 border border-amber-200'
                     )}>
                         Fator R: {formatPercent(details.fatorR)}
-                    </div>
-                )}
-                
-                {details.netProfit !== undefined && (
-                    <div className="p-3 border rounded-md bg-background/80 space-y-1">
-                        <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Demonstrativo de Lucro</h4>
-                        <div className='flex justify-between items-center'>
-                            <span className="text-muted-foreground">Lucro Líquido Empresa</span>
-                            <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
-                        </div>
-                        <div className='flex justify-between items-center font-bold text-green-700 border-t mt-1.5 pt-1.5'>
-                            <span>Distribuição de Lucros</span>
-                            <span>{formatCurrencyBRL(details.netProfit)}</span>
-                        </div>
-                        <p className='text-xs text-muted-foreground pt-2'>*A distribuição de lucros é isenta de IR para o sócio, conforme Lei 9.249/95.</p>
                     </div>
                 )}
                 
