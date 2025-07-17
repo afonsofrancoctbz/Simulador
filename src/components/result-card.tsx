@@ -12,17 +12,22 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
-    const faturamentoTaxes = details.breakdown.filter(item => [
-        'DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'
-    ].some(tax => item.name.includes(tax)));
-    
+    const faturamentoTaxes = details.breakdown.filter(item => ['DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
     const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
-    
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
     const parseTaxName = (name: string) => {
         const match = name.match(/^(.*?)(\s\(.*\))?$/);
         if (!match) return { baseName: name, percentage: null };
+
+        // Specific override for DAS rate
+        if (name.includes('DAS') && details.effectiveDasRate !== undefined) {
+            return {
+                baseName: 'DAS',
+                percentage: `(${formatPercent(details.effectiveDasRate)})`
+            };
+        }
+
         return {
             baseName: match[1],
             percentage: match[2] || null
@@ -46,7 +51,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
             <CardContent className="flex-grow p-4 pt-2 space-y-4 flex flex-col text-sm">
                 
-                <div className="p-4 border-b rounded-t-lg bg-muted/20 space-y-2">
+                <div className="p-4 border rounded-lg bg-muted/20 space-y-2">
                      <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Faturamento Mensal</span>
                         <span className="font-bold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
@@ -67,9 +72,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                                 <div key={index} className="flex justify-between items-center">
                                     <span className="text-muted-foreground">
                                         {baseName}
-                                        {item.name.includes('DAS') && details.effectiveDasRate !== undefined && (
-                                            <span className='ml-1.5 font-bold text-primary'>{formatPercent(details.effectiveDasRate)}</span>
-                                        )}
+                                        {percentage && <span className='ml-1.5 font-bold text-primary'>{percentage}</span>}
                                     </span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
