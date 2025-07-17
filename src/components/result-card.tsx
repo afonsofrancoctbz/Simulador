@@ -8,7 +8,7 @@ import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { CheckCircle, Info, Trophy } from 'lucide-react';
 
 const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
-    const isCheapest = details.order === 1 && details.totalMonthlyCost > 0;
+    const isRecommended = details.order === 1 && details.totalMonthlyCost > 0;
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
@@ -77,13 +77,13 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     return (
         <Card className={cn(
             "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2 bg-card", 
-            isCheapest ? 'border-primary shadow-primary/30' : 'border-border/80'
+            isRecommended ? 'border-primary shadow-primary/30' : 'border-border/80'
         )}>
-            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5"><Trophy className="h-4 w-4" />Recomendado</Badge>}
+            {isRecommended && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5"><Trophy className="h-4 w-4" />Recomendado</Badge>}
             
             <CardHeader className={cn(
                 'pt-10 pb-4 text-center',
-                 isCheapest ? 'bg-primary/5' : ''
+                 isRecommended ? 'bg-primary/5' : ''
             )}>
                 <CardTitle className="text-xl font-bold text-foreground">{details.regime}</CardTitle>
                  {details.annex && <CardDescription className='font-semibold text-primary/90 text-base mt-1'>{details.annex}</CardDescription>}
@@ -104,14 +104,14 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                 <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
                     {details.regime === 'Lucro Presumido' ? (
                         <>
-                          {renderTaxGroup('Impostos s/ Faturamento', lucroPresumidoImpostosFaturamento)}
-                          {renderTaxGroup('Impostos s/ Lucro Presumido', lucroPresumidoImpostosLucro)}
+                          {renderTaxGroup('IMPOSTOS S/ FATURAMENTO', lucroPresumidoImpostosFaturamento)}
+                          {renderTaxGroup('IMPOSTOS S/ LUCRO PRESUMIDO', lucroPresumidoImpostosLucro)}
                         </>
                     ) : (
-                        renderTaxGroup('Impostos s/ Faturamento', simplesNacionalImpostos)
+                        renderTaxGroup('IMPOSTOS', simplesNacionalImpostos)
                     )}
-                    {renderTaxGroup('Encargos s/ Folha e Pró-labore', encargosFolha)}
-                    {renderTaxGroup('Outros Custos', outrosCustos)}
+                    {renderTaxGroup('ENCARGOS S/ FOLHA E PRÓ-LABORE', encargosFolha)}
+                    {renderTaxGroup('OUTROS CUSTOS', outrosCustos)}
                 </div>
 
                 {details.fatorR !== undefined && (
@@ -138,7 +138,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
             <CardFooter className={cn(
                 "p-4 bg-muted/30 mt-auto border-t",
-                isCheapest ? 'bg-primary/5' : ''
+                isRecommended ? 'bg-primary/5' : ''
             )}>
                 <div className="text-center w-full space-y-1">
                     <div className="flex justify-center items-baseline gap-2 text-sm text-muted-foreground">
@@ -152,7 +152,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     <div className="text-2xl font-bold text-primary">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
-                    <p className="text-xs text-muted-foreground">(Impostos + Mensalidade)</p>
+                    <p className="text-xs text-muted-foreground">(Impostos + Encargos + Mensalidade)</p>
                 </div>
             </CardFooter>
         </Card>

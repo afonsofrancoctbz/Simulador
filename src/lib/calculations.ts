@@ -341,7 +341,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const notes: string[] = [];
-  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. IRPJ e CSLL incidem normally sobre a presunção de lucro.");
+  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. IRPJ e CSLL incidem sobre a presunção de lucro do faturamento total.");
   
   const pis = domesticRevenue * 0.0065; 
   const cofins = domesticRevenue * 0.03; 
@@ -358,7 +358,11 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
   const csll = presumedProfitBase * 0.09;
   
-  const cpp = 0; // CPP não deve ser calculada aqui conforme imagem de referência.
+  let cpp = 0;
+  const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
+  if (hasAnexoIV && monthlyPayroll > 0) {
+      cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
+  }
   
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
@@ -375,6 +379,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `ISS`, value: iss },
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
+    { name: `CPP (INSS Patronal)`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
@@ -454,3 +459,4 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
