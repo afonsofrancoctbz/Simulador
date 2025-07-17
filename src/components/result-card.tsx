@@ -13,8 +13,10 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const proLaborePerPartner = details.proLabore / partnersCount;
 
     const faturamentoTaxes = details.breakdown.filter(item => ['DAS'].some(tax => item.name.includes(tax)));
+    
     const lucroPresumidoFaturamento = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS'].some(tax => item.name.includes(tax)));
     const lucroPresumidoLucro = details.breakdown.filter(item => ['IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
+    
     const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
