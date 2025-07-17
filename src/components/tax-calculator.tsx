@@ -451,25 +451,26 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
 
     const submissionValues = transformFormToSubmission(form.getValues());
-    const { selectedCnaes, numberOfPartners: numSocios } = form.getValues();
+    const { selectedCnaes: selectedCnaesCodes, numberOfPartners: numSocios } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
         
+        // Logic to decide which scenarios to show
         const scenariosToShow : (TaxDetails | TaxDetails2026)[] = [];
 
+        // Always add Lucro Presumido if not commerce only
         if (!isCommerceOnly) {
-            scenariosToShow.push(lucroPresumido);
+             scenariosToShow.push(lucroPresumido);
         }
+
+        // Always add the base Simples Nacional scenario
+        scenariosToShow.push(simplesNacionalBase);
         
-        // Always show the base scenario. If there is an optimized one, show it too.
-        // Otherwise, the base one is the only Simples option.
+        // Add the optimized scenario only if it exists
         if (simplesNacionalOtimizado) {
-            scenariosToShow.push(simplesNacionalBase);
             scenariosToShow.push(simplesNacionalOtimizado);
-        } else {
-             scenariosToShow.push(simplesNacionalBase);
         }
         
         scenarios = scenariosToShow;
@@ -498,7 +499,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </h3>
                 </div>
                 <ul className="border rounded-lg p-3 bg-muted/20 divide-y divide-border/50">
-                    {selectedCnaes.map((code) => {
+                    {selectedCnaesCodes.map((code) => {
                         const cnae = getCnaeData(code);
                         if (!cnae) return null;
                         return (
