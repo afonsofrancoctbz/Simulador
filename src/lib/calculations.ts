@@ -197,8 +197,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const totalMonthlyCost = totalTax + fee;
 
     const breakdown = [
-        ...(cppFromAnnexIV > 0 ? [{ name: "CPP (INSS Patronal - 20%)", value: cppFromAnnexIV }] : []),
-        ...(totalINSSRetido > 0 ? [{ name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido }] : []),
+        ...(cppFromAnnexIV > 0 ? [{ name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV }] : []),
+        ...(totalINSSRetido > 0 ? [{ name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido }] : []),
         ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
     ];
 
