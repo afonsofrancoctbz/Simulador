@@ -448,7 +448,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `ISS (${formatPercent(fiscalConfig2025.aliquota_iss_padrao)})`, value: iss }, { name: "IRPJ", value: irpj },
     { name: "CSLL", value: csll }, { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: inssPatronal },
     { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
-    { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
+    { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
   return {
