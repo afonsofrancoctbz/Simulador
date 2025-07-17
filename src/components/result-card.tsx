@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { Banknote, CheckCircle, Info } from 'lucide-react';
+import { CheckCircle, Info } from 'lucide-react';
 
 const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
@@ -23,22 +23,22 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     
     return (
         <Card className={cn(
-            "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2", 
-            isCheapest ? 'border-primary shadow-primary/30' : 'border-border/80 bg-card'
+            "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2 bg-card", 
+            isCheapest ? 'border-primary shadow-primary/30' : 'border-border/80'
         )}>
             {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-4 py-1.5 rounded-full shadow-lg">🏆 Recomendado</Badge>}
             
             <CardHeader className={cn(
-                'pt-8 pb-4 text-center',
+                'pt-10 pb-4 text-center',
                  isCheapest ? 'bg-primary/5' : ''
             )}>
                 <CardTitle className="text-xl font-bold text-foreground">{details.regime}</CardTitle>
-                 {details.annex && <CardDescription className='font-semibold text-primary/90 text-base -mt-1'>{details.annex}</CardDescription>}
+                 {details.annex && <CardDescription className='font-semibold text-primary/90 text-base mt-1'>{details.annex}</CardDescription>}
             </CardHeader>
 
-            <CardContent className="flex-grow p-4 pt-0 space-y-4 flex flex-col text-sm">
+            <CardContent className="flex-grow p-4 pt-2 space-y-4 flex flex-col text-sm">
                 
-                <div className="p-3 border rounded-md bg-background/50 space-y-1">
+                <div className="p-3 border rounded-lg bg-muted/20 space-y-2">
                      <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Faturamento Mensal</span>
                         <span className="font-bold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
@@ -49,7 +49,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     </div>
                 </div>
 
-                <div className="p-3 border rounded-md bg-background/50 space-y-4">
+                <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
                     {faturamentoTaxes.length > 0 && (
                         <div className="space-y-1.5">
                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs">Impostos s/ Faturamento</h4>
@@ -58,7 +58,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                                     <span className="text-muted-foreground">
                                         {item.name}
                                         {item.name.includes('DAS') && details.effectiveDasRate !== undefined && (
-                                            <span className='ml-1.5 font-bold text-primary/90'>{formatPercent(details.effectiveDasRate)}</span>
+                                            <span className='ml-1.5 font-bold text-primary'>{formatPercent(details.effectiveDasRate)}</span>
                                         )}
                                     </span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
@@ -68,7 +68,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     )}
                     
                     {folhaTaxes.length > 0 && (
-                         <div className="space-y-1.5">
+                         <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs">Encargos s/ Folha e Pró-labore</h4>
                             {folhaTaxes.map((item, index) => (
                                 <div key={index} className="flex justify-between items-center">
@@ -80,7 +80,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     )}
 
                      {outrosCustos.length > 0 && (
-                         <div className="space-y-1.5">
+                         <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs">Outros Custos</h4>
                             {outrosCustos.map((item, index) => (
                                 <div key={index} className="flex justify-between items-center">
@@ -94,7 +94,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
                 {details.fatorR !== undefined && (
                     <div className={cn(
-                        "text-center rounded-md p-3 text-sm font-semibold flex flex-col items-center justify-center gap-1", 
+                        "text-center rounded-lg p-3 text-sm font-semibold flex flex-col items-center justify-center gap-1", 
                         details.fatorR >= 0.28 
                             ? 'bg-green-100 text-green-900 border border-green-200' 
                             : 'bg-amber-100 text-amber-900 border border-amber-200'
@@ -107,7 +107,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                 )}
                 
                 {details.notes && details.notes.map((note, index) => (
-                     <div key={index} className="flex items-start gap-3 p-3 text-xs rounded-md bg-sky-50 text-sky-900 border border-sky-200">
+                     <div key={index} className="flex items-start gap-3 p-3 text-xs rounded-lg bg-sky-50 text-sky-900 border border-sky-200">
                         <Info className="h-4 w-4 mt-0.5 shrink-0" />
                         <p>{note}</p>
                     </div>
@@ -116,7 +116,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
             <CardFooter className={cn(
                 "p-4 bg-muted/30 mt-auto border-t",
-                isCheapest ? 'bg-primary/10' : ''
+                isCheapest ? 'bg-primary/5' : ''
             )}>
                 <div className="text-center w-full space-y-1">
                     <div className="flex justify-center items-baseline gap-2 text-sm text-muted-foreground">
