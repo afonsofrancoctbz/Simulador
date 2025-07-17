@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { CheckCircle, Info } from 'lucide-react';
+import { CheckCircle, Info, Trophy } from 'lucide-react';
 
 const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
@@ -26,7 +26,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
             "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2 bg-card", 
             isCheapest ? 'border-primary shadow-primary/30' : 'border-border/80'
         )}>
-            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-4 py-1.5 rounded-full shadow-lg">🏆 Recomendado</Badge>}
+            {isCheapest && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-bold text-sm px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5"><Trophy className="h-4 w-4" />Recomendado</Badge>}
             
             <CardHeader className={cn(
                 'pt-10 pb-4 text-center',
