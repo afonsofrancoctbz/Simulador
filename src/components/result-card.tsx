@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails, TaxFormValues } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { Info } from 'lucide-react';
+import { Info, Banknote, ChevronsDown, ChevronsUp, HandCoins } from 'lucide-react';
 
 const ResultCardComponent = ({ details, isCheapest, formValues }: { details: TaxDetails, isCheapest: boolean, formValues: TaxFormValues }) => {
     const numSocios = formValues.numberOfPartners || 1;
@@ -42,6 +42,10 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
 
     const totalImpostosFaturamentoLP = [...faturamentoMensalTaxes, ...faturamentoTrimestralTaxes].reduce((sum, item) => sum + item.value, 0);
     const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamentoLP / details.totalRevenue : 0;
+    
+    const inssProLabore = details.breakdown.find(item => item.name.includes('INSS s/ Pró-labore'))?.value ?? 0;
+    const irrfProLabore = details.breakdown.find(item => item.name.includes('IRRF s/ Pró-labore'))?.value ?? 0;
+    const proLaboreLiquido = details.proLabore - inssProLabore - irrfProLabore;
 
     return (
         <Card className={cn(
@@ -61,13 +65,9 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
             <CardContent className="flex-grow p-3 space-y-2 flex flex-col">
                 
                 <div className="p-2 border rounded-md bg-background/80 space-y-1 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-muted-foreground">Faturamento Mensal</span>
-                        <span className="font-medium text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
-                    </div>
-                     <div className="flex justify-between">
-                        <span className="text-muted-foreground">{proLaboreLabel}</span>
-                        <span className="font-medium text-foreground">{formatCurrencyBRL(details.proLabore / numSocios)}</span>
+                    <div className="flex justify-between items-center text-lg">
+                        <span className="text-muted-foreground flex items-center gap-2"><Banknote className="h-5 w-5"/>Faturamento</span>
+                        <span className="font-bold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
                     </div>
                 </div>
                 
@@ -189,6 +189,37 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                          <p>{details.optimizationNote}</p>
                      </div>
                 )}
+
+                <div className="p-2 border rounded-md bg-background/80 space-y-2 mt-auto">
+                    <div className="flex flex-col text-sm">
+                        <div className='flex justify-between items-center'>
+                           <span className="text-muted-foreground flex items-center gap-2"><HandCoins className='h-4 w-4'/>Pró-labore Bruto</span>
+                           <span className="font-medium">{formatCurrencyBRL(details.proLabore)}</span>
+                        </div>
+                        <div className='flex justify-between items-center text-destructive'>
+                           <span className="flex items-center gap-2"><ChevronsDown className='h-4 w-4'/>Total Descontos</span>
+                           <span className="font-medium">- {formatCurrencyBRL(inssProLabore + irrfProLabore)}</span>
+                        </div>
+                        <div className='flex justify-between items-center text-green-700 font-bold border-t mt-1 pt-1'>
+                           <span className="flex items-center gap-2"><ChevronsUp className='h-4 w-4'/>Líquido por Sócio</span>
+                           <span>{formatCurrencyBRL(proLaboreLiquido / numSocios)}</span>
+                        </div>
+                    </div>
+                    {details.netProfit !== undefined && (
+                        <div className="flex flex-col text-sm pt-2 border-t">
+                            <div className='flex justify-between items-center'>
+                               <span className="text-muted-foreground">Lucro Líquido Empresa</span>
+                               <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
+                            </div>
+                            <div className='flex justify-between items-center font-bold text-green-700'>
+                               <span>Distribuição de Lucros</span>
+                               <span>{formatCurrencyBRL(details.netProfit)}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+
             </CardContent>
 
             <CardFooter className="p-2 bg-muted/30 mt-auto border-t">

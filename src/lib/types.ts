@@ -96,6 +96,7 @@ export const TaxDetailsSchema = z.object({
     annualSavings: z.number().optional(),
     optimizationNote: z.string().optional(),
     partnerTaxes: z.array(PartnerTaxDetailsSchema),
+    netProfit: z.number().optional(),
     order: z.number().optional(),
 });
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
