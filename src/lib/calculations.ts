@@ -341,7 +341,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const notes: string[] = [];
-  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. IRPJ e CSLL incidem normalmente sobre a presunção de lucro.");
+  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. IRPJ e CSLL incidem normally sobre a presunção de lucro.");
   
   const pis = domesticRevenue * 0.0065; 
   const cofins = domesticRevenue * 0.03; 

@@ -12,12 +12,11 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const partnersCount = details.partnerTaxes.length || 1;
     const proLaborePerPartner = details.proLabore / partnersCount;
 
-    const faturamentoTaxes = details.breakdown.filter(item => ['DAS'].some(tax => item.name.includes(tax)));
+    const lucroPresumidoImpostosFaturamento = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS'].includes(item.name));
+    const lucroPresumidoImpostosLucro = details.breakdown.filter(item => ['IRPJ', 'CSLL'].includes(item.name));
+    const simplesNacionalImpostos = details.breakdown.filter(item => item.name.includes('DAS'));
     
-    const lucroPresumidoFaturamento = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS'].some(tax => item.name.includes(tax)));
-    const lucroPresumidoLucro = details.breakdown.filter(item => ['IRPJ', 'CSLL'].some(tax => item.name.includes(tax)));
-    
-    const folhaTaxes = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
+    const encargosFolha = details.breakdown.filter(item => ['CPP (INSS Patronal - 20%)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].includes(item.name));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
     const getTaxEffectiveRateOnRevenue = (taxValue: number) => {
@@ -105,13 +104,13 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                 <div className="p-4 border rounded-lg bg-background/30 space-y-4 flex-grow">
                     {details.regime === 'Lucro Presumido' ? (
                         <>
-                          {renderTaxGroup('Impostos s/ Faturamento', lucroPresumidoFaturamento)}
-                          {renderTaxGroup('Impostos s/ Lucro Presumido', lucroPresumidoLucro)}
+                          {renderTaxGroup('Impostos s/ Faturamento', lucroPresumidoImpostosFaturamento)}
+                          {renderTaxGroup('Impostos s/ Lucro Presumido', lucroPresumidoImpostosLucro)}
                         </>
                     ) : (
-                        renderTaxGroup('Impostos s/ Faturamento', faturamentoTaxes)
+                        renderTaxGroup('Impostos s/ Faturamento', simplesNacionalImpostos)
                     )}
-                    {renderTaxGroup('Encargos s/ Folha e Pró-labore', folhaTaxes)}
+                    {renderTaxGroup('Encargos s/ Folha e Pró-labore', encargosFolha)}
                     {renderTaxGroup('Outros Custos', outrosCustos)}
                 </div>
 

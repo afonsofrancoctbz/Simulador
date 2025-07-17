@@ -12,7 +12,7 @@ export const FISCAL_CONFIG_2025 = {
     rat: 0.03, // Riscos Ambientais do Trabalho (média) - Não usado em todos os casos
     terceiros: 0.058, // Salário Educação, etc. - Não usado em todos os casos
     get total() {
-        return this.base + this.rat + this.terceiros; // 28.8%
+        return this.base; // For Lucro Presumido Anexo IV context
     }
   },
   // Tabela progressiva para funcionários CLT, não se aplica ao pró-labore dos sócios
