@@ -460,7 +460,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         scenariosToShow.push(simplesNacionalBase);
         if (simplesNacionalOtimizado) scenariosToShow.push(simplesNacionalOtimizado);
         
-        scenarios = scenariosToShow;
+        scenarios = scenariosToShow.filter(s => s.totalRevenue > 0 || s.proLabore > 0);
+
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         if (!isCommerceOnly) scenarios.push(results.lucroPresumido);
         scenarios.push(results.simplesNacionalTradicional, results.simplesNacionalHibrido);
@@ -541,8 +542,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 </div>
             )}
 
-            {cheapestScenario && (
-                <>
+            {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
+                 <>
                     <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
                     <ProfitStatementCard details={cheapestScenario as TaxDetails} />
                 </>
@@ -556,23 +557,26 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
         <Card className="shadow-xl overflow-hidden border bg-card max-w-7xl mx-auto">
-            <CardContent className="p-6 md:p-8">
-                <div className="flex flex-col gap-8">
-                    
-                    <div className="space-y-6">
-                        <div className='border-b pb-4'>
-                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                                <Building2 className="h-5 w-5 text-primary" />
-                                1. Dados da Empresa e Folha
-                            </h3>
-                            <p className='text-base text-muted-foreground mt-1'>Informações sobre seus custos com pessoal e localização.</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <CardContent className="p-6 md:p-8 space-y-8">
+                
+                {/* Section 1: Company & Payroll */}
+                <Card className='border-none shadow-none'>
+                    <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
+                         <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                            <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
+                               <Building2 className="h-5 w-5 text-primary" />
+                            </div>
+                            1. Dados da Empresa e Folha
+                        </h3>
+                        <p className='text-base text-muted-foreground mt-1'>Informações sobre seus custos com pessoal e localização.</p>
+                    </CardHeader>
+                    <CardContent className='p-4 pt-6 grid grid-cols-1 lg:grid-cols-2 gap-8'>
+                        <div className='space-y-6'>
                             <FormField
                                 control={form.control}
                                 name="city"
                                 render={({ field }) => (
-                                    <FormItem className="md:col-span-3">
+                                    <FormItem>
                                         <FormLabel>Onde sua empresa será registrada?</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
@@ -589,13 +593,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                             </SelectContent>
                                         </Select>
                                         <FormDescription className='text-sm'>
-                                            Selecionar a cidade nos permite fornecer informações mais precisas sobre taxas e prazos.
+                                            Informação usada para taxas e prazos de abertura.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                            <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => {
+                             <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => {
                                 const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                     const { value } = e.target;
                                     const digitsOnly = value.replace(/\D/g, '');
@@ -628,120 +632,124 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                     <FormLabel>Número de Sócios</FormLabel>
                                     <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
                                      <FormDescription className='text-sm'>
-                                        Quantos sócios administram.
+                                        Quantos sócios administram a empresa.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <div className="md:col-span-3 space-y-4">
-                                <FormLabel>Pró-labore e Vínculos dos Sócios</FormLabel>
-                                <div className="space-y-6">
-                                    {fields.map((item, index) => (
-                                        <div key={item.id} className="p-4 border rounded-lg bg-muted/20">
-                                            <h4 className="font-semibold text-foreground mb-4">Sócio {index + 1}</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-start">
+                        </div>
+                        <div className="space-y-4">
+                            <FormLabel>Pró-labore e Vínculos dos Sócios</FormLabel>
+                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                {fields.map((item, index) => (
+                                    <div key={item.id} className="p-4 border rounded-lg bg-muted/30">
+                                        <h4 className="font-semibold text-foreground mb-4">Sócio {index + 1}</h4>
+                                        <div className="space-y-4">
+                                            <FormField
+                                                control={form.control}
+                                                name={`proLabores.${index}.value`}
+                                                render={({ field }) => {
+                                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = e.target;
+                                                        const digitsOnly = value.replace(/\D/g, '');
+                                                        field.onChange(Number(digitsOnly) / 100);
+                                                    };
+                                                    return (
+                                                        <FormItem>
+                                                        <FormLabel>Pró-labore Mensal</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            placeholder={formatBRL(MINIMUM_WAGE)}
+                                                            onChange={handleChange}
+                                                            onBlur={field.onBlur}
+                                                            value={field.value ? formatBRL(field.value) : ''}
+                                                            name={field.name}
+                                                            ref={field.ref}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                        </FormItem>
+                                                    );
+                                                }}
+                                            />
+
+                                            <div className="space-y-4">
                                                 <FormField
                                                     control={form.control}
-                                                    name={`proLabores.${index}.value`}
+                                                    name={`proLabores.${index}.hasOtherInssContribution`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background">
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel>Outro vínculo INSS?</FormLabel>
+                                                                <FormDescription className='text-xs'>
+                                                                    Se já contribui como CLT, etc.
+                                                                </FormDescription>
+                                                            </div>
+                                                            <FormControl>
+                                                                <Switch
+                                                                    checked={field.value}
+                                                                    onCheckedChange={field.onChange}
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`proLabores.${index}.otherContributionSalary`}
                                                     render={({ field }) => {
                                                         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                                             const { value } = e.target;
                                                             const digitsOnly = value.replace(/\D/g, '');
                                                             field.onChange(Number(digitsOnly) / 100);
                                                         };
-                                                        return (
-                                                            <FormItem>
-                                                            <FormLabel>Pró-labore Mensal</FormLabel>
+                                                        return(
+                                                        <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible h-0 opacity-0 transition-all')}>
+                                                            <FormLabel>Salário de Contribuição</FormLabel>
                                                             <FormControl>
                                                                 <Input
-                                                                type="text"
-                                                                inputMode="decimal"
-                                                                placeholder={formatBRL(MINIMUM_WAGE)}
-                                                                onChange={handleChange}
-                                                                onBlur={field.onBlur}
-                                                                value={field.value ? formatBRL(field.value) : ''}
-                                                                name={field.name}
-                                                                ref={field.ref}
+                                                                    type="text"
+                                                                    inputMode="decimal"
+                                                                    placeholder="0,00"
+                                                                    onChange={handleChange}
+                                                                    onBlur={field.onBlur}
+                                                                    value={field.value ? formatBRL(field.value) : ''}
+                                                                    name={field.name}
+                                                                    ref={field.ref}
                                                                 />
                                                             </FormControl>
+                                                            <FormDescription className="text-xs">
+                                                                Salário base no outro vínculo (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
+                                                            </FormDescription>
                                                             <FormMessage />
-                                                            </FormItem>
-                                                        );
+                                                        </FormItem>
+                                                        )
                                                     }}
                                                 />
-
-                                                <div className="space-y-4">
-                                                    <FormField
-                                                        control={form.control}
-                                                        name={`proLabores.${index}.hasOtherInssContribution`}
-                                                        render={({ field }) => (
-                                                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background">
-                                                                <div className="space-y-0.5">
-                                                                    <FormLabel>Outro vínculo INSS?</FormLabel>
-                                                                    <FormDescription className='text-xs'>
-                                                                        Se já contribui como CLT, etc.
-                                                                    </FormDescription>
-                                                                </div>
-                                                                <FormControl>
-                                                                    <Switch
-                                                                        checked={field.value}
-                                                                        onCheckedChange={field.onChange}
-                                                                    />
-                                                                </FormControl>
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                    <FormField
-                                                        control={form.control}
-                                                        name={`proLabores.${index}.otherContributionSalary`}
-                                                        render={({ field }) => {
-                                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                const { value } = e.target;
-                                                                const digitsOnly = value.replace(/\D/g, '');
-                                                                field.onChange(Number(digitsOnly) / 100);
-                                                            };
-                                                            return(
-                                                            <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible h-0')}>
-                                                                <FormLabel>Salário de Contribuição</FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        type="text"
-                                                                        inputMode="decimal"
-                                                                        placeholder="0,00"
-                                                                        onChange={handleChange}
-                                                                        onBlur={field.onBlur}
-                                                                        value={field.value ? formatBRL(field.value) : ''}
-                                                                        name={field.name}
-                                                                        ref={field.ref}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormDescription className="text-xs">
-                                                                    Salário base no outro vínculo (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
-                                                                </FormDescription>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                            )
-                                                        }}
-                                                    />
-                                                </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    </div>
+                    </CardContent>
+                </Card>
 
-                    <div className="space-y-6">
-                        <div className='border-b pb-4'>
-                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                {/* Section 2: Activities & Revenue */}
+                 <Card className='border-none shadow-none'>
+                    <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
+                         <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                             <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
                                 <Briefcase className="h-5 w-5 text-primary" />
-                                2. Atividades e Faturamento Mensal
-                            </h3>
-                            <p className='text-base text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
-                        </div>
-                       
-                        <div>
+                            </div>
+                            2. Atividades e Faturamento Mensal
+                        </h3>
+                        <p className='text-base text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
+                    </CardHeader>
+                     <CardContent className='p-4 pt-6 space-y-8'>
+                         <div>
                             <FormLabel>Atividades (CNAEs) da empresa</FormLabel>
                             <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[40px] bg-background">
                                 {selectedCnaes.length > 0 ? selectedCnaes.map(code => (
@@ -751,13 +759,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                             <XCircle className="h-3 w-3 text-destructive/80" />
                                         </Button>
                                     </Badge>
-                                )) : <p className="text-base text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
+                                )) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
                             </div>
                             <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setCnaeSelectorOpen(true)}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                             </Button>
+                            <FormMessage>{form.formState.errors.selectedCnaes?.message}</FormMessage>
                         </div>
-
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                              <FormField control={form.control} name="rbt12" render={({ field }) => {
                                     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -781,7 +790,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                             />
                                         </FormControl>
                                         <FormDescription className='text-sm'>
-                                            Deixe R$ 0,00 se estiver abrindo a empresa agora. A calculadora estimará o valor.
+                                            Deixe R$ 0,00 se estiver abrindo a empresa agora.
                                         </FormDescription>
                                         <FormMessage />
                                         {showSimplesLimitWarning && (
@@ -789,7 +798,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                                 <AlertTriangle className="h-4 w-4" />
                                                 <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
                                                 <AlertDescription>
-                                                    Com base no faturamento mensal informado, sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões do Simples Nacional. Empresas que ultrapassam esse limite devem ser desenquadradas do regime.
+                                                    Sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões.
                                                 </AlertDescription>
                                             </Alert>
                                         )}
@@ -818,14 +827,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                             />
                                         </FormControl>
                                         <FormDescription className='text-sm'>
-                                            Soma de salários e pró-labore do último ano (sem encargos).
+                                            Soma de salários e pró-labore do último ano.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                     );
                                 }} />
                         </div>
-
+                        
                         {year === 2026 && (
                           <FormField
                             control={form.control}
@@ -847,7 +856,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                   <span className='font-bold text-primary w-16 text-center'>{field.value ?? 50}%</span>
                                 </div>
                                 <FormDescription>
-                                  Informe qual a porcentagem do seu faturamento que vem de vendas para outras empresas (Pessoa Jurídica).
+                                  Informe a porcentagem do seu faturamento que vem de vendas para outras empresas (PJ).
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>
@@ -858,45 +867,43 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {revenueGroups.length > 0 && <Separator />}
 
                         {revenueGroups.length > 0 && (
-                            <div className='space-y-8'>
-                                <div>
-                                    <h4 className="font-medium text-md text-foreground mb-4 flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {revenueGroups.map(annex => (
-                                            <FormField
-                                                key={`domestic_${annex}`}
-                                                control={form.control}
-                                                name={`revenues.domestic_${annex}`}
-                                                render={({ field }) => {
-                                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                        const { value } = e.target;
-                                                        const digitsOnly = value.replace(/\D/g, '');
-                                                        field.onChange(Number(digitsOnly) / 100);
-                                                    };
-                                                    return (
-                                                    <FormItem>
-                                                        <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="text"
-                                                                inputMode="decimal"
-                                                                placeholder="0,00"
-                                                                onChange={handleChange}
-                                                                onBlur={field.onBlur}
-                                                                value={field.value ? formatBRL(field.value) : ''}
-                                                                name={field.name}
-                                                                ref={field.ref}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}} />
-                                        ))}
-                                    </div>
+                            <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6'>
+                                <div className='space-y-4'>
+                                    <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
+                                    {revenueGroups.map(annex => (
+                                        <FormField
+                                            key={`domestic_${annex}`}
+                                            control={form.control}
+                                            name={`revenues.domestic_${annex}`}
+                                            render={({ field }) => {
+                                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                    const { value } = e.target;
+                                                    const digitsOnly = value.replace(/\D/g, '');
+                                                    field.onChange(Number(digitsOnly) / 100);
+                                                };
+                                                return (
+                                                <FormItem>
+                                                    <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            placeholder="0,00"
+                                                            onChange={handleChange}
+                                                            onBlur={field.onBlur}
+                                                            value={field.value ? formatBRL(field.value) : ''}
+                                                            name={field.name}
+                                                            ref={field.ref}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}} />
+                                    ))}
                                 </div>
                                 
-                                <div>
-                                    <h4 className="font-medium text-md text-foreground mb-4 flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
+                                <div className='space-y-4'>
+                                    <h4 className="font-medium text-md text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                         <FormField control={form.control} name="exportCurrency" render={({ field }) => (
                                             <FormItem>
@@ -921,7 +928,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                         {exportCurrency !== 'BRL' && (
                                             <FormField control={form.control} name="exchangeRate" render={({ field }) => (
                                                 <FormItem className='md:col-span-2'>
-                                                    <FormLabel>Taxa de Câmbio ({exportCurrency} para BRL)</FormLabel>
+                                                    <FormLabel>Taxa de Câmbio ({exportCurrency})</FormLabel>
                                                     <div className="relative">
                                                         <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} disabled={isFetchingRate} /></FormControl>
                                                          <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10 text-muted-foreground" onClick={fetchRates} disabled={isFetchingRate}>
@@ -933,7 +940,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                             )} />
                                         )}
                                     </div>
-                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     <div className="space-y-4">
                                         {revenueGroups.map(annex => (
                                             <FormField
                                                 key={`export_${annex}`}
@@ -968,27 +975,32 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                 </div>
                             </div>
                         )}
-                        {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
-                    </div>
+                        {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
+                    </CardContent>
+                </Card>
 
-                    <div className="space-y-6">
-                        <div className='border-b pb-4'>
-                            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                 {/* Section 3: Plan Selection */}
+                <Card className='border-none shadow-none'>
+                    <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
+                       <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                            <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
                                 <ListChecks className="h-5 w-5 text-primary" />
-                                3. Selecione o Plano Contabilizei
-                            </h3>
-                        </div>
+                            </div>
+                            3. Selecione o Plano Contabilizei
+                        </h3>
+                    </CardHeader>
+                     <CardContent className='p-4 pt-6'>
                        <FormField
                           control={form.control}
                           name="selectedPlan"
                           render={({ field }) => (
-                              <FormItem className='pt-2'>
+                              <FormItem>
                                    <FormLabel>Qual plano de contabilidade melhor se encaixa no seu perfil?</FormLabel>
                                   <FormControl>
                                       <RadioGroup
                                           onValueChange={field.onChange}
                                           value={field.value}
-                                          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+                                          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2"
                                       >
                                           {planOptions.map(plan => {
                                               const isDisabled = plan.value === 'expertsEssencial' && isCommerceOnly;
@@ -1023,14 +1035,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                               </FormItem>
                           )}
                       />
-                    </div>
+                    </CardContent>
+                </Card>
 
-                </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6">
                 <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
-                  4. Analisar e Otimizar Impostos
+                  Analisar e Otimizar Impostos
                 </Button>
             </CardFooter>
         </Card>
