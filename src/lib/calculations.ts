@@ -170,8 +170,8 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
           regime: 'Simples Nacional', totalTax, totalMonthlyCost, totalRevenue,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee,
           breakdown: [
-              { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
-              { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
+              { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV },
+              { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
               { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido }
           ].filter(i => i.value > 0),
           partnerTaxes, netProfit: -totalMonthlyCost, annex: hasAnexoIV ? 'Anexo IV' : 'N/A'
@@ -245,41 +245,41 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const totalTax = companyTaxes + totalWithheldTaxes;
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
-  let mainAnnexLabel: string;
-  const regimeName = "Simples Nacional";
-
+  let regimeName = "Simples Nacional";
+  let annexLabel = "";
   if (useAnnexIIIForV) {
-    mainAnnexLabel = "Anexo III (Com Fator R)";
+    annexLabel = "Anexo III (Com Fator R)";
   } else if (hasAnnexVActivity) {
-    mainAnnexLabel = "Anexo V (Sem Fator R)";
+    annexLabel = "Anexo V (Sem Fator R)";
   } else {
     const annexKeys = Object.keys(revenueByEffectiveAnnex) as Annex[];
     if (annexKeys.length === 1) {
-      mainAnnexLabel = `Anexo ${annexKeys[0]}`;
+      annexLabel = `Anexo ${annexKeys[0]}`;
     } else if (annexKeys.length > 1) {
-      mainAnnexLabel = `Múltiplos Anexos (${annexKeys.join(', ')})`;
-    } else {
-      mainAnnexLabel = 'Padrão';
+       annexLabel = `Múltiplos Anexos (${annexKeys.join(', ')})`;
     }
   }
 
+  const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
+  const inssRate = totalProLaboreBruto > 0 ? totalINSSRetido / totalProLaboreBruto : 0;
+  const irrfRate = totalProLaboreBruto > 0 ? totalIRRFRetido / totalProLaboreBruto : 0;
+  const cppRateAnexoIV = monthlyPayroll > 0 ? cppFromAnnexIV / monthlyPayroll : 0;
+
   const breakdown = [
-    { name: `DAS`, value: totalDas },
-    { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV },
-    { name: `ISS (Fora do DAS)`, value: totalIssSeparado },
-    { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
+    { name: `DAS (${formatPercent(effectiveDasRate)})`, value: totalDas },
+    { name: `CPP (INSS Patronal - ${formatPercent(cppRateAnexoIV)})`, value: cppFromAnnexIV },
+    { name: `ISS (Fora do DAS - ${formatPercent(municipalISSRate)})`, value: totalIssSeparado },
+    { name: `INSS s/ Pró-labore (${formatPercent(inssRate)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
-  const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
-  
   const companyCosts = companyTaxes + totalProLaboreBruto + contabilizeiFee;
   const netProfit = totalRevenue - companyCosts;
 
   return {
     regime: regimeName, totalTax, totalMonthlyCost, totalRevenue,
     proLabore: totalProLaboreBruto, fatorR: hasAnnexVActivity ? fatorR : undefined,
-    annex: mainAnnexLabel, effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
+    annex: annexLabel, effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
     effectiveDasRate, contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001), 
     notes, partnerTaxes, netProfit,
   };
@@ -299,22 +299,21 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   
-  const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
-  
   let cpp = 0;
-  if (monthlyPayroll > 0 && hasAnexoIV) {
+  if (monthlyPayroll > 0) {
       cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
   }
   
   if (totalRevenue === 0) {
       const totalTax = totalINSSRetido + totalIRRFRetido + cpp;
       const totalMonthlyCost = totalTax + contabilizeiFee;
+      const cppRate = monthlyPayroll > 0 ? cpp / monthlyPayroll : 0;
       return {
           regime: 'Lucro Presumido', totalTax, totalMonthlyCost, totalRevenue: 0,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee, 
           breakdown: [
-              { name: `CPP (INSS Patronal)`, value: cpp },
-              { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
+              { name: `CPP (INSS Patronal - ${formatPercent(cppRate)})`, value: cpp },
+              { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
               { name: `IRRF s/ Pró-labore`, value: totalIRRFRetido },
           ].filter(item => item.value > 0.001),
           partnerTaxes, netProfit: -totalMonthlyCost,
@@ -348,14 +347,23 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const companyCosts = companyRevenueTaxes + cpp + totalProLaboreBruto + contabilizeiFee;
   const netProfit = totalRevenue - companyCosts;
   
+  const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
+  const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
+  const pisRate = domesticRevenue > 0 ? pis / domesticRevenue : 0;
+  const cofinsRate = domesticRevenue > 0 ? cofins / domesticRevenue : 0;
+  const issRate = domesticRevenue > 0 ? iss / domesticRevenue : 0;
+  const inssRate = totalProLaboreBruto > 0 ? totalINSSRetido / totalProLaboreBruto : 0;
+  const irrfRate = totalProLaboreBruto > 0 ? totalIRRFRetido / totalProLaboreBruto : 0;
+  const cppRate = monthlyPayroll > 0 ? cpp / monthlyPayroll : 0;
+
   const breakdown = [
-    { name: `PIS`, value: pis },
-    { name: `COFINS`, value: cofins },
-    { name: `ISS`, value: iss },
-    { name: `IRPJ`, value: irpj },
-    { name: `CSLL`, value: csll },
-    { name: `CPP (INSS Patronal)`, value: cpp },
-    { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
+    { name: `PIS (${formatPercent(pisRate)})`, value: pis },
+    { name: `COFINS (${formatPercent(cofinsRate)})`, value: cofins },
+    { name: `ISS (${formatPercent(issRate)})`, value: iss },
+    { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj },
+    { name: `CSLL (${formatPercent(csllRate)})`, value: csll },
+    { name: `CPP (INSS Patronal - ${formatPercent(cppRate)})`, value: cpp },
+    { name: `INSS s/ Pró-labore (${formatPercent(inssRate)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
