@@ -1,6 +1,3 @@
-
-
-
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CNAE_DATA,
@@ -374,7 +371,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 }
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan, selectedCnaes } = values;
   const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
   
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -382,9 +379,18 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const totalRevenue = domesticRevenue + exportRevenueBRL;
 
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
+  
+  const allCnaesData = selectedCnaes
+      .map(code => getCnaeData(code))
+      .filter((c): c is CnaeData => !!c);
 
-  const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total : 0;
+  const hasAnnexIVActivity = allCnaesData.some(c => c.annex === 'IV');
+
+  let inssPatronal = 0;
+  if(hasAnnexIVActivity) {
+    const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
+    inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total : 0;
+  }
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
@@ -413,7 +419,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const notes: string[] = [];
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. No Lucro Presumido, também são isentas de IRPJ e CSLL.");
-  if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga o INSS Patronal (CPP de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento.`);
+  if (inssPatronal > 0) notes.push(`No Lucro Presumido, atividades do Anexo IV (ex: construção, limpeza) pagam o INSS Patronal (CPP de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento.`);
   
   const domesticActivitiesWithProfitRate = domesticActivities.map(activity => ({
     revenue: activity.revenue,
@@ -425,10 +431,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     return sum + (activity.revenue * activity.profitRate);
   }, 0);
   
-  const IRPJ_ADDITIONAL_THRESHOLD = 20000 * 3; // Trimestral
-  const quarterlyPresumedProfit = presumedProfitBase * 3;
-  const irpjAdicionalAnual = Math.max(0, quarterlyPresumedProfit - IRPJ_ADDITIONAL_THRESHOLD) * 0.10;
-  let irpj = (presumedProfitBase * 0.15) + (irpjAdicionalAnual / 3);
+  const IRPJ_ADDITIONAL_MONTHLY_THRESHOLD = 20000;
+  const irpjAdicionalMensal = Math.max(0, presumedProfitBase - IRPJ_ADDITIONAL_MONTHLY_THRESHOLD) * 0.10;
+  let irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
   
   const csll = presumedProfitBase * 0.09;
   const pis = domesticRevenue * 0.0065; 
