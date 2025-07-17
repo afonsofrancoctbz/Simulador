@@ -452,25 +452,20 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       return null;
     }
 
-    const submissionValues = transformFormToSubmission(form.getValues());
-    const { selectedCnaes: selectedCnaesCodes, numberOfPartners: numSocios } = form.getValues();
+    const { selectedCnaes: selectedCnaesCodes, numberOfPartners: numPartners } = form.getValues();
 
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
         
-        // Logic to decide which scenarios to show
         const scenariosToShow : (TaxDetails | TaxDetails2026)[] = [];
 
-        // Always add Lucro Presumido if not commerce only
         if (!isCommerceOnly) {
              scenariosToShow.push(lucroPresumido);
         }
 
-        // Always add the base Simples Nacional scenario
         scenariosToShow.push(simplesNacionalBase);
         
-        // Add the optimized scenario only if it exists and is different from the base
         if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
             scenariosToShow.push(simplesNacionalOtimizado);
         }
@@ -528,22 +523,15 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 </p>
             </div>
 
-            <div className="flex flex-wrap justify-center items-start gap-8">
-                <div className="flex flex-wrap justify-center items-stretch gap-8">
-                    {sortedForDisplay.map(scenario => (
-                        <ResultCard 
-                            key={scenario.regime} 
-                            details={scenario as TaxDetailsSchema} 
-                            isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
-                        />
-                    ))}
-                </div>
-                {cheapestScenario && (
-                    <PartnerProfitCard
-                        details={cheapestScenario as TaxDetailsSchema}
-                        numPartners={submissionValues.numberOfPartners}
+            <div className="flex flex-wrap justify-center items-stretch gap-8">
+                {sortedForDisplay.map(scenario => (
+                     <ResultCard 
+                        key={scenario.regime} 
+                        details={scenario as TaxDetailsSchema} 
+                        isCheapest={cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedForDisplay.length > 1 && cheapestScenario.totalMonthlyCost > 0}
+                        numPartners={numPartners}
                     />
-                )}
+                ))}
             </div>
 
             {advice && year === 2025 && (

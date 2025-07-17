@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { Banknote } from 'lucide-react';
+import { Banknote, ChevronsDown, ChevronsUp, HandCoins } from 'lucide-react';
 
-const ResultCardComponent = ({ details, isCheapest }: { details: TaxDetails, isCheapest: boolean }) => {
+const ResultCardComponent = ({ details, isCheapest, numPartners }: { details: TaxDetails, isCheapest: boolean, numPartners: number }) => {
 
     const isLucroPresumido = details.regime.includes('Lucro Presumido');
 
@@ -41,6 +41,10 @@ const ResultCardComponent = ({ details, isCheapest }: { details: TaxDetails, isC
     const totalImpostosFaturamentoLP = [...faturamentoMensalTaxes, ...faturamentoTrimestralTaxes].reduce((sum, item) => sum + item.value, 0);
     const aliquotaEfetivaFaturamento = details.totalRevenue > 0 ? totalImpostosFaturamentoLP / details.totalRevenue : 0;
     
+    const inssProLabore = details.breakdown.find(item => item.name.includes('INSS s/ Pró-labore'))?.value ?? 0;
+    const irrfProLabore = details.breakdown.find(item => item.name.includes('IRRF s/ Pró-labore'))?.value ?? 0;
+    const totalDescontosProLabore = inssProLabore + irrfProLabore;
+
     return (
         <Card className={cn(
             "flex flex-col w-full max-w-sm mx-auto shadow-lg transition-all duration-300 relative border-2", 
@@ -53,10 +57,10 @@ const ResultCardComponent = ({ details, isCheapest }: { details: TaxDetails, isC
                  isCheapest ? 'bg-primary/5' : ''
             )}>
                 <CardTitle className="text-xl font-bold text-foreground">{details.regime}</CardTitle>
-                {details.annex && <CardDescription className='font-semibold text-primary/90 text-base'>{details.annex}</CardDescription>}
+                 {details.annex && <CardDescription className='font-semibold text-primary/90 text-base'>{details.annex}</CardDescription>}
             </CardHeader>
 
-            <CardContent className="flex-grow p-4 space-y-3 flex flex-col text-sm">
+            <CardContent className="flex-grow p-4 space-y-4 flex flex-col text-sm">
                 
                 <div className="p-3 border rounded-md bg-background/80 flex justify-between items-center text-base">
                     <span className="text-muted-foreground flex items-center gap-2"><Banknote className="h-5 w-5"/>Faturamento</span>
@@ -163,7 +167,7 @@ const ResultCardComponent = ({ details, isCheapest }: { details: TaxDetails, isC
 
                 {details.fatorR !== undefined && (
                     <div className={cn(
-                        "text-center rounded-md p-2 text-sm font-semibold mt-auto", 
+                        "text-center rounded-md p-2 text-sm font-semibold", 
                         details.fatorR >= 0.28 
                             ? 'bg-green-100 text-green-900 border border-green-200' 
                             : 'bg-amber-100 text-amber-900 border border-amber-200'
@@ -171,6 +175,38 @@ const ResultCardComponent = ({ details, isCheapest }: { details: TaxDetails, isC
                         Fator R: {formatPercent(details.fatorR)}
                     </div>
                 )}
+
+                 <div className="mt-auto pt-4 space-y-4 text-sm">
+                    <div className="space-y-1 p-3 border rounded-md bg-background/80">
+                        <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Resumo para os Sócios</h4>
+                        <div className='flex justify-between items-center'>
+                            <span className="text-muted-foreground flex items-center gap-2"><HandCoins className='h-4 w-4'/>Pró-labore Bruto</span>
+                            <span className="font-medium">{formatCurrencyBRL(details.proLabore)}</span>
+                        </div>
+                        <div className='flex justify-between items-center text-destructive'>
+                            <span className="flex items-center gap-2"><ChevronsDown className='h-4 w-4'/>Total Descontos</span>
+                            <span className="font-medium">- {formatCurrencyBRL(totalDescontosProLabore)}</span>
+                        </div>
+                        <div className='flex justify-between items-center text-green-700 font-bold border-t mt-1.5 pt-1.5'>
+                            <span className="flex items-center gap-2"><ChevronsUp className='h-4 w-4'/>Líquido por Sócio</span>
+                            <span>{formatCurrencyBRL( (details.proLabore - totalDescontosProLabore) / numPartners)}</span>
+                        </div>
+                    </div>
+                    {details.netProfit !== undefined && (
+                        <div className="space-y-1 p-3 border rounded-md bg-background/80">
+                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Demonstrativo de Lucro</h4>
+                            <div className='flex justify-between items-center'>
+                                <span className="text-muted-foreground">Lucro Líquido Empresa</span>
+                                <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
+                            </div>
+                            <div className='flex justify-between items-center font-bold text-green-700 border-t mt-1.5 pt-1.5'>
+                                <span>Distribuição de Lucros</span>
+                                <span>{formatCurrencyBRL(details.netProfit)}</span>
+                            </div>
+                            <p className='text-xs text-muted-foreground pt-2'>*A distribuição de lucros é isenta de IR para o sócio, conforme Lei 9.249/95.</p>
+                        </div>
+                    )}
+                </div>
                 
             </CardContent>
 

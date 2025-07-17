@@ -14,7 +14,7 @@ const PartnerProfitCardComponent = ({ details, numPartners }: { details: TaxDeta
     const totalDescontosProLabore = inssProLabore + irrfProLabore;
 
     return (
-        <Card className="flex flex-col w-full max-w-sm mx-auto shadow-lg border-2 border-transparent">
+        <Card className="flex flex-col w-full max-w-sm mx-auto shadow-lg border-2 border-primary">
             <CardHeader>
                 <CardTitle className="text-xl font-bold text-foreground text-center">Resumo para os Sócios</CardTitle>
                  <CardDescription className='text-center'>Resultado líquido no cenário recomendado.</CardDescription>
