@@ -149,7 +149,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
   const monthlyPayrollForFatorR = values.totalSalaryExpense + totalProLaboreBruto;
 
-  const fatorR = effectiveRbt12 > 0 ? (fp12 > 0 ? fp12 : monthlyPayrollForFatorR * 12) / effectiveRbt12 : (totalRevenue > 0 ? monthlyPayrollForFatorR / totalRevenue : 0);
+  const fatorR = totalRevenue > 0 ? (monthlyPayrollForFatorR / totalRevenue) : 0;
 
   const hasAnnexVActivity = allCnaesData.some(a => a.requiresFatorR);
   const useAnnexIIIForV = hasAnnexVActivity && fatorR >= 0.28;
@@ -357,22 +357,13 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
   const csll = presumedProfitBase * 0.09;
   
-  let cpp = 0;
-  const hasAnnexIVActivity = selectedCnaes.some(c => getCnaeData(c)?.annex === 'IV');
-  if (hasAnnexIVActivity) {
-      const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-      cpp = totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total;
-      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha, mesmo no Lucro Presumido.`);
-  }
-
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
-  const companyPayrollTaxes = cpp;
 
-  const totalTax = companyRevenueTaxes + totalWithheldTaxes + companyPayrollTaxes;
+  const totalTax = companyRevenueTaxes + totalWithheldTaxes;
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
-  const companyCosts = companyRevenueTaxes + companyPayrollTaxes + totalProLaboreBruto + contabilizeiFee;
+  const companyCosts = companyRevenueTaxes + totalProLaboreBruto + contabilizeiFee;
   const netProfit = totalRevenue - companyCosts;
   
   const breakdown = [
@@ -381,7 +372,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `ISS`, value: iss },
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
-    { name: `CPP (INSS Patronal - 20%)`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
