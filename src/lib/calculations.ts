@@ -82,7 +82,6 @@ export function calcularEncargosProLabore(input: ProLaboreInput): ProLaboreOutpu
 
   const tetoINSS = configuracaoFiscal.teto_inss;
   
-  // Logic for "duplo vínculo" (double contribution)
   const remainingContributionRoom = Math.max(0, tetoINSS - otherContributionSalary);
   const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
   
@@ -155,6 +154,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
   
   const monthlyPayrollForFatorR = values.totalSalaryExpense + totalProLaboreBruto;
+  // According to legislation, FP12 for Fator R does NOT include INSS Patronal (CPP) or FGTS.
   const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayrollForFatorR * 12;
 
   const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
@@ -331,13 +331,11 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   }
 
   if (useAnnexIIIForV) {
-      regimeName = "Simples Nacional (Anexo III via Fator R)";
+      regimeName = "Simples Nacional - Anexo III (Com Fator R)";
       mainAnnexLabel = "Anexo III";
-      optimizationNote = `Cenário com Fator R de ${formatPercent(fatorR)} (>= 28%), enquadrando no Anexo III.`;
   } else if (hasAnnexVActivity) {
-      regimeName = "Simples Nacional (Anexo V)";
+      regimeName = "Simples Nacional - Anexo V";
       mainAnnexLabel = "Anexo V";
-      optimizationNote = `A alíquota maior é aplicada pois o Fator R de ${formatPercent(fatorR)} está abaixo de 28%.`;
   } else {
       regimeName = `Simples Nacional`;
   }
@@ -413,7 +411,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   }
 
   const notes: string[] = [];
-  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS, ISS, IRPJ e CSLL no Lucro Presumido.");
+  if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. No Lucro Presumido, também são isentas de IRPJ e CSLL.");
   if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga o INSS Patronal (CPP de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha de pagamento.`);
   
   const domesticActivitiesWithProfitRate = domesticActivities.map(activity => ({
@@ -421,6 +419,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     profitRate: getCnaeData(activity.code)?.presumedProfitRate ?? 0.32,
   }));
 
+  // Presumed profit base considers only domestic revenue for IRPJ and CSLL due to export exemption.
   let presumedProfitBase = domesticActivitiesWithProfitRate.reduce((sum, activity) => {
     return sum + (activity.revenue * activity.profitRate);
   }, 0);
@@ -500,12 +499,10 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
               const rbt12 = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
               
-              const monthlyPayrollForOptimizedFatorR = values.totalSalaryExpense + requiredTotalProLabore;
-              
               // Recalculate FP12 for optimized scenario, using same logic as base scenario
               const fp12Otimizado = values.fp12 > 0 
-                  ? (values.fp12 - (values.totalSalaryExpense + totalProLaboreBruto) * 12 + monthlyPayrollForOptimizedFatorR * 12) // simple projection, could be more complex
-                  : monthlyPayrollForOptimizedFatorR * 12;
+                  ? (values.fp12 - totalProLaboreBruto * 12 + requiredTotalProLabore * 12)
+                  : (values.totalSalaryExpense + requiredTotalProLabore) * 12;
 
               simplesNacionalOtimizado = _calculateSimplesNacional(
                 { ...optimizedValues, fp12: fp12Otimizado, rbt12 }, 
@@ -517,10 +514,10 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   }
   
   const scenarios = [simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido].filter(Boolean) as TaxDetails[];
-  scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
   
   let order = 1;
-  for(const s of scenarios) {
+  const orderedScenarios = scenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
+  for(const s of orderedScenarios) {
       if (s.regime === simplesNacionalBase.regime) simplesNacionalBase.order = order++;
       if (simplesNacionalOtimizado && s.regime === simplesNacionalOtimizado.regime) simplesNacionalOtimizado.order = order++;
       if (s.regime === lucroPresumido.regime) lucroPresumido.order = order++;
@@ -528,8 +525,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
 
   return {
-    simplesNacionalBase: { ...simplesNacionalBase },
-    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado } : null,
-    lucroPresumido: { ...lucroPresumido },
+    simplesNacionalBase,
+    simplesNacionalOtimizado,
+    lucroPresumido,
   };
 }
