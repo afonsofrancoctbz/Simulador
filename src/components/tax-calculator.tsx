@@ -37,6 +37,7 @@ import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
 import { PartnerDetailsCard } from './partner-details-card';
+import { ProfitStatementCard } from './profit-statement-card';
 
 const fiscalConfig2025 = getFiscalParameters(2025);
 const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
@@ -474,8 +475,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       : null;
 
     return (
-        <div id="results-section" className="mt-16 w-full">
-            <div className="max-w-4xl mx-auto mb-12">
+        <div id="results-section" className="mt-16 w-full space-y-12">
+            <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-4">
                     <h3 className="font-semibold text-lg text-foreground flex items-center justify-center gap-2">
                         <ListChecks className="h-5 w-5 text-primary"/>
@@ -503,24 +504,26 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 </ul>
             </div>
             
-            <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
-                <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
-                </p>
-            </div>
+            <div>
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
+                    <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
+                        Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
+                    </p>
+                </div>
 
-            <div className="flex flex-wrap justify-center items-start gap-8">
-                {sortedForDisplay.map((scenario, index) => (
-                     <ResultCard 
-                        key={scenario.regime + index} 
-                        details={scenario as TaxDetails} 
-                    />
-                ))}
+                <div className="flex flex-wrap justify-center items-start gap-8">
+                    {sortedForDisplay.map((scenario, index) => (
+                        <ResultCard 
+                            key={scenario.regime + index} 
+                            details={scenario as TaxDetails} 
+                        />
+                    ))}
+                </div>
             </div>
 
             {advice && year === 2025 && (
-                <div className="mt-12 max-w-5xl mx-auto">
+                <div className="max-w-5xl mx-auto">
                     <Alert variant="default" className="bg-primary/5 border-primary/20">
                         <Lightbulb className="h-5 w-5 text-primary" />
                         <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
@@ -539,9 +542,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             )}
 
             {cheapestScenario && (
-                <div className="mt-12 w-full">
+                <>
                     <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
-                </div>
+                    <ProfitStatementCard details={cheapestScenario as TaxDetails} />
+                </>
             )}
             
       </div>
