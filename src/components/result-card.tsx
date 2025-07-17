@@ -68,7 +68,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                     <span className="font-bold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
                 </div>
                 
-                <div className="p-3 border rounded-md bg-background/80 space-y-2">
+                <div className="p-3 border rounded-md bg-background/80 space-y-4">
                     {isLucroPresumido ? (
                         <>
                             {faturamentoMensalTaxes.length > 0 && (
@@ -177,9 +177,9 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                     </div>
                 )}
                 
-                <div className="p-3 border rounded-md bg-background/80 space-y-2 mt-auto flex-grow flex flex-col justify-end">
-                    <div className="flex flex-col">
-                        <div className='flex justify-between items-center'>
+                <div className="mt-auto pt-4 space-y-4">
+                    <div className="space-y-1">
+                       <div className='flex justify-between items-center'>
                            <span className="text-muted-foreground flex items-center gap-2"><HandCoins className='h-4 w-4'/>Pró-labore Bruto</span>
                            <span className="font-medium">{formatCurrencyBRL(details.proLabore)}</span>
                         </div>
@@ -193,7 +193,7 @@ const ResultCardComponent = ({ details, isCheapest, formValues }: { details: Tax
                         </div>
                     </div>
                     {details.netProfit !== undefined && (
-                        <div className="flex flex-col pt-2 border-t mt-2">
+                        <div className="space-y-1 pt-2 border-t">
                              <div className='flex justify-between items-center'>
                                <span className="text-muted-foreground">Lucro Líquido Empresa</span>
                                <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
