@@ -162,7 +162,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   // --- 4. Calculate CPP for Anexo IV (if applicable) ---
   let cppFromAnnexIV = 0;
   if (hasAnnexIV && monthlyPayroll > 0) {
-    const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.base;
+    const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.total; // Use total CPP rate
     cppFromAnnexIV = monthlyPayroll * cppRate;
   }
 
@@ -197,7 +197,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const totalMonthlyCost = totalTax + fee;
 
     const breakdown = [
-        ...(cppFromAnnexIV > 0 ? [{ name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV }] : []),
+        ...(cppFromAnnexIV > 0 ? [{ name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)})`, value: cppFromAnnexIV }] : []),
         ...(totalINSSRetido > 0 ? [{ name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido }] : []),
         ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
     ];
@@ -254,7 +254,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   }
 
   if (hasAnnexIV) {
-      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha de pagamento, fora do DAS.`);
+      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento, fora do DAS.`);
   }
 
   // --- Group Revenue & Calculate DAS ---
@@ -342,7 +342,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   const breakdown = [
     { name: `DAS (${formatPercent(totalRevenue > 0 ? totalDas / totalRevenue : 0)})`, value: totalDas },
-    { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV },
+    { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)})`, value: cppFromAnnexIV },
     { name: `ISS (Fora do DAS)`, value: totalIssSeparado },
     { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
@@ -383,7 +383,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
 
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base : 0;
+  // **CORRECTION**: Use the total CPP rate (28.8%) for Lucro Presumido
+  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total : 0;
 
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
@@ -394,7 +395,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       const totalTax = companyPayrollTaxes + totalWithheldTaxes;
       const totalMonthlyCost = totalTax + contabilizeiFee;
       const breakdown = [
-        ...(inssPatronal > 0 ? [{ name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: inssPatronal }] : []),
+        ...(inssPatronal > 0 ? [{ name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)})`, value: inssPatronal }] : []),
         ...(totalINSSRetido > 0 ? [{ name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido }] : []),
         ...(totalIRRFRetido > 0 ? [{ name: "IRRF s/ Pró-labore", value: totalIRRFRetido }] : []),
       ];
@@ -412,7 +413,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const notes: string[] = [];
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. No Lucro Presumido, também são isentas de IRPJ e CSLL.");
-  if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga o INSS Patronal (CPP de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha de pagamento.`);
+  if (totalPayroll > 0) notes.push(`No Lucro Presumido, a empresa paga o INSS Patronal (CPP de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento.`);
   
   const domesticActivitiesWithProfitRate = domesticActivities.map(activity => ({
     revenue: activity.revenue,
@@ -446,7 +447,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const breakdown = [
     { name: `PIS (${formatPercent(0.0065)})`, value: pis }, { name: `COFINS (${formatPercent(0.03)})`, value: cofins },
     { name: `ISS (${formatPercent(fiscalConfig2025.aliquota_iss_padrao)})`, value: iss }, { name: "IRPJ", value: irpj },
-    { name: "CSLL", value: csll }, { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: inssPatronal },
+    { name: "CSLL", value: csll }, { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)})`, value: inssPatronal },
     { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
