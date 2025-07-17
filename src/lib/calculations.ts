@@ -134,7 +134,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, monthlyPayroll: number): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, fp12, selectedPlan, selectedCnaes } = values;
+  const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, selectedPlan, selectedCnaes } = values;
 
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
   const exportRevenue = exportActivities.reduce((sum, act) => act.revenue, 0) * exchangeRate;
@@ -147,28 +147,11 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       .filter((c): c is CnaeData => !!c);
 
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-  const monthlyPayrollForFatorR = values.totalSalaryExpense + totalProLaboreBruto;
-
-  const fatorR = totalRevenue > 0 ? (monthlyPayrollForFatorR / totalRevenue) : (monthlyPayrollForFatorR > 0 ? 1 : 0);
+  
+  const fatorR = totalRevenue > 0 ? (monthlyPayroll / totalRevenue) : 0;
 
   const hasAnnexVActivity = allCnaesData.some(a => a.requiresFatorR);
   const useAnnexIIIForV = hasAnnexVActivity && fatorR >= 0.28;
-
-  const activitiesByAnnex = allCnaesData.reduce((acc, cnae) => {
-    let effectiveAnnex: Annex = cnae.annex;
-    if (cnae.requiresFatorR) {
-        effectiveAnnex = useAnnexIIIForV ? 'III' : 'V';
-    }
-    if (!acc[effectiveAnnex]) {
-      acc[effectiveAnnex] = 0;
-    }
-    const cnaeDomesticRevenue = domesticActivities.find(a => a.code === cnae.code)?.revenue ?? 0;
-    const cnaeExportRevenue = (exportActivities.find(a => a.code === cnae.code)?.revenue ?? 0) * exchangeRate;
-    const cnaeRevenue = cnaeDomesticRevenue + cnaeExportRevenue;
-
-    acc[effectiveAnnex] += cnaeRevenue;
-    return acc;
-  }, {} as Record<Annex, number>);
 
   let cppFromAnnexIV = 0;
   const hasAnexoIV = allCnaesData.some(c => c.annex === 'IV');
@@ -205,9 +188,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const SUBLIMIT_SIMPLES = 3600000;
   const rbt12ExceededSublimit = effectiveRbt12 > SUBLIMIT_SIMPLES;
 
-  if (hasAnnexVActivity && totalRevenue > 0) {
-    notes.push(`Seu "Fator R" é de ${formatPercent(fatorR)}. ${useAnnexIIIForV ? 'Suas atividades do Anexo V são tributadas pelo Anexo III, o que é vantajoso.' : 'Como o valor é inferior a 28%, suas atividades do Anexo V são tributadas pelas alíquotas do Anexo V.'}`);
-  }
   if (hasAnexoIV) {
       notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha de pagamento, fora do DAS.`);
   }
@@ -266,28 +246,21 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
   let mainAnnexLabel: string;
-  let regimeName: string;
-
-  const annexKeys = Object.keys(revenueByEffectiveAnnex) as Annex[];
-  if (annexKeys.length === 1) {
-    mainAnnexLabel = `Anexo ${annexKeys[0]}`;
-  } else if (annexKeys.length > 1) {
-    mainAnnexLabel = `Múltiplos Anexos (${annexKeys.join(', ')})`;
-  } else {
-    const uniqueAnnexesFromCnaes = [...new Set(allCnaesData.map(c => c.annex))];
-    mainAnnexLabel = uniqueAnnexesFromCnaes.length > 0 
-      ? `Anexo ${uniqueAnnexesFromCnaes.join('/')}`
-      : 'Padrão';
-  }
+  const regimeName = "Simples Nacional";
 
   if (useAnnexIIIForV) {
-      regimeName = "Simples Nacional";
-      mainAnnexLabel = "Anexo III (Otimizado)";
+    mainAnnexLabel = "Anexo III (Com Fator R)";
   } else if (hasAnnexVActivity) {
-      regimeName = "Simples Nacional";
-      mainAnnexLabel = "Anexo V";
+    mainAnnexLabel = "Anexo V (Sem Fator R)";
   } else {
-      regimeName = `Simples Nacional`;
+    const annexKeys = Object.keys(revenueByEffectiveAnnex) as Annex[];
+    if (annexKeys.length === 1) {
+      mainAnnexLabel = `Anexo ${annexKeys[0]}`;
+    } else if (annexKeys.length > 1) {
+      mainAnnexLabel = `Múltiplos Anexos (${annexKeys.join(', ')})`;
+    } else {
+      mainAnnexLabel = 'Padrão';
+    }
   }
 
   const breakdown = [
@@ -329,7 +302,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
   
   let cpp = 0;
-  if (monthlyPayroll > 0) {
+  if (monthlyPayroll > 0 && hasAnexoIV) {
       cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
   }
   
@@ -438,8 +411,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
                 optimizedMonthlyPayrollFull
               );
               if (simplesNacionalOtimizado) {
-                 simplesNacionalOtimizado.regime = 'Simples Nacional';
-                 simplesNacionalOtimizado.annex = 'Anexo III (Otimizado)';
                  simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para ${formatCurrencyBRL(requiredTotalProLabore)} para otimizar o Fator R.`
               }
           }
@@ -461,6 +432,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
-
-
-

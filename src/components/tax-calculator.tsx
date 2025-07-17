@@ -5,11 +5,11 @@ import { useEffect, useState, useMemo, type ComponentType } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent, AlertTriangle } from 'lucide-react';
+import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent, AlertTriangle, CheckCircle, Trophy, Info, DollarSign } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/calculations';
-import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, TaxDetails2026, PlanEnumSchema, TaxDetailsSchema } from '@/lib/types';
+import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, PlanEnumSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
@@ -25,7 +25,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
-import { ResultCard } from './result-card';
 import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Switch } from './ui/switch';
@@ -38,6 +37,7 @@ import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const fiscalConfig2025 = getFiscalParameters(2025);
 const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
@@ -437,10 +437,18 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const renderResults = () => {
     if (isLoading) {
       return (
-        <div id="results-section" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12 w-full">
-          <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
-          <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
-          <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
+        <div id="results-section" className="mt-12 w-full">
+            <Card className='max-w-7xl mx-auto'>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2 mx-auto" />
+                    <Skeleton className="h-5 w-3/4 mx-auto mt-2" />
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                     <div className='space-y-4'><Skeleton className="h-40 w-full" /> <Skeleton className="h-20 w-full" /></div>
+                     <div className='space-y-4'><Skeleton className="h-40 w-full" /> <Skeleton className="h-20 w-full" /></div>
+                     <div className='space-y-4'><Skeleton className="h-40 w-full" /> <Skeleton className="h-20 w-full" /></div>
+                </CardContent>
+            </Card>
         </div>
       );
     }
@@ -458,8 +466,9 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         
         if (!isCommerceOnly) scenariosToShow.push(lucroPresumido);
         scenariosToShow.push(simplesNacionalBase);
-        if (simplesNacionalOtimizado) scenariosToShow.push(simplesNacionalOtimizado);
-        
+        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
+            scenariosToShow.push(simplesNacionalOtimizado);
+        }
         scenarios = scenariosToShow.filter(s => s.totalRevenue > 0 || s.proLabore > 0);
 
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
@@ -469,86 +478,191 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     if (scenarios.length === 0) return null;
     
-    const sortedForDisplay = [...scenarios].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+    const sortedScenarios = [...scenarios].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
     const cheapestScenario = scenarios.length > 0
       ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
       : null;
 
+    const getTaxItems = (details: TaxDetails) => {
+        const isPresumido = details.regime === 'Lucro Presumido';
+        const revenueTaxes = details.breakdown.filter(item => ['PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'DAS'].some(tax => item.name.includes(tax)));
+        const payrollTaxes = details.breakdown.filter(item => ['CPP', 'INSS', 'IRRF'].some(tax => item.name.includes(tax)));
+        const otherCosts = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
+        return { revenueTaxes, payrollTaxes, otherCosts };
+    };
+
     return (
-        <div id="results-section" className="mt-16 w-full space-y-12">
-            <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-4">
-                    <h3 className="font-semibold text-lg text-foreground flex items-center justify-center gap-2">
-                        <ListChecks className="h-5 w-5 text-primary"/>
-                        Resumo das Atividades Selecionadas
-                    </h3>
-                </div>
-                <ul className="border rounded-lg p-3 bg-muted/20 divide-y divide-border/50">
-                    {selectedCnaesCodes.map((code) => {
-                        const cnae = getCnaeData(code);
-                        if (!cnae) return null;
-                        return (
-                             <li key={code} className="flex flex-col sm:flex-row items-start justify-between gap-x-4 gap-y-1 py-2 first:pt-0 last:pb-0">
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-foreground">{cnae.code}</p>
-                                    <p className="text-muted-foreground text-sm">{cnae.description}</p>
-                                </div>
-                                <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center">
-                                    <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
-                                    {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
-                                    {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
-                                </div>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </div>
-            
-            <div>
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
-                    <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
-                        Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
-                    </p>
-                </div>
+      <div id="results-section" className="mt-16 w-full space-y-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-4">
+            <h3 className="font-semibold text-lg text-foreground flex items-center justify-center gap-2">
+              <ListChecks className="h-5 w-5 text-primary" />
+              Resumo das Atividades Selecionadas
+            </h3>
+          </div>
+          <ul className="border rounded-lg p-3 bg-muted/20 divide-y divide-border/50">
+            {selectedCnaesCodes.map((code) => {
+              const cnae = getCnaeData(code);
+              if (!cnae) return null;
+              return (
+                <li key={code} className="flex flex-col sm:flex-row items-start justify-between gap-x-4 gap-y-1 py-2 first:pt-0 last:pb-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground">{cnae.code}</p>
+                    <p className="text-muted-foreground text-sm">{cnae.description}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center">
+                    <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
+                    {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
+                    {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        
+        <div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
+            <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
+              Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
+            </p>
+          </div>
 
-                <div className="flex flex-wrap justify-center items-start gap-8">
-                    {sortedForDisplay.map((scenario, index) => (
-                        <ResultCard 
-                            key={scenario.regime + index} 
-                            details={scenario as TaxDetails} 
-                        />
-                    ))}
-                </div>
-            </div>
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {sortedScenarios.map((scenario) => {
+              const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && sortedScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+              const { revenueTaxes, payrollTaxes, otherCosts } = getTaxItems(scenario as TaxDetails);
+              const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) * 100 : 0;
 
-            {advice && year === 2025 && (
-                <div className="max-w-5xl mx-auto">
-                    <Alert variant="default" className="bg-primary/5 border-primary/20">
-                        <Lightbulb className="h-5 w-5 text-primary" />
-                        <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
-                        <AlertDescription className="text-sm text-foreground/90">
-                            {isAdviceLoading ? (
-                                <div className="space-y-1.5 pt-1">
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-11/12" />
-                                </div>
-                            ) : (
-                                advice
-                            )}
-                        </AlertDescription>
-                    </Alert>
-                </div>
-            )}
+              return (
+                <div key={scenario.regime + (scenario.annex || '')}
+                  className={cn(
+                    "border rounded-xl w-full flex flex-col transition-all duration-300",
+                    isRecommended ? "bg-card shadow-2xl border-primary/50" : "bg-muted/30 shadow-lg border-transparent"
+                  )}
+                >
+                  {/* Header */}
+                  <div className={cn(
+                      "p-6 rounded-t-xl text-center relative overflow-hidden",
+                      isRecommended ? "bg-gradient-to-br from-primary/10 to-background" : ""
+                  )}>
+                    {isRecommended && (
+                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-4 py-1.5 shadow-lg flex items-center gap-1.5">
+                        <Trophy className="h-4 w-4" /> Recomendado
+                      </Badge>
+                    )}
+                    <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
+                    {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
+                  </div>
 
-            {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
-                 <>
-                    <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
-                    <ProfitStatementCard details={cheapestScenario as TaxDetails} />
-                </>
-            )}
-            
+                  <Separator />
+
+                  {/* Body */}
+                  <div className="p-4 flex-grow space-y-6">
+                    {/* Cost Breakdown */}
+                    <div className='space-y-4'>
+                      {revenueTaxes.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-muted-foreground text-sm flex items-center gap-2"><DollarSign className="h-4 w-4 text-primary/70" /> Impostos s/ Faturamento</h4>
+                          {revenueTaxes.map(item => (
+                            <div key={item.name} className="flex justify-between items-center text-sm pl-6">
+                              <span className="text-muted-foreground">{item.name}</span>
+                              <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {payrollTaxes.length > 0 && (
+                        <div className="space-y-2">
+                           <h4 className="font-semibold text-muted-foreground text-sm flex items-center gap-2"><Users className="h-4 w-4 text-primary/70" /> Encargos s/ Folha e Pró-labore</h4>
+                          {payrollTaxes.map(item => (
+                            <div key={item.name} className="flex justify-between items-center text-sm pl-6">
+                              <span className="text-muted-foreground">{item.name}</span>
+                              <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                       <div className="space-y-2">
+                          <h4 className="font-semibold text-muted-foreground text-sm flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary/70" /> Outros Custos</h4>
+                          {otherCosts.map(item => (
+                            <div key={item.name} className="flex justify-between items-center text-sm pl-6">
+                              <span className="text-muted-foreground">{item.name}</span>
+                              <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                            </div>
+                          ))}
+                        </div>
+                    </div>
+                     <Separator/>
+
+                    {/* Fator R Info */}
+                    {scenario.fatorR !== undefined && (
+                      <div className={cn(
+                        "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
+                        scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
+                      )}>
+                        {scenario.fatorR >= 0.28 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+                        <span>Fator R: {formatPercent(scenario.fatorR)}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Footer */}
+                  <div className={cn("p-6 rounded-b-xl mt-auto", isRecommended ? 'bg-primary/5' : 'bg-muted/50')}>
+                    <div className="w-full space-y-2 text-center">
+                        <div className="flex justify-between items-baseline gap-2">
+                            <span className="text-sm text-muted-foreground">Custo Total Mensal</span>
+                             <div className="text-2xl font-bold text-primary">
+                                {formatCurrencyBRL(scenario.totalMonthlyCost)}
+                            </div>
+                        </div>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="w-full bg-muted rounded-full h-2.5">
+                                        <div className={cn("h-2.5 rounded-full", isRecommended ? "bg-gradient-to-r from-primary to-accent" : "bg-primary/80")} style={{ width: `${Math.min(costPercentage, 100)}%` }}></div>
+                                    </div>
+                                </TooltipTrigger>
+                                 <TooltipContent>
+                                    <p>Este custo representa {formatPercent(costPercentage/100)} do seu faturamento.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {advice && year === 2025 && (
+          <div className="max-w-5xl mx-auto">
+            <Alert variant="default" className="bg-primary/5 border-primary/20">
+              <Lightbulb className="h-5 w-5 text-primary" />
+              <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
+              <AlertDescription className="text-sm text-foreground/90">
+                {isAdviceLoading ? (
+                  <div className="space-y-1.5 pt-1">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-11/12" />
+                  </div>
+                ) : (
+                  advice
+                )}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
+          <>
+            <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
+            <ProfitStatementCard details={cheapestScenario as TaxDetails} />
+          </>
+        )}
       </div>
     );
   };
