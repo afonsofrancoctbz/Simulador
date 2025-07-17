@@ -330,12 +330,17 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       : 'Padrão';
   }
 
-  if (values.proLabores.some(p => p.value < proLabores.reduce((acc, p) => acc + p.value, 0))) {
-    regimeName = "Simples Nacional Otimizado (Anexo III)";
-    optimizationNote = `Cenário otimizado. Seu Fator R de ${formatPercent(fatorR)} é >= 28%, enquadrando no Anexo III.`;
-  } else {
-    regimeName = `Simples Nacional - ${mainAnnexLabel}`;
-    if (hasAnnexVActivity && !useAnnexIIIForV) {
+  // This function is now only for a single scenario. The "optimization" part is handled in calculateTaxes
+  regimeName = `Simples Nacional - ${mainAnnexLabel}`;
+  
+  if (hasAnnexVActivity) {
+    if (useAnnexIIIForV) {
+        regimeName = "Simples Nacional - Anexo III (Com Fator R)";
+        mainAnnexLabel = "Anexo III (Com Fator R)";
+        optimizationNote = `Cenário com Fator R de ${formatPercent(fatorR)} (>= 28%), enquadrando no Anexo III.`;
+    } else {
+        regimeName = "Simples Nacional - Anexo V";
+        mainAnnexLabel = "Anexo V";
         optimizationNote = `A alíquota maior é aplicada pois o Fator R de ${formatPercent(fatorR)} está abaixo de 28%.`;
     }
   }
@@ -502,13 +507,13 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               
               const optimizedMonthlyPayroll = values.totalSalaryExpense + requiredTotalProLabore;
 
-              // Correctly recalculate FP12 for the optimized scenario
+              const rbt12 = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
               const fp12Otimizado = values.fp12 > 0 
                 ? (values.fp12 - monthlyPayroll + optimizedMonthlyPayroll) 
                 : optimizedMonthlyPayroll * 12;
 
               simplesNacionalOtimizado = _calculateSimplesNacional(
-                { ...optimizedValues, fp12: fp12Otimizado }, 
+                { ...optimizedValues, fp12: fp12Otimizado, rbt12 }, 
                 requiredTotalProLabore, 
                 optimizedMonthlyPayroll
               );
@@ -518,7 +523,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   
   return {
     simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2 : 1 },
-    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, regime: 'Simples Nacional Otimizado (Anexo III)', order: 1 } : null,
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
