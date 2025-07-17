@@ -16,13 +16,32 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
     const folhaTaxes = details.breakdown.filter(item => ['CPP', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
     const outrosCustos = [{ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee }];
 
-    const parseTaxName = (name: string) => {
-        const match = name.match(/^(.*?)(\s\(.*\))?$/);
-        if (!match) return { baseName: name, percentage: null };
+    const getTaxEffectiveRate = (taxValue: number) => {
+        if (details.totalRevenue > 0) {
+            return formatPercent(taxValue / details.totalRevenue);
+        }
+        return null;
+    };
 
+    const parseTaxName = (name: string, value: number) => {
+        const match = name.match(/^(.*?)(\s\(.*\))?$/);
+        let baseName = name;
+        let percentage = null;
+    
+        if (match) {
+            baseName = match[1];
+            percentage = match[2] || null;
+        }
+
+        if (baseName.includes('IRPJ') || baseName.includes('CSLL')) {
+            percentage = getTaxEffectiveRate(value);
+        } else if (name.startsWith('DAS')) {
+            percentage = formatPercent(details.effectiveDasRate ?? 0);
+        }
+        
         return {
-            baseName: match[1],
-            percentage: match[2] || null
+            baseName: baseName,
+            percentage: percentage
         };
     };
 
@@ -57,14 +76,16 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                 <div className="p-4 border rounded-lg bg-background/30 space-y-3 flex-grow">
                     {faturamentoTaxes.length > 0 && (
                         <div className="space-y-1.5">
-                            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Impostos s/ Faturamento</h4>
+                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">
+                                {details.regime === 'Lucro Presumido' ? 'Impostos s/ Faturamento e Lucro' : 'Impostos s/ Faturamento'}
+                            </h4>
                             {faturamentoTaxes.map((item, index) => {
-                                const { baseName, percentage } = parseTaxName(item.name);
+                                const { baseName, percentage } = parseTaxName(item.name, item.value);
                                 return (
                                 <div key={index} className="flex justify-between items-center">
                                     <span className="text-muted-foreground">
                                         {baseName}
-                                        {percentage && <span className='ml-1.5 font-bold text-primary'>{percentage}</span>}
+                                        {percentage && <span className='ml-1.5 font-bold text-primary'>({percentage})</span>}
                                     </span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
@@ -76,12 +97,12 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                          <div className="space-y-1.5 pt-3 mt-3 border-t border-dashed">
                             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-2">Encargos s/ Folha e Pró-labore</h4>
                             {folhaTaxes.map((item, index) => {
-                                const { baseName, percentage } = parseTaxName(item.name);
+                                const { baseName, percentage } = parseTaxName(item.name, item.value);
                                 return (
                                 <div key={index} className="flex justify-between items-center">
                                     <span className="text-muted-foreground">
                                         {baseName}
-                                        {percentage && <span className='ml-1.5 font-bold text-primary'>{percentage}</span>}
+                                        {item.name.includes("INSS") && <span className='ml-1.5 font-bold text-primary'>(11,00%)</span>}
                                     </span>
                                     <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                 </div>
