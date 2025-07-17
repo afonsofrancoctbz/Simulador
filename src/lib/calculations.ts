@@ -358,16 +358,10 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
   const csll = presumedProfitBase * 0.09;
   
-  // Calculate CPP only if there are Anexo IV activities
-  const hasAnexoIVActivity = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
-  const cpp = hasAnexoIVActivity && monthlyPayroll > 0 
+  const cpp = monthlyPayroll > 0 
     ? monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base 
     : 0;
   
-  if(hasAnexoIVActivity && monthlyPayroll > 0){
-    notes.push("Atividades do Anexo IV recolhem a CPP (20%) sobre a folha, mesmo no Lucro Presumido.");
-  }
-
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
 

@@ -152,7 +152,7 @@ const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
                     <div className="text-2xl font-bold text-primary">
                         {formatCurrencyBRL(details.totalMonthlyCost)}
                     </div>
-                    <p className="text-xs text-muted-foreground">(Impostos + Mensalidade)</p>
+                    <p className="text-xs text-muted-foreground">(Impostos + Encargos + Mensalidade)</p>
                 </div>
             </CardFooter>
         </Card>
