@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useEffect, useState, useMemo, type ComponentType } from 'react';
@@ -37,6 +35,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
+import { TaxAnalysisReport } from './tax-analysis-report';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -539,48 +538,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 ))}
             </div>
 
-            {cheapestScenario && numSocios > 1 && (
-                <div className="mt-12 max-w-4xl mx-auto">
-                    <Card className="shadow-lg border-primary/10">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-foreground text-center flex items-center justify-center gap-2">
-                                <Users className="h-5 w-5 text-primary"/>
-                                Detalhamento por Sócio (Cenário Recomendado)
-                            </CardTitle>
-                            <CardDescription className="text-center">
-                                Valores individuais de pró-labore e impostos retidos no cenário mais econômico.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {cheapestScenario.partnerTaxes.map((partner, index) => (
-                                <div key={index} className="p-4 border rounded-lg bg-muted/30">
-                                    <h4 className="font-semibold mb-3 text-foreground">Sócio {index + 1}</h4>
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex justify-between items-baseline">
-                                            <span className="text-muted-foreground">Pró-labore Bruto</span>
-                                            <span className="font-medium">{formatCurrencyBRL(partner.proLaboreBruto)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-baseline">
-                                            <span className="text-muted-foreground">(-) INSS Retido (11%)</span>
-                                            <span className="font-medium text-destructive/90">-{formatCurrencyBRL(partner.inss)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-baseline">
-                                            <span className="text-muted-foreground">(-) IRRF Retido</span>
-                                            <span className="font-medium text-destructive/90">-{formatCurrencyBRL(partner.irrf)}</span>
-                                        </div>
-                                        <Separator className="my-2"/>
-                                        <div className="flex justify-between items-baseline font-bold">
-                                            <span className="text-foreground">(=) Pró-labore Líquido</span>
-                                            <span className="text-primary">{formatCurrencyBRL(partner.proLaboreLiquido)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
-            
             {advice && year === 2025 && (
                 <div className="mt-12 max-w-5xl mx-auto">
                     <Alert variant="default" className="bg-primary/5 border-primary/20">
@@ -599,54 +556,11 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </Alert>
                 </div>
             )}
-
-            {cheapestScenario && (
-                <div className="mt-12 max-w-4xl mx-auto">
-                    <Card className="shadow-lg border-2 border-primary/20">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-foreground text-center">Demonstrativo de Lucro (Cenário Recomendado)</CardTitle>
-                            <CardDescription className="text-center">
-                                Uma visão simplificada do resultado da sua empresa no cenário mais econômico.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-4 space-y-2 text-base">
-                            {(() => {
-                                const details = cheapestScenario;
-                                const totalProLaboreLiquido = details.partnerTaxes.reduce((sum, p) => sum + p.proLaboreLiquido, 0);
-                                const lucroDisponivel = details.totalRevenue - details.totalTax - totalProLaboreLiquido - details.contabilizeiFee;
-
-                                return (
-                                    <>
-                                        <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
-                                            <span className="text-muted-foreground">(+) Faturamento Mensal</span>
-                                            <span className="font-semibold text-foreground">{formatCurrencyBRL(details.totalRevenue)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
-                                            <span className="text-muted-foreground">(-) Total de Impostos e Encargos</span>
-                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(details.totalTax)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
-                                            <span className="text-muted-foreground">(-) Pró-labore (Líquido)</span>
-                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(totalProLaboreLiquido)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center p-2 rounded-md bg-muted/30">
-                                            <span className="text-muted-foreground">(-) Mensalidade Contabilizei</span>
-                                            <span className="font-semibold text-foreground">-{formatCurrencyBRL(details.contabilizeiFee)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center p-3 mt-2 border-t font-bold text-lg">
-                                            <span>(=) Lucro Disponível para Distribuição</span>
-                                            <span className="text-primary">{formatCurrencyBRL(lucroDisponivel)}</span>
-                                        </div>
-                                    </>
-                                );
-                            })()}
-                        </CardContent>
-                        <CardFooter className="p-4 pt-0">
-                            <p className="text-xs text-muted-foreground/80 text-center w-full">A distribuição de lucros é isenta de Imposto de Renda para o sócio (Lei 9.249/95 – Art.10).</p>
-                        </CardFooter>
-                    </Card>
-                </div>
+            
+            {year === 2025 && 'simplesNacionalBase' in results && (
+                <TaxAnalysisReport results={results} />
             )}
+            
       </div>
     );
   };
@@ -1162,4 +1076,3 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
-
