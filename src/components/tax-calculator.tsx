@@ -36,7 +36,6 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
-import RocSection from './roc-section';
 
 
 const fiscalConfig2025 = getFiscalParameters(2025);
@@ -1068,19 +1067,19 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {revenueGroups.length === 0 && <p className='text-base text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-6">
                         <div className='border-b pb-4'>
                             <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                                 <ListChecks className="h-5 w-5 text-primary" />
                                 3. Selecione o Plano Contabilizei
                             </h3>
-                            <p className='text-muted-foreground text-sm mt-1'>Qual plano de contabilidade melhor se encaixa no seu perfil?</p>
                         </div>
                        <FormField
                           control={form.control}
                           name="selectedPlan"
                           render={({ field }) => (
                               <FormItem className='pt-2'>
+                                   <FormLabel>Qual plano de contabilidade melhor se encaixa no seu perfil?</FormLabel>
                                   <FormControl>
                                       <RadioGroup
                                           onValueChange={field.onChange}
