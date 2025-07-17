@@ -1,10 +1,9 @@
 
 import { memo } from 'react';
 import { cn } from "@/lib/utils"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { TaxDetails } from "@/lib/types";
-import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
+import { formatCurrencyBRL } from "@/lib/utils";
 import { ChevronsDown, ChevronsUp, HandCoins } from 'lucide-react';
 
 const PartnerProfitCardComponent = ({ details, numPartners }: { details: TaxDetails, numPartners: number }) => {
@@ -34,18 +33,6 @@ const PartnerProfitCardComponent = ({ details, numPartners }: { details: TaxDeta
                         <span>{formatCurrencyBRL( (details.proLabore - totalDescontosProLabore) / numPartners)}</span>
                     </div>
                 </div>
-                {details.netProfit !== undefined && (
-                    <div className="space-y-1 pt-4 border-t">
-                            <div className='flex justify-between items-center'>
-                            <span className="text-muted-foreground">Lucro Líquido Empresa</span>
-                            <span className="font-medium">{formatCurrencyBRL(details.netProfit)}</span>
-                        </div>
-                        <div className='flex justify-between items-center font-bold text-green-700'>
-                            <span>Distribuição de Lucros</span>
-                            <span>{formatCurrencyBRL(details.netProfit)}</span>
-                        </div>
-                    </div>
-                )}
             </CardContent>
         </Card>
     );

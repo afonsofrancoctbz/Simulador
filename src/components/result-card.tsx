@@ -5,25 +5,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import type { TaxDetails } from "@/lib/types";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { Banknote, ChevronsDown, ChevronsUp, HandCoins } from 'lucide-react';
+import { Banknote } from 'lucide-react';
 
-const ResultCardComponent = ({ details, numPartners }: { details: TaxDetails, numPartners: number }) => {
+const ResultCardComponent = ({ details }: { details: TaxDetails }) => {
 
     const isLucroPresumido = details.regime.includes('Lucro Presumido');
 
-    // Separa os impostos por tipo para exibição em blocos distintos
     const faturamentoGeralTaxes = details.breakdown.filter(item => [
         'DAS (Guia Unificada)', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'
     ].some(tax => item.name.includes(tax)));
 
     const folhaTaxes = details.breakdown.filter(item => ['CPP (Encargos Patronais)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax)));
-
-    // Calcula os valores para o resumo dos sócios
-    const inssProLabore = details.breakdown.find(item => item.name.includes('INSS s/ Pró-labore'))?.value ?? 0;
-    const irrfProLabore = details.breakdown.find(item => item.name.includes('IRRF s/ Pró-labore'))?.value ?? 0;
-    const totalDescontosProLabore = inssProLabore + irrfProLabore;
-    const liquidoPorSocio = numPartners > 0 ? (details.proLabore - totalDescontosProLabore) / numPartners : 0;
-
+    
     const isCheapest = details.order === 1 && details.totalMonthlyCost > 0;
 
     return (
@@ -90,22 +83,6 @@ const ResultCardComponent = ({ details, numPartners }: { details: TaxDetails, nu
                     </div>
                 )}
                 
-                <div className="p-3 border rounded-md bg-background/80 space-y-1">
-                    <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Resumo para os Sócios</h4>
-                    <div className='flex justify-between items-center'>
-                        <span className="text-muted-foreground flex items-center gap-2"><HandCoins className='h-4 w-4'/>Pró-labore Bruto</span>
-                        <span className="font-medium">{formatCurrencyBRL(details.proLabore)}</span>
-                    </div>
-                    <div className='flex justify-between items-center text-destructive'>
-                        <span className="flex items-center gap-2"><ChevronsDown className='h-4 w-4'/>Total Descontos</span>
-                        <span className="font-medium">- {formatCurrencyBRL(totalDescontosProLabore)}</span>
-                    </div>
-                    <div className='flex justify-between items-center text-green-700 font-bold border-t mt-1.5 pt-1.5'>
-                        <span className="flex items-center gap-2"><ChevronsUp className='h-4 w-4'/>Líquido por Sócio</span>
-                        <span>{formatCurrencyBRL(liquidoPorSocio)}</span>
-                    </div>
-                </div>
-
                 {details.netProfit !== undefined && (
                     <div className="p-3 border rounded-md bg-background/80 space-y-1">
                         <h4 className="font-semibold uppercase tracking-wider text-muted-foreground text-xs mb-1.5">Demonstrativo de Lucro</h4>

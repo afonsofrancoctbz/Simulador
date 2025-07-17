@@ -36,6 +36,7 @@ import { Label } from './ui/label';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
+import { PartnerProfitCard } from './partner-profit-card';
 
 const fiscalConfig2025 = getFiscalParameters(2025);
 const MINIMUM_WAGE_2025 = fiscalConfig2025.salario_minimo;
@@ -168,7 +169,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   
   const revenueGroups = useMemo(() => {
     const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is CnaeData => !!c);
-    // Group by original Annex, not effective Annex after Fator R
     const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
     return annexes;
   }, [selectedCnaes]);
@@ -232,7 +232,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
   const handleCnaeConfirm = (codes: string[]) => {
     form.setValue('selectedCnaes', codes, { shouldValidate: true });
-    // Reset revenues when CNAEs change, preserving only those for still-selected annexes
     const newRevenues: Record<string, number | undefined> = {};
     const newAnnexes = new Set(codes.map(code => getCnaeData(code)?.annex).filter(Boolean));
     const currentRevenues = form.getValues('revenues');
@@ -261,10 +260,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     for (const key in values.revenues) {
         const revenue = values.revenues[key] || 0;
         if (revenue > 0) {
-            const [type, annex] = key.split('_'); // e.g. "domestic", "V"
+            const [type, annex] = key.split('_');
             const cnaesInGroup = cnaesByAnnex[annex] || [];
             if (cnaesInGroup.length > 0) {
-                const revenuePerCnae = revenue / cnaesInGroup.length; // Evenly distribute revenue
+                const revenuePerCnae = revenue / cnaesInGroup.length;
                 cnaesInGroup.forEach(code => {
                     const activity = { code, revenue: revenuePerCnae };
                     if (type === 'domestic') {
@@ -300,7 +299,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   }
 
   async function onSubmit(values: CalculatorFormValues) {
-    // Business rule: Do not serve Anexo I/II companies with projected revenue > 4.8M
     if ((values.rbt12 ?? 0) === 0) {
         let domestic = 0;
         let exportRaw = 0;
@@ -455,24 +453,15 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
+        const scenariosToShow : TaxDetails[] = [];
         
-        const scenariosToShow : (TaxDetails | TaxDetails2026)[] = [];
-
-        if (!isCommerceOnly) {
-             scenariosToShow.push(lucroPresumido);
-        }
-
+        if (!isCommerceOnly) scenariosToShow.push(lucroPresumido);
         scenariosToShow.push(simplesNacionalBase);
+        if (simplesNacionalOtimizado) scenariosToShow.push(simplesNacionalOtimizado);
         
-        if (simplesNacionalOtimizado) {
-            scenariosToShow.push(simplesNacionalOtimizado);
-        }
-        
-        scenarios = scenariosToShow.filter(Boolean); // Remove nulls
+        scenarios = scenariosToShow;
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
-        if (!isCommerceOnly) {
-          scenarios.push(results.lucroPresumido);
-        }
+        if (!isCommerceOnly) scenarios.push(results.lucroPresumido);
         scenarios.push(results.simplesNacionalTradicional, results.simplesNacionalHibrido);
     }
 
@@ -480,9 +469,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     
     const sortedForDisplay = [...scenarios].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
+    const cheapestScenario = scenarios.length > 0
+      ? scenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current))
+      : null;
+
     return (
         <div id="results-section" className="mt-16 w-full">
-             <div className="max-w-4xl mx-auto mb-12">
+            <div className="max-w-4xl mx-auto mb-12">
                 <div className="text-center mb-4">
                     <h3 className="font-semibold text-lg text-foreground flex items-center justify-center gap-2">
                         <ListChecks className="h-5 w-5 text-primary"/>
@@ -517,15 +510,20 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                 </p>
             </div>
 
-            <div className="flex flex-wrap justify-center items-stretch gap-8">
+            <div className="flex flex-wrap justify-center items-start gap-8">
                 {sortedForDisplay.map((scenario, index) => (
                      <ResultCard 
                         key={scenario.regime + index} 
                         details={scenario as TaxDetails} 
-                        numPartners={numPartners}
                     />
                 ))}
             </div>
+
+            {cheapestScenario && (
+                <div className="mt-12 max-w-sm mx-auto">
+                    <PartnerProfitCard details={cheapestScenario as TaxDetails} numPartners={numPartners} />
+                </div>
+            )}
 
             {advice && year === 2025 && (
                 <div className="mt-12 max-w-5xl mx-auto">
