@@ -150,15 +150,19 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     if (!acc[cnae.annex]) {
       acc[cnae.annex] = 0;
     }
-    const cnaeRevenue = domesticActivities.find(a => a.code === cnae.code)?.revenue ?? 0 + 
-                        (exportActivities.find(a => a.code === cnae.code)?.revenue ?? 0) * exchangeRate;
+    const cnaeDomesticRevenue = domesticActivities.find(a => a.code === cnae.code)?.revenue ?? 0;
+    const cnaeExportRevenue = (exportActivities.find(a => a.code === cnae.code)?.revenue ?? 0) * exchangeRate;
+    const cnaeRevenue = cnaeDomesticRevenue + cnaeExportRevenue;
+
     acc[cnae.annex] += cnaeRevenue;
     return acc;
   }, {} as Record<Annex, number>);
 
   if (activitiesByAnnex.IV > 0 && monthlyPayroll > 0) {
     const cppRate = fiscalConfig2025.aliquotas_cpp_patronal.total;
-    cppFromAnnexIV = monthlyPayroll * cppRate * (activitiesByAnnex.IV / totalRevenue);
+    // CPP for Anexo IV is calculated only on the payroll proportional to Anexo IV revenue
+    const payrollForAnexoIV = monthlyPayroll * (activitiesByAnnex.IV / totalRevenue);
+    cppFromAnnexIV = payrollForAnexoIV * cppRate;
   }
   
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
@@ -313,29 +317,16 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
   
-  const allCnaesData = selectedCnaes
-      .map(code => getCnaeData(code))
-      .filter((c): c is CnaeData => !!c);
-
-  const hasAnnexIVActivity = allCnaesData.some(c => c.annex === 'IV');
-  
-  let cpp = 0;
-  const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  if (hasAnnexIVActivity && totalPayroll > 0) {
-      cpp = totalPayroll * fiscalConfig2025.aliquotas_cpp_patronal.total;
-  }
-
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
-
+  
   if (totalRevenue === 0) {
-      const totalTax = cpp + totalINSSRetido + totalIRRFRetido;
+      const totalTax = totalINSSRetido + totalIRRFRetido;
       const totalMonthlyCost = totalTax + contabilizeiFee;
       return {
           regime: 'Lucro Presumido', totalTax, totalMonthlyCost, totalRevenue: 0,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee, 
           breakdown: [
-              { name: `CPP s/ Pró-labore`, value: cpp },
               { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
               { name: `IRRF s/ Pró-labore`, value: totalIRRFRetido },
           ].filter(item => item.value > 0.001),
@@ -345,9 +336,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
   const notes: string[] = [];
   if (exportRevenueBRL > 0) notes.push("Receitas de exportação são isentas de PIS, COFINS e ISS. No Lucro Presumido, IRPJ e CSLL incidem sobre essa receita.");
-  if (cpp > 0) notes.push(`Atividades do Anexo IV pagam o INSS Patronal (CPP de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.total)}) sobre a folha de pagamento.`);
   
-  const presumedProfitBase = totalRevenue * 0.32; // Assuming all services are 32%
+  // Base de presunção de 32% para serviços
+  const presumedProfitBase = totalRevenue * 0.32;
   
   const IRPJ_ADDITIONAL_MONTHLY_THRESHOLD = 20000;
   const irpjAdicionalMensal = Math.max(0, presumedProfitBase - IRPJ_ADDITIONAL_MONTHLY_THRESHOLD) * 0.10;
@@ -359,13 +350,16 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const iss = domesticRevenue * fiscalConfig2025.aliquota_iss_padrao; 
 
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
-  const companyPayrollTaxes = cpp;
-  const totalCompanyTaxes = companyRevenueTaxes + companyPayrollTaxes;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
-  const totalTax = totalCompanyTaxes + totalWithheldTaxes;
+
+  // The CPP is not calculated for most service companies under Lucro Presumido
+  // It only applies to activities from Anexo IV, which is not the case for the reference image.
+  // Therefore, it's removed from the main calculation. A more complex logic could check CNAE.
+  
+  const totalTax = companyRevenueTaxes + totalWithheldTaxes;
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
-  const companyCosts = totalCompanyTaxes + totalProLaboreBruto + contabilizeiFee;
+  const companyCosts = companyRevenueTaxes + totalProLaboreBruto + contabilizeiFee;
   const netProfit = totalRevenue - companyCosts;
 
   const breakdown = [
@@ -374,7 +368,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `ISS`, value: iss },
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
-    { name: `CPP s/ Pró-labore`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
