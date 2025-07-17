@@ -438,17 +438,15 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     if (isLoading) {
       return (
         <div id="results-section" className="mt-12 w-full">
-            <Card className='max-w-7xl mx-auto'>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2 mx-auto" />
-                    <Skeleton className="h-5 w-3/4 mx-auto mt-2" />
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                     <div className='space-y-4'><Skeleton className="h-40 w-full" /> <Skeleton className="h-20 w-full" /></div>
-                     <div className='space-y-4'><Skeleton className="h-40 w-full" /> <Skeleton className="h-20 w-full" /></div>
-                     <div className='space-y-4'><Skeleton className="h-40 w-full" /> <Skeleton className="h-20 w-full" /></div>
-                </CardContent>
-            </Card>
+            <div className="text-center mb-12">
+              <Skeleton className="h-10 w-1/2 mx-auto" />
+              <Skeleton className="h-5 w-3/4 mx-auto mt-4" />
+            </div>
+            <div className='max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-start'>
+                <Skeleton className="h-[450px] w-full rounded-xl" />
+                <Skeleton className="h-[450px] w-full rounded-xl" />
+                <Skeleton className="h-[450px] w-full rounded-xl" />
+            </div>
         </div>
       );
     }
@@ -457,19 +455,21 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       return null;
     }
 
-    const { selectedCnaes: selectedCnaesCodes } = form.getValues();
-
     let scenarios: (TaxDetails | TaxDetails2026)[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
         const scenariosToShow : TaxDetails[] = [];
         
         if (!isCommerceOnly) scenariosToShow.push(lucroPresumido);
-        scenariosToShow.push(simplesNacionalBase);
-        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
-            scenariosToShow.push(simplesNacionalOtimizado);
+
+        if (simplesNacionalBase.fatorR === undefined) {
+             scenariosToShow.push(simplesNacionalBase);
+        } else {
+            scenariosToShow.push(simplesNacionalOtimizado || simplesNacionalBase); // Show optimized if available
+            scenariosToShow.push(simplesNacionalBase); // Always show the non-optimized
         }
-        scenarios = scenariosToShow.filter(s => s.totalRevenue > 0 || s.proLabore > 0);
+        
+        scenarios = scenariosToShow.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
 
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
         if (!isCommerceOnly) scenarios.push(results.lucroPresumido);
@@ -478,10 +478,11 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     if (scenarios.length === 0) return null;
     
-    const sortedScenarios = [...scenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-
+    // Create a unique key for scenarios to prevent duplicates if base and optimized are identical
+    const uniqueScenarios = Array.from(new Map(scenarios.map(s => [s.regime + s.annex, s])).values());
+    const sortedScenarios = [...uniqueScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
     const cheapestScenario = sortedScenarios.length > 0 ? sortedScenarios[0] : null;
-    
+
     const groupTaxes = (details: TaxDetails) => {
       const groups: { [key: string]: { name: string, value: number }[] } = {
           "Impostos s/ Faturamento": [],
@@ -490,47 +491,19 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       };
 
       details.breakdown.forEach(item => {
-          if (['DAS', 'PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL'].some(tax => item.name.includes(tax))) {
+          if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].some(tax => item.name.split('(')[0].trim() === tax)) {
               groups["Impostos s/ Faturamento"].push(item);
-          } else if (['CPP', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(tax => item.name.includes(tax))) {
+          } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.split('(')[0].trim() === tax)) {
               groups["Encargos s/ Folha e Pró-labore"].push(item);
           }
       });
       groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
       return groups;
-  };
+    };
 
     return (
       <div id="results-section" className="mt-16 w-full space-y-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-4">
-            <h3 className="font-semibold text-lg text-foreground flex items-center justify-center gap-2">
-              <ListChecks className="h-5 w-5 text-primary" />
-              Resumo das Atividades Selecionadas
-            </h3>
-          </div>
-          <ul className="border rounded-lg p-3 bg-muted/20 divide-y divide-border/50">
-            {selectedCnaesCodes.map((code) => {
-              const cnae = getCnaeData(code);
-              if (!cnae) return null;
-              return (
-                <li key={code} className="flex flex-col sm:flex-row items-start justify-between gap-x-4 gap-y-1 py-2 first:pt-0 last:pb-0">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">{cnae.code}</p>
-                    <p className="text-muted-foreground text-sm">{cnae.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center">
-                    <Badge variant="secondary" className="text-xs">Anexo {cnae.annex}</Badge>
-                    {cnae.requiresFatorR && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Fator R</Badge>}
-                    {cnae.isRegulated && <Badge variant="outline" className="border-blue-500 text-blue-600 text-xs">Regulamentada</Badge>}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        
         <div>
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
@@ -539,37 +512,37 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </p>
           </div>
 
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            {scenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario, index) => {
-              const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && scenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-center items-stretch gap-6">
+            {uniqueScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
+              if (!scenario) return null;
+              const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && uniqueScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
               const groupedTaxes = groupTaxes(scenario as TaxDetails);
               const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
               return (
                 <div key={scenario.regime + (scenario.annex || '')}
                   className={cn(
-                    "border rounded-xl w-full flex flex-col transition-all duration-300",
-                    isRecommended ? "bg-card shadow-2xl border-primary/50" : "bg-card shadow-lg border-transparent"
+                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-lg",
+                    isRecommended ? "shadow-2xl border-primary/50" : "border-border"
                   )}
                 >
-                  <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden", isRecommended ? "bg-card" : "bg-card")}>
+                  <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
                     {isRecommended && (
-                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-4 py-1.5 shadow-lg flex items-center gap-1.5">
-                        <Trophy className="h-4 w-4" /> Recomendado
+                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-lg">
+                        Recomendado
                       </Badge>
                     )}
                     <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
                     {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                   </div>
 
-                  <Separator />
-
-                  <div className="p-4 flex-grow space-y-4">
+                  <div className="p-6 pt-4 flex-grow space-y-4">
                     {Object.entries(groupedTaxes).map(([groupName, items]) => {
-                       if (items.length === 0) return null;
+                       if (items.length === 0 || items.every(i => i.value === 0)) return null;
                        return (
                          <div key={groupName} className="space-y-2">
-                           <h4 className="font-semibold text-muted-foreground text-sm flex items-center gap-2">
+                            <Separator />
+                           <h4 className="font-semibold text-muted-foreground text-sm pt-2">
                              {groupName}
                            </h4>
                            {items.map(item => (
@@ -581,8 +554,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                          </div>
                        )
                     })}
-                    
-                     {scenario.fatorR !== undefined && (
+                  </div>
+                  
+                  <div className="p-6 pt-4 mt-auto space-y-4">
+                    {scenario.fatorR !== undefined && (
                       <div className={cn(
                         "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
                         scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
@@ -591,20 +566,19 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         <span>Fator R: {formatPercent(scenario.fatorR)}</span>
                       </div>
                     )}
-                  </div>
-                  
-                  <div className={cn("p-6 rounded-b-xl mt-auto", isRecommended ? 'bg-muted/30' : 'bg-muted/50')}>
-                    <div className="w-full space-y-2 text-center">
-                        <div className="flex justify-between items-baseline gap-2">
-                            <span className="text-sm font-medium text-foreground">Custo Total Mensal</span>
-                             <div className="text-2xl font-bold text-primary">
-                                {formatCurrencyBRL(scenario.totalMonthlyCost)}
-                            </div>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2.5">
-                            <div className={cn("h-2.5 rounded-full", isRecommended ? "bg-gradient-to-r from-primary to-accent" : "bg-primary/80")} style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
-                        </div>
-                        <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
+                    <div className={cn("p-4 rounded-b-lg", isRecommended ? 'bg-muted/30' : 'bg-muted/50')}>
+                      <div className="w-full space-y-2 text-center">
+                          <div className="flex justify-between items-baseline gap-2">
+                              <span className="text-sm font-medium text-foreground">Custo Total Mensal</span>
+                              <div className="text-2xl font-bold text-primary">
+                                  {formatCurrencyBRL(scenario.totalMonthlyCost)}
+                              </div>
+                          </div>
+                          <div className="w-full bg-muted rounded-full h-2">
+                              <div className={cn("h-2 rounded-full", isRecommended ? "bg-primary" : "bg-primary/80")} style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                          </div>
+                          <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -648,7 +622,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         <Card className="shadow-xl overflow-hidden border bg-card max-w-7xl mx-auto">
             <CardContent className="p-6 md:p-8 space-y-8">
                 
-                {/* Section 1: Company & Payroll */}
                 <Card className='border-none shadow-none'>
                     <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
@@ -826,7 +799,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </CardContent>
                 </Card>
 
-                {/* Section 2: Activities & Revenue */}
                  <Card className='border-none shadow-none'>
                     <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
                          <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
@@ -1068,7 +1040,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                     </CardContent>
                 </Card>
 
-                 {/* Section 3: Plan Selection */}
                 <Card className='border-none shadow-none'>
                     <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
                        <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
@@ -1164,3 +1135,4 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
+
