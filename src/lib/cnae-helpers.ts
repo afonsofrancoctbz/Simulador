@@ -1,5 +1,5 @@
 import { CNAE_DATA_RAW } from './cnaes-raw';
-import type { CnaeData, FeeBracket } from './types';
+import type { CnaeData, FeeBracket, Plan } from './types';
 
 // This file is for helper functions related to CNAEs.
 // The raw data is now in cnaes-raw.ts to keep this file cleaner.

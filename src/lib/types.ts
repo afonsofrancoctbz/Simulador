@@ -141,10 +141,7 @@ export interface FeeBracket {
     min: number;
     max: number;
     plans: {
-        basico: number;
-        padrao: number;
-        multibeneficios: number;
-        expertsEssencial: number;
+        [key in Plan]: number;
     }
 }
 
