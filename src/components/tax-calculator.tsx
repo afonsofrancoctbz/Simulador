@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useMemo, type ComponentType } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { z } from "zod";
@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CnaeSelector } from './cnae-selector';
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
@@ -188,7 +188,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
               variant: "default",
           });
       }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCommerceOnly, form]);
 
     const hasHealthOrVetCnae = useMemo(() => {
@@ -1127,5 +1126,3 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
-
-    
