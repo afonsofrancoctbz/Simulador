@@ -165,7 +165,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee,
           breakdown: [
               { name: `CPP (INSS Patronal - 20,00%)`, value: cppFromAnnexIV },
-              { name: `INSS s/ Pró-labore (11,00%)`, value: totalINSSRetido },
+              { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
               { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido }
           ].filter(i => i.value > 0.001),
           partnerTaxes, netProfit: -totalMonthlyCost, annex: hasAnexoIV ? 'Anexo IV' : 'N/A'
@@ -175,8 +175,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const notes: string[] = [];
   
   let totalDas = 0;
-  const SUBLIMIT_SIMPLES = 3600000;
-  const rbt12ExceededSublimit = effectiveRbt12 > SUBLIMIT_SIMPLES;
 
   if (hasAnexoIV && cppFromAnnexIV > 0) {
       notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
@@ -220,10 +218,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     }
   }
 
-  if (rbt12ExceededSublimit) {
-      notes.push(`Faturamento anual (${formatCurrencyBRL(effectiveRbt12)}) ultrapassou o sublimite de ${formatCurrencyBRL(SUBLIMIT_SIMPLES)}. ISS e/ou ICMS serão cobrados fora do DAS.`);
-  }
-
   const companyTaxes = totalDas + cppFromAnnexIV;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
   const totalTax = companyTaxes + totalWithheldTaxes;
@@ -250,7 +244,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const breakdown = [
     { name: `DAS (${formatPercent(effectiveDasRate)})`, value: totalDas },
     { name: `CPP (INSS Patronal - 20,00%)`, value: cppFromAnnexIV },
-    { name: `INSS s/ Pró-labore (11,00%)`, value: totalINSSRetido },
+    { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
@@ -289,8 +283,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
           regime: 'Lucro Presumido', totalTax, totalMonthlyCost, totalRevenue: 0,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee, 
           breakdown: [
-              { name: 'CPP (INSS Patronal - 20,00%)', value: cpp },
-              { name: `INSS s/ Pró-labore (11,00%)`, value: totalINSSRetido },
+              { name: `CPP (INSS Patronal - 20,00%)`, value: cpp },
+              { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
               { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
           ].filter(item => item.value > 0.001),
           partnerTaxes, netProfit: -totalMonthlyCost,
@@ -312,7 +306,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjBase = presumedProfitBase;
   const irpj = irpjBase * 0.15;
-  const additionalIrpj = Math.max(0, (irpjBase/3) - 20000) * 3 * 0.10; // Corrigido para mensal
+  const additionalIrpj = Math.max(0, (irpjBase/3) - 20000) * 3 * 0.10;
   const csll = presumedProfitBase * 0.09;
   
   const companyRevenueTaxes = irpj + additionalIrpj + csll + pis + cofins + iss;
@@ -329,8 +323,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `PIS (${formatPercent(pis / totalRevenue)})`, value: pis },
     { name: `COFINS (${formatPercent(cofins / totalRevenue)})`, value: cofins },
     { name: `ISS (${formatPercent(iss / totalRevenue)})`, value: iss },
-    { name: 'CPP (INSS Patronal - 20,00%)', value: cpp },
-    { name: `INSS s/ Pró-labore (11,00%)`, value: totalINSSRetido },
+    { name: `CPP (INSS Patronal - 20,00%)`, value: cpp },
+    { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
@@ -415,5 +409,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
-
-    
