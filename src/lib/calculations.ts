@@ -26,6 +26,12 @@ const fiscalConfig2025 = getFiscalParameters(2025) as FiscalConfig;
  * @returns The found bracket or the last bracket as a fallback.
  */
 function _findBracket<T extends { max: number }>(table: T[], value: number): T {
+  // Add a guard clause to prevent crash if table is undefined
+  if (!table) {
+    // This case should not happen with proper data, but it's a safe fallback.
+    // We return a structure that won't crash the next steps.
+    return { max: Infinity } as T;
+  }
   return table.find(bracket => value <= bracket.max) || table[table.length - 1];
 }
 
@@ -47,7 +53,7 @@ function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | und
  * @param config The fiscal configuration for the given year.
  * @returns An object containing an array of detailed partner taxes and the total INSS and IRRF withheld.
  */
-export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
+function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
 
@@ -88,7 +94,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
  * @param config The fiscal configuration.
  * @returns The calculated CPP value.
  */
-export function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
+function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
     return baseDeCalculo * config.aliquotas_cpp_patronal.base;
 }
 
@@ -104,7 +110,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, selectedPlan, selectedCnaes, fp12 } = values;
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+    const exportRevenue = exportActivities.reduce((sum, act) => act.revenue, 0) * exchangeRate;
     const totalRevenue = domesticRevenue + exportRevenue;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
@@ -143,7 +149,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
         const annexTable = fiscalConfig2025.simples_nacional[effectiveAnnex];
         
-        // FIX: Add a guard clause to prevent crash if annexTable is undefined
         if (!annexTable) {
             console.warn(`Tabela do anexo ${effectiveAnnex} não encontrada para o CNAE ${activity.code}. Pulando cálculo para esta atividade.`);
             continue;
