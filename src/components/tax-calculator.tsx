@@ -8,7 +8,7 @@ import { z } from "zod";
 import { BarChartBig, Rocket, Building2, Loader2, Lightbulb, TrendingUp, RefreshCw, Briefcase, PlusCircle, XCircle, Users, ListChecks, Percent, AlertTriangle, CheckCircle, Trophy, Info, DollarSign } from 'lucide-react';
 
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
-import { getCnaeData } from '@/lib/calculations';
+import { getCnaeData } from '@/lib/cnae-helpers';
 import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, TaxDetails, ProLaboreFormSchema, PlanEnumSchema } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatBRL, formatPercent } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
