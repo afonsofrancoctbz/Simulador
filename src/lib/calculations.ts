@@ -168,7 +168,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
   
-  if (totalRevenue === 0 && effectiveRbt12 === 0) {
+  if (totalRevenue === 0) {
       const totalTax = cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
       const totalMonthlyCost = totalTax + contabilizeiFee;
       return {
@@ -194,7 +194,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const rbt12ExceededSublimit = effectiveRbt12 > SUBLIMIT_SIMPLES;
 
   if (hasAnexoIV) {
-      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha de pagamento, fora do DAS.`);
+      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
   }
 
   const revenueByEffectiveAnnex = allActivities.reduce((acc, activity) => {
@@ -308,20 +308,27 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   
-  // CPP is always due on payroll for service companies in Lucro Presumido
-  const cpp = monthlyPayroll > 0 ? monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base : 0;
-
+  let cpp = 0;
+  // A CPP de 20% é devida para todas as atividades de serviço no Lucro Presumido, não apenas Anexo IV.
+  if (monthlyPayroll > 0) {
+      cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
+  }
+  
   if (totalRevenue === 0) {
       const totalTax = totalINSSRetido + totalIRRFRetido + cpp;
       const totalMonthlyCost = totalTax + contabilizeiFee;
+      const breakdown = [
+          { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
+          { name: `IRRF s/ Pró-labore`, value: totalIRRFRetido },
+      ];
+       // Adiciona CPP ao breakdown apenas se for aplicável
+       if (cpp > 0) {
+        breakdown.push({ name: 'CPP (INSS Patronal)', value: cpp });
+       }
       return {
           regime: 'Lucro Presumido', totalTax, totalMonthlyCost, totalRevenue: 0,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee, 
-          breakdown: [
-              // CPP is included in total but not shown in breakdown as per image
-              { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
-              { name: `IRRF s/ Pró-labore`, value: totalIRRFRetido },
-          ].filter(item => item.value > 0.001),
+          breakdown: breakdown.filter(item => item.value > 0.001),
           partnerTaxes, netProfit: -totalMonthlyCost,
       };
   }
@@ -338,32 +345,27 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const cnaeInfo = getCnaeData(activity.code);
     return sum + (activity.revenue * (cnaeInfo?.presumedProfitRate ?? 0.32));
   }, 0);
-
-  const IRPJ_ADDITIONAL_MONTHLY_THRESHOLD = 20000;
-  const irpjAdicionalMensal = Math.max(0, presumedProfitBase - IRPJ_ADDITIONAL_MONTHLY_THRESHOLD) * 0.10;
-  const irpj = (presumedProfitBase * 0.15) + irpjAdicionalMensal;
+  
+  // No Lucro Presumido, o IRPJ e CSLL são calculados sobre a base presumida.
+  const irpj = presumedProfitBase * 0.15;
   const csll = presumedProfitBase * 0.09;
   
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
 
-  // The final logic: CPP is calculated and added to totalTax, but not to the breakdown.
   const totalTax = companyRevenueTaxes + cpp + totalWithheldTaxes;
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
   const companyCosts = companyRevenueTaxes + cpp + totalProLaboreBruto + contabilizeiFee;
   const netProfit = totalRevenue - companyCosts;
-  
-  const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
-  const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
-  
+
   const breakdown = [
     { name: `IRPJ`, value: irpj },
     { name: `CSLL`, value: csll },
     { name: `PIS`, value: pis },
     { name: `COFINS`, value: cofins },
     { name: `ISS`, value: iss },
-    // { name: `CPP (INSS Patronal)`, value: cpp }, // Intentionally hidden from breakdown
+    // A CPP é parte do custo mas não aparece no breakdown, conforme a imagem de referência
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];

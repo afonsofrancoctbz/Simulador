@@ -476,23 +476,28 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     const cheapestScenario = validScenarios.length > 0 ? validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current)) : null;
 
     const groupTaxes = (details: TaxDetails) => {
-      const groups: { [key: string]: { name: string, value: number }[] } = {
-          "IMPOSTOS S/ FATURAMENTO": [],
-          "ENCARGOS S/ FOLHA E PRÓ-LABORE": [],
-          "OUTROS CUSTOS": []
-      };
+        const groups: { [key: string]: { name: string, value: number, rate?: number }[] } = {
+            "IMPOSTOS S/ FATURAMENTO": [],
+            "ENCARGOS S/ FOLHA E PRÓ-LABORE": [],
+            "OUTROS CUSTOS": []
+        };
+    
+        const revenue = details.totalRevenue > 0 ? details.totalRevenue : 1;
+    
+        details.breakdown.forEach(item => {
+            const taxName = item.name.split('(')[0].trim();
+            const rate = revenue > 0 ? (item.value / revenue) * 100 : 0;
+            const newItem = { ...item, rate };
 
-      details.breakdown.forEach(item => {
-        const taxName = item.name.split('(')[0].trim();
-        if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].includes(taxName)) {
-            groups["IMPOSTOS S/ FATURAMENTO"].push(item);
-        } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].includes(taxName)) {
-            groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(item);
-        }
-      });
-      groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
-
-      return groups;
+            if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].includes(taxName)) {
+                groups["IMPOSTOS S/ FATURAMENTO"].push(newItem);
+            } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].includes(taxName)) {
+                groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(newItem);
+            }
+        });
+        groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+    
+        return groups;
     };
     
     return (
@@ -506,7 +511,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
           </div>
 
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
-            {validScenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost).map((scenario) => {
+            {validScenarios.sort((a, b) => a.order! - b.order!).map((scenario) => {
               if (!scenario) return null;
               const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
               const groupedTaxes = groupTaxes(scenario);
@@ -539,12 +544,23 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                       {groupName}
                                   </h4>
                                   <div className="space-y-3">
-                                  {items.map(item => (
-                                      <div key={item.name} className="flex justify-between items-center text-base">
-                                          <span className="text-muted-foreground">{item.name}</span>
-                                          <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
-                                      </div>
-                                  ))}
+                                  {items.map(item => {
+                                      let displayName = item.name;
+                                      if (item.rate && item.name !== 'Mensalidade Contabilizei' && item.name !== 'IRRF s/ Pró-labore' && item.name !== 'INSS s/ Pró-labore' && item.name !== 'CPP (INSS Patronal)') {
+                                          displayName = `${item.name} (${item.rate.toFixed(2).replace('.', ',')}%)`;
+                                      } else if (item.name === 'INSS s/ Pró-labore') {
+                                           displayName = 'INSS s/ Pró-labore (11,00%)';
+                                      } else if (item.name === 'CPP (INSS Patronal)') {
+                                           displayName = 'CPP (INSS Patronal) (20,00%)';
+                                      }
+
+                                      return (
+                                        <div key={item.name} className="flex justify-between items-center text-base">
+                                            <span className="text-muted-foreground">{displayName}</span>
+                                            <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                                        </div>
+                                      )
+                                  })}
                                   </div>
                               </div>
                           )
