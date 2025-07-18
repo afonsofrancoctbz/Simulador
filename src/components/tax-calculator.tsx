@@ -482,16 +482,11 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             "Outros Custos": []
         };
     
-        const revenue = details.totalRevenue > 0 ? details.totalRevenue : 1;
-    
         details.breakdown.forEach(item => {
-            const taxName = item.name.split('(')[0].trim();
-            const newItem = { ...item };
-
-            if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].includes(taxName)) {
-                groups["Impostos s/ Faturamento"].push(newItem);
-            } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal - 20%)'].includes(taxName)) {
-                groups["Encargos s/ Folha e Pró-labore"].push(newItem);
+            if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].some(tax => item.name.includes(tax))) {
+                groups["Impostos s/ Faturamento"].push(item);
+            } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.includes(tax))) {
+                groups["Encargos s/ Folha e Pró-labore"].push(item);
             }
         });
         groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
@@ -533,20 +528,20 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                     </div>
 
-                    <div className="p-6 pt-0 flex-grow text-sm">
+                    <div className="p-6 pt-0 flex-grow text-base">
                         {Object.entries(groupedTaxes).map(([groupName, items]) => {
                           if (items.length === 0 || items.every(i => i.value === 0 && !i.name.includes("Mensalidade"))) return null;
                           return (
                               <div key={groupName} className="space-y-3">
-                                  <Separator className="my-3"/>
+                                  <Separator className="my-4"/>
                                   <h4 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
                                       {groupName}
                                   </h4>
                                   <div className="space-y-3">
                                   {items.map(item => (
-                                    <div key={item.name} className="flex justify-between items-center text-base">
+                                    <div key={item.name} className="flex justify-between items-center">
                                         <span className="text-muted-foreground">{item.name}</span>
-                                        <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                                        <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                     </div>
                                   ))}
                                   </div>

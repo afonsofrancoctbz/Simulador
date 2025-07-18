@@ -273,7 +273,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   
-  // CPP is always due for services in Lucro Presumido
   const cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
   
   if (totalRevenue === 0) {
@@ -412,3 +411,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
+    
