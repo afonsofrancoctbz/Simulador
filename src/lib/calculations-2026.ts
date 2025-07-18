@@ -1,4 +1,5 @@
-import { getFiscalParameters } from '@/config/fiscal';
+
+import { getFiscalParameters, type FiscalConfig, type FiscalConfig2026 } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -14,15 +15,11 @@ import { formatPercent } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 
-const fiscalConfig2026 = getFiscalParameters(2026);
-
-// --- UTILITY FUNCTIONS ---
+const fiscalConfig2026 = getFiscalParameters(2026) as FiscalConfig2026;
 
 function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
     return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
 }
-
-// --- CORE CALCULATION LOGIC FOR 2026 ---
 
 function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
@@ -70,10 +67,10 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
     contabilizeiFee: fee,
     breakdown: [
-        { name: `CBS (${formatPercent(cbs / totalRevenue)})`, value: cbs },
-        { name: `IBS (${formatPercent(ibs / totalRevenue)})`, value: ibs },
-        { name: `IRPJ (${formatPercent((irpj+irpjAdicional) / totalRevenue)})`, value: irpj + irpjAdicional },
-        { name: `CSLL (${formatPercent(csll / totalRevenue)})`, value: csll }, 
+        { name: `CBS (${formatPercent(totalRevenue > 0 ? cbs / totalRevenue : 0)})`, value: cbs },
+        { name: `IBS (${formatPercent(totalRevenue > 0 ? ibs / totalRevenue : 0)})`, value: ibs },
+        { name: `IRPJ (${formatPercent(totalRevenue > 0 ? (irpj+irpjAdicional) / totalRevenue : 0)})`, value: irpj + irpjAdicional },
+        { name: `CSLL (${formatPercent(totalRevenue > 0 ? csll / totalRevenue : 0)})`, value: csll }, 
         { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2026.aliquotas_cpp_patronal.base)})`, value: inssPatronal },
         { name: "INSS s/ Pró-labore (11,00%)", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
