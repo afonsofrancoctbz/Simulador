@@ -316,8 +316,9 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
       }
   }
 
+  // Set display order for the UI
   lucroPresumido.order = 3;
-  if(simplesNacionalOtimizado) {
+  if (simplesNacionalOtimizado) {
     simplesNacionalBase.order = 2;
     simplesNacionalOtimizado.order = 1;
   } else {
@@ -330,3 +331,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
+// Re-export for use in 2026 calculations
+export { _calculatePartnerTaxes, _calculateCpp };
