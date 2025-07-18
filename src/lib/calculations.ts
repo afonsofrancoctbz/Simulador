@@ -133,7 +133,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, monthlyPayroll: number): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, selectedPlan, selectedCnaes } = values;
+  const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, selectedPlan, selectedCnaes, fp12 } = values;
 
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
   const exportRevenue = exportActivities.reduce((sum, act) => act.revenue, 0) * exchangeRate;
@@ -146,8 +146,14 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
       .filter((c): c is CnaeData => !!c);
 
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+  const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
   
-  const fatorR = totalRevenue > 0 ? (monthlyPayroll / totalRevenue) : 0;
+  let fatorR = 0;
+  if(effectiveRbt12 > 0) {
+      fatorR = effectiveFp12 / effectiveRbt12;
+  } else if (totalRevenue > 0) {
+      fatorR = monthlyPayroll / totalRevenue;
+  }
 
   const hasAnnexVActivity = allCnaesData.some(a => a.requiresFatorR);
   const useAnnexIIIForV = hasAnnexVActivity && fatorR >= 0.28;
@@ -214,7 +220,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const bracketIndex = _findBracketIndex(annexTable, effectiveRbt12);
     const bracket = annexTable[bracketIndex];
     
-    const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12) : annexTable[0].rate;
+    let effectiveRate;
+    if (effectiveRbt12 > 0) {
+      effectiveRate = (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12;
+    } else {
+      effectiveRate = annexTable[0].rate;
+    }
     
     const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
     const isLastBracket = bracketIndex === annexTable.length - 1;
@@ -263,7 +274,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
   
   const breakdown = [
-    { name: `DAS (${formatPercent(effectiveDasRate)})`, value: totalDas },
+    { name: `DAS`, value: totalDas },
     { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV },
     { name: `ISS (Fora do DAS)`, value: totalIssSeparado },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
@@ -346,16 +357,13 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
   const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
-  const pisRate = domesticRevenue > 0 ? pis / domesticRevenue : 0;
-  const cofinsRate = domesticRevenue > 0 ? cofins / domesticRevenue : 0;
-  const issRate = domesticRevenue > 0 ? iss / domesticRevenue : 0;
 
   const breakdown = [
     { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj },
     { name: `CSLL (${formatPercent(csllRate)})`, value: csll },
-    { name: `PIS (${formatPercent(pisRate)})`, value: pis },
-    { name: `COFINS (${formatPercent(cofinsRate)})`, value: cofins },
-    { name: `ISS (${formatPercent(issRate)})`, value: iss },
+    { name: `PIS`, value: pis },
+    { name: `COFINS`, value: cofins },
+    { name: `ISS`, value: iss },
     { name: `CPP (INSS Patronal)`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
@@ -434,4 +442,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
 

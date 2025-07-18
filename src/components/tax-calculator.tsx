@@ -434,6 +434,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
   }
 
+    const parseTaxName = (name: string) => {
+        const match = name.match(/(.+) \((\d{1,2}(?:,\d{1,2})?%)\)/);
+        if (match) {
+            return { name: match[1], rate: match[2] };
+        }
+        return { name, rate: null };
+    };
+
   const renderResults = () => {
     if (isLoading) {
       return (
@@ -460,13 +468,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
         const scenariosToShow : TaxDetails[] = [];
         
-        if (!isCommerceOnly) scenariosToShow.push(lucroPresumido);
+        scenariosToShow.push(lucroPresumido);
 
         if (simplesNacionalBase.fatorR === undefined) {
              scenariosToShow.push(simplesNacionalBase);
         } else {
-            scenariosToShow.push(simplesNacionalOtimizado || simplesNacionalBase); // Show optimized if available
-            scenariosToShow.push(simplesNacionalBase); // Always show the non-optimized
+            scenariosToShow.push(simplesNacionalOtimizado || simplesNacionalBase);
+            scenariosToShow.push(simplesNacionalBase);
         }
         
         scenarios = scenariosToShow.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
@@ -478,7 +486,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     if (scenarios.length === 0) return null;
     
-    // Create a unique key for scenarios to prevent duplicates if base and optimized are identical
     const uniqueScenarios = Array.from(new Map(scenarios.map(s => [s.regime + s.annex, s])).values());
     const sortedScenarios = [...uniqueScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
     const cheapestScenario = sortedScenarios.length > 0 ? sortedScenarios[0] : null;
@@ -522,65 +529,68 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
               return (
                 <div key={scenario.regime + (scenario.annex || '')}
                   className={cn(
-                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-lg",
-                    isRecommended ? "shadow-2xl border-primary/50" : "border-border"
+                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm",
+                    isRecommended ? "shadow-lg border-primary/50" : "border-border"
                   )}
                 >
-                  <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
-                    {isRecommended && (
-                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-lg">
-                        Recomendado
-                      </Badge>
-                    )}
-                    <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
-                    {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
-                  </div>
-
-                  <div className="p-6 pt-4 flex-grow space-y-4">
-                    {Object.entries(groupedTaxes).map(([groupName, items]) => {
-                       if (items.length === 0 || items.every(i => i.value === 0)) return null;
-                       return (
-                         <div key={groupName} className="space-y-2">
-                            <Separator />
-                           <h4 className="font-semibold text-muted-foreground text-sm pt-2">
-                             {groupName}
-                           </h4>
-                           {items.map(item => (
-                             <div key={item.name} className="flex justify-between items-center text-sm pl-4">
-                               <span className="text-muted-foreground">{item.name}</span>
-                               <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
-                             </div>
-                           ))}
-                         </div>
-                       )
-                    })}
-                  </div>
-                  
-                  <div className="p-6 pt-4 mt-auto space-y-4">
-                    {scenario.fatorR !== undefined && (
-                      <div className={cn(
-                        "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
-                        scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
-                      )}>
-                        {scenario.fatorR >= 0.28 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                        <span>Fator R: {formatPercent(scenario.fatorR)}</span>
-                      </div>
-                    )}
-                    <div className={cn("p-4 rounded-b-lg", isRecommended ? 'bg-muted/30' : 'bg-muted/50')}>
-                      <div className="w-full space-y-2 text-center">
-                          <div className="flex justify-between items-baseline gap-2">
-                              <span className="text-sm font-medium text-foreground">Custo Total Mensal</span>
-                              <div className="text-2xl font-bold text-primary">
-                                  {formatCurrencyBRL(scenario.totalMonthlyCost)}
-                              </div>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-2">
-                              <div className={cn("h-2 rounded-full", isRecommended ? "bg-primary" : "bg-primary/80")} style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
-                          </div>
-                          <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
-                      </div>
+                    <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
+                        {isRecommended && (
+                        <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-md">
+                            Recomendado
+                        </Badge>
+                        )}
+                        <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
+                        {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                     </div>
-                  </div>
+
+                    <div className="p-6 pt-0 flex-grow space-y-4">
+                        {Object.entries(groupedTaxes).map(([groupName, items]) => {
+                        if (items.length === 0 || items.every(i => i.value === 0)) return null;
+                        return (
+                            <div key={groupName} className="space-y-3">
+                                <Separator />
+                                <h4 className="font-semibold text-muted-foreground text-sm pt-2">
+                                    {groupName}
+                                </h4>
+                                <div className="space-y-2">
+                                {items.map(item => {
+                                    const { name, rate } = parseTaxName(item.name);
+                                    return (
+                                        <div key={item.name} className="flex justify-between items-center text-sm pl-4">
+                                            <span className="text-muted-foreground">{name}</span>
+                                            <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                                        </div>
+                                    )
+                                })}
+                                </div>
+                            </div>
+                        )
+                        })}
+                    </div>
+                  
+                    <div className="p-6 pt-4 mt-auto space-y-4">
+                        {scenario.fatorR !== undefined && (
+                        <div className={cn(
+                            "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
+                            scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
+                        )}>
+                            {scenario.fatorR >= 0.28 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+                            <span>Fator R: {formatPercent(scenario.fatorR)}</span>
+                        </div>
+                        )}
+                        <div className={cn("p-4 rounded-lg bg-muted/30")}>
+                            <div className="w-full space-y-2 text-center">
+                                <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>
+                                <div className="text-2xl font-bold text-primary">
+                                    {formatCurrencyBRL(scenario.totalMonthlyCost)}
+                                </div>
+                                <div className="w-full bg-muted rounded-full h-2">
+                                    <div className="bg-gradient-to-r from-primary/70 to-accent h-2 rounded-full" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                                </div>
+                                <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
               )
             })}
@@ -1135,4 +1145,5 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
+
 
