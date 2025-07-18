@@ -260,11 +260,11 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
   const annexKeys = Object.keys(revenueByEffectiveAnnex) as Annex[];
   if (useAnnexIIIForV) {
+    regimeName = "Simples Nacional Anexo III";
     annexLabel = "Anexo III (Com Fator R)";
-    regimeName = "Simples Nacional Anexo III"
   } else if (hasAnnexVActivity) {
+    regimeName = "Simples Nacional Anexo V";
     annexLabel = "Anexo V (Sem Fator R)";
-    regimeName = "Simples Nacional Anexo V"
   } else if (annexKeys.length === 1) {
     annexLabel = `Anexo ${annexKeys[0]}`;
   } else if (annexKeys.length > 1) {
@@ -308,7 +308,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   
-  // A CPP de 20% incide sobre a folha para prestadores de serviço no Lucro Presumido.
+  // CPP is always due on payroll for service companies in Lucro Presumido
   const cpp = monthlyPayroll > 0 ? monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base : 0;
 
   if (totalRevenue === 0) {
@@ -355,13 +355,19 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
   const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
+  const pisRate = totalRevenue > 0 ? pis / totalRevenue : 0;
+  const cofinsRate = totalRevenue > 0 ? cofins / totalRevenue : 0;
+  const issRate = totalRevenue > 0 ? iss / totalRevenue : 0;
+  const cppRate = totalRevenue > 0 ? cpp / totalRevenue : 0;
+  const inssRetidoRate = totalRevenue > 0 ? totalINSSRetido / totalRevenue : 0;
+  const irrfRetidoRate = totalRevenue > 0 ? totalIRRFRetido / totalRevenue : 0;
   
   const breakdown = [
     { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj },
     { name: `CSLL (${formatPercent(csllRate)})`, value: csll },
-    { name: `PIS`, value: pis },
-    { name: `COFINS`, value: cofins },
-    { name: `ISS`, value: iss },
+    { name: `PIS (${formatPercent(pisRate)})`, value: pis },
+    { name: `COFINS (${formatPercent(cofinsRate)})`, value: cofins },
+    { name: `ISS (${formatPercent(issRate)})`, value: iss },
     { name: `CPP (INSS Patronal)`, value: cpp },
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
@@ -419,6 +425,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
                 optimizedMonthlyPayrollFull
               );
               if (simplesNacionalOtimizado) {
+                 simplesNacionalOtimizado.regime = "Simples Nacional Anexo III";
+                 simplesNacionalOtimizado.annex = "Anexo III (Com Fator R)";
                  simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para ${formatCurrencyBRL(requiredTotalProLabore)} para otimizar o Fator R.`
               }
           }

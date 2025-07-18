@@ -434,14 +434,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     }
   }
 
-    const parseTaxName = (name: string) => {
-        const match = name.match(/^(.*?) \((\d{1,2}(?:,\d{1,2})?%)\)$/);
-        if (match) {
-            return { name: match[1], rate: `(${match[2]})` };
-        }
-        return { name, rate: null };
-    };
-
   const renderResults = () => {
     if (isLoading) {
       return (
@@ -463,35 +455,25 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       return null;
     }
 
-    let scenarios: (TaxDetails | TaxDetails2026)[] = [];
+    let scenarios: TaxDetails[] = [];
     if (year === 2025 && 'simplesNacionalBase' in results) {
         const { simplesNacionalBase, simplesNacionalOtimizado, lucroPresumido } = results;
-        const scenariosToShow : TaxDetails[] = [];
         
-        scenariosToShow.push(lucroPresumido);
-
-        if (simplesNacionalBase.fatorR === undefined) {
-             scenariosToShow.push(simplesNacionalBase);
-        } else {
-            // Show the non-optimized one first, then the optimized one
-            scenariosToShow.push(simplesNacionalBase);
-            if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
-                scenariosToShow.push(simplesNacionalOtimizado);
-            }
+        scenarios.push(lucroPresumido);
+        scenarios.push(simplesNacionalBase);
+        
+        if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
+            scenarios.push(simplesNacionalOtimizado);
         }
-        
-        scenarios = scenariosToShow.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
-
     } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
-        if (!isCommerceOnly) scenarios.push(results.lucroPresumido);
-        scenarios.push(results.simplesNacionalTradicional, results.simplesNacionalHibrido);
+        if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
+        scenarios.push(results.simplesNacionalTradicional as TaxDetails, results.simplesNacionalHibrido as TaxDetails);
     }
 
     if (scenarios.length === 0) return null;
     
-    const uniqueScenarios = Array.from(new Map(scenarios.map(s => [s.regime, s])).values());
-    const sortedScenarios = [...uniqueScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-    const cheapestScenario = sortedScenarios.length > 0 ? sortedScenarios[0] : null;
+    const validScenarios = scenarios.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
+    const cheapestScenario = validScenarios.length > 0 ? validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current)) : null;
 
     const groupTaxes = (details: TaxDetails) => {
       const groups: { [key: string]: { name: string, value: number }[] } = {
@@ -512,6 +494,14 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
       return groups;
     };
+    
+    const parseTaxName = (name: string) => {
+        const match = name.match(/^(.*?) \((\d{1,2}(?:,\d{1,2})?%)\)$/);
+        if (match) {
+            return { name: match[1], rate: `(${match[2]})` };
+        }
+        return { name, rate: null };
+    };
 
     return (
       <div id="results-section" className="mt-16 w-full space-y-12">
@@ -523,18 +513,15 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </p>
           </div>
 
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-center items-stretch gap-8">
-            {uniqueScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
+            {validScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
               if (!scenario) return null;
-              const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && uniqueScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
-              const groupedTaxes = groupTaxes(scenario as TaxDetails);
+              const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+              const groupedTaxes = groupTaxes(scenario);
               const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
               
-              const inssSocioItem = scenario.breakdown.find(item => item.name.startsWith('INSS s/ Pró-labore'));
-              const inssSocioRate = inssSocioItem && scenario.proLabore > 0 ? (inssSocioItem.value / scenario.proLabore) : fiscalConfig.aliquota_inss_prolabore;
-
               return (
-                <div key={scenario.regime}
+                <div key={scenario.regime + (scenario.annex || '')}
                   className={cn(
                     "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300",
                     isRecommended ? "shadow-lg border-primary" : "shadow-sm border-border"
@@ -550,29 +537,21 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                     </div>
 
-                    <div className="p-6 pt-0 flex-grow space-y-1 text-base">
+                    <div className="p-6 pt-0 flex-grow space-y-1 text-sm">
                         {Object.entries(groupedTaxes).map(([groupName, items]) => {
                           if (items.length === 0 || items.every(i => i.value === 0 && !i.name.includes("Mensalidade"))) return null;
                           return (
                               <div key={groupName} className="space-y-3">
                                   <Separator className="my-3"/>
-                                  <h4 className="font-semibold text-muted-foreground text-sm">
+                                  <h4 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
                                       {groupName}
                                   </h4>
                                   <div className="space-y-3">
                                   {items.map(item => {
                                       const { name, rate } = parseTaxName(item.name);
-                                      let finalRate = rate;
-
-                                      if (item.name.startsWith("CPP")) {
-                                        finalRate = `(${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`;
-                                      } else if (item.name.startsWith("INSS s/ Pró-labore")) {
-                                        finalRate = `(${formatPercent(inssSocioRate)})`;
-                                      }
-
                                       return (
-                                          <div key={item.name} className="flex justify-between items-center text-sm">
-                                              <span className="text-muted-foreground">{name} {finalRate}</span>
+                                          <div key={item.name} className="flex justify-between items-center text-base">
+                                              <span className="text-muted-foreground">{name}</span>
                                               <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
                                           </div>
                                       )
@@ -617,7 +596,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             <Alert variant="default" className="bg-primary/5 border-primary/20">
               <Lightbulb className="h-5 w-5 text-primary" />
               <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
-              <AlertDescription className="text-sm text-foreground/90">
+              <AlertDescription className="text-base text-foreground/90 leading-relaxed">
                 {isAdviceLoading ? (
                   <div className="space-y-1.5 pt-1">
                     <Skeleton className="h-4 w-full" />
