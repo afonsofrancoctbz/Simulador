@@ -45,7 +45,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
     return sum + (activity.revenue * (cnaeInfo?.presumedProfitRate ?? 0.32));
   }, 0);
 
-  const irpj = presumedProfitBase * 0.15 + Math.max(0, presumedProfitBase - 20000) * 0.10;
+  const irpj = presumedProfitBase * 0.15 + Math.max(0, (presumedProfitBase/3) - 20000) * 3 * 0.10;
   const csll = presumedProfitBase * 0.09;
   
   const totalIva = domesticActivities.reduce((sum, activity) => {
@@ -226,3 +226,5 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+    

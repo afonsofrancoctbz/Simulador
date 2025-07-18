@@ -204,13 +204,13 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const bracket = _findBracket(annexTable, effectiveRbt12);
     
     const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
-    const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-
+    
     if (annexInfo.domestic > 0) {
       totalDas += annexInfo.domestic * effectiveRate;
     }
     
     if (annexInfo.export > 0) {
+      const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
       const exportExemptionFactor = PIS + COFINS + ISS + IPI + ICMS;
       const exportDasRate = effectiveRate * (1 - exportExemptionFactor);
       totalDas += annexInfo.export * exportDasRate;
@@ -312,7 +312,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjBase = presumedProfitBase;
   const irpj = irpjBase * 0.15;
-  const additionalIrpj = Math.max(0, irpjBase - 20000) * 0.10; // Adicional sobre o que excede 20k/mês
+  const additionalIrpj = Math.max(0, (irpjBase/3) - 20000) * 3 * 0.10; // Corrigido para mensal
   const csll = presumedProfitBase * 0.09;
   
   const companyRevenueTaxes = irpj + additionalIrpj + csll + pis + cofins + iss;
@@ -415,3 +415,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
+    
