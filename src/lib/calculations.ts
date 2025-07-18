@@ -1,4 +1,3 @@
-
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -95,7 +94,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const fatorR = totalRevenue > 0 ? monthlyPayroll / totalRevenue : (effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0);
 
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-    const useAnnexIIIForV = hasAnnexVActivity && fatorR >= 0.28;
+    const useAnnexIIIForV = hasAnnexVActivity && fatorR >= fiscalConfig2025.simples_nacional.limite_fator_r;
 
     const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
@@ -116,7 +115,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) continue;
 
-        const effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
+        const effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2025.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
         finalAnnexes.add(effectiveAnnex);
         
         if (effectiveAnnex === 'IV') {
@@ -255,10 +254,10 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
   const fatorRBase = simplesNacionalBase.fatorR;
 
-  if (hasAnnexVActivity && fatorRBase !== undefined && fatorRBase < 0.28) {
+  if (hasAnnexVActivity && fatorRBase !== undefined && fatorRBase < fiscalConfig2025.simples_nacional.limite_fator_r) {
       const totalRevenue = simplesNacionalBase.totalRevenue;
       if (totalRevenue > 0) {
-          const requiredPayrollForFatorR = totalRevenue * 0.28;
+          const requiredPayrollForFatorR = totalRevenue * fiscalConfig2025.simples_nacional.limite_fator_r;
           let requiredTotalProLabore = requiredPayrollForFatorR - values.totalSalaryExpense;
 
           const minProLaboreTotal = fiscalConfig2025.salario_minimo * values.numberOfPartners;

@@ -1,4 +1,3 @@
-
 import { getFiscalParameters } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -133,7 +132,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     const revenueByAnnex = allActivities.reduce((acc, activity) => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return acc;
-        let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
+        let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
         if (!acc[effectiveAnnex]) acc[effectiveAnnex] = 0;
         acc[effectiveAnnex] += activity.revenue;
         return acc;
@@ -175,7 +174,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
           const cnaeInfo = getCnaeData(activity.code);
           if (!cnaeInfo) return sum;
   
-          let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
+          let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
           const annexTable = fiscalConfig2026.simples_nacional[effectiveAnnex];
           const bracket = _findBracket(annexTable, effectiveRbt12);
           const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;

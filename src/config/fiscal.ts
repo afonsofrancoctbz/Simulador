@@ -37,6 +37,7 @@ export const FISCAL_CONFIG_2025 = {
     { min: 4664.69, max: Infinity, rate: 0.275, deduction: 896.00 },
   ],
   simples_nacional: {
+    limite_fator_r: 0.28,
     anexoI: [
         { min: 0, max: 180000, rate: 0.04, deduction: 0, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.415, ICMS: 0.34 } },
         { min: 180000.01, max: 360000, rate: 0.073, deduction: 5940, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.415, ICMS: 0.34 } },
