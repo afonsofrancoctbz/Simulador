@@ -16,7 +16,7 @@ import {
 import { formatPercent } from './utils';
 import { getCnaeData } from './cnae-helpers';
 
-const fiscalConfig2025 = getFiscalParameters(2025);
+const fiscalConfig2025 = getFiscalParameters(2025) as FiscalConfig;
 
 /**
  * Finds the correct bracket from a given table based on a value.
@@ -142,6 +142,13 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         }
 
         const annexTable = fiscalConfig2025.simples_nacional[effectiveAnnex];
+        
+        // FIX: Add a guard clause to prevent crash if annexTable is undefined
+        if (!annexTable) {
+            console.warn(`Tabela do anexo ${effectiveAnnex} não encontrada para o CNAE ${activity.code}. Pulando cálculo para esta atividade.`);
+            continue;
+        }
+
         const bracket = _findBracket(annexTable, effectiveRbt12);
         
         const effectiveRate = effectiveRbt12 > 0 
