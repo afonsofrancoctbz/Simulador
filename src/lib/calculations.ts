@@ -317,12 +317,15 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const netProfit = totalRevenue - totalMonthlyCost;
 
+  const irpjRate = totalRevenue > 0 ? (irpj + additionalIrpj) / totalRevenue : 0;
+  const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
+  
   const breakdown = [
-    { name: `IRPJ (${formatPercent((irpj + additionalIrpj) / totalRevenue)})`, value: irpj + additionalIrpj },
-    { name: `CSLL (${formatPercent(csll / totalRevenue)})`, value: csll },
-    { name: `PIS (${formatPercent(pis / totalRevenue)})`, value: pis },
-    { name: `COFINS (${formatPercent(cofins / totalRevenue)})`, value: cofins },
-    { name: `ISS (${formatPercent(iss / totalRevenue)})`, value: iss },
+    { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj + additionalIrpj },
+    { name: `CSLL (${formatPercent(csllRate)})`, value: csll },
+    { name: `PIS (${formatPercent(totalRevenue > 0 ? pis / totalRevenue : 0)})`, value: pis },
+    { name: `COFINS (${formatPercent(totalRevenue > 0 ? cofins / totalRevenue : 0)})`, value: cofins },
+    { name: `ISS (${formatPercent(totalRevenue > 0 ? iss / totalRevenue : 0)})`, value: iss },
     { name: `CPP (INSS Patronal - 20,00%)`, value: cpp },
     { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
