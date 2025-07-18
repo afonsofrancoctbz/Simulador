@@ -21,6 +21,10 @@ function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | und
     return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
 }
 
+function _findBracket<T extends { max: number }>(table: T[], value: number): T {
+    return table.find(bracket => value <= bracket.max) || table[table.length - 1];
+}
+
 function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
   const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
@@ -30,7 +34,9 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const totalRevenue = domesticRevenue + exportRevenueBRL;
   const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
+  // Uses the centralized function from calculations.ts
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2026);
+  // Uses the centralized function from calculations.ts
   const inssPatronal = _calculateCpp(monthlyPayroll, fiscalConfig2026);
 
   let presumedProfitBase = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))].reduce((sum, activity) => {
@@ -80,15 +86,13 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   };
 }
 
-function _findBracket<T extends { max: number }>(table: T[], value: number): T {
-    return table.find(bracket => value <= bracket.max) || table[table.length - 1];
-}
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0, rbt12, selectedPlan, fp12 } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
 
+    // Uses the centralized function from calculations.ts
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2026);
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
