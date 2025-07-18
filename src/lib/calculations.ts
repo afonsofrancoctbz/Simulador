@@ -123,16 +123,25 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const }))
     ];
 
+    let hasAnnexIVActivity = false;
+
     for (const activity of allActivities) {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) continue;
 
         const effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
         finalAnnexes.add(effectiveAnnex);
+        
+        if (effectiveAnnex === 'IV') {
+            hasAnnexIVActivity = true;
+        }
 
         const annexTable = fiscalConfig2025.simples_nacional[effectiveAnnex];
         const bracket = _findBracket(annexTable, effectiveRbt12);
-        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
+        
+        const effectiveRate = effectiveRbt12 > 0 
+            ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12) 
+            : bracket.rate;
 
         let dasForActivity = 0;
         if (activity.type === 'export') {
@@ -147,13 +156,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
             dasForActivity = activity.revenue * effectiveRate;
         }
         totalDas += dasForActivity;
+    }
 
-        // VERIFICAÇÃO CRÍTICA: Aplica a CPP apenas e somente se o anexo for IV.
-        if (effectiveAnnex === 'IV') {
-            cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig2025);
-            if (!notes.some(n => n.includes('Anexo IV'))) {
-                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
-            }
+    if (hasAnnexIVActivity) {
+        cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig2025);
+        if (!notes.some(n => n.includes('Anexo IV'))) {
+            notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
         }
     }
 
