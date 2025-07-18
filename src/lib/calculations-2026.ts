@@ -10,8 +10,6 @@ import {
   type TaxFormValues,
   type TaxDetails2026,
   type Annex,
-  type PartnerTaxDetails,
-  type ProLaboreForm,
 } from './types';
 import { formatCurrencyBRL, formatPercent } from './utils';
 import { _findBracket, _findFeeBracket, getCnaeData, _calculatePartnerTaxes } from './calculations';
@@ -40,7 +38,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-  const inssPatronal = totalPayroll > 0 ? totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base : 0;
+  const inssPatronal = totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base;
 
   let presumedProfitBase = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))].reduce((sum, activity) => {
     const cnaeInfo = getCnaeData(activity.code);
@@ -50,8 +48,6 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const irpj = presumedProfitBase * 0.15 + Math.max(0, presumedProfitBase - 20000) * 0.10;
   const csll = presumedProfitBase * 0.09;
   
-  // Reforma Tributária: PIS/COFINS -> CBS, ISS -> IBS
-  // Calculate total IVA considering reductions for each activity
   const totalIva = domesticActivities.reduce((sum, activity) => {
     const cnaeInfo = getCnaeData(activity.code);
     const reduction = cnaeInfo?.ivaReduction ?? 0;
@@ -59,10 +55,8 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
     return sum + (activity.revenue * effectiveIvaRate);
   }, 0);
 
-  // Split total IVA proportionally between CBS and IBS
   const cbs = IVA_RATE > 0 ? totalIva * (CBS_RATE / IVA_RATE) : 0;
   const ibs = IVA_RATE > 0 ? totalIva * (IBS_RATE / IVA_RATE) : 0;
-
 
   const companyRevenueTaxes = irpj + csll + cbs + ibs;
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
@@ -79,10 +73,12 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
     effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
     contabilizeiFee: fee,
     breakdown: [
-        { name: "CBS", value: cbs }, { name: "IBS", value: ibs },
-        { name: "IRPJ", value: irpj }, { name: "CSLL", value: csll }, 
-        { name: "CPP (INSS Patronal - 20%)", value: inssPatronal },
-        { name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido },
+        { name: `CBS (${formatPercent(cbs / totalRevenue)})`, value: cbs },
+        { name: `IBS (${formatPercent(ibs / totalRevenue)})`, value: ibs },
+        { name: `IRPJ (${formatPercent(irpj / totalRevenue)})`, value: irpj },
+        { name: `CSLL (${formatPercent(csll / totalRevenue)})`, value: csll }, 
+        { name: "CPP (INSS Patronal - 20,00%)", value: inssPatronal },
+        { name: "INSS s/ Pró-labore (11,00%)", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
     ].filter(i => i.value > 0.001),
     notes: ["No cenário de 2026, PIS/COFINS e ISS são substituídos por CBS e IBS. IRPJ, CSLL e encargos sobre a folha permanecem."],
@@ -93,6 +89,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 0, rbt12, selectedPlan } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
+    const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
 
@@ -105,7 +102,6 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     if (totalRevenue === 0 && effectiveRbt12 === 0) {
-      // Handle zero revenue case
       return {
         regime: isHybrid ? 'Simples Nacional Híbrido' : 'Simples Nacional Tradicional',
         totalTax: totalINSSRetido + totalIRRFRetido,
@@ -115,7 +111,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
         effectiveRate: 0,
         contabilizeiFee: fee,
         breakdown: [
-          { name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido },
+          { name: "INSS s/ Pró-labore (11,00%)", value: totalINSSRetido },
           { name: "IRRF s/ Pró-labore", value: totalIRRFRetido }
         ].filter(i => i.value > 0.001),
         partnerTaxes
@@ -123,8 +119,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     }
 
     const allActivities = [...domesticActivities, ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate }))];
-    const totalPayrollForFatorR = totalSalaryExpense + totalProLaboreBruto;
-    const fatorR = totalRevenue > 0 ? totalPayrollForFatorR / totalRevenue : 0;
+    const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : 0;
     
     let totalDas = 0;
     let cppFromAnnexIV = 0;
@@ -149,13 +144,13 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
         totalDas += annexRevenue * effectiveRate;
 
         if (annex === 'IV') {
-            const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
-            cppFromAnnexIV += (totalSalaryExpense + totalProLaboreBruto) * cppRate * (annexRevenue / totalRevenue);
+            cppFromAnnexIV += totalPayroll * fiscalConfig.aliquotas_cpp_patronal.base;
         }
     }
 
     if (isHybrid) {
-      // 1. Calculate the IVA that will be paid "por fora"
+      const b2bRevenue = domesticRevenue * (b2bRevenuePercentage / 100);
+      
       const totalIvaPorFora = domesticActivities.reduce((sum, activity) => {
           const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
           const cnaeInfo = getCnaeData(activity.code);
@@ -166,7 +161,6 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
       
       ivaTaxes = totalIvaPorFora;
   
-      // 2. Calculate how much the DAS should be reduced
       const dasReduction = domesticActivities.reduce((sum, activity) => {
           const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
           const cnaeInfo = getCnaeData(activity.code);
@@ -192,8 +186,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     const breakdown = [
         { name: 'DAS (Simples Nacional)', value: totalDas },
         { name: 'IVA (CBS+IBS) fora do DAS', value: ivaTaxes },
-        { name: "CPP (INSS Patronal - 20%)", value: cppFromAnnexIV },
-        { name: "INSS s/ Pró-labore (11%)", value: totalINSSRetido },
+        { name: "CPP (INSS Patronal - 20,00%)", value: cppFromAnnexIV },
+        { name: "INSS s/ Pró-labore (11,00%)", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido }
     ];
 
@@ -202,6 +196,9 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
       notes.push(`Neste cenário, ${formatPercent(b2bRevenuePercentage/100)} do faturamento (B2B) paga IVA fora do DAS. A alíquota do IVA pode ser reduzida dependendo da sua atividade.`);
     } else {
       notes.push("Regime padrão do Simples Nacional. O crédito de IVA gerado para clientes B2B é limitado à alíquota do DAS.");
+    }
+    if (cppFromAnnexIV > 0) {
+      notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
     }
 
     return {
