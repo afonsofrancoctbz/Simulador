@@ -1,0 +1,207 @@
+
+"use client";
+
+import { Lightbulb, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
+import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from './ui/separator';
+import { Badge } from './ui/badge';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
+import { PartnerDetailsCard } from './partner-details-card';
+import { ProfitStatementCard } from './profit-statement-card';
+
+interface TaxResultsProps {
+  year: 2025 | 2026;
+  isLoading: boolean;
+  isAdviceLoading: boolean;
+  results: CalculationResults | CalculationResults2026 | null;
+  advice: string | null;
+  error: string | null;
+}
+
+export default function TaxResults({ year, isLoading, isAdviceLoading, results, advice, error }: TaxResultsProps) {
+  if (isLoading) {
+    return (
+      <div id="results-section" className="mt-12 w-full">
+        <div className="text-center mb-12">
+          <Skeleton className="h-10 w-1/2 mx-auto" />
+          <Skeleton className="h-5 w-3/4 mx-auto mt-4" />
+        </div>
+        <div className='max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8'>
+          <Skeleton className="h-[450px] w-full max-w-sm rounded-xl" />
+          <Skeleton className="h-[450px] w-full max-w-sm rounded-xl" />
+          <Skeleton className="h-[450px] w-full max-w-sm rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div id="results-section" className="mt-12 max-w-5xl mx-auto">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-5 w-5" />
+          <AlertTitle>Erro no Cálculo</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!results) {
+    return null;
+  }
+
+  let scenarios: TaxDetails[] = [];
+  if (year === 2025 && 'simplesNacionalBase' in results) {
+    scenarios.push(results.lucroPresumido);
+    scenarios.push(results.simplesNacionalBase);
+    if (results.simplesNacionalOtimizado) {
+      scenarios.push(results.simplesNacionalOtimizado);
+    }
+  } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
+    const isCommerceOnly = results.lucroPresumido.breakdown.length === 0 && results.lucroPresumido.totalRevenue > 0;
+    if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
+    scenarios.push(results.simplesNacionalTradicional as TaxDetails, results.simplesNacionalHibrido as TaxDetails);
+  }
+
+  if (scenarios.length === 0) return null;
+    
+  const validScenarios = scenarios.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
+  const cheapestScenario = validScenarios.length > 0 ? validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current)) : null;
+
+  const groupTaxes = (details: TaxDetails) => {
+    const groups: { [key: string]: { name: string, value: number, rate?: number }[] } = {
+      "Impostos s/ Faturamento": [],
+      "Encargos s/ Folha e Pró-labore": [],
+      "Outros Custos": []
+    };
+
+    details.breakdown.forEach(item => {
+      if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].some(tax => item.name.includes(tax))) {
+        groups["Impostos s/ Faturamento"].push(item);
+      } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.includes(tax))) {
+        groups["Encargos s/ Folha e Pró-labore"].push(item);
+      }
+    });
+    groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+
+    return groups;
+  };
+    
+  return (
+    <div id="results-section" className="mt-16 w-full space-y-12">
+      <div>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
+          <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
+            Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
+          </p>
+        </div>
+
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
+          {validScenarios.sort((a, b) => a.order! - b.order!).map((scenario) => {
+            if (!scenario) return null;
+            const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+            const groupedTaxes = groupTaxes(scenario);
+            const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
+            
+            return (
+              <div key={scenario.regime + (scenario.annex || '')}
+                className={cn(
+                  "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm",
+                  isRecommended ? "border-primary shadow-lg" : "border-border"
+                )}
+              >
+                  <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
+                      {isRecommended && (
+                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-md">
+                          Recomendado
+                      </Badge>
+                      )}
+                      <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
+                      {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
+                  </div>
+
+                  <div className="p-6 pt-0 flex-grow text-base">
+                      {Object.entries(groupedTaxes).map(([groupName, items]) => {
+                        if (items.length === 0 || items.every(i => i.value === 0 && !i.name.includes("Mensalidade"))) return null;
+                        return (
+                            <div key={groupName} className="space-y-3">
+                                <Separator className="my-4"/>
+                                <h4 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+                                    {groupName}
+                                </h4>
+                                <div className="space-y-3">
+                                {items.map(item => (
+                                  <div key={item.name} className="flex justify-between items-center">
+                                      <span className="text-muted-foreground">{item.name}</span>
+                                      <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                  </div>
+                                ))}
+                                </div>
+                            </div>
+                        )
+                      })}
+                  </div>
+                
+                  <div className="p-6 mt-auto space-y-4">
+                      {scenario.fatorR !== undefined && (
+                      <div className={cn(
+                          "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
+                          scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
+                      )}>
+                          {scenario.fatorR >= 0.28 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+                          <span>Fator R: {formatPercent(scenario.fatorR)}</span>
+                      </div>
+                      )}
+                      <div className={cn("p-4 rounded-lg bg-muted/30")}>
+                          <div className="w-full space-y-2 text-center">
+                              <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>
+                              <div className="text-3xl font-bold text-primary">
+                                  {formatCurrencyBRL(scenario.totalMonthlyCost)}
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-2.5 mt-2">
+                                  <div className="bg-gradient-to-r from-primary/70 to-primary h-2.5 rounded-full" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                              </div>
+                              <p className='text-sm text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {advice && year === 2025 && (
+        <div className="mt-12 max-w-5xl mx-auto">
+          <Alert variant="default" className="bg-primary/5 border-primary/20">
+            <Lightbulb className="h-5 w-5 text-primary" />
+            <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
+            <AlertDescription className="text-base text-foreground/90 leading-relaxed">
+              {isAdviceLoading ? (
+                <div className="space-y-1.5 pt-1 flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin"/>
+                  <span>Analisando o melhor cenário...</span>
+                </div>
+              ) : (
+                advice
+              )}
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
+      {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
+        <>
+          <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
+          <ProfitStatementCard details={cheapestScenario as TaxDetails} />
+        </>
+      )}
+    </div>
+  );
+};
