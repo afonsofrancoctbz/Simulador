@@ -1,9 +1,10 @@
+
 "use client"
 
 import * as React from "react"
 import { Check, Search, PlusCircle, XCircle } from "lucide-react"
 
-import { CNAE_DATA } from "@/lib/cnaes"
+import { CNAE_DATA_RAW as CNAE_DATA } from "@/lib/cnaes-raw"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {

@@ -3,7 +3,7 @@ import { getFiscalParameters, type FiscalConfig, type FiscalConfig2026 } from '@
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
-} from './constants';
+} from './cnae-helpers';
 import {
   type CalculationResults2026,
   type TaxFormValues,
