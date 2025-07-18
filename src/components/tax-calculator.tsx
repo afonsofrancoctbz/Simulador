@@ -477,25 +477,24 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     const groupTaxes = (details: TaxDetails) => {
         const groups: { [key: string]: { name: string, value: number, rate?: number }[] } = {
-            "IMPOSTOS S/ FATURAMENTO": [],
-            "ENCARGOS S/ FOLHA E PRÓ-LABORE": [],
-            "OUTROS CUSTOS": []
+            "Impostos s/ Faturamento": [],
+            "Encargos s/ Folha e Pró-labore": [],
+            "Outros Custos": []
         };
     
         const revenue = details.totalRevenue > 0 ? details.totalRevenue : 1;
     
         details.breakdown.forEach(item => {
             const taxName = item.name.split('(')[0].trim();
-            const rate = revenue > 0 ? (item.value / revenue) * 100 : 0;
-            const newItem = { ...item, rate };
+            const newItem = { ...item };
 
             if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].includes(taxName)) {
-                groups["IMPOSTOS S/ FATURAMENTO"].push(newItem);
-            } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].includes(taxName)) {
-                groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(newItem);
+                groups["Impostos s/ Faturamento"].push(newItem);
+            } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal - 20%)'].includes(taxName)) {
+                groups["Encargos s/ Folha e Pró-labore"].push(newItem);
             }
         });
-        groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+        groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
     
         return groups;
     };
@@ -520,8 +519,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
               return (
                 <div key={scenario.regime + (scenario.annex || '')}
                   className={cn(
-                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300",
-                    isRecommended ? "shadow-lg border-primary" : "shadow-sm border-border"
+                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm",
+                    isRecommended ? "border-primary shadow-lg" : "border-border"
                   )}
                 >
                     <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
@@ -544,23 +543,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                       {groupName}
                                   </h4>
                                   <div className="space-y-3">
-                                  {items.map(item => {
-                                      let displayName = item.name;
-                                      if (item.rate && item.name !== 'Mensalidade Contabilizei' && item.name !== 'IRRF s/ Pró-labore' && item.name !== 'INSS s/ Pró-labore' && item.name !== 'CPP (INSS Patronal)') {
-                                          displayName = `${item.name} (${item.rate.toFixed(2).replace('.', ',')}%)`;
-                                      } else if (item.name === 'INSS s/ Pró-labore') {
-                                           displayName = 'INSS s/ Pró-labore (11,00%)';
-                                      } else if (item.name === 'CPP (INSS Patronal)') {
-                                           displayName = 'CPP (INSS Patronal) (20,00%)';
-                                      }
-
-                                      return (
-                                        <div key={item.name} className="flex justify-between items-center text-base">
-                                            <span className="text-muted-foreground">{displayName}</span>
-                                            <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
-                                        </div>
-                                      )
-                                  })}
+                                  {items.map(item => (
+                                    <div key={item.name} className="flex justify-between items-center text-base">
+                                        <span className="text-muted-foreground">{item.name}</span>
+                                        <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                                    </div>
+                                  ))}
                                   </div>
                               </div>
                           )
@@ -1144,3 +1132,5 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
+
+    
