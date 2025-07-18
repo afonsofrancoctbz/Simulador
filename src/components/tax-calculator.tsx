@@ -435,7 +435,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   }
 
     const parseTaxName = (name: string) => {
-        const match = name.match(/(.+) \((\d{1,2}(?:,\d{1,2})?%)\)/);
+        const match = name.match(/^(.*?) \((\d{1,2}(?:,\d{1,2})?%)\)$/);
         if (match) {
             return { name: match[1], rate: match[2] };
         }
@@ -473,8 +473,11 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
         if (simplesNacionalBase.fatorR === undefined) {
              scenariosToShow.push(simplesNacionalBase);
         } else {
-            scenariosToShow.push(simplesNacionalOtimizado || simplesNacionalBase);
+            // Show the non-optimized one first, then the optimized one
             scenariosToShow.push(simplesNacionalBase);
+            if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost !== simplesNacionalBase.totalMonthlyCost) {
+                scenariosToShow.push(simplesNacionalOtimizado);
+            }
         }
         
         scenarios = scenariosToShow.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
@@ -486,7 +489,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     if (scenarios.length === 0) return null;
     
-    const uniqueScenarios = Array.from(new Map(scenarios.map(s => [s.regime + s.annex, s])).values());
+    const uniqueScenarios = Array.from(new Map(scenarios.map(s => [s.regime, s])).values());
     const sortedScenarios = [...uniqueScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
     const cheapestScenario = sortedScenarios.length > 0 ? sortedScenarios[0] : null;
 
@@ -500,7 +503,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       details.breakdown.forEach(item => {
           if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].some(tax => item.name.split('(')[0].trim() === tax)) {
               groups["Impostos s/ Faturamento"].push(item);
-          } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.split('(')[0].trim() === tax)) {
+          } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.split('(')[0].trim().includes(tax))) {
               groups["Encargos s/ Folha e Pró-labore"].push(item);
           }
       });
@@ -519,7 +522,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
             </p>
           </div>
 
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-center items-stretch gap-6">
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-center items-stretch gap-8">
             {uniqueScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
               if (!scenario) return null;
               const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && uniqueScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
@@ -527,10 +530,10 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
               const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
               return (
-                <div key={scenario.regime + (scenario.annex || '')}
+                <div key={scenario.regime}
                   className={cn(
-                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm",
-                    isRecommended ? "shadow-lg border-primary/50" : "border-border"
+                    "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300",
+                    isRecommended ? "shadow-lg border-primary" : "shadow-sm border-border"
                   )}
                 >
                     <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
@@ -539,25 +542,25 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                             Recomendado
                         </Badge>
                         )}
-                        <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
+                        <h3 className="text-2xl font-bold text-foreground mt-4">{scenario.regime}</h3>
                         {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                     </div>
 
-                    <div className="p-6 pt-0 flex-grow space-y-4">
+                    <div className="p-6 pt-0 flex-grow space-y-4 text-base">
                         {Object.entries(groupedTaxes).map(([groupName, items]) => {
                         if (items.length === 0 || items.every(i => i.value === 0)) return null;
                         return (
-                            <div key={groupName} className="space-y-3">
-                                <Separator />
-                                <h4 className="font-semibold text-muted-foreground text-sm pt-2">
+                            <div key={groupName}>
+                                <Separator className="my-3"/>
+                                <h4 className="font-semibold text-muted-foreground text-sm mb-3">
                                     {groupName}
                                 </h4>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                 {items.map(item => {
                                     const { name, rate } = parseTaxName(item.name);
                                     return (
-                                        <div key={item.name} className="flex justify-between items-center text-sm pl-4">
-                                            <span className="text-muted-foreground">{name}</span>
+                                        <div key={item.name} className="flex justify-between items-center text-sm">
+                                            <span className="text-muted-foreground">{name} {rate && `(${rate})`}</span>
                                             <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
                                         </div>
                                     )
@@ -568,7 +571,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         })}
                     </div>
                   
-                    <div className="p-6 pt-4 mt-auto space-y-4">
+                    <div className="p-6 mt-auto space-y-4">
                         {scenario.fatorR !== undefined && (
                         <div className={cn(
                             "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
@@ -581,13 +584,13 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         <div className={cn("p-4 rounded-lg bg-muted/30")}>
                             <div className="w-full space-y-2 text-center">
                                 <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>
-                                <div className="text-2xl font-bold text-primary">
+                                <div className="text-3xl font-bold text-primary">
                                     {formatCurrencyBRL(scenario.totalMonthlyCost)}
                                 </div>
-                                <div className="w-full bg-muted rounded-full h-2">
-                                    <div className="bg-gradient-to-r from-primary/70 to-accent h-2 rounded-full" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                                <div className="w-full bg-muted rounded-full h-2.5 mt-2">
+                                    <div className="bg-gradient-to-r from-primary/70 to-primary h-2.5 rounded-full" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
                                 </div>
-                                <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
+                                <p className='text-sm text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
                             </div>
                         </div>
                     </div>
@@ -1145,5 +1148,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
+
 
 

@@ -149,10 +149,10 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
   
   let fatorR = 0;
-  if(effectiveRbt12 > 0) {
-      fatorR = effectiveFp12 / effectiveRbt12;
-  } else if (totalRevenue > 0) {
+  if (totalRevenue > 0) {
       fatorR = monthlyPayroll / totalRevenue;
+  } else if (effectiveRbt12 > 0) {
+      fatorR = effectiveFp12 / effectiveRbt12;
   }
 
   const hasAnnexVActivity = allCnaesData.some(a => a.requiresFatorR);
@@ -258,18 +258,19 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
   let regimeName = "Simples Nacional";
   let annexLabel = "";
 
-  if(useAnnexIIIForV) {
+  const annexKeys = Object.keys(revenueByEffectiveAnnex) as Annex[];
+  if (useAnnexIIIForV) {
     annexLabel = "Anexo III (Com Fator R)";
-  } else if(hasAnnexVActivity) {
+    regimeName = "Simples Nacional Anexo III"
+  } else if (hasAnnexVActivity) {
     annexLabel = "Anexo V (Sem Fator R)";
-  } else {
-    const annexKeys = Object.keys(revenueByEffectiveAnnex) as Annex[];
-    if (annexKeys.length === 1) {
-      annexLabel = `Anexo ${annexKeys[0]}`;
-    } else if (annexKeys.length > 1) {
-       annexLabel = `Múltiplos Anexos (${annexKeys.join(', ')})`;
-    }
+    regimeName = "Simples Nacional Anexo V"
+  } else if (annexKeys.length === 1) {
+    annexLabel = `Anexo ${annexKeys[0]}`;
+  } else if (annexKeys.length > 1) {
+    annexLabel = `Múltiplos Anexos (${annexKeys.join(', ')})`;
   }
+
 
   const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
   
@@ -294,7 +295,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 }
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
-  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan, selectedCnaes } = values;
+  const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
   const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
   
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -307,12 +308,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   
-  let cpp = 0;
-  const hasAnexoIV = selectedCnaes.some(code => getCnaeData(code)?.annex === 'IV');
-  if (monthlyPayroll > 0 && hasAnexoIV) {
-      cpp = monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base;
-  }
-  
+  // A CPP de 20% incide sobre a folha para prestadores de serviço no Lucro Presumido.
+  const cpp = monthlyPayroll > 0 ? monthlyPayroll * fiscalConfig2025.aliquotas_cpp_patronal.base : 0;
+
   if (totalRevenue === 0) {
       const totalTax = totalINSSRetido + totalIRRFRetido + cpp;
       const totalMonthlyCost = totalTax + contabilizeiFee;
@@ -357,6 +355,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
   const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
+  const inssRate = totalProLaboreBruto > 0 ? totalINSSRetido / totalProLaboreBruto : 0;
+  const cppRate = totalProLaboreBruto > 0 ? cpp / totalProLaboreBruto : 0;
+
 
   const breakdown = [
     { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj },
@@ -364,8 +365,8 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     { name: `PIS`, value: pis },
     { name: `COFINS`, value: cofins },
     { name: `ISS`, value: iss },
-    { name: `CPP (INSS Patronal)`, value: cpp },
-    { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
+    { name: `CPP (INSS Patronal - ${formatPercent(cppRate)})`, value: cpp },
+    { name: `INSS s/ Pró-labore (${formatPercent(inssRate)})`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
@@ -442,5 +443,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
+
 
 
