@@ -154,7 +154,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
             const exportDasRate = effectiveRate * (1 - exportExemptionFactor);
             dasForActivity = activity.revenue * exportDasRate;
-            if (!notes.some(n => n.includes('exportação'))) {
+            if (exportRevenue > 0 && !notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
             }
         } else {
@@ -163,7 +163,6 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         totalDas += dasForActivity;
     }
 
-    // CRITICAL LOGIC: Add CPP only if there are Annex IV activities.
     if (hasAnnexIVActivity) {
         cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig2025);
         if (!notes.some(n => n.includes('Anexo IV'))) {
@@ -214,7 +213,6 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
 
-    // CRITICAL LOGIC: CPP is always calculated for Lucro Presumido.
     const cpp = _calculateCpp(monthlyPayroll, fiscalConfig2025);
 
     const notes: string[] = [];
