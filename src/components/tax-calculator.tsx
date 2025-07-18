@@ -477,32 +477,24 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
 
     const groupTaxes = (details: TaxDetails) => {
       const groups: { [key: string]: { name: string, value: number }[] } = {
-          "Impostos s/ Faturamento": [],
-          "Encargos s/ Folha e Pró-labore": [],
-          "Outros Custos": []
+          "IMPOSTOS S/ FATURAMENTO": [],
+          "ENCARGOS S/ FOLHA E PRÓ-LABORE": [],
+          "OUTROS CUSTOS": []
       };
 
       details.breakdown.forEach(item => {
         const taxName = item.name.split('(')[0].trim();
         if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].includes(taxName)) {
-            groups["Impostos s/ Faturamento"].push(item);
+            groups["IMPOSTOS S/ FATURAMENTO"].push(item);
         } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].includes(taxName)) {
-            groups["Encargos s/ Folha e Pró-labore"].push(item);
+            groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(item);
         }
       });
-      groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+      groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
       return groups;
     };
     
-    const parseTaxName = (name: string) => {
-        const match = name.match(/^(.*?) \((\d{1,2}(?:,\d{1,2})?%)\)$/);
-        if (match) {
-            return { name: match[1], rate: `(${match[2]})` };
-        }
-        return { name, rate: null };
-    };
-
     return (
       <div id="results-section" className="mt-16 w-full space-y-12">
         <div>
@@ -514,7 +506,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
           </div>
 
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
-            {validScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
+            {validScenarios.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost).map((scenario) => {
               if (!scenario) return null;
               const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
               const groupedTaxes = groupTaxes(scenario);
@@ -537,7 +529,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                         {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                     </div>
 
-                    <div className="p-6 pt-0 flex-grow space-y-1 text-sm">
+                    <div className="p-6 pt-0 flex-grow text-sm">
                         {Object.entries(groupedTaxes).map(([groupName, items]) => {
                           if (items.length === 0 || items.every(i => i.value === 0 && !i.name.includes("Mensalidade"))) return null;
                           return (
@@ -547,15 +539,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                                       {groupName}
                                   </h4>
                                   <div className="space-y-3">
-                                  {items.map(item => {
-                                      const { name, rate } = parseTaxName(item.name);
-                                      return (
-                                          <div key={item.name} className="flex justify-between items-center text-base">
-                                              <span className="text-muted-foreground">{name}</span>
-                                              <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
-                                          </div>
-                                      )
-                                  })}
+                                  {items.map(item => (
+                                      <div key={item.name} className="flex justify-between items-center text-base">
+                                          <span className="text-muted-foreground">{item.name}</span>
+                                          <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                                      </div>
+                                  ))}
                                   </div>
                               </div>
                           )

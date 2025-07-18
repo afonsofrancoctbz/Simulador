@@ -318,7 +318,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
           regime: 'Lucro Presumido', totalTax, totalMonthlyCost, totalRevenue: 0,
           proLabore: totalProLaboreBruto, effectiveRate: 0, contabilizeiFee, 
           breakdown: [
-              { name: `CPP (INSS Patronal)`, value: cpp },
+              // CPP is included in total but not shown in breakdown as per image
               { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
               { name: `IRRF s/ Pró-labore`, value: totalIRRFRetido },
           ].filter(item => item.value > 0.001),
@@ -347,6 +347,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   const companyRevenueTaxes = irpj + csll + pis + cofins + iss;
   const totalWithheldTaxes = totalINSSRetido + totalIRRFRetido;
 
+  // The final logic: CPP is calculated and added to totalTax, but not to the breakdown.
   const totalTax = companyRevenueTaxes + cpp + totalWithheldTaxes;
   const totalMonthlyCost = totalTax + contabilizeiFee;
   
@@ -355,20 +356,14 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
   const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
-  const pisRate = totalRevenue > 0 ? pis / totalRevenue : 0;
-  const cofinsRate = totalRevenue > 0 ? cofins / totalRevenue : 0;
-  const issRate = totalRevenue > 0 ? iss / totalRevenue : 0;
-  const cppRate = totalRevenue > 0 ? cpp / totalRevenue : 0;
-  const inssRetidoRate = totalRevenue > 0 ? totalINSSRetido / totalRevenue : 0;
-  const irrfRetidoRate = totalRevenue > 0 ? totalIRRFRetido / totalRevenue : 0;
   
   const breakdown = [
-    { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj },
-    { name: `CSLL (${formatPercent(csllRate)})`, value: csll },
-    { name: `PIS (${formatPercent(pisRate)})`, value: pis },
-    { name: `COFINS (${formatPercent(cofinsRate)})`, value: cofins },
-    { name: `ISS (${formatPercent(issRate)})`, value: iss },
-    { name: `CPP (INSS Patronal)`, value: cpp },
+    { name: `IRPJ`, value: irpj },
+    { name: `CSLL`, value: csll },
+    { name: `PIS`, value: pis },
+    { name: `COFINS`, value: cofins },
+    { name: `ISS`, value: iss },
+    // { name: `CPP (INSS Patronal)`, value: cpp }, // Intentionally hidden from breakdown
     { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
