@@ -355,18 +355,15 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
   
   const irpjRate = totalRevenue > 0 ? irpj / totalRevenue : 0;
   const csllRate = totalRevenue > 0 ? csll / totalRevenue : 0;
-  const inssRate = totalProLaboreBruto > 0 ? totalINSSRetido / totalProLaboreBruto : 0;
-  const cppRate = totalProLaboreBruto > 0 ? cpp / totalProLaboreBruto : 0;
-
-
+  
   const breakdown = [
     { name: `IRPJ (${formatPercent(irpjRate)})`, value: irpj },
     { name: `CSLL (${formatPercent(csllRate)})`, value: csll },
     { name: `PIS`, value: pis },
     { name: `COFINS`, value: cofins },
     { name: `ISS`, value: iss },
-    { name: `CPP (INSS Patronal - ${formatPercent(cppRate)})`, value: cpp },
-    { name: `INSS s/ Pró-labore (${formatPercent(inssRate)})`, value: totalINSSRetido },
+    { name: `CPP (INSS Patronal)`, value: cpp },
+    { name: `INSS s/ Pró-labore`, value: totalINSSRetido },
     { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
   ];
 
@@ -443,6 +440,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
-
-
-

@@ -437,7 +437,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     const parseTaxName = (name: string) => {
         const match = name.match(/^(.*?) \((\d{1,2}(?:,\d{1,2})?%)\)$/);
         if (match) {
-            return { name: match[1], rate: match[2] };
+            return { name: match[1], rate: `(${match[2]})` };
         }
         return { name, rate: null };
     };
@@ -501,11 +501,12 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       };
 
       details.breakdown.forEach(item => {
-          if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].some(tax => item.name.split('(')[0].trim() === tax)) {
-              groups["Impostos s/ Faturamento"].push(item);
-          } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.split('(')[0].trim().includes(tax))) {
-              groups["Encargos s/ Folha e Pró-labore"].push(item);
-          }
+        const taxName = item.name.split('(')[0].trim();
+        if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL'].includes(taxName)) {
+            groups["Impostos s/ Faturamento"].push(item);
+        } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].includes(taxName)) {
+            groups["Encargos s/ Folha e Pró-labore"].push(item);
+        }
       });
       groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
@@ -528,6 +529,9 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
               const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && uniqueScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
               const groupedTaxes = groupTaxes(scenario as TaxDetails);
               const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
+              
+              const inssSocioItem = scenario.breakdown.find(item => item.name.startsWith('INSS s/ Pró-labore'));
+              const inssSocioRate = inssSocioItem && scenario.proLabore > 0 ? (inssSocioItem.value / scenario.proLabore) : fiscalConfig.aliquota_inss_prolabore;
 
               return (
                 <div key={scenario.regime}
@@ -542,32 +546,40 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
                             Recomendado
                         </Badge>
                         )}
-                        <h3 className="text-2xl font-bold text-foreground mt-4">{scenario.regime}</h3>
+                        <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
                         {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                     </div>
 
-                    <div className="p-6 pt-0 flex-grow space-y-4 text-base">
+                    <div className="p-6 pt-0 flex-grow space-y-1 text-base">
                         {Object.entries(groupedTaxes).map(([groupName, items]) => {
-                        if (items.length === 0 || items.every(i => i.value === 0)) return null;
-                        return (
-                            <div key={groupName}>
-                                <Separator className="my-3"/>
-                                <h4 className="font-semibold text-muted-foreground text-sm mb-3">
-                                    {groupName}
-                                </h4>
-                                <div className="space-y-3">
-                                {items.map(item => {
-                                    const { name, rate } = parseTaxName(item.name);
-                                    return (
-                                        <div key={item.name} className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">{name} {rate && `(${rate})`}</span>
-                                            <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
-                                        </div>
-                                    )
-                                })}
-                                </div>
-                            </div>
-                        )
+                          if (items.length === 0 || items.every(i => i.value === 0 && !i.name.includes("Mensalidade"))) return null;
+                          return (
+                              <div key={groupName} className="space-y-3">
+                                  <Separator className="my-3"/>
+                                  <h4 className="font-semibold text-muted-foreground text-sm">
+                                      {groupName}
+                                  </h4>
+                                  <div className="space-y-3">
+                                  {items.map(item => {
+                                      const { name, rate } = parseTaxName(item.name);
+                                      let finalRate = rate;
+
+                                      if (item.name.startsWith("CPP")) {
+                                        finalRate = `(${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`;
+                                      } else if (item.name.startsWith("INSS s/ Pró-labore")) {
+                                        finalRate = `(${formatPercent(inssSocioRate)})`;
+                                      }
+
+                                      return (
+                                          <div key={item.name} className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">{name} {finalRate}</span>
+                                              <span className="font-medium">{formatCurrencyBRL(item.value)}</span>
+                                          </div>
+                                      )
+                                  })}
+                                  </div>
+                              </div>
+                          )
                         })}
                     </div>
                   
@@ -1148,6 +1160,3 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     </FormProvider>
   );
 }
-
-
-
