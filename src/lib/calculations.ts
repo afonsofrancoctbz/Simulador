@@ -8,7 +8,6 @@ import {
   type CalculationResults,
   type TaxFormValues,
   type TaxDetails,
-  type CnaeData,
   type Annex,
   type FeeBracket,
   type ProLaboreForm,
@@ -23,9 +22,6 @@ const fiscalConfig2025 = getFiscalParameters(2025);
 
 /**
  * Encontra a faixa correta em uma tabela de imposto baseada em um valor.
- * @param table A tabela de imposto (ex: tabela do IRRF).
- * @param value O valor base para encontrar a faixa.
- * @returns A faixa correspondente da tabela.
  */
 function _findBracket<T extends { max: number }>(table: T[], value: number): T {
   return table.find(bracket => value <= bracket.max) || table[table.length - 1];
@@ -33,9 +29,6 @@ function _findBracket<T extends { max: number }>(table: T[], value: number): T {
 
 /**
  * Encontra a faixa de preço da mensalidade da Contabilizei com base na receita.
- * @param table A tabela de preços.
- * @param revenue A receita mensal.
- * @returns A faixa de preço correspondente.
  */
 function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
     return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
@@ -44,11 +37,8 @@ function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | und
 /**
  * Calcula os encargos (INSS e IRRF) retidos de cada sócio.
  * Função pura que centraliza a lógica de impostos sobre o pró-labore.
- * @param proLabores Lista com os valores de pró-labore dos sócios.
- * @param config O objeto de configuração fiscal do ano.
- * @returns Um objeto com a lista de impostos por sócio e os totais de INSS e IRRF.
  */
-function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
+export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
 
@@ -83,11 +73,8 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfi
 /**
  * Calcula a Contribuição Previdenciária Patronal (CPP).
  * Função pura e isolada para a CPP.
- * @param baseDeCalculo Soma da folha de salários e pró-labore.
- * @param config O objeto de configuração fiscal do ano.
- * @returns O valor da CPP (20% sobre a base).
  */
-function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
+export function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
     return baseDeCalculo * config.aliquotas_cpp_patronal.base;
 }
 
@@ -176,7 +163,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
     const breakdown = [
         { name: `DAS (${formatPercent(totalRevenue > 0 ? totalDas / totalRevenue : 0)})`, value: totalDas },
-        { name: `CPP (INSS Patronal - 20,00%)`, value: cppFromAnnexIV },
+        { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV },
         { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
@@ -204,7 +191,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
 
-    // VERIFICAÇÃO CRÍTICA: CPP é sempre devida no Lucro Presumido para serviços.
+    // **REGRA CRÍTICA**: CPP é sempre devida no Lucro Presumido para serviços.
     const cpp = _calculateCpp(monthlyPayroll, fiscalConfig2025);
 
     const notes: string[] = [];
@@ -238,7 +225,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       { name: `PIS (${formatPercent(pis / totalRevenue)})`, value: pis },
       { name: `COFINS (${formatPercent(cofins / totalRevenue)})`, value: cofins },
       { name: `ISS (${formatPercent(iss / totalRevenue)})`, value: iss },
-      { name: `CPP (INSS Patronal - 20,00%)`, value: cpp },
+      { name: `CPP (INSS Patronal - ${formatPercent(fiscalConfig2025.aliquotas_cpp_patronal.base)})`, value: cpp },
       { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
       { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
