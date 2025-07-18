@@ -1,6 +1,11 @@
-import { CnaeData, FeeBracket } from "./types";
+import { FeeBracket } from "./types";
+import { CNAE_DATA_RAW } from './cnaes-raw';
+import { type CnaeData } from './types';
 
-export { CNAE_DATA } from './cnaes';
+
+// This allows augmenting CNAE data with calculated fields if needed in the future
+export const CNAE_DATA: CnaeData[] = CNAE_DATA_RAW;
+
 
 export const CONTABILIZEI_FEES_LUCRO_PRESUMIDO: FeeBracket[] = [
     { label: 'até R$ 25.000', min: 0, max: 25000, plans: { basico: 239, padrao: 295, multibeneficios: 325, expertsEssencial: 459 } },

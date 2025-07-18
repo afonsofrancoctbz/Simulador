@@ -6,7 +6,6 @@ export const FISCAL_CONFIG_2025 = {
   salario_minimo: 1518.00,
   teto_inss: 8157.41,
   aliquota_inss_prolabore: 0.11, // Alíquota fixa de 11% para pró-labore de sócios
-  aliquota_iss_padrao: 0.05, // 5%
   aliquotas_cpp_patronal: {
     base: 0.20,
     rat: 0.03, // Riscos Ambientais do Trabalho (média) - Não usado em todos os casos
@@ -15,7 +14,15 @@ export const FISCAL_CONFIG_2025 = {
         return this.base; // Para Lucro Presumido e Anexo IV context
     }
   },
-  // Tabela progressiva para funcionários CLT, não se aplica ao pró-labore dos sócios
+  lucro_presumido_rates: {
+    PIS: 0.0065,
+    COFINS: 0.03,
+    ISS: 0.05, // Alíquota máxima padrão, pode variar por município
+    IRPJ_BASE: 0.15,
+    IRPJ_ADICIONAL_BASE: 0.10,
+    CSLL: 0.09,
+    LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL: 20000,
+  },
   tabela_inss_clt_progressiva: [
     { min: 0, max: 1518.00, rate: 0.075, deduction: 0 },
     { min: 1518.01, max: 2793.88, rate: 0.09, deduction: 22.77 },
@@ -36,7 +43,7 @@ export const FISCAL_CONFIG_2025 = {
         { min: 360000.01, max: 720000, rate: 0.095, deduction: 13860, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.42, ICMS: 0.335 } },
         { min: 720000.01, max: 1800000, rate: 0.107, deduction: 22500, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.42, ICMS: 0.335 } },
         { min: 1800000.01, max: 3600000, rate: 0.143, deduction: 87300, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.42, ICMS: 0.335 } },
-        { min: 3600000.01, max: 4800000, rate: 0.19, deduction: 378000, distribution: { IRPJ: 0.135, CSLL: 0.10, COFINS: 0.2827, PIS: 0.0613, CPP: 0.421, ICMS: 0 } },
+        { min: 3600000.01, max: 4800000, rate: 0.19, deduction: 378000, distribution: { IRPJ: 0.135, CSLL: 0.10, COFINS: 0.2827, PIS: 0.0613, CPP: 0, ICMS: 0.421 } },
     ],
     anexoII: [
         { min: 0, max: 180000, rate: 0.045, deduction: 0, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.375, ICMS: 0.3, IPI: 0.075 } },
@@ -44,7 +51,7 @@ export const FISCAL_CONFIG_2025 = {
         { min: 360000.01, max: 720000, rate: 0.10, deduction: 13860, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.375, ICMS: 0.3, IPI: 0.075 } },
         { min: 720000.01, max: 1800000, rate: 0.112, deduction: 22500, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.375, ICMS: 0.3, IPI: 0.075 } },
         { min: 1800000.01, max: 3600000, rate: 0.147, deduction: 85500, distribution: { IRPJ: 0.055, CSLL: 0.035, COFINS: 0.1274, PIS: 0.0276, CPP: 0.375, ICMS: 0.3, IPI: 0.075 } },
-        { min: 3600000.01, max: 4800000, rate: 0.30, deduction: 720000, distribution: { IRPJ: 0.085, CSLL: 0.075, COFINS: 0.2274, PIS: 0.0276, CPP: 0.235, ICMS: 0, IPI: 0.35 } },
+        { min: 3600000.01, max: 4800000, rate: 0.30, deduction: 720000, distribution: { IRPJ: 0.085, CSLL: 0.075, COFINS: 0.2274, PIS: 0.0276, CPP: 0, ICMS: 0, IPI: 0.35 } },
     ],
     anexoIII: [
         { min: 0, max: 180000, rate: 0.06, deduction: 0, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1282, PIS: 0.0278, CPP: 0.434, ISS: 0.335 } },
@@ -52,7 +59,7 @@ export const FISCAL_CONFIG_2025 = {
         { min: 360000.01, max: 720000, rate: 0.135, deduction: 17640, distribution: { IRPJ: 0.04, CSLL: 0.035, COFINS: 0.1364, PIS: 0.0296, CPP: 0.434, ISS: 0.325 } },
         { min: 720000.01, max: 1800000, rate: 0.16, deduction: 35640, distribution: { IRPJ: 0.04, CSLL: 0.04, COFINS: 0.1409, PIS: 0.0306, CPP: 0.434, ISS: 0.3145 } },
         { min: 1800000.01, max: 3600000, rate: 0.21, deduction: 125640, distribution: { IRPJ: 0.04, CSLL: 0.04, COFINS: 0.1356, PIS: 0.0294, CPP: 0.445, ISS: 0.310 } },
-        { min: 3600000.01, max: 4800000, rate: 0.33, deduction: 648000, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.1603, PIS: 0.0347, CPP: 0.305, ISS: 0 } },
+        { min: 3600000.01, max: 4800000, rate: 0.33, deduction: 648000, distribution: { IRPJ: 0.35, CSLL: 0.15, COFINS: 0.1603, PIS: 0.0347, CPP: 0, ISS: 0 } },
     ],
     anexoIV: [
         { min: 0, max: 180000, rate: 0.045, deduction: 0, distribution: { IRPJ: 0.188, CSLL: 0.152, COFINS: 0.2043, PIS: 0.0457, ISS: 0.41 } },
@@ -77,8 +84,8 @@ export const FISCAL_CONFIG_2026 = {
     ...FISCAL_CONFIG_2025, // Inherit most rules
     ano_vigencia: 2026,
     reforma_tributaria: {
-        cbs_rate: 0.009, // 0.9%
-        ibs_rate: 0.001, // 0.1%
+        cbs_rate: 0.088, 
+        ibs_rate: 0.177, 
         get iva_rate() {
             return this.cbs_rate + this.ibs_rate;
         }
@@ -97,7 +104,16 @@ export type FiscalConfig2026 = typeof FISCAL_CONFIG_2026;
  */
 export const getFiscalParameters = (year: number = 2025): FiscalConfig | FiscalConfig2026 => {
     if (year === 2026) {
-        return FISCAL_CONFIG_2026;
+        // As alíquotas do IVA são estimativas e devem ser atualizadas conforme a regulamentação.
+        // A estimativa do governo é de 26.5%, aqui dividida entre CBS (8.8%) e IBS (17.7%).
+        return {
+            ...FISCAL_CONFIG_2026,
+            reforma_tributaria: {
+                cbs_rate: 0.088,
+                ibs_rate: 0.177,
+                get iva_rate() { return this.cbs_rate + this.ibs_rate; }
+            }
+        };
     }
     return FISCAL_CONFIG_2025;
 }
