@@ -19,28 +19,39 @@ import { getCnaeData } from './cnae-helpers';
 
 const fiscalConfig2025 = getFiscalParameters(2025);
 
-// --- UTILITY FUNCTIONS (PURE LOGIC) ---
+// --- FUNÇÕES UTILITÁRIAS PURAS E REUTILIZÁVEIS ---
 
 /**
- * Finds the correct bracket in a given tax table based on a value.
+ * Encontra a faixa correta em uma tabela de imposto baseada em um valor.
+ * @param table A tabela de imposto (ex: tabela do IRRF).
+ * @param value O valor base para encontrar a faixa.
+ * @returns A faixa correspondente da tabela.
  */
 function _findBracket<T extends { max: number }>(table: T[], value: number): T {
   return table.find(bracket => value <= bracket.max) || table[table.length - 1];
 }
 
 /**
- * Finds the correct fee bracket based on monthly revenue.
+ * Encontra a faixa de preço da mensalidade da Contabilizei com base na receita.
+ * @param table A tabela de preços.
+ * @param revenue A receita mensal.
+ * @returns A faixa de preço correspondente.
  */
 function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
     return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
 }
 
 /**
- * Calculates INSS and IRRF for a single partner's pro-labore.
+ * Calcula os encargos (INSS e IRRF) retidos de cada sócio.
+ * Função pura que centraliza a lógica de impostos sobre o pró-labore.
+ * @param proLabores Lista com os valores de pró-labore dos sócios.
+ * @param config O objeto de configuração fiscal do ano.
+ * @returns Um objeto com a lista de impostos por sócio e os totais de INSS e IRRF.
  */
 function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
+
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
         if (proLaboreBruto <= 0) {
@@ -50,7 +61,7 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfi
         const remainingContributionRoom = Math.max(0, config.teto_inss - (proLabore.hasOtherInssContribution ? proLabore.otherContributionSalary || 0 : 0));
         const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
         const inss = baseCalculoINSS * config.aliquota_inss_prolabore;
-        
+
         const baseCalculoIRRF = proLaboreBruto - inss;
         const irrfBracket = _findBracket(config.tabela_irrf, baseCalculoIRRF);
         const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
@@ -70,13 +81,17 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfi
 }
 
 /**
- * Calculates the CPP (Contribuição Previdenciária Patronal).
+ * Calcula a Contribuição Previdenciária Patronal (CPP).
+ * Função pura e isolada para a CPP.
+ * @param baseDeCalculo Soma da folha de salários e pró-labore.
+ * @param config O objeto de configuração fiscal do ano.
+ * @returns O valor da CPP (20% sobre a base).
  */
 function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
     return baseDeCalculo * config.aliquotas_cpp_patronal.base;
 }
 
-// --- CORE CALCULATION LOGIC ---
+// --- LÓGICA DE CÁLCULO PRINCIPAL ---
 
 function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: number, monthlyPayroll: number): TaxDetails {
     const { domesticActivities, exportActivities, exchangeRate, proLabores, rbt12, selectedPlan, selectedCnaes, fp12 } = values;
@@ -86,10 +101,10 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
     const totalRevenue = domesticRevenue + exportRevenue;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
-    
+
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
-    
+
     const fatorR = totalRevenue > 0 ? monthlyPayroll / totalRevenue : (effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0);
 
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
@@ -97,7 +112,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
     const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
-    
+
     let totalDas = 0;
     let cppFromAnnexIV = 0;
     const notes: string[] = [];
@@ -107,14 +122,14 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         ...domesticActivities.map(a => ({ ...a, type: 'domestic' as const })),
         ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const }))
     ];
-    
+
     for (const activity of allActivities) {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) continue;
-        
+
         const effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= 0.28) ? 'III' : cnaeInfo.annex;
         finalAnnexes.add(effectiveAnnex);
-        
+
         const annexTable = fiscalConfig2025.simples_nacional[effectiveAnnex];
         const bracket = _findBracket(annexTable, effectiveRbt12);
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
@@ -133,6 +148,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         }
         totalDas += dasForActivity;
 
+        // VERIFICAÇÃO CRÍTICA: Aplica a CPP apenas e somente se o anexo for IV.
         if (effectiveAnnex === 'IV') {
             cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig2025);
             if (!notes.some(n => n.includes('Anexo IV'))) {
@@ -156,12 +172,12 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
         { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
-    
+
     return {
         regime: regimeName, totalTax, totalMonthlyCost, totalRevenue,
         proLabore: totalProLaboreBruto, fatorR: hasAnnexVActivity ? fatorR : undefined,
         annex: annexLabel, effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
-        contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001), 
+        contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001),
         notes, partnerTaxes, netProfit: totalRevenue - totalMonthlyCost
     };
 }
@@ -169,7 +185,7 @@ function _calculateSimplesNacional(values: TaxFormValues, totalProLaboreBruto: n
 
 function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
-    
+
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
@@ -179,13 +195,13 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2025);
     const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
-    
-    // Regra Crítica: CPP é sempre devida no Lucro Presumido para serviços.
+
+    // VERIFICAÇÃO CRÍTICA: CPP é sempre devida no Lucro Presumido para serviços.
     const cpp = _calculateCpp(monthlyPayroll, fiscalConfig2025);
 
     const notes: string[] = [];
     if (exportRevenueBRL > 0) notes.push("Receitas de exportação de serviços são isentas de PIS, COFINS e ISS.");
-    
+
     // Impostos sobre Faturamento (só sobre receita doméstica)
     const pis = domesticRevenue * fiscalConfig2025.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * fiscalConfig2025.lucro_presumido_rates.COFINS;
@@ -197,17 +213,17 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
         const cnaeInfo = getCnaeData(activity.code);
         return sum + (activity.revenue * (cnaeInfo?.presumedProfitRate ?? 0.32));
     }, 0);
-  
+
     const irpjBase = presumedProfitBase;
     const irpj = irpjBase * fiscalConfig2025.lucro_presumido_rates.IRPJ_BASE;
     const irpjAdicional = Math.max(0, (irpjBase - (fiscalConfig2025.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL * 1))) * fiscalConfig2025.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
 
     const csll = presumedProfitBase * fiscalConfig2025.lucro_presumido_rates.CSLL;
-  
+
     const companyRevenueTaxes = irpj + irpjAdicional + csll + pis + cofins + iss;
     const totalTax = companyRevenueTaxes + cpp + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
-  
+
     const breakdown = [
       { name: `IRPJ (${formatPercent((irpj + irpjAdicional) / totalRevenue)})`, value: irpj + irpjAdicional },
       { name: `CSLL (${formatPercent(csll / totalRevenue)})`, value: csll },
@@ -218,7 +234,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       { name: `INSS s/ Pró-labore (${formatPercent(fiscalConfig2025.aliquota_inss_prolabore)})`, value: totalINSSRetido },
       { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
-  
+
     return {
       regime: 'Lucro Presumido',
       totalTax, totalMonthlyCost, totalRevenue, proLabore: totalProLaboreBruto,
@@ -229,6 +245,9 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 }
 
 
+/**
+ * Função principal que orquestra os cálculos para todos os cenários.
+ */
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const totalProLaboreBruto = values.proLabores.reduce((acc, p) => acc + p.value, 0);
   const monthlyPayroll = values.totalSalaryExpense + totalProLaboreBruto;
@@ -237,16 +256,16 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const simplesNacionalBase = _calculateSimplesNacional(values, totalProLaboreBruto, monthlyPayroll);
 
   let simplesNacionalOtimizado: TaxDetails | null = null;
-  
+
   const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
   const fatorRBase = simplesNacionalBase.fatorR;
-  
+
   if (hasAnnexVActivity && fatorRBase !== undefined && fatorRBase < 0.28) {
       const totalRevenue = simplesNacionalBase.totalRevenue;
       if (totalRevenue > 0) {
           const requiredPayrollForFatorR = totalRevenue * 0.28;
           let requiredTotalProLabore = requiredPayrollForFatorR - values.totalSalaryExpense;
-          
+
           const minProLaboreTotal = fiscalConfig2025.salario_minimo * values.numberOfPartners;
           if (requiredTotalProLabore < minProLaboreTotal) {
             requiredTotalProLabore = minProLaboreTotal;
@@ -267,8 +286,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
           }
       }
   }
-  
-  // Assign a fixed order for display
+
+  // Define uma ordem fixa para exibição nos resultados
   lucroPresumido.order = 3;
   if(simplesNacionalOtimizado) {
     simplesNacionalBase.order = 2;
@@ -276,7 +295,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   } else {
     simplesNacionalBase.order = 1;
   }
-  
+
   return {
     simplesNacionalBase,
     simplesNacionalOtimizado,
