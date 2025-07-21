@@ -1,6 +1,5 @@
 
 import { z } from "zod";
-import type { FiscalConfig } from "@/config/fiscal";
 import { FISCAL_CONFIG_2025 } from "@/config/fiscal";
 import { formatCurrencyBRL } from "./utils";
 
@@ -73,7 +72,12 @@ export type PartnerTaxDetails = z.infer<typeof PartnerTaxDetailsSchema>;
 
 // Schema for the details of a single tax scenario
 export const TaxDetailsSchema = z.object({
-    regime: z.string(),
+    regime: z.enum([
+      "Simples Nacional", 
+      "Lucro Presumido",
+      "Simples Nacional Híbrido",
+      "Simples Nacional Tradicional"
+    ]),
     totalTax: z.number(),
     totalMonthlyCost: z.number(),
     totalRevenue: z.number(),
@@ -120,7 +124,7 @@ export interface CnaeData {
   code: string;
   description: string;
   annex: Annex;
-  category?: string;
+  category: string;
   requiresFatorR?: boolean;
   presumedProfitRate: number;
   isRegulated?: boolean;
@@ -136,21 +140,4 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
-
-export interface ProLaboreInput {
-  proLaboreBruto: number;
-  otherContributionSalary?: number;
-  configuracaoFiscal: FiscalConfig;
-}
-
-export interface ProLaboreOutput {
-  valorBruto: number;
-  baseCalculoINSS: number;
-  aliquotaEfetivaINSS: number;
-  valorINSSCalculado: number;
-  baseCalculoIRRF: number;
-  valorIRRFCalculado: number;
-  valorLiquido: number; // Bruto - INSS - IRRF
-}
-
     
