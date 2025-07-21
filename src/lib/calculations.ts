@@ -157,31 +157,26 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
-
-    let regimeName = "Simples Nacional";
-    let annexLabel = [...finalAnnexes].length === 1 ? `Anexo ${[...finalAnnexes][0]}` : `Anexos (${[...finalAnnexes].join(', ')})`;
+    
+    let annexLabel: string;
     if (useAnnexIIIForV) {
-      annexLabel = "Anexo III (Com Fator R)";
+      annexLabel = 'Anexo III (Com Fator R)';
     } else if (hasAnnexVActivity) {
-      const aV = [...finalAnnexes].find(a => a === "V");
-      const others = [...finalAnnexes].filter(a => a !== "V");
-      if (aV && others.length > 0) {
-        annexLabel = `Anexo V e outros (Sem Fator R)`;
-      } else if (aV) {
-        annexLabel = `Anexo V (Sem Fator R)`;
-      }
+      annexLabel = 'Anexo V (Sem Fator R)';
+    } else {
+      annexLabel = [...finalAnnexes].length === 1 ? `Anexo ${[...finalAnnexes][0]}` : `Anexos (${[...finalAnnexes].join(', ')})`;
     }
 
 
     const breakdown = [
-        { name: 'DAS (Simples Nacional)', value: totalDas },
+        { name: `DAS (Simples Nacional - ${formatPercent(totalRevenue > 0 ? totalDas / totalRevenue : 0)})`, value: totalDas },
         { name: `CPP (INSS Patronal - ${formatPercent(config.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV },
         { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
 
     return {
-        regime: regimeName, totalTax, totalMonthlyCost, totalRevenue,
+        regime: "Simples Nacional", totalTax, totalMonthlyCost, totalRevenue,
         proLabore: totalProLaboreBruto, fatorR: hasAnnexVActivity ? fatorR : undefined,
         annex: annexLabel, effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
         contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001),
