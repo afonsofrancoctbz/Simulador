@@ -26,36 +26,20 @@ import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
 
 export const CalculatorFormSchema = z.object({
-  city: z.string({ required_error: "Por favor, selecione uma cidade." }).optional(),
+  city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
+    message: "Por favor, selecione uma cidade válida da lista."
+  }),
   selectedCnaes: z.array(z.string()).min(1, "Selecione ao menos uma atividade (CNAE)."),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number(),
-  totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
-  proLabores: z.array(ProLaboreFormSchema),
-  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
+  totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
+  proLabores: z.array(ProLaboreFormSchema).min(1),
+  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
-}).superRefine((data, ctx) => {
-    const fiscalConfig = getFiscalParameters();
-    data.proLabores.forEach((proLabore, index) => {
-      if (proLabore.value > 0 && proLabore.value < fiscalConfig.salario_minimo) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(fiscalConfig.salario_minimo)}.`,
-              path: [`proLabores.${index}.value`],
-          });
-      }
-      if (proLabore.hasOtherInssContribution && (proLabore.otherContributionSalary === undefined || proLabore.otherContributionSalary <= 0)) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: 'Informe um valor de contribuição positivo.',
-              path: [`proLabores.${index}.otherContributionSalary`],
-          });
-      }
-    });
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
@@ -674,3 +658,5 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading, onCnaeSel
         </form>
     );
 }
+
+    

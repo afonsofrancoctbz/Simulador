@@ -17,9 +17,19 @@ export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
 // Schema for an individual pro-labore input from the form
 export const ProLaboreFormSchema = z.object({
-  value: z.coerce.number().min(0, "O valor deve ser positivo."),
+  value: z.coerce.number().min(0, "O valor deve ser positivo.").refine(val => val === 0 || val >= MINIMUM_WAGE, {
+    message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+  }),
   hasOtherInssContribution: z.boolean().default(false),
   otherContributionSalary: z.coerce.number().min(0, "O valor deve ser positivo.").optional(),
+}).superRefine((data, ctx) => {
+    if (data.hasOtherInssContribution && (data.otherContributionSalary === undefined || data.otherContributionSalary <= 0)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Informe um valor de contribuição positivo.',
+            path: ['otherContributionSalary'],
+        });
+    }
 });
 export type ProLaboreForm = z.infer<typeof ProLaboreFormSchema>;
 
@@ -41,23 +51,6 @@ export const TaxFormValuesSchema = z.object({
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
-}).superRefine((data, ctx) => {
-    data.proLabores.forEach((proLabore, index) => {
-      if (proLabore.value > 0 && proLabore.value < MINIMUM_WAGE) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
-              path: [`proLabores.${index}.value`],
-          });
-      }
-      if (proLabore.hasOtherInssContribution && (proLabore.otherContributionSalary === undefined || proLabore.otherContributionSalary <= 0)) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: 'Informe um valor de contribuição positivo.',
-              path: [`proLabores.${index}.otherContributionSalary`],
-          });
-      }
-    });
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
@@ -160,3 +153,5 @@ export interface ProLaboreOutput {
   valorIRRFCalculado: number;
   valorLiquido: number; // Bruto - INSS - IRRF
 }
+
+    
