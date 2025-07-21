@@ -25,6 +25,14 @@ const nextConfig = {
     // Fail the build on ESLint errors
     ignoreDuringBuilds: false,
   },
+  // Adding this to prevent bundling errors with Genkit and its dependencies
+  experimental: {
+    serverComponentsExternalPackages: [
+      'genkit',
+      '@genkit-ai/googleai',
+      '@opentelemetry/instrumentation',
+    ],
+  },
 };
 
 module.exports = nextConfig;
