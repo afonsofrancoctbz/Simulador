@@ -61,7 +61,7 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         const currentRevenues = form.getValues('revenues');
 
         for (const key in currentRevenues) {
-            const annex = key.split('_')[1] as Annex;
+            const [type, annex] = key.split('_') as [string, Annex];
             if (newAnnexes.has(annex)) {
                 newRevenues[key] = currentRevenues[key];
             }
