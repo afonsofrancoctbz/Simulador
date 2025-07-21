@@ -135,17 +135,17 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
             ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12) 
             : bracket.rate;
 
-        let dasForActivity = 0;
+        let dasForActivity = activity.revenue * effectiveRate;
+        
         if (activity.type === 'export') {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-            const exportDasRate = effectiveRate * (1 - exportExemptionFactor);
-            dasForActivity = activity.revenue * exportDasRate;
+            const exportDasRate = effectiveRate * exportExemptionFactor;
+            dasForActivity -= activity.revenue * exportDasRate;
+
             if (exportRevenue > 0 && !notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
             }
-        } else {
-            dasForActivity = activity.revenue * effectiveRate;
         }
         totalDas += dasForActivity;
     }

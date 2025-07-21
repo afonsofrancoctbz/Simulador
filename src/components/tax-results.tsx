@@ -152,12 +152,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                       <span className="text-muted-foreground flex items-center gap-1.5">
                                         {item.name.replace(/\s*\([^)]*\)/, '')}
                                         {item.name === 'DAS' && scenario.effectiveDasRate && (
-                                          <span className="text-muted-foreground font-medium text-xs">
+                                          <span className="text-xs text-muted-foreground/80 font-medium">
                                             ({formatPercent(scenario.effectiveDasRate)})
                                           </span>
                                         )}
-                                        {item.name !== 'DAS' && !item.name.startsWith('IRPJ') && !item.name.startsWith('CSLL') && (
-                                           <span className="text-muted-foreground font-medium text-xs">
+                                        {item.name !== 'DAS' && (
+                                           <span className="text-xs text-muted-foreground/80 font-medium">
                                              {item.name.match(/\(([^)]+)\)/)?.[0]}
                                            </span>
                                         )}
