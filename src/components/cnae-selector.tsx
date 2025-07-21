@@ -55,7 +55,7 @@ const categoryToCnaeMap: Record<string, string[]> = {
 
 const MAX_SELECTION = 20;
 
-export function CnaeSelector({
+function CnaeSelectorComponent({
   open,
   onOpenChange,
   onConfirm,
@@ -324,3 +324,7 @@ export function CnaeSelector({
     </Dialog>
   )
 }
+
+export const CnaeSelector = React.memo(CnaeSelectorComponent);
+
+    
