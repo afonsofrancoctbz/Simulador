@@ -133,7 +133,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         
         // Calculate the effective tax rate based on the RBT12
         const effectiveRate = effectiveRbt12 > 0 
-            ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12
+            ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12)
             : bracket.rate;
 
         // Calculate the full DAS for the activity's revenue
@@ -327,4 +327,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 // Export for use in 2026 calculations to avoid duplication
 export { };
 
+    
     
