@@ -1,11 +1,10 @@
 
 import { z } from "zod";
 import type { FiscalConfig } from "@/config/fiscal";
-import { getFiscalParameters } from "@/config/fiscal";
+import { FISCAL_CONFIG_2025 } from "@/config/fiscal";
 import { formatCurrencyBRL } from "./utils";
 
-const fiscalConfig = getFiscalParameters();
-const MINIMUM_WAGE = fiscalConfig.salario_minimo;
+const MINIMUM_WAGE = FISCAL_CONFIG_2025.salario_minimo;
 
 
 // Schema for an individual CNAE item
