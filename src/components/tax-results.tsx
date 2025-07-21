@@ -156,7 +156,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                             ({formatPercent(scenario.effectiveDasRate)})
                                           </span>
                                         )}
-                                        {item.name !== 'DAS' && (
+                                        {item.name !== 'DAS' && !item.name.startsWith('IRPJ') && !item.name.startsWith('CSLL') && (
                                            <span className="text-muted-foreground font-medium text-xs">
                                              {item.name.match(/\(([^)]+)\)/)?.[0]}
                                            </span>
