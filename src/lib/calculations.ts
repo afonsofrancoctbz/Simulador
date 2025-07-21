@@ -1,3 +1,4 @@
+
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -161,7 +162,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     let annexLabel: string;
     if (useAnnexIIIForV) {
       annexLabel = 'Anexo III (Com Fator R)';
-    } else if (hasAnnexVActivity) {
+    } else if (finalAnnexes.size === 1 && hasAnnexVActivity) {
       annexLabel = 'Anexo V (Sem Fator R)';
     } else {
       annexLabel = [...finalAnnexes].length === 1 ? `Anexo ${[...finalAnnexes][0]}` : `Anexos (${[...finalAnnexes].join(', ')})`;
@@ -180,7 +181,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         proLabore: totalProLaboreBruto, fatorR: hasAnnexVActivity ? fatorR : undefined,
         annex: annexLabel, effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
         contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001),
-        notes, partnerTaxes, netProfit: totalRevenue - totalMonthlyCost
+        notes, partnerTaxes,
     };
 }
 
@@ -252,7 +253,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       totalTax, totalMonthlyCost, totalRevenue, proLabore: totalProLaboreBruto,
       effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
       contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001),
-      notes, partnerTaxes, netProfit: totalRevenue - totalMonthlyCost,
+      notes, partnerTaxes,
     };
 }
 
