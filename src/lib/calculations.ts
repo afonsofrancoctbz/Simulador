@@ -131,7 +131,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         const bracket = findBracket(annexTable, effectiveRbt12);
         
         const effectiveRate = effectiveRbt12 > 0 
-            ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12
+            ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12)
             : bracket.rate;
 
         let dasForActivity = activity.revenue * effectiveRate;
