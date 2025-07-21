@@ -160,8 +160,18 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
     let regimeName = "Simples Nacional";
     let annexLabel = [...finalAnnexes].length === 1 ? `Anexo ${[...finalAnnexes][0]}` : `Anexos (${[...finalAnnexes].join(', ')})`;
-    if (useAnnexIIIForV) annexLabel = "Com Fator R";
-    if (hasAnnexVActivity && !useAnnexIIIForV) annexLabel = "Sem Fator R";
+    if (useAnnexIIIForV) {
+      annexLabel = "Anexo III (Com Fator R)";
+    } else if (hasAnnexVActivity) {
+      const aV = [...finalAnnexes].find(a => a === "V");
+      const others = [...finalAnnexes].filter(a => a !== "V");
+      if (aV && others.length > 0) {
+        annexLabel = `Anexo V e outros (Sem Fator R)`;
+      } else if (aV) {
+        annexLabel = `Anexo V (Sem Fator R)`;
+      }
+    }
+
 
     const breakdown = [
         { name: 'DAS (Simples Nacional)', value: totalDas },
@@ -287,7 +297,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues);
               if (simplesNacionalOtimizado) {
                  simplesNacionalOtimizado.regime = "Simples Nacional";
-                 simplesNacionalOtimizado.annex = "Com Fator R";
+                 simplesNacionalOtimizado.annex = "Anexo III (Com Fator R)";
                  simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R.`
               }
           }

@@ -128,9 +128,16 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                       {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                   </div>
 
-                  <div className="p-6 pt-0 flex-grow text-base">
+                  <div className="px-6 pb-6 pt-0 flex-grow text-base">
+                      <div className='text-center py-3 mb-4 bg-muted/30 rounded-md'>
+                        <div className='text-xs uppercase text-muted-foreground font-semibold'>Faturamento Mensal</div>
+                        <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
+                      </div>
+
                       {Object.entries(groupedTaxes).map(([groupName, items]) => {
-                        if (items.length === 0 || items.every(i => i.value === 0 && !i.name.includes("Mensalidade"))) return null;
+                        const filteredItems = items.filter(item => item.value > 0.001 || item.name.includes("Mensalidade"));
+                        if (filteredItems.length === 0) return null;
+
                         return (
                             <div key={groupName} className="space-y-3">
                                 <Separator className="my-4"/>
@@ -138,9 +145,14 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                     {groupName}
                                 </h4>
                                 <div className="space-y-3">
-                                {items.map(item => (
-                                  <div key={item.name} className="flex justify-between items-center">
-                                      <span className="text-muted-foreground">{item.name}</span>
+                                {filteredItems.map(item => (
+                                  <div key={item.name} className="flex justify-between items-center text-sm">
+                                      <span className="text-muted-foreground flex items-center gap-1.5">
+                                        {item.name.replace(/\s*\([^)]*\)/, '')}
+                                        <span className="text-primary/70 font-medium">
+                                          {item.name.match(/\(([^)]+)\)/)?.[0]}
+                                        </span>
+                                      </span>
                                       <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                   </div>
                                 ))}
