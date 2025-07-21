@@ -12,33 +12,8 @@ import {
   type ProLaboreForm,
   type PartnerTaxDetails,
 } from './types';
-import { formatPercent } from './utils';
+import { formatPercent, findBracket, findFeeBracket } from './utils';
 import { getCnaeData } from './cnae-helpers';
-
-/**
- * Finds the correct bracket from a given table based on a value.
- * @param table The table to search in.
- * @param value The value to find the bracket for.
- * @returns The found bracket or the last bracket as a fallback.
- */
-function _findBracket<T extends { max: number }>(table: T[], value: number): T {
-  if (!table) {
-    // This condition should ideally not be hit if CNAE data is correct,
-    // but it prevents a crash if an invalid annex table is requested.
-    return { max: Infinity } as T;
-  }
-  return table.find(bracket => value <= bracket.max) || table[table.length - 1];
-}
-
-/**
- * Finds the correct fee bracket from the Contabilizei fee tables.
- * @param table The fee table.
- * @param revenue The monthly revenue.
- * @returns The found fee bracket.
- */
-function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
-    return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
-}
 
 /**
  * Centralized function to calculate partner-specific taxes (INSS and IRRF).
@@ -61,7 +36,7 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfi
         const inss = baseCalculoINSS * config.aliquota_inss_prolabore;
 
         const baseCalculoIRRF = proLaboreBruto - inss;
-        const irrfBracket = _findBracket(config.tabela_irrf, baseCalculoIRRF);
+        const irrfBracket = findBracket(config.tabela_irrf, baseCalculoIRRF);
         const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
 
         totalINSSRetido += inss;
@@ -113,7 +88,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
     const useAnnexIIIForV = hasAnnexVActivity && fatorR >= config.simples_nacional.limite_fator_r;
 
-    const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
 
     let totalDas = 0;
@@ -152,7 +127,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
             continue;
         }
 
-        const bracket = _findBracket(annexTable, effectiveRbt12);
+        const bracket = findBracket(annexTable, effectiveRbt12);
         
         const effectiveRate = effectiveRbt12 > 0 
             ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12) 
@@ -221,7 +196,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
-    const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
 
     // CPP is always calculated for Lucro Presumido

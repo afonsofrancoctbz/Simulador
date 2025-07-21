@@ -11,19 +11,11 @@ import {
   type Annex,
   type FeeBracket,
 } from './types';
-import { formatPercent } from './utils';
+import { formatPercent, findBracket, findFeeBracket } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 
 const fiscalConfig2026 = getFiscalParameters(2026) as FiscalConfig2026;
-
-function _findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
-    return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
-}
-
-function _findBracket<T extends { max: number }>(table: T[], value: number): T {
-    return table.find(bracket => value <= bracket.max) || table[table.length - 1];
-}
 
 function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan } = values;
@@ -60,7 +52,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 
   const companyRevenueTaxes = irpj + irpjAdicional + csll + cbs + ibs;
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
-  const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
   const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
   const totalMonthlyCost = totalTax + fee;
 
@@ -102,7 +94,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     const effectiveFp12 = fp12 > 0 ? fp12 : totalPayroll * 12;
 
-    const feeBracket = _findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     if (totalRevenue === 0 && effectiveRbt12 === 0) {
@@ -143,7 +135,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
         const annex = annexStr as Annex;
         const annexRevenue = revenueByAnnex[annex];
         const annexTable = fiscalConfig2026.simples_nacional[annex];
-        const bracket = _findBracket(annexTable, effectiveRbt12);
+        const bracket = findBracket(annexTable, effectiveRbt12);
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
         
         totalDas += annexRevenue * effectiveRate;
@@ -177,7 +169,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
   
           let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
           const annexTable = fiscalConfig2026.simples_nacional[effectiveAnnex];
-          const bracket = _findBracket(annexTable, effectiveRbt12);
+          const bracket = findBracket(annexTable, effectiveRbt12);
           const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
           
           const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
