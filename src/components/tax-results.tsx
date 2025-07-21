@@ -76,20 +76,20 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string, value: number, rate?: number }[] } = {
-      "Impostos s/ Faturamento": [],
-      "Encargos s/ Folha e Pró-labore": [],
-      "Outros Custos": []
+      "IMPOSTOS S/ FATURAMENTO": [],
+      "ENCARGOS S/ FOLHA E PRÓ-LABORE": [],
+      "OUTROS CUSTOS": []
     };
 
     details.breakdown.forEach(item => {
       if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].some(tax => item.name.includes(tax))) {
-        groups["Impostos s/ Faturamento"].push(item);
+        groups["IMPOSTOS S/ FATURAMENTO"].push(item);
       } else if (['INSS s/ Pró-labore', 'CPP (INSS Patronal)', 'IRRF'].some(tax => item.name.includes(tax))) {
-        groups["Encargos s/ Folha e Pró-labore"].push(item);
+        groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(item);
       }
     });
     
-    groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+    groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
     return groups;
   };
@@ -132,7 +132,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
                   <div className="px-6 pb-6 pt-0 flex-grow text-base">
                       <div className='text-center py-3 mb-4 bg-muted/30 rounded-md'>
-                        <div className='text-xs uppercase text-muted-foreground font-semibold'>Faturamento Mensal</div>
+                        <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
                       </div>
 
@@ -151,15 +151,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-muted-foreground flex items-center gap-1.5">
                                         {item.name.replace(/\s*\([^)]*\)/, '')}
-                                        {item.name === 'DAS' && scenario.effectiveDasRate && (
+                                        {item.name === 'DAS' && scenario.effectiveDasRate ? (
                                           <span className="text-xs text-muted-foreground/80 font-medium">
                                             ({formatPercent(scenario.effectiveDasRate)})
                                           </span>
-                                        )}
-                                        {item.name !== 'DAS' && (
-                                           <span className="text-xs text-muted-foreground/80 font-medium">
-                                             {item.name.match(/\(([^)]+)\)/)?.[0]}
-                                           </span>
+                                        ) : (
+                                           item.name.match(/\(([^)]+)\)/)?.[0] && <span className="text-xs text-muted-foreground/80 font-medium">{item.name.match(/\(([^)]+)\)/)?.[0]}</span>
                                         )}
                                       </span>
                                       <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
