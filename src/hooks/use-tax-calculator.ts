@@ -137,7 +137,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
                     }
                 } catch (aiError) {
                     console.error("Error fetching AI advice:", aiError);
-                    setAdvice("Não foi possível obter a recomendação da IA no momento.");
+                    setAdvice("Não foi possível obter a recomendação da IA no momento. Por favor, tente novamente.");
                 } finally {
                     setIsAdviceLoading(false);
                 }

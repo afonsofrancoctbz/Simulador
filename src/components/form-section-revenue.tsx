@@ -17,6 +17,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Slider } from './ui/slider';
 import type { CalculatorFormValues } from './tax-calculator-form';
+import { useToast } from '@/hooks/use-toast';
 
 interface FormSectionRevenueProps {
     year: 2025 | 2026;
@@ -25,6 +26,7 @@ interface FormSectionRevenueProps {
 
 export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionRevenueProps) {
     const form = useFormContext<CalculatorFormValues>();
+    const { toast } = useToast();
     const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
     const [isFetchingRate, setIsFetchingRate] = useState(false);
     
@@ -66,17 +68,23 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         setIsFetchingRate(true);
         try {
           const response = await fetch('/api/exchange-rate');
-          if (response.ok) {
-            const data = await response.json();
-            setExchangeRates(data);
-            const currentCurrency = form.getValues('exportCurrency');
-            if (data[currentCurrency]) {
-              form.setValue('exchangeRate', data[currentCurrency], { shouldValidate: true });
-            }
-            return data;
+          if (!response.ok) {
+            throw new Error('A resposta da API de câmbio não foi OK');
           }
+          const data = await response.json();
+          setExchangeRates(data);
+          const currentCurrency = form.getValues('exportCurrency');
+          if (data[currentCurrency]) {
+            form.setValue('exchangeRate', data[currentCurrency], { shouldValidate: true });
+          }
+          return data;
         } catch (error) {
           console.error("Falha ao buscar taxas de câmbio", error);
+          toast({
+            title: "Erro de Conexão",
+            description: "Não foi possível carregar as taxas de câmbio. Por favor, insira manualmente.",
+            variant: "destructive",
+          });
         } finally {
           setIsFetchingRate(false);
         }

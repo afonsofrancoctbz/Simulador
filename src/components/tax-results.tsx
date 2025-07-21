@@ -92,6 +92,8 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     return groups;
   };
     
+  const hasAdviceError = advice?.startsWith('Não foi possível');
+
   return (
     <div id="results-section" className="mt-16 w-full space-y-12">
       <div>
@@ -179,10 +181,21 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
       {advice && year === 2025 && (
         <div className="mt-12 max-w-5xl mx-auto">
-          <Alert variant="default" className="bg-primary/5 border-primary/20">
-            <Lightbulb className="h-5 w-5 text-primary" />
-            <AlertTitle className="font-semibold text-primary">Recomendação da IA</AlertTitle>
-            <AlertDescription className="text-base text-foreground/90 leading-relaxed">
+           <Alert variant="default" className={cn(
+              "bg-primary/5 border-primary/20",
+              hasAdviceError && "bg-amber-50/80 border-amber-200 text-amber-900"
+            )}>
+             {hasAdviceError ? 
+               <AlertTriangle className="h-5 w-5 text-amber-600" /> : 
+               <Lightbulb className="h-5 w-5 text-primary" />
+             }
+             <AlertTitle className={cn(
+                "font-semibold text-primary",
+                hasAdviceError && "text-amber-900"
+             )}>
+              {hasAdviceError ? "Aviso sobre a Recomendação" : "Recomendação da IA"}
+             </AlertTitle>
+             <AlertDescription className="text-base text-foreground/90 leading-relaxed">
               {isAdviceLoading ? (
                 <div className="space-y-1.5 pt-1 flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin"/>
