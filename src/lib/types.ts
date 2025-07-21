@@ -124,7 +124,9 @@ export interface CnaeData {
   annex: Annex;
   category: string;
   requiresFatorR?: boolean;
-  presumedProfitRate: number;
+  presumedProfitRate?: number; // Kept for legacy/simpler cases
+  presumedProfitRateIRPJ?: number;
+  presumedProfitRateCSLL?: number;
   isRegulated?: boolean;
   notes?: string;
   ivaReduction?: number;

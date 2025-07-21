@@ -1,3 +1,4 @@
+
 import { type CnaeData } from './types';
 
 export const CNAE_DATA_RAW: CnaeData[] = [
@@ -8,7 +9,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Veterinária',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRMV. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -19,7 +21,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -30,7 +33,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -41,7 +45,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM.'
@@ -52,7 +57,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM.'
@@ -63,7 +69,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM.'
@@ -74,7 +81,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -85,7 +93,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -96,7 +105,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico. Não pode ser MEI.'
@@ -107,7 +117,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -118,7 +129,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -129,7 +141,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -140,7 +153,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -151,7 +165,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -162,7 +177,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -173,7 +189,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -184,7 +201,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -195,7 +213,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -206,7 +225,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -217,7 +237,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -228,7 +249,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -239,7 +261,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -250,7 +273,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -261,7 +285,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -272,7 +297,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -283,7 +309,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -294,7 +321,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -305,7 +333,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo COREN. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -316,7 +345,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -327,7 +357,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRP. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -338,7 +369,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -349,7 +381,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -360,7 +393,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREFONO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -371,7 +405,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -382,7 +417,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada. O conselho (CRM, COFEN, CRF) depende da área de atuação. RT necessário.'
@@ -393,7 +429,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -403,7 +440,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -413,7 +451,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -424,7 +463,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -434,7 +474,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -444,7 +485,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -454,7 +496,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -465,7 +508,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -476,7 +520,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -487,7 +532,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Saúde e Bem-estar',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CBOO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -500,7 +546,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Odontologia',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -511,7 +558,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Odontologia',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
@@ -524,7 +572,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -533,7 +582,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -542,7 +592,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -551,7 +602,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -560,7 +612,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -569,7 +622,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
@@ -579,7 +633,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -588,7 +643,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -597,7 +653,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -606,7 +663,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
 
@@ -617,7 +675,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CAU. Exige registro da empresa e um Responsável Técnico arquiteto.'
@@ -628,7 +687,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e um Responsável Técnico engenheiro.'
@@ -639,7 +699,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
@@ -650,7 +711,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
@@ -661,7 +723,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.3
   },
@@ -671,7 +734,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
@@ -682,7 +746,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
@@ -693,7 +758,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
@@ -704,7 +770,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -713,7 +780,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -722,7 +790,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Engenharia, Arquitetura e Design',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   
@@ -733,7 +802,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Consultoria e Gestão Empresarial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
@@ -743,7 +813,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Consultoria e Gestão Empresarial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CREA ou CONEP (para pesquisas em humanos).'
   },
@@ -753,7 +824,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Consultoria e Gestão Empresarial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -762,7 +834,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Consultoria e Gestão Empresarial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA.'
   },
@@ -772,7 +845,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Consultoria e Gestão Empresarial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -784,7 +858,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -793,7 +868,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -802,7 +878,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -811,7 +888,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -820,7 +898,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -829,7 +908,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -838,7 +918,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -847,7 +928,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
 
@@ -858,7 +940,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -868,7 +951,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -878,7 +962,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -888,7 +973,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -898,7 +984,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -908,7 +995,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -918,7 +1006,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -928,7 +1017,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -938,7 +1028,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -948,7 +1039,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -958,7 +1050,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -968,7 +1061,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -978,7 +1072,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -988,7 +1083,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -998,7 +1094,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1008,7 +1105,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1018,7 +1116,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
   },
   {
@@ -1027,7 +1126,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
   },
   {
@@ -1036,7 +1136,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1046,7 +1147,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1056,7 +1158,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1066,7 +1169,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Educação e Treinamento',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1078,7 +1182,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CRA.'
   },
@@ -1088,7 +1193,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
   },
   {
@@ -1097,7 +1203,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1106,7 +1213,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1115,7 +1223,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1124,7 +1233,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1133,7 +1243,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1142,7 +1253,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1151,7 +1263,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Administrativos e de Apoio',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
 
@@ -1162,7 +1275,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CADASTUR.'
   },
@@ -1172,7 +1286,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CADASTUR.'
   },
@@ -1182,7 +1297,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CADASTUR.'
   },
@@ -1192,7 +1308,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA.'
   },
@@ -1202,7 +1319,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1211,7 +1329,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Turismo e Eventos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1220,7 +1339,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Diversos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1229,7 +1349,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Logística e Transporte',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1238,7 +1359,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Logística e Transporte',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1247,7 +1369,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1256,7 +1379,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1265,7 +1389,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
 
@@ -1277,7 +1402,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades Jurídicas e Contábeis',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pela OAB. É obrigatório o registro da sociedade na OAB e deve ser composta apenas por advogados.'
@@ -1288,7 +1414,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades Jurídicas e Contábeis',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRC. Exige registro da empresa e um Responsável Técnico contador.'
@@ -1299,7 +1426,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades Jurídicas e Contábeis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true
   },
   {
@@ -1308,7 +1436,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades Jurídicas e Contábeis',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
 
@@ -1319,7 +1448,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
   },
@@ -1329,7 +1459,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
   },
@@ -1339,7 +1470,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1349,7 +1481,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1359,7 +1492,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1369,7 +1503,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1379,7 +1514,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1389,7 +1525,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1399,7 +1536,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1409,7 +1547,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1419,7 +1558,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1429,7 +1569,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1439,7 +1580,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE.'
   },
@@ -1449,7 +1591,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
   },
@@ -1459,7 +1602,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Representação Comercial',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
   },
@@ -1471,7 +1615,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1481,7 +1626,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1491,7 +1637,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1501,7 +1648,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1511,7 +1659,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1521,7 +1670,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1531,7 +1681,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Atividades artísticas, criativas e de espetáculos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1541,7 +1692,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1551,7 +1703,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1561,7 +1714,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Cultura e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
   },
@@ -1573,7 +1727,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1582,7 +1737,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1591,7 +1747,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1600,7 +1757,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1609,7 +1767,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1618,7 +1777,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1627,7 +1787,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1636,7 +1797,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1645,7 +1807,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1654,7 +1817,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1663,7 +1827,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1672,7 +1837,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1681,7 +1847,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1690,7 +1857,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1699,7 +1867,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1708,7 +1877,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1717,7 +1887,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA. O enquadramento no Anexo III depende do Fator R.'
   },
@@ -1729,7 +1900,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1738,7 +1910,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREF ou CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
   },
@@ -1748,7 +1921,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1757,7 +1931,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1766,7 +1941,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1775,7 +1951,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1784,7 +1961,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Esportes e Lazer',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
 
@@ -1795,7 +1973,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pela CVM. É obrigatório o registro da PJ.'
   },
@@ -1805,7 +1984,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade passível de registro no Bacen.'
   },
@@ -1815,7 +1995,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1824,7 +2005,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1833,7 +2015,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pela SUSEP, exige RT no contrato social.'
   },
@@ -1843,7 +2026,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1852,7 +2036,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
   },
@@ -1862,7 +2047,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
   },
@@ -1872,7 +2058,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Financeiros e Imobiliários',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRECI/CRA.'
   },
@@ -1884,7 +2071,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1893,7 +2081,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1902,7 +2091,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1911,7 +2101,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1920,7 +2111,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1929,7 +2121,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1938,7 +2131,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1947,7 +2141,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1956,7 +2151,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1965,7 +2161,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1974,7 +2171,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1983,7 +2181,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -1992,7 +2191,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Fotografia e Audiovisual',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2001,7 +2201,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2010,7 +2211,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2019,7 +2221,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2028,7 +2231,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2037,7 +2241,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comunicação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   
@@ -2048,7 +2253,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Profissionais e Técnicos',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2057,7 +2263,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Profissionais e Técnicos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2066,7 +2273,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Agenciamento e Representação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado por CRA ou CORE.'
   },
@@ -2076,7 +2284,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Agenciamento e Representação',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2085,7 +2294,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Profissionais e Técnicos',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentação depende da atividade específica (ex: CONEP para pesquisas com humanos).'
   },
@@ -2095,7 +2305,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2104,7 +2315,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2113,7 +2325,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2122,7 +2335,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2131,7 +2345,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2140,7 +2355,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2149,7 +2365,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2158,7 +2375,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2167,7 +2385,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2176,7 +2395,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2185,7 +2405,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2194,7 +2415,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2203,7 +2425,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2212,7 +2435,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado se possuir procedimentos invasivos (CRBM, CRO, COFEN, CRM, etc.).'
   },
@@ -2222,7 +2446,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2231,7 +2456,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2240,7 +2466,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2249,7 +2476,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2258,7 +2486,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2267,7 +2496,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Pessoais',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   
@@ -2278,7 +2508,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2288,7 +2519,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2298,7 +2530,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2308,7 +2541,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2318,7 +2552,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2328,7 +2563,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2338,7 +2574,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2348,7 +2585,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2358,7 +2596,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2368,7 +2607,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2378,7 +2618,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2388,7 +2629,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2398,7 +2640,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2408,7 +2651,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2418,7 +2662,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2428,7 +2673,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2438,7 +2684,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2448,7 +2695,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2458,7 +2706,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2468,7 +2717,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2478,7 +2728,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2488,7 +2739,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2498,7 +2750,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2508,7 +2761,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2518,7 +2772,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2528,7 +2783,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2538,7 +2794,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2548,7 +2805,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2558,7 +2816,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2568,7 +2827,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2578,7 +2838,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2588,7 +2849,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2598,7 +2860,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2608,7 +2871,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2618,7 +2882,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2628,7 +2893,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2638,7 +2904,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CREA.'
   },
@@ -2648,7 +2915,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CREA.'
   },
@@ -2658,7 +2926,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Regulamentado pelo CREA.'
   },
@@ -2668,7 +2937,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2678,7 +2948,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Automotivos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false,
   },
   {
@@ -2687,7 +2958,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2697,7 +2969,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Automotivos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2706,7 +2979,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Automotivos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2715,7 +2989,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Automotivos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2724,7 +2999,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2734,7 +3010,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Serviços Automotivos',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -2743,7 +3020,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2756,7 +3034,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'V',
     requiresFatorR: true,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA ou CAU. Exige registro da empresa e indicação de Responsável Técnico.'
   },
@@ -2766,7 +3045,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2776,7 +3056,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2786,7 +3067,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2796,7 +3078,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2806,7 +3089,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2816,7 +3100,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2826,7 +3111,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2836,7 +3122,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2846,7 +3133,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2856,7 +3144,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2866,7 +3155,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2876,7 +3166,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2886,7 +3177,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA/CAU.'
   },
@@ -2896,7 +3188,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2906,7 +3199,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA.'
   },
@@ -2916,7 +3210,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2926,7 +3221,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA.'
   },
@@ -2936,7 +3232,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Construção Civil',
     annex: 'IV',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
   },
@@ -2948,7 +3245,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2957,7 +3255,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2966,7 +3265,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2975,7 +3275,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2984,7 +3285,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -2993,7 +3295,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3002,7 +3305,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3011,7 +3315,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3020,7 +3325,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3029,7 +3335,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3038,7 +3345,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3047,7 +3355,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3056,7 +3365,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3065,7 +3375,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3074,7 +3385,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3083,7 +3395,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3092,7 +3405,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3101,7 +3415,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3110,7 +3425,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3119,7 +3435,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3128,7 +3445,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3137,7 +3455,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3146,7 +3465,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3155,7 +3475,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3164,7 +3485,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3173,7 +3495,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3182,7 +3505,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3191,7 +3515,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3200,7 +3525,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3209,7 +3535,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3218,7 +3545,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3227,7 +3555,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3236,7 +3565,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3245,7 +3575,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3254,7 +3585,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3263,7 +3595,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3272,7 +3605,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3281,7 +3615,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3290,7 +3625,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3299,7 +3635,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3308,7 +3645,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3317,7 +3655,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3326,7 +3665,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3335,7 +3675,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3344,7 +3685,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3353,7 +3695,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3362,7 +3705,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3371,7 +3715,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3380,7 +3725,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3389,7 +3735,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3398,7 +3745,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3407,7 +3755,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3416,7 +3765,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3425,7 +3775,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3434,7 +3785,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3443,7 +3795,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3452,7 +3805,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3461,7 +3815,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3470,7 +3825,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3479,7 +3835,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3488,7 +3845,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3497,7 +3855,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3506,7 +3865,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3515,7 +3875,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3524,7 +3885,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3533,7 +3895,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3542,7 +3905,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Varejista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3551,7 +3915,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Tecnologia da Informação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   
@@ -3562,7 +3927,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Atacadista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3571,7 +3937,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Atacadista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3580,7 +3947,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Comércio Atacadista',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   
@@ -3591,7 +3959,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3600,7 +3969,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3609,7 +3979,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3618,7 +3989,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3627,7 +3999,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3636,7 +4009,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3645,7 +4019,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRate: 0.32,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
   {
@@ -3654,7 +4029,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3663,7 +4039,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3672,7 +4049,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3681,7 +4059,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3690,7 +4069,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3699,7 +4079,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3708,7 +4089,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3717,7 +4099,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3726,7 +4109,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3735,7 +4119,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3744,7 +4129,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3753,7 +4139,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
   {
@@ -3762,7 +4149,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Hospedagem e Alimentação',
     annex: 'I',
     requiresFatorR: false,
-    presumedProfitRate: 0.08,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
     isRegulated: false
   }
 ];
