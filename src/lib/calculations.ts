@@ -77,9 +77,9 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenue = exportActivities.reduce((sum, act) => act.revenue, 0) * exchangeRate;
+    const exportRevenue = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenue;
-
+    
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
 
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
@@ -199,7 +199,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
 
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+    const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenueBRL;
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
@@ -216,7 +216,10 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
     const iss = domesticRevenue * config.lucro_presumido_rates.ISS;
 
-    const allActivities = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
+    const allActivities = [
+        ...domesticActivities, 
+        ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))
+    ];
     
     if (totalRevenue === 0 && allActivities.length === 0 && selectedCnaes.length > 0) {
         allActivities.push({ code: selectedCnaes[0], revenue: 0, type: 'domestic'});
@@ -318,3 +321,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 }
 // Export for use in 2026 calculations to avoid duplication
 export { };
+
+    
