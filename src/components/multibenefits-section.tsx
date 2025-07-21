@@ -73,7 +73,7 @@ export default function MultibenefitsSection() {
                  {/* TotalPass Card */}
                 <Card className="flex flex-col text-left overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-card">
                     <CardHeader>
-                        <Image src={partnerBenefits[0].partnerLogo} alt={partnerBenefits[0].partnerAlt} width={120} height={40} className="mb-4" />
+                        <Image src={partnerBenefits[0].partnerLogo} alt="" width={120} height={40} className="mb-4" />
                         <CardTitle className="text-2xl font-bold text-primary">{partnerBenefits[0].title}</CardTitle>
                     </CardHeader>
                     <CardContent className="flex-grow">
@@ -84,7 +84,7 @@ export default function MultibenefitsSection() {
                  {/* StarBem Card */}
                 <Card className="flex flex-col text-left overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-card">
                     <CardHeader>
-                         <Image src={partnerBenefits[1].partnerLogo} alt={partnerBenefits[1].partnerAlt} width={120} height={40} className="mb-4" />
+                         <Image src={partnerBenefits[1].partnerLogo} alt="" width={120} height={40} className="mb-4" />
                         <CardTitle className="text-2xl font-bold text-primary">{partnerBenefits[1].title}</CardTitle>
                     </CardHeader>
                     <CardContent className="flex-grow space-y-4">
