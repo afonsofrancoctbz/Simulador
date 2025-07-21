@@ -110,7 +110,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
     for (const activity of allActivities) {
         const cnaeInfo = getCnaeData(activity.code);
-        if (!cnaeInfo) continue;
+        if (!cnaeInfo || activity.revenue <= 0) continue;
 
         let effectiveAnnex: Annex = cnaeInfo.annex;
         if (cnaeInfo.requiresFatorR) {
@@ -124,7 +124,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
         const annexTable = config.simples_nacional[effectiveAnnex];
         
-        if (!annexTable || activity.revenue <= 0) {
+        if (!annexTable) {
             continue;
         }
 
