@@ -124,15 +124,14 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
         const annexTable = config.simples_nacional[effectiveAnnex];
         
-        if (!annexTable) {
-            console.warn(`Tabela do anexo ${effectiveAnnex} não encontrada. Pulando cálculo.`);
+        if (!annexTable || activity.revenue <= 0) {
             continue;
         }
 
         const bracket = findBracket(annexTable, effectiveRbt12);
         
         const effectiveRate = effectiveRbt12 > 0 
-            ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12) 
+            ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12
             : bracket.rate;
 
         let dasForActivity = activity.revenue * effectiveRate;
@@ -140,8 +139,8 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         if (activity.type === 'export') {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-            const exportDasRate = effectiveRate * exportExemptionFactor;
-            dasForActivity -= activity.revenue * exportDasRate;
+            const exportExemptionValue = activity.revenue * effectiveRate * exportExemptionFactor;
+            dasForActivity -= exportExemptionValue;
 
             if (exportRevenue > 0 && !notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
