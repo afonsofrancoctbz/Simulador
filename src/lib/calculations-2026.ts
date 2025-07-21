@@ -1,4 +1,5 @@
 
+
 import { getFiscalParameters, type FiscalConfig, type FiscalConfig2026 } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
