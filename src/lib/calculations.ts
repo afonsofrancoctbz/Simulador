@@ -170,8 +170,8 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
 
     const breakdown = [
-        { name: `DAS (Simples Nacional - ${formatPercent(totalRevenue > 0 ? totalDas / totalRevenue : 0)})`, value: totalDas },
-        { name: `CPP (INSS Patronal - ${formatPercent(config.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV },
+        { name: `DAS (Simples Nacional)`, value: totalDas },
+        { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV },
         { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
@@ -243,7 +243,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       { name: `PIS (${formatPercent(config.lucro_presumido_rates.PIS)})`, value: pis },
       { name: `COFINS (${formatPercent(config.lucro_presumido_rates.COFINS)})`, value: cofins },
       { name: `ISS (${formatPercent(config.lucro_presumido_rates.ISS)})`, value: iss },
-      { name: `CPP (INSS Patronal - ${formatPercent(config.aliquotas_cpp_patronal.base)})`, value: cpp },
+      { name: `CPP (INSS Patronal)`, value: cpp },
       { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
       { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
@@ -317,3 +317,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 }
 // Export for use in 2026 calculations to avoid duplication
 export { _calculatePartnerTaxes, _calculateCpp };
+
+    

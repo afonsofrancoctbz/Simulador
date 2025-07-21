@@ -83,10 +83,15 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     details.breakdown.forEach(item => {
       if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].some(tax => item.name.includes(tax))) {
         groups["Impostos s/ Faturamento"].push(item);
-      } else if (['INSS s/ Pró-labore', 'IRRF s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.includes(tax))) {
+      } else if (['INSS s/ Pró-labore', 'CPP (INSS Patronal)'].some(tax => item.name.includes(tax))) {
         groups["Encargos s/ Folha e Pró-labore"].push(item);
       }
     });
+
+    // IRRF is an advance, but shown as an encargo for clarity
+     const irrfItem = details.breakdown.find(item => item.name.includes('IRRF'));
+     if(irrfItem) groups["Encargos s/ Folha e Pró-labore"].push(irrfItem);
+
     groups["Outros Custos"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
     return groups;
@@ -230,3 +235,5 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     </div>
   );
 };
+
+    
