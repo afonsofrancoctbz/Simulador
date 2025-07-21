@@ -119,5 +119,3 @@ export const getFiscalParameters = (year: number = 2025): FiscalConfig | FiscalC
     }
     return FISCAL_CONFIG_2025;
 }
-
-    
