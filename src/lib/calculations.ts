@@ -1,4 +1,5 @@
 
+
 import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -9,7 +10,6 @@ import {
   type TaxFormValues,
   type TaxDetails,
   type Annex,
-  type FeeBracket,
   type ProLaboreForm,
   type PartnerTaxDetails,
 } from './types';
@@ -170,7 +170,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
 
     const breakdown = [
-        { name: `DAS (Simples Nacional)`, value: totalDas },
+        { name: `DAS`, value: totalDas },
         { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV },
         { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
@@ -180,6 +180,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         regime: "Simples Nacional", totalTax, totalMonthlyCost, totalRevenue,
         proLabore: totalProLaboreBruto, fatorR: hasAnnexVActivity ? fatorR : undefined,
         annex: annexLabel, effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
+        effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
         contabilizeiFee, breakdown: breakdown.filter(item => item.value > 0.001),
         notes, partnerTaxes,
     };
@@ -317,5 +318,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 }
 // Export for use in 2026 calculations to avoid duplication
 export { _calculatePartnerTaxes, _calculateCpp };
-
-    
