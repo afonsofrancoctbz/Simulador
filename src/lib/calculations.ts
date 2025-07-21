@@ -82,6 +82,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
 
+    // Use RBT12 if provided, otherwise project annual revenue from current month's total.
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
 
@@ -99,18 +100,21 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const finalAnnexes = new Set<Annex>();
     let hasAnnexIVActivity = false;
 
+    // Combine all activities for a single processing loop
     const allActivities = [
         ...domesticActivities.map(a => ({ ...a, type: 'domestic' as const })),
         ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const }))
     ];
-
+    
+    // Fallback for when there is no revenue but CNAEs are selected
     if (totalRevenue === 0 && allActivities.length === 0 && selectedCnaes.length > 0) {
         allActivities.push({ code: selectedCnaes[0], revenue: 0, type: 'domestic'});
     }
 
+    // Process each activity to calculate its contribution to DAS
     for (const activity of allActivities) {
         const cnaeInfo = getCnaeData(activity.code);
-        if (!cnaeInfo || activity.revenue <= 0) continue;
+        if (!cnaeInfo) continue;
 
         let effectiveAnnex: Annex = cnaeInfo.annex;
         if (cnaeInfo.requiresFatorR) {
@@ -123,29 +127,31 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         }
 
         const annexTable = config.simples_nacional[effectiveAnnex];
+        if (!annexTable) continue;
         
-        if (!annexTable) {
-            continue;
-        }
-
         const bracket = findBracket(annexTable, effectiveRbt12);
         
+        // Calculate the effective tax rate based on the RBT12
         const effectiveRate = effectiveRbt12 > 0 
-            ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12)
+            ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12
             : bracket.rate;
 
+        // Calculate the full DAS for the activity's revenue
         let dasForActivity = activity.revenue * effectiveRate;
         
-        if (activity.type === 'export') {
+        // If the activity is an export, calculate and apply the tax exemption
+        if (activity.type === 'export' && dasForActivity > 0) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+            // The exemption factor is the sum of tax shares that don't apply to exports
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-            const exportExemptionValue = activity.revenue * effectiveRate * exportExemptionFactor;
+            const exportExemptionValue = dasForActivity * exportExemptionFactor;
             dasForActivity -= exportExemptionValue;
 
             if (exportRevenue > 0 && !notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
             }
         }
+        
         totalDas += dasForActivity;
     }
 
