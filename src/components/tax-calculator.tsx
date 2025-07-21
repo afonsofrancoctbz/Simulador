@@ -9,12 +9,10 @@ import { z } from "zod";
 import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import { type CalculationResults, type CalculationResults2026, type TaxFormValues, type CnaeItem, Annex, CnaeData, ProLaboreFormSchema, PlanEnumSchema } from '@/lib/types';
-import { formatCurrencyBRL } from "@/lib/utils";
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
 import { useToast } from '@/hooks/use-toast';
-import { CnaeSelector } from './cnae-selector';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
@@ -28,7 +26,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   const [advice, setAdvice] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdviceLoading, setIsAdviceLoading] = useState(false);
-  const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,20 +65,6 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       return cnae?.category === 'Odontologia';
     });
   }, [selectedCnaes]);
-
-  const handleCnaeConfirm = (codes: string[]) => {
-    form.setValue('selectedCnaes', codes, { shouldValidate: true });
-    const newRevenues: Record<string, number | undefined> = {};
-    const newAnnexes = new Set(codes.map(code => getCnaeData(code)?.annex).filter(Boolean));
-    const currentRevenues = form.getValues('revenues');
-    for (const key in currentRevenues) {
-      const annex = key.split('_')[1] as Annex;
-      if (newAnnexes.has(annex)) {
-        newRevenues[key] = currentRevenues[key];
-      }
-    }
-    form.setValue('revenues', newRevenues);
-  };
 
   const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
     const domesticActivities: CnaeItem[] = [];
@@ -206,16 +189,8 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
     <FormProvider {...form}>
       <TaxCalculatorForm
         year={year}
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         isLoading={isLoading}
-        onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)}
-      />
-
-      <CnaeSelector
-        open={isCnaeSelectorOpen}
-        onOpenChange={setCnaeSelectorOpen}
-        onConfirm={handleCnaeConfirm}
-        initialSelectedCodes={selectedCnaes}
       />
 
       <div className="mt-12">

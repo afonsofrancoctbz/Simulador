@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
@@ -10,6 +11,9 @@ import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { FormSectionCompany } from "./form-section-company";
 import { FormSectionRevenue } from "./form-section-revenue";
 import { FormSectionPlan } from "./form-section-plan";
+import { CnaeSelector } from './cnae-selector';
+import { getCnaeData } from "@/lib/cnae-helpers";
+import type { Annex } from "@/lib/types";
 
 export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
@@ -41,30 +45,57 @@ interface TaxCalculatorFormProps {
     year: 2025 | 2026;
     onSubmit: (values: CalculatorFormValues) => void;
     isLoading: boolean;
-    onCnaeSelectorOpen: () => void;
 }
 
-export default function TaxCalculatorForm({ year, onSubmit, isLoading, onCnaeSelectorOpen }: TaxCalculatorFormProps) {
+export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalculatorFormProps) {
     const form = useFormContext<CalculatorFormValues>();
+    const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
+    
+    const selectedCnaes = form.watch("selectedCnaes");
+    
+    const handleCnaeConfirm = (codes: string[]) => {
+        form.setValue('selectedCnaes', codes, { shouldValidate: true });
+        // After confirming, we should update the `revenues` object to only keep annexes that are still present
+        const newRevenues: Record<string, number | undefined> = {};
+        const newAnnexes = new Set(codes.map(code => getCnaeData(code)?.annex).filter(Boolean));
+        const currentRevenues = form.getValues('revenues');
+
+        for (const key in currentRevenues) {
+            const annex = key.split('_')[1] as Annex;
+            if (newAnnexes.has(annex)) {
+                newRevenues[key] = currentRevenues[key];
+            }
+        }
+        form.setValue('revenues', newRevenues);
+    };
+
 
     return (
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
-            <Card className="shadow-xl overflow-hidden border bg-card max-w-7xl mx-auto">
-                <CardContent className="p-6 md:p-8 space-y-8">
-                    
-                    <FormSectionCompany year={year} />
+        <>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
+                <Card className="shadow-xl overflow-hidden border bg-card max-w-7xl mx-auto">
+                    <CardContent className="p-6 md:p-8 space-y-8">
+                        
+                        <FormSectionCompany year={year} />
 
-                    <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />
-                    
-                    <FormSectionPlan />
+                        <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
+                        
+                        <FormSectionPlan />
 
-                </CardContent>
-                <CardFooter className="bg-muted/30 border-t p-6">
-                    <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                      {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
-                    </Button>
-                </CardFooter>
-            </Card>
-        </form>
+                    </CardContent>
+                    <CardFooter className="bg-muted/30 border-t p-6">
+                        <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                        {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </form>
+            <CnaeSelector
+                open={isCnaeSelectorOpen}
+                onOpenChange={setCnaeSelectorOpen}
+                onConfirm={handleCnaeConfirm}
+                initialSelectedCodes={selectedCnaes}
+            />
+        </>
     );
 }
