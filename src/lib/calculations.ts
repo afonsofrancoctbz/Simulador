@@ -219,7 +219,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     
     // Ensure there's at least one activity to get presumedProfitRate from, even with 0 revenue
     if (totalRevenue === 0 && allActivities.length === 0 && values.selectedCnaes.length > 0) {
-        allActivities.push({ code: values.selectedCnaes[0], revenue: 0 });
+        allActivities.push({ code: values.selectedCnaes[0], revenue: 0, type: 'domestic'});
     }
 
     const presumedProfitBase = allActivities.reduce((sum, activity) => {
@@ -238,11 +238,11 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
     const breakdown = [
-      { name: `IRPJ (${formatPercent(totalRevenue > 0 ? (irpj + irpjAdicional) / totalRevenue : 0)})`, value: irpj + irpjAdicional },
-      { name: `CSLL (${formatPercent(totalRevenue > 0 ? csll / totalRevenue : 0)})`, value: csll },
-      { name: `PIS (${formatPercent(totalRevenue > 0 ? pis / totalRevenue : 0)})`, value: pis },
-      { name: `COFINS (${formatPercent(totalRevenue > 0 ? cofins / totalRevenue : 0)})`, value: cofins },
-      { name: `ISS (${formatPercent(totalRevenue > 0 ? iss / totalRevenue : 0)})`, value: iss },
+      { name: `IRPJ`, value: irpj + irpjAdicional },
+      { name: `CSLL`, value: csll },
+      { name: `PIS (${formatPercent(config.lucro_presumido_rates.PIS)})`, value: pis },
+      { name: `COFINS (${formatPercent(config.lucro_presumido_rates.COFINS)})`, value: cofins },
+      { name: `ISS (${formatPercent(config.lucro_presumido_rates.ISS)})`, value: iss },
       { name: `CPP (INSS Patronal - ${formatPercent(config.aliquotas_cpp_patronal.base)})`, value: cpp },
       { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
       { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },

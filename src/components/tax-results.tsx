@@ -149,7 +149,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-muted-foreground flex items-center gap-1.5">
                                         {item.name.replace(/\s*\([^)]*\)/, '')}
-                                        <span className="text-primary/70 font-medium">
+                                        <span className="text-primary/70 font-medium text-xs">
                                           {item.name.match(/\(([^)]+)\)/)?.[0]}
                                         </span>
                                       </span>
