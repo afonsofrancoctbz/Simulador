@@ -9,7 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import { calculateTaxes } from '@/lib/calculations';
-import { getCnaeData, CNAE_DATA_RAW } from '@/lib/cnae-helpers';
+import { CNAE_DATA_RAW } from '@/lib/cnaes-raw';
 import { getFiscalParameters } from '@/config/fiscal';
 import type { CalculationResults, TaxFormValues } from '@/lib/types';
 import { CalculationResultsSchema, TaxFormValuesSchema } from '@/lib/types';
@@ -39,13 +39,12 @@ const calculateTaxesFlow = ai.defineFlow(
       })),
       rbt12: formValues.rbt12,
       fp12: formValues.fp12,
-      proLaboreValues: formValues.proLabores.map(p => p.value),
+      proLaboreDetails: formValues.proLabores,
       cnaeCodes: formValues.selectedCnaes,
       totalSalaryExpense: formValues.totalSalaryExpense,
       fiscalConfig: fiscalConfig,
       cnaeData: CNAE_DATA_RAW,
       selectedPlan: formValues.selectedPlan,
-      proLaboreDetails: formValues.proLabores,
     };
     
     // Here we call the new, pure calculation logic.
