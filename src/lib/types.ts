@@ -1,9 +1,10 @@
 
+
 import { z } from "zod";
 import { formatCurrencyBRL } from "./utils";
 
-// A constante foi movida para cá para quebrar a dependência circular.
-const MINIMUM_WAGE = 1518.00;
+// This constant is now defined here to break a circular dependency.
+export const MINIMUM_WAGE = 1518.00;
 
 
 // Schema for an individual CNAE item
@@ -35,7 +36,7 @@ export const PlanEnumSchema = z.enum(['basico', 'padrao', 'multibeneficios', 'ex
 export type Plan = z.infer<typeof PlanEnumSchema>;
 
 
-// Schema for the main form input passed to calculation functions
+// Schema for the main form input passed from the frontend to the Genkit flow
 export const TaxFormValuesSchema = z.object({
   selectedCnaes: z.array(z.string()),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
@@ -75,8 +76,6 @@ export const TaxDetailsSchema = z.object({
     regime: z.enum([
       "Simples Nacional", 
       "Lucro Presumido",
-      "Simples Nacional Híbrido",
-      "Simples Nacional Tradicional"
     ]),
     totalTax: z.number(),
     totalMonthlyCost: z.number(),
@@ -96,18 +95,6 @@ export const TaxDetailsSchema = z.object({
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
 
-// Schemas for 2026 results
-export const TaxDetails2026Schema = TaxDetailsSchema.extend({});
-export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;
-
-export const CalculationResults2026Schema = z.object({
-    simplesNacionalTradicional: TaxDetails2026Schema,
-    simplesNacionalHibrido: TaxDetails2026Schema,
-    lucroPresumido: TaxDetails2026Schema,
-});
-export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
-
-
 export const CalculationResultsSchema = z.object({
   simplesNacionalOtimizado: TaxDetailsSchema.nullable(),
   simplesNacionalBase: TaxDetailsSchema,
@@ -124,7 +111,6 @@ export interface CnaeData {
   annex: Annex;
   category: string;
   requiresFatorR?: boolean;
-  presumedProfitRate?: number; // Kept for legacy/simpler cases
   presumedProfitRateIRPJ?: number;
   presumedProfitRateCSLL?: number;
   isRegulated?: boolean;
@@ -140,4 +126,3 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
-    
