@@ -93,7 +93,7 @@ export { _calculateCpp };
  * Follows the rules specified in the requirements document.
  */
 function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOverride?: number[]): TaxDetails {
-    const { fiscalConfig, cnaeData, selectedPlan, totalSalaryExpense, fp12, rbt12, cnaeCodes } = input;
+    const { fiscalConfig, selectedPlan, totalSalaryExpense, fp12, rbt12, cnaeCodes } = input;
     
     const proLaboresToUse = proLaboreValuesOverride 
         ? input.proLaboreDetails.map((p, i) => ({ ...p, value: proLaboreValuesOverride[i] || p.value }))
@@ -136,50 +136,63 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             notes,
         };
     }
-    
-    for (const activity of allActivities) {
-        const cnaeInfo = cnaeData.find(c => c?.code === activity.code);
-        if (!cnaeInfo || activity.revenue <= 0) continue;
 
-        let effectiveAnnex: Annex = cnaeInfo.annex;
+    const revenueByAnnex: { [key in Annex]?: number } = {};
+    const exportRevenueByAnnex: { [key in Annex]?: number } = {};
+    
+    allActivities.forEach(activity => {
+        const cnaeInfo = getCnaeData(activity.code);
+        if (!cnaeInfo) return;
+
+        let effectiveAnnex = cnaeInfo.annex;
         if (cnaeInfo.requiresFatorR) {
             effectiveAnnex = fatorR >= fiscalConfig.simples_nacional.limite_fator_r ? 'III' : 'V';
         }
         finalAnnexes.add(effectiveAnnex);
         
-        const isExportActivity = input.exportActivities.some(a => a.code === activity.code && a.revenue === activity.revenue);
-        if (effectiveAnnex === 'IV') {
-            const cppForActivity = _calculateCpp(monthlyPayroll * (activity.revenue / totalRevenue), fiscalConfig);
-            cppFromAnnexIV += cppForActivity;
-            if (!notes.some(n => n.includes('Anexo IV'))) {
-                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
-            }
-        }
-
-        const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
-        if (!annexTable) continue;
+        const isExport = input.exportActivities.some(exp => exp.code === activity.code && exp.revenue === activity.revenue);
         
+        if (isExport) {
+            exportRevenueByAnnex[effectiveAnnex] = (exportRevenueByAnnex[effectiveAnnex] || 0) + activity.revenue;
+        } else {
+            revenueByAnnex[effectiveAnnex] = (revenueByAnnex[effectiveAnnex] || 0) + activity.revenue;
+        }
+    });
+
+    for (const annexStr in revenueByAnnex) {
+        const annex = annexStr as Annex;
+        const annexTable = fiscalConfig.simples_nacional[annex];
         const bracket = findBracket(annexTable, effectiveRbt12);
-        const effectiveRate = effectiveRbt12 > 0 
-            ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12)
-            : bracket.rate;
-
-        let dasForActivity = activity.revenue * effectiveRate;
+        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
         
-        if (isExportActivity) {
-             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-             const exportExemptionValue = (activity.revenue * effectiveRate) * exportExemptionFactor;
-             dasForActivity = Math.max(0, dasForActivity - exportExemptionValue);
-
-            if (!notes.some(n => n.includes('exportação'))) {
-                notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
-            }
-        }
+        totalDas += (revenueByAnnex[annex] ?? 0) * effectiveRate;
+    }
+    
+    for (const annexStr in exportRevenueByAnnex) {
+        const annex = annexStr as Annex;
+        const annexTable = fiscalConfig.simples_nacional[annex];
+        const bracket = findBracket(annexTable, effectiveRbt12);
+        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
+        
+        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+        const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
+        
+        let dasForActivity = (exportRevenueByAnnex[annex] ?? 0) * effectiveRate;
+        dasForActivity -= dasForActivity * exportExemptionFactor;
         
         totalDas += dasForActivity;
+         if (!notes.some(n => n.includes('exportação'))) {
+            notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
+        }
     }
-
+    
+    if (finalAnnexes.has('IV')) {
+        cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
+        if (!notes.some(n => n.includes('Anexo IV'))) {
+            notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
+        }
+    }
+    
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
