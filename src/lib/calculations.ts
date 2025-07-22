@@ -333,7 +333,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
-// Export for use in 2026 calculations to avoid duplication
-export { };
 
     

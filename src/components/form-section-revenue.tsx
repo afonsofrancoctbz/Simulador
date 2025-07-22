@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
@@ -154,7 +155,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                     />
                                 </FormControl>
                                 <FormDescription className='text-sm'>
-                                    Deixe R$ 0,00 se estiver abrindo a empresa agora.
+                                    Para empresas com menos de 12 meses, calcule a média mensal desde a abertura e multiplique por 12. Se for o primeiro mês, pode deixar em R$ 0,00.
                                 </FormDescription>
                                 <FormMessage />
                                 {showSimplesLimitWarning && (
