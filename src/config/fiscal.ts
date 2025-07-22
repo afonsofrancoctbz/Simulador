@@ -1,4 +1,5 @@
 
+
 // Baseado na sua solicitação para um arquivo de configuração centralizado.
 // Todos os parâmetros fiscais que podem mudar ano a ano são armazenados aqui.
 
