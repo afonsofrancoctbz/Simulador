@@ -66,7 +66,7 @@ export function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): numb
 
 
 // =================================================================================
-// CÁLCULO DO SIMPLES NACIONAL (COM CORREÇÃO)
+// CÁLCULO DO SIMPLES NACIONAL (RECONSTRUÍDO)
 // =================================================================================
 
 function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
@@ -108,7 +108,10 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     
     // Fallback for when there is no revenue but CNAEs are selected
     if (totalRevenue === 0 && allActivities.length === 0 && selectedCnaes.length > 0) {
-        allActivities.push({ code: selectedCnaes[0], revenue: 0, type: 'domestic'});
+        const firstCnae = getCnaeData(selectedCnaes[0]);
+        if (firstCnae) {
+           allActivities.push({ code: firstCnae.code, revenue: 0, type: 'domestic'});
+        }
     }
 
     // Process each activity to calculate its contribution to DAS
@@ -178,7 +181,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
 
     const breakdown = [
         { name: 'DAS', value: totalDas },
-        { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
+        { name: `CPP (INSS Patronal - ${formatPercent(config.aliquotas_cpp_patronal.base)})`, value: cppFromAnnexIV },
         { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
@@ -227,7 +230,10 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
     ];
     
     if (totalRevenue === 0 && allActivities.length === 0 && selectedCnaes.length > 0) {
-        allActivities.push({ code: selectedCnaes[0], revenue: 0, type: 'domestic'});
+        const firstCnae = getCnaeData(selectedCnaes[0]);
+        if(firstCnae) {
+           allActivities.push({ code: firstCnae.code, revenue: 0});
+        }
     }
 
     const irpjPresumedProfitBase = allActivities.reduce((sum, activity) => {
@@ -255,7 +261,7 @@ function calculateLucroPresumido(values: TaxFormValues): TaxDetails {
       { name: `PIS (${formatPercent(config.lucro_presumido_rates.PIS)})`, value: pis },
       { name: `COFINS (${formatPercent(config.lucro_presumido_rates.COFINS)})`, value: cofins },
       { name: `ISS (${formatPercent(config.lucro_presumido_rates.ISS)})`, value: iss },
-      { name: 'CPP (INSS Patronal)', value: cpp },
+      { name: `CPP (INSS Patronal - ${formatPercent(config.aliquotas_cpp_patronal.base)})`, value: cpp },
       { name: `INSS s/ Pró-labore (${formatPercent(config.aliquota_inss_prolabore)})`, value: totalINSSRetido },
       { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
     ];
@@ -311,11 +317,14 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
   // Set display order for the UI
   lucroPresumido.order = 3;
-  if (simplesNacionalOtimizado) {
+  if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
     simplesNacionalBase.order = 2;
     simplesNacionalOtimizado.order = 1;
   } else {
     simplesNacionalBase.order = 1;
+    if(simplesNacionalOtimizado) {
+       simplesNacionalOtimizado.order = 2;
+    }
   }
 
   return {
@@ -326,8 +335,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 }
 // Export for use in 2026 calculations to avoid duplication
 export { };
-
-    
-    
 
     

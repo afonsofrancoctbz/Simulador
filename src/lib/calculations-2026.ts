@@ -34,7 +34,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
 
   let presumedProfitBase = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))].reduce((sum, activity) => {
     const cnaeInfo = getCnaeData(activity.code);
-    return sum + (activity.revenue * (cnaeInfo?.presumedProfitRate ?? 0.32));
+    return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateIRPJ ?? 0.32));
   }, 0);
 
   const irpj = presumedProfitBase * fiscalConfig2026.lucro_presumido_rates.IRPJ_BASE;
@@ -89,7 +89,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2026);
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenue = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+    const exportRevenue = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenue;
     
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
@@ -228,3 +228,5 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+    
