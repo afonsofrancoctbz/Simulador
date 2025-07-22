@@ -23,7 +23,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
   
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-  const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + act.revenue, 0) * exchangeRate;
+  const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
   const totalRevenue = domesticRevenue + exportRevenueBRL;
   const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
