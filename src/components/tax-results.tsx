@@ -82,12 +82,21 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     };
 
     details.breakdown.forEach(item => {
-      if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].some(tax => item.name.includes(tax))) {
+      // Imposto do Simples (DAS) ou impostos do Presumido
+      if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].includes(item.name)) {
         groups["IMPOSTOS S/ FATURAMENTO"].push(item);
-      } else if (['INSS s/ Pró-labore', 'CPP (INSS Patronal)', 'IRRF'].some(tax => item.name.includes(tax))) {
+      } 
+      // Encargos da folha
+      else if (['INSS s/ Pró-labore', 'CPP (INSS Patronal)', 'IRRF'].some(tax => item.name.includes(tax))) {
         groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(item);
       }
     });
+    
+    // Agrupando o DAS com os impostos de faturamento
+    const dasItem = details.breakdown.find(item => item.name === 'DAS');
+    if (dasItem) {
+      groups["IMPOSTOS S/ FATURAMENTO"].push(dasItem);
+    }
     
     groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 

@@ -89,7 +89,6 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
     
     const hasAnnexVActivity = selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-    const useAnnexIIIForV = hasAnnexVActivity && fatorR >= config.simples_nacional.limite_fator_r;
 
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
@@ -98,7 +97,6 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     let cppFromAnnexIV = 0;
     const notes: string[] = [];
     const finalAnnexes = new Set<Annex>();
-    let hasAnnexIVActivity = false;
 
     // Combine all activities for a single processing loop
     const allActivities = [
@@ -126,7 +124,11 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         finalAnnexes.add(effectiveAnnex);
         
         if (effectiveAnnex === 'IV') {
-            hasAnnexIVActivity = true;
+            // CPP for Anexo IV is calculated on the total payroll for the month
+            cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
+            if (!notes.some(n => n.includes('Anexo IV'))) {
+                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(config.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
+            }
         }
 
         const annexTable = config.simples_nacional[effectiveAnnex];
@@ -158,26 +160,27 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         totalDas += dasForActivity;
     }
 
-    if (hasAnnexIVActivity) {
-        cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
-        if (!notes.some(n => n.includes('Anexo IV'))) {
-            notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(config.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
-        }
-    }
-
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
     
     let annexLabel: string;
-    if (useAnnexIIIForV) {
-      annexLabel = 'Anexo III (Com Fator R)';
-    } else if (finalAnnexes.size === 1 && hasAnnexVActivity) {
-      annexLabel = 'Anexo V (Sem Fator R)';
-    } else if (finalAnnexes.size === 0 && hasAnnexVActivity) {
-        annexLabel = 'Anexo V (Sem Fator R)';
+    const isOptimized = fatorR >= config.simples_nacional.limite_fator_r && hasAnnexVActivity;
+
+    if (finalAnnexes.size === 0 && hasAnnexVActivity) {
+        annexLabel = fatorR >= config.simples_nacional.limite_fator_r ? 'Anexo III (Com Fator R)' : 'Anexo V (Sem Fator R)';
+    } else if (finalAnnexes.size === 1) {
+        const singleAnnex = [...finalAnnexes][0];
+        if (singleAnnex === 'V') {
+            annexLabel = 'Anexo V (Sem Fator R)';
+        } else if (singleAnnex === 'III' && hasAnnexVActivity) {
+             annexLabel = 'Anexo III (Com Fator R)';
+        } else {
+            annexLabel = `Anexo ${singleAnnex}`;
+        }
     } else {
-      annexLabel = [...finalAnnexes].length === 1 ? `Anexo ${[...finalAnnexes][0]}` : `Anexos (${[...finalAnnexes].join(', ')})`;
+        annexLabel = `Anexos (${[...finalAnnexes].join(', ')})`;
     }
+
 
     const breakdown = [
         { name: 'DAS', value: totalDas },
@@ -307,9 +310,9 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
               
               simplesNacionalOtimizado = _calculateSimplesNacional(optimizedValues);
               if (simplesNacionalOtimizado) {
-                  simplesNacionalOtimizado.regime = "Simples Nacional";
-                  simplesNacionalOtimizado.annex = "Anexo III (Com Fator R)";
-                  simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R.`
+                  simplesNacionalOtimizado.regime = "Simples Nacional"; // Mantém o regime
+                  simplesNacionalOtimizado.annex = "Anexo III (Com Fator R)"; // Especifica o resultado
+                  simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`
               }
           }
       }
