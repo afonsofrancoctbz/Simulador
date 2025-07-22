@@ -21,7 +21,7 @@ interface TaxResultsProps {
   error: string | null;
 }
 
-export default function TaxResults({ year, isLoading, isAdviceLoading, results, advice, error }: TaxResultsProps) {
+export default function TaxResults({ year, isLoading, isAdviceLoading, results, error }: TaxResultsProps) {
   if (isLoading) {
     return (
       <div id="results-section" className="mt-12 w-full">
@@ -75,24 +75,21 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
   const cheapestScenario = validScenarios.length > 0 ? validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current)) : null;
 
   const groupTaxes = (details: TaxDetails) => {
-    const groups: { [key: string]: { name: string, value: number, rate?: number }[] } = {
-      "IMPOSTOS S/ FATURAMENTO": [],
-      "ENCARGOS S/ FOLHA E PRÓ-LABORE": [],
-      "OUTROS CUSTOS": []
+    const groups: { [key: string]: { name: string; value: number }[] } = {
+        'IMPOSTOS S/ FATURAMENTO': [],
+        'ENCARGOS S/ FOLHA E PRÓ-LABORE': [],
+        'OUTROS CUSTOS': [],
     };
 
     details.breakdown.forEach(item => {
-      // Imposto do Simples (DAS) ou impostos do Presumido
-      if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].includes(item.name)) {
-        groups["IMPOSTOS S/ FATURAMENTO"].push(item);
-      } 
-      // Encargos da folha
-      else if (['INSS s/ Pró-labore', 'CPP (INSS Patronal)', 'IRRF'].some(tax => item.name.includes(tax))) {
-        groups["ENCARGOS S/ FOLHA E PRÓ-LABORE"].push(item);
-      }
+        if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].includes(item.name)) {
+            groups['IMPOSTOS S/ FATURAMENTO'].push(item);
+        } else if (['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].includes(item.name)) {
+            groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
+        }
     });
-    
-    groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+
+    groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
     return groups;
   };
@@ -151,14 +148,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                 {filteredItems.map(item => (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-muted-foreground flex items-center gap-1.5">
-                                        {item.name.replace(/\s*\([^)]*\)/, '')}
+                                        {item.name}
                                         {item.name === 'DAS' && scenario.effectiveDasRate ? (
                                           <span className="text-xs text-muted-foreground/80 font-medium">
                                             ({formatPercent(scenario.effectiveDasRate)})
                                           </span>
-                                        ) : (
-                                           item.name.match(/\(([^)]+)\)/)?.[0] && <span className="text-xs text-muted-foreground/80 font-medium">{item.name.match(/\(([^)]+)\)/)?.[0]}</span>
-                                        )}
+                                        ) : null}
                                       </span>
                                       <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                   </div>

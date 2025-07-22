@@ -1,3 +1,4 @@
+
 import { getFiscalParameters, type FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -10,7 +11,6 @@ import {
     type Annex,
     type ProLaboreForm,
     type PartnerTaxDetails,
-    type CnaeData,
     type CnaeItem,
     type Plan,
 } from './types';
@@ -29,7 +29,7 @@ export interface TaxCalculationInput {
   cnaeCodes: string[];
   totalSalaryExpense: number;
   fiscalConfig: FiscalConfig;
-  cnaeData: CnaeData[];
+  cnaeData: ReturnType<typeof getCnaeData>[];
   selectedPlan: Plan;
 }
 
@@ -137,7 +137,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     }
     
     for (const activity of allActivities) {
-        const cnaeInfo = cnaeData.find(c => c.code === activity.code);
+        const cnaeInfo = cnaeData.find(c => c?.code === activity.code);
         if (!cnaeInfo || activity.revenue <= 0) continue;
 
         let effectiveAnnex: Annex = cnaeInfo.annex;
@@ -186,7 +186,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     if (finalAnnexes.size === 1) {
         const singleAnnex = [...finalAnnexes][0];
         if ((singleAnnex === 'III' && hasAnnexVActivity) || singleAnnex === 'V') {
-           annexLabel = fatorR >= fiscalConfig.simples_nacional.limite_fator_r ? 'Anexo III (Com Fator R)' : 'Anexo V (Sem Fator R)';
+           annexLabel = fatorR >= fiscalConfig.simples_nacional.limite_fator_r ? 'Anexo III (pelo Fator R)' : 'Anexo V';
         } else {
             annexLabel = `Anexo ${singleAnnex}`;
         }
@@ -243,7 +243,7 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
 
     const allActivities = [...input.domesticActivities, ...input.exportActivities];
     const presumedProfitBaseIRPJ = allActivities.reduce((sum, activity) => {
-        const cnaeInfo = cnaeData.find(c => c.code === activity.code);
+        const cnaeInfo = cnaeData.find(c => c?.code === activity.code);
         return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateIRPJ ?? 0.32));
     }, 0);
 
@@ -251,7 +251,7 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
     const irpjAdicional = Math.max(0, (presumedProfitBaseIRPJ - fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
     
     const presumedProfitBaseCSLL = allActivities.reduce((sum, activity) => {
-        const cnaeInfo = cnaeData.find(c => c.code === activity.code);
+        const cnaeInfo = cnaeData.find(c => c?.code === activity.code);
         return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateCSLL ?? 0.32));
     }, 0);
     const csll = presumedProfitBaseCSLL * fiscalConfig.lucro_presumido_rates.CSLL;
