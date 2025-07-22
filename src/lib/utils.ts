@@ -25,13 +25,14 @@ export const formatPercent = (value: number) => {
  * Finds the correct bracket from a given table based on a value.
  * @param table The table to search in.
  * @param value The value to find the bracket for.
- * @returns The found bracket or the last bracket as a fallback.
+ * @returns The found bracket or the first bracket as a fallback if not found.
  */
 export function findBracket<T extends { max: number }>(table: T[], value: number): T {
-  if (!table) {
-    return { max: Infinity } as T;
+  if (!table || table.length === 0) {
+    // This should not happen with valid config, but as a safeguard:
+    throw new Error("Invalid tax table provided to findBracket.");
   }
-  return table.find(bracket => value <= bracket.max) || table[table.length - 1];
+  return table.find(bracket => value <= bracket.max) || table[0];
 }
 
 /**

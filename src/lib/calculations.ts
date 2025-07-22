@@ -148,15 +148,21 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
 
         let originalAnnex: Annex = cnaeInfo.annex;
         let effectiveAnnex: Annex = originalAnnex;
+        let effectiveAnnexTable = fiscalConfig.simples_nacional[effectiveAnnex];
 
         // Fator R Rule: Decide the effective annex to be used for calculation
         if (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) {
             effectiveAnnex = 'III';
+            effectiveAnnexTable = fiscalConfig.simples_nacional.anexoIII;
         }
         finalAnnexes.add(effectiveAnnex);
         
-        const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
-        const bracket = findBracket(annexTable, effectiveRbt12);
+        const bracket = findBracket(effectiveAnnexTable, effectiveRbt12);
+
+        if (!bracket) {
+            console.error(`Could not find tax bracket for RBT12 ${effectiveRbt12} in annex ${effectiveAnnex}`);
+            return;
+        }
         
         const effectiveRate = effectiveRbt12 > 0 
             ? ((effectiveRbt12 * bracket.rate) - bracket.deduction) / effectiveRbt12
