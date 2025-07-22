@@ -33,31 +33,26 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     
     const rbt12Value = form.watch("rbt12");
     const watchedRevenues = form.watch("revenues");
-    const watchedExchangeRate = form.watch("exchangeRate");
-    const watchedExportCurrency = form.watch("exportCurrency");
-    const selectedCnaes = form.watch("selectedCnaes");
 
     const projectedAnnualRevenue = useMemo(() => {
-        let domestic = 0;
-        let exportRaw = 0;
-
-        for (const key in watchedRevenues) {
-            const revenue = watchedRevenues[key] || 0;
-            if (key.startsWith('domestic_')) {
-                domestic += revenue;
-            } else if (key.startsWith('export_')) {
-                exportRaw += revenue;
-            }
-        }
+        const domestic = Object.keys(watchedRevenues)
+            .filter(k => k.startsWith('domestic_'))
+            .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
         
-        const exportBRL = watchedExportCurrency !== 'BRL' ? exportRaw * watchedExchangeRate : exportRaw;
-        return (domestic + exportBRL) * 12;
-    }, [watchedRevenues, watchedExchangeRate, watchedExportCurrency]);
+        const exportVal = Object.keys(watchedRevenues)
+            .filter(k => k.startsWith('export_'))
+            .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
+
+        const exchangeRate = form.getValues('exportCurrency') !== 'BRL' ? (form.getValues('exchangeRate') || 1) : 1;
+        
+        return (domestic + (exportVal * exchangeRate)) * 12;
+    }, [watchedRevenues, form]);
       
     const SIMPLES_NACIONAL_LIMIT = 4800000;
     const showSimplesLimitWarning = (rbt12Value ?? 0) === 0 && projectedAnnualRevenue > SIMPLES_NACIONAL_LIMIT;
 
     const exportCurrency = form.watch("exportCurrency");
+    const selectedCnaes = form.watch("selectedCnaes");
 
     const revenueGroups = useMemo(() => {
         const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is any => !!c);

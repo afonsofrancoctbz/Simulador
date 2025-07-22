@@ -1,5 +1,4 @@
 
-
 import { getFiscalParameters, type FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -103,6 +102,29 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const exportRevenue = input.exportActivities.reduce((acc, act) => acc + act.revenue, 0);
     const totalRevenue = domesticRevenue + exportRevenue;
     
+    // Sanity check: if there's no revenue and no past revenue, return a zeroed-out result.
+    if (totalRevenue === 0 && rbt12 === 0) {
+        const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig);
+        const fee = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, 0)?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
+        const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
+        return {
+            regime: "Simples Nacional",
+            totalTax: totalINSSRetido + totalIRRFRetido,
+            totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
+            totalRevenue: 0,
+            proLabore: totalProLaboreBruto,
+            fatorR: hasAnnexVActivity ? 0 : undefined,
+            effectiveDasRate: 0,
+            contabilizeiFee: fee,
+            partnerTaxes,
+            breakdown: [
+                { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
+                { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
+            ].filter(i => i.value > 0),
+            notes: [],
+        };
+    }
+
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
     
@@ -117,22 +139,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const notes: string[] = [];
     const finalAnnexes = new Set<Annex>();
     const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
-
-    if (totalRevenue === 0 && effectiveRbt12 === 0) {
-       const totalTax = cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
-       return {
-            regime: "Simples Nacional",
-            totalTax: totalTax || 0,
-            totalMonthlyCost: (totalTax + contabilizeiFee) || 0,
-            totalRevenue,
-            proLabore: totalProLaboreBruto,
-            fatorR: hasAnnexVActivity ? fatorR : undefined,
-            contabilizeiFee,
-            partnerTaxes,
-            breakdown: [],
-            notes,
-        };
-    }
 
     const allActivities = [...input.domesticActivities, ...input.exportActivities];
 
@@ -152,9 +158,8 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         
-        // Use nominal rate if RBT12 is zero to prevent division by zero
         const effectiveRate = effectiveRbt12 > 0 
-            ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12
+            ? ((effectiveRbt12 * bracket.rate) - bracket.deduction) / effectiveRbt12
             : bracket.rate;
 
         let dasForActivity = activity.revenue * effectiveRate;
@@ -162,7 +167,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         // Export Exemption
         const isExport = input.exportActivities.some(exp => exp.code === activity.code && exp.revenue === activity.revenue);
         if (isExport) {
-            // CRITICAL FIX: The distribution must come from the EFFECTIVE ANNEX table
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
             dasForActivity -= (activity.revenue * effectiveRate * exportExemptionFactor);
@@ -181,7 +185,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             }
         }
     });
-    
     
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;

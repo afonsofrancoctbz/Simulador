@@ -9,7 +9,7 @@ import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
 import { getCnaeData } from '@/lib/cnae-helpers';
-import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem } from '@/lib/types';
+import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
 
 export function useTaxCalculator(year: 2025 | 2026) {
@@ -45,33 +45,50 @@ export function useTaxCalculator(year: 2025 | 2026) {
         const domesticActivities: CnaeItem[] = [];
         const exportActivities: CnaeItem[] = [];
 
+        // 1. Group selected CNAEs by their effective annex
         const cnaesByAnnex: Record<string, string[]> = {};
         values.selectedCnaes.forEach(code => {
             const cnae = getCnaeData(code);
             if (cnae) {
-                if (!cnaesByAnnex[cnae.annex]) cnaesByAnnex[cnae.annex] = [];
-                cnaesByAnnex[cnae.annex].push(code);
+                // For this transformation, we use the base annex. Fator R logic will be applied in the backend.
+                const annex = cnae.annex;
+                if (!cnaesByAnnex[annex]) cnaesByAnnex[annex] = [];
+                cnaesByAnnex[annex].push(code);
             }
         });
 
+        // 2. Distribute domestic revenue among CNAEs of the same annex
         for (const key in values.revenues) {
-            const revenue = values.revenues[key] || 0;
-            if (revenue > 0) {
-                const [type, annex] = key.split('_');
-                const cnaesInGroup = cnaesByAnnex[annex] || [];
-                if (cnaesInGroup.length > 0) {
-                    const revenuePerCnae = revenue / cnaesInGroup.length;
-                    cnaesInGroup.forEach(code => {
-                        const activity = { code, revenue: revenuePerCnae };
-                        if (type === 'domestic') {
-                            domesticActivities.push(activity);
-                        } else {
-                            exportActivities.push(activity);
-                        }
+            if (key.startsWith('domestic_')) {
+                const annex = key.split('_')[1] as Annex;
+                const revenue = values.revenues[key] || 0;
+                const cnaesInAnnex = cnaesByAnnex[annex];
+
+                if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
+                    const revenuePerCnae = revenue / cnaesInAnnex.length;
+                    cnaesInAnnex.forEach(code => {
+                        domesticActivities.push({ code, revenue: revenuePerCnae });
                     });
                 }
             }
         }
+        
+        // 3. Distribute export revenue among CNAEs of the same annex
+        for (const key in values.revenues) {
+             if (key.startsWith('export_')) {
+                const annex = key.split('_')[1] as Annex;
+                const revenue = values.revenues[key] || 0;
+                const cnaesInAnnex = cnaesByAnnex[annex];
+
+                if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
+                    const revenuePerCnae = revenue / cnaesInAnnex.length;
+                    cnaesInAnnex.forEach(code => {
+                        exportActivities.push({ code, revenue: revenuePerCnae });
+                    });
+                }
+            }
+        }
+
 
         const submissionProLabores = values.proLabores.map(p => ({
             ...p,
