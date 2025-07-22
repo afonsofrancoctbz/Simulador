@@ -98,13 +98,11 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const notes: string[] = [];
     const finalAnnexes = new Set<Annex>();
 
-    // Combine all activities for a single processing loop
     const allActivities = [
         ...domesticActivities.map(a => ({ ...a, type: 'domestic' as const })),
         ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, type: 'export' as const }))
     ];
     
-    // Fallback for when there is no revenue but CNAEs are selected
     if (totalRevenue === 0 && allActivities.length === 0 && selectedCnaes.length > 0) {
         const firstCnae = getCnaeData(selectedCnaes[0]);
         if (firstCnae) {
@@ -112,7 +110,6 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         }
     }
 
-    // Process each activity to calculate its contribution to DAS
     for (const activity of allActivities) {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) continue;
@@ -124,7 +121,6 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         finalAnnexes.add(effectiveAnnex);
         
         if (effectiveAnnex === 'IV') {
-            // CPP for Anexo IV is calculated on the total payroll for the month
             cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
             if (!notes.some(n => n.includes('Anexo IV'))) {
                 notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(config.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
@@ -136,20 +132,16 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
         
         const bracket = findBracket(annexTable, effectiveRbt12);
         
-        // Calculate the effective tax rate based on the RBT12
         const effectiveRate = effectiveRbt12 > 0 
             ? Math.max(0, (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12)
             : bracket.rate;
 
-        // Calculate the full DAS for the activity's revenue
         let dasForActivity = activity.revenue * effectiveRate;
         
-        // If the activity is an export, calculate and apply the tax exemption
         if (activity.type === 'export' && dasForActivity > 0) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-            // The exemption factor is the sum of tax shares that don't apply to exports
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-            const exportExemptionValue = dasForActivity * exportExemptionFactor;
+            const exportExemptionValue = (activity.revenue * effectiveRate) * exportExemptionFactor;
             dasForActivity -= exportExemptionValue;
 
             if (exportRevenue > 0 && !notes.some(n => n.includes('exportação'))) {
@@ -164,8 +156,7 @@ function _calculateSimplesNacional(values: TaxFormValues): TaxDetails {
     const totalMonthlyCost = totalTax + contabilizeiFee;
     
     let annexLabel: string;
-    const isOptimized = fatorR >= config.simples_nacional.limite_fator_r && hasAnnexVActivity;
-
+    
     if (finalAnnexes.size === 0 && hasAnnexVActivity) {
         annexLabel = fatorR >= config.simples_nacional.limite_fator_r ? 'Anexo III (Com Fator R)' : 'Anexo V (Sem Fator R)';
     } else if (finalAnnexes.size === 1) {
@@ -336,5 +327,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido,
   };
 }
-
-    

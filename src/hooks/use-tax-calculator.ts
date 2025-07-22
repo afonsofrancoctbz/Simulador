@@ -8,7 +8,6 @@ import { useToast } from '@/hooks/use-toast';
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
-import { getTaxOptimizationAdvice, type TaxOptimizationInput } from '@/ai/flows/tax-optimization-advice';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
@@ -115,32 +114,6 @@ export function useTaxCalculator(year: 2025 | 2026) {
                 if (!calculatedResults) throw new Error("A API de cálculo não retornou resultados.");
                 setResults(calculatedResults);
 
-                const totalRevenue = submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0);
-                if (totalRevenue === 0 && submissionValues.rbt12 === 0) return;
-
-                setIsAdviceLoading(true);
-                try {
-                    if (calculatedResults.simplesNacionalOtimizado) {
-                        const aiInput: TaxOptimizationInput = {
-                            activities: [...submissionValues.domesticActivities, ...submissionValues.exportActivities].map(a => `${a.code} (R$ ${a.revenue.toFixed(2)})`).join(', '),
-                            totalDomesticRevenue: submissionValues.domesticActivities.reduce((acc, act) => acc + act.revenue, 0),
-                            totalExportRevenue: submissionValues.exportActivities.reduce((acc, act) => acc + (act.revenue * submissionValues.exchangeRate), 0),
-                            totalSalaryExpense: values.totalSalaryExpense,
-                            totalProLabore: submissionValues.proLabores.reduce((acc, pl) => acc + pl.value, 0),
-                            numberOfPartners: values.numberOfPartners,
-                            simplesNacionalSemFatorRBurden: calculatedResults.simplesNacionalBase.totalMonthlyCost,
-                            simplesNacionalComFatorRBurden: calculatedResults.simplesNacionalOtimizado.totalMonthlyCost,
-                            lucroPresumidoTaxBurden: calculatedResults.lucroPresumido.totalMonthlyCost,
-                        };
-                        const aiResult = await getTaxOptimizationAdvice(aiInput);
-                        setAdvice(aiResult.advice);
-                    }
-                } catch (aiError) {
-                    console.error("Error fetching AI advice:", aiError);
-                    setAdvice("Não foi possível obter a recomendação da IA no momento. Por favor, tente novamente.");
-                } finally {
-                    setIsAdviceLoading(false);
-                }
             } else { // Year is 2026
                 const calculatedResults = await calculateTaxes2026OnServer(submissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo para 2026 não retornou resultados.");

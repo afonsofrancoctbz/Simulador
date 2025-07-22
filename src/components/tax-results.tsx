@@ -2,7 +2,7 @@
 
 "use client";
 
-import { Lightbulb, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -95,7 +95,9 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     // Agrupando o DAS com os impostos de faturamento
     const dasItem = details.breakdown.find(item => item.name === 'DAS');
     if (dasItem) {
-      groups["IMPOSTOS S/ FATURAMENTO"].push(dasItem);
+        if (!groups["IMPOSTOS S/ FATURAMENTO"].some(i => i.name === 'DAS')) {
+            groups["IMPOSTOS S/ FATURAMENTO"].push(dasItem);
+        }
     }
     
     groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
@@ -103,8 +105,6 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     return groups;
   };
     
-  const hasAdviceError = advice?.startsWith('Não foi possível');
-
   return (
     <div id="results-section" className="mt-16 w-full space-y-12">
       <div>
@@ -205,36 +205,6 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
           })}
         </div>
       </div>
-
-      {advice && year === 2025 && (
-        <div className="mt-12 max-w-5xl mx-auto">
-           <Alert variant="default" className={cn(
-              "bg-primary/5 border-primary/20",
-              hasAdviceError && "bg-amber-50/80 border-amber-200 text-amber-900"
-            )}>
-             {hasAdviceError ? 
-               <AlertTriangle className="h-5 w-5 text-amber-600" /> : 
-               <Lightbulb className="h-5 w-5 text-primary" />
-             }
-             <AlertTitle className={cn(
-                "font-semibold text-primary",
-                hasAdviceError && "text-amber-900"
-             )}>
-              {hasAdviceError ? "Aviso sobre a Recomendação" : "Recomendação da IA"}
-             </AlertTitle>
-             <AlertDescription className="text-base text-foreground/90 leading-relaxed">
-              {isAdviceLoading ? (
-                <div className="space-y-1.5 pt-1 flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin"/>
-                  <span>Analisando o melhor cenário...</span>
-                </div>
-              ) : (
-                advice
-              )}
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
 
       {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
         <>
