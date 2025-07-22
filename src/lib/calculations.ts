@@ -1,4 +1,5 @@
 
+
 import { getFiscalParameters, type FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -317,6 +318,7 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
           
           simplesNacionalOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
           if (simplesNacionalOtimizado) {
+              simplesNacionalOtimizado.annex = `Anexo III (Com Fator R Otimizado)`
               simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`
           }
       }

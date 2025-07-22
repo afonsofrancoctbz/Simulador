@@ -151,7 +151,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                         {item.name}
                                         {item.name === 'DAS' && scenario.effectiveDasRate ? (
                                           <span className="text-xs text-muted-foreground/80 font-medium">
-                                            ({formatPercent(scenario.effectiveDasRate)})
+                                            (Alíq. Efetiva: {formatPercent(scenario.effectiveDasRate)})
                                           </span>
                                         ) : null}
                                       </span>
