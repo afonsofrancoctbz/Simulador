@@ -72,6 +72,8 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfi
 
     return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
 }
+export { _calculatePartnerTaxes };
+
 
 /**
  * Calculates the Contribuição Previdenciária Patronal (CPP).
@@ -79,7 +81,7 @@ function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfi
 function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
     return baseDeCalculo * config.aliquotas_cpp_patronal.base;
 }
-
+export { _calculateCpp };
 
 // =================================================================================
 // 3. REGIME-SPECIFIC CALCULATION FUNCTIONS
@@ -118,7 +120,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const allActivities = [...input.domesticActivities, ...input.exportActivities];
     const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
 
-    if (totalRevenue === 0 && effectiveRbt12 === 0) {
+    if (totalRevenue === 0) {
        const totalTax = cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
        return {
             regime: "Simples Nacional",
@@ -148,7 +150,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         if (effectiveAnnex === 'IV') {
             const cppForActivity = _calculateCpp(monthlyPayroll * (activity.revenue / totalRevenue), fiscalConfig);
             cppFromAnnexIV += cppForActivity;
-            if (!isExportActivity && !notes.some(n => n.includes('Anexo IV'))) {
+            if (!notes.some(n => n.includes('Anexo IV'))) {
                 notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
             }
         }
@@ -190,6 +192,8 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         }
     }
     
+    const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
+
     return {
         regime: "Simples Nacional",
         totalTax,
@@ -199,7 +203,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         fatorR: hasAnnexVActivity ? fatorR : undefined,
         annex: annexLabel,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
-        effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
+        effectiveDasRate,
         contabilizeiFee,
         breakdown: [
             { name: 'DAS', value: totalDas },

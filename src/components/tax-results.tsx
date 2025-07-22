@@ -92,14 +92,6 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
       }
     });
     
-    // Agrupando o DAS com os impostos de faturamento
-    const dasItem = details.breakdown.find(item => item.name === 'DAS');
-    if (dasItem) {
-        if (!groups["IMPOSTOS S/ FATURAMENTO"].some(i => i.name === 'DAS')) {
-            groups["IMPOSTOS S/ FATURAMENTO"].push(dasItem);
-        }
-    }
-    
     groups["OUTROS CUSTOS"].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
     return groups;
