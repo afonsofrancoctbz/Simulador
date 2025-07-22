@@ -5,7 +5,6 @@ import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
     getCnaeData,
-    CNAE_DATA_RAW
 } from './cnae-helpers';
 import {
     type CalculationResults,
@@ -15,7 +14,8 @@ import {
     type PartnerTaxDetails,
     type CnaeData,
     type CnaeItem,
-    type Plan
+    type Plan,
+    type TaxFormValues,
 } from './types';
 import { formatPercent, findBracket, findFeeBracket } from './utils';
 
@@ -36,6 +36,7 @@ export interface TaxCalculationInput {
   fiscalConfig: FiscalConfig;
   cnaeData: CnaeData[];
   selectedPlan: Plan;
+  totalRevenue: number;
 }
 
 // =================================================================================
@@ -95,15 +96,12 @@ function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
  * Follows the rules specified in the requirements document.
  */
 function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOverride?: number[]): TaxDetails {
-    const { fiscalConfig, cnaeData, selectedPlan, totalSalaryExpense, fp12, rbt12 } = input;
+    const { fiscalConfig, cnaeData, selectedPlan, totalSalaryExpense, fp12, rbt12, totalRevenue } = input;
     const proLaboresToUse = proLaboreValuesOverride 
         ? input.proLaboreDetails.map((p, i) => ({ ...p, value: proLaboreValuesOverride[i] || p.value }))
         : input.proLaboreDetails;
 
     const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
-    const domesticRevenue = input.domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenue = input.exportActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const totalRevenue = domesticRevenue + exportRevenue;
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
     
     // Step 1: Determine Effective RBT12 and FP12
@@ -119,6 +117,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     
     let totalDas = 0;
     let cppFromAnnexIV = 0;
+    let totalDasRate = 0;
     const notes: string[] = [];
     const finalAnnexes = new Set<Annex>();
     const hasAnnexVActivity = input.cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
@@ -127,7 +126,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
 
     for (const activity of allActivities) {
         const cnaeInfo = cnaeData.find(c => c.code === activity.code);
-        if (!cnaeInfo) continue;
+        if (!cnaeInfo || activity.revenue <= 0) continue;
 
         // Step 3: Determine the Correct Annex
         let effectiveAnnex: Annex = cnaeInfo.annex;
@@ -157,17 +156,19 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         let dasForActivity = activity.revenue * effectiveRate;
         
         if (input.exportActivities.some(a => a.code === activity.code && a.revenue === activity.revenue)) {
+             const effectiveRateForExport = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-            const exportExemptionValue = (activity.revenue * effectiveRate) * exportExemptionFactor;
+            const exportExemptionValue = (activity.revenue * effectiveRateForExport) * exportExemptionFactor;
             dasForActivity -= exportExemptionValue;
 
-            if (exportRevenue > 0 && !notes.some(n => n.includes('exportação'))) {
+            if (input.exportActivities.reduce((a, b) => a + b.revenue, 0) > 0 && !notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
             }
         }
         
         totalDas += dasForActivity;
+        totalDasRate += activity.revenue * effectiveRate; // Accumulate for the overall effective rate
     }
 
     // Step 7: Calculate Total Cost
@@ -193,13 +194,13 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         fatorR: hasAnnexVActivity ? fatorR : undefined,
         annex: annexLabel,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
-        effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
+        effectiveDasRate: totalRevenue > 0 ? totalDasRate / totalRevenue : 0,
         contabilizeiFee,
         breakdown: [
             { name: 'DAS', value: totalDas },
             { name: 'CPP', value: cppFromAnnexIV },
-            { name: 'Partner_INSS', value: totalINSSRetido },
-            { name: 'Partner_IRRF', value: totalIRRFRetido },
+            { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
+            { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
         ],
         notes,
         partnerTaxes,
@@ -212,13 +213,12 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
  * Follows the rules specified in the requirements document.
  */
 function calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
-    const { fiscalConfig, cnaeData, totalSalaryExpense, selectedPlan } = input;
+    const { fiscalConfig, cnaeData, totalSalaryExpense, selectedPlan, totalRevenue } = input;
     
     const proLabores = input.proLaboreDetails;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     const domesticRevenue = input.domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenue = input.exportActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const totalRevenue = domesticRevenue + exportRevenue;
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
@@ -271,8 +271,8 @@ function calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
           { name: 'IRPJ', value: irpj + irpjAdicional },
           { name: 'CSLL', value: csll },
           { name: 'CPP', value: cpp },
-          { name: 'Partner_INSS', value: totalINSSRetido },
-          { name: 'Partner_IRRF', value: totalIRRFRetido },
+          { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
+          { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
         ],
         notes,
         partnerTaxes,
@@ -285,7 +285,7 @@ function calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
 // =================================================================================
 
 export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
-  const { fiscalConfig, totalSalaryExpense, proLaboreValues } = input;
+  const { fiscalConfig, totalSalaryExpense, proLaboreValues, totalRevenue } = input;
   
   const simplesNacionalBase = _calculateSimplesNacional(input);
   const lucroPresumido = calculateLucroPresumido(input);
@@ -293,13 +293,12 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
 
   const hasAnnexVActivity = input.cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
   const fatorRBase = simplesNacionalBase.fatorR;
-  const totalRevenue = simplesNacionalBase.totalRevenue;
 
   if (hasAnnexVActivity && fatorRBase !== undefined && fatorRBase < fiscalConfig.simples_nacional.limite_fator_r && totalRevenue > 0) {
       const requiredPayrollForFatorR = totalRevenue * fiscalConfig.simples_nacional.limite_fator_r;
-      const requiredTotalProLabore = requiredPayrollForFatorR - totalSalaryExpense;
       const currentTotalProLabore = proLaboreValues.reduce((a, b) => a + b, 0);
-
+      const requiredTotalProLabore = Math.max(0, requiredPayrollForFatorR - totalSalaryExpense);
+      
       const minProLaboreTotal = fiscalConfig.salario_minimo * proLaboreValues.length;
 
       if (requiredTotalProLabore > currentTotalProLabore) {
@@ -332,3 +331,5 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
     lucroPresumido,
   };
 }
+
+    
