@@ -118,12 +118,12 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const finalAnnexes = new Set<Annex>();
     const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
 
-    if (totalRevenue === 0) {
+    if (totalRevenue === 0 && effectiveRbt12 === 0) {
        const totalTax = cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
        return {
             regime: "Simples Nacional",
-            totalTax,
-            totalMonthlyCost: totalTax + contabilizeiFee,
+            totalTax: totalTax || 0,
+            totalMonthlyCost: (totalTax + contabilizeiFee) || 0,
             totalRevenue,
             proLabore: totalProLaboreBruto,
             fatorR: hasAnnexVActivity ? fatorR : undefined,
@@ -140,41 +140,48 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
 
-        let effectiveAnnex: Annex = cnaeInfo.annex;
-        if (cnaeInfo.requiresFatorR) {
-            effectiveAnnex = fatorR >= fiscalConfig.simples_nacional.limite_fator_r ? 'III' : 'V';
+        let originalAnnex: Annex = cnaeInfo.annex;
+        let effectiveAnnex: Annex = originalAnnex;
+
+        // Fator R Rule: Decide the effective annex to be used for calculation
+        if (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) {
+            effectiveAnnex = 'III';
         }
         finalAnnexes.add(effectiveAnnex);
         
-        const isExport = input.exportActivities.some(exp => exp.code === activity.code && exp.revenue === activity.revenue);
         const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         
-        // Critical Fix: Handle RBT12 of zero to prevent division by zero
+        // Use nominal rate if RBT12 is zero to prevent division by zero
         const effectiveRate = effectiveRbt12 > 0 
             ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12
-            : bracket.rate; // Use nominal rate if RBT12 is zero
+            : bracket.rate;
 
         let dasForActivity = activity.revenue * effectiveRate;
         
+        // Export Exemption
+        const isExport = input.exportActivities.some(exp => exp.code === activity.code && exp.revenue === activity.revenue);
         if (isExport) {
+            // CRITICAL FIX: The distribution must come from the EFFECTIVE ANNEX table
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
-            dasForActivity -= dasForActivity * exportExemptionFactor;
+            dasForActivity -= (activity.revenue * effectiveRate * exportExemptionFactor);
             if (!notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
             }
         }
         
         totalDas += dasForActivity;
+
+        // Anexo IV CPP Rule
+        if (originalAnnex === 'IV') {
+            cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
+             if (!notes.some(n => n.includes('Anexo IV'))) {
+                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
+            }
+        }
     });
     
-    if (finalAnnexes.has('IV')) {
-        cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
-        if (!notes.some(n => n.includes('Anexo IV'))) {
-            notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
-        }
-    }
     
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
@@ -207,7 +214,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV || 0 },
             { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0 },
             { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
-        ],
+        ].filter(item => item.value > 0),
         notes,
         partnerTaxes,
     };
@@ -277,7 +284,7 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
           { name: 'CPP (INSS Patronal)', value: cpp },
           { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
           { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
-        ],
+        ].filter(item => item.value > 0),
         notes,
         partnerTaxes,
     };
