@@ -1,9 +1,9 @@
 
 import { z } from "zod";
-import { FISCAL_CONFIG_2025 } from "@/config/fiscal";
 import { formatCurrencyBRL } from "./utils";
 
-const MINIMUM_WAGE = FISCAL_CONFIG_2025.salario_minimo;
+// A constante foi movida para cá para quebrar a dependência circular.
+const MINIMUM_WAGE = 1518.00;
 
 
 // Schema for an individual CNAE item
