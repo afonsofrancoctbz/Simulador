@@ -35,7 +35,7 @@ const calculateTaxesFlow = ai.defineFlow(
       domesticActivities: formValues.domesticActivities,
       exportActivities: formValues.exportActivities.map(act => ({
         ...act,
-        revenue: act.revenue * formValues.exchangeRate,
+        revenue: act.revenue * formValues.exchangeRate, // Convert export revenue to BRL
       })),
       rbt12: formValues.rbt12,
       fp12: formValues.fp12,
