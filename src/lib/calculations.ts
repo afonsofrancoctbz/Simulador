@@ -172,11 +172,18 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         
         const isExport = input.exportActivities.some(exp => exp.code === activity.code && exp.revenue * exchangeRate === activity.revenue);
         if (isExport) {
-            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-            const exportExemptionFactor = PIS + COFINS + ISS + ICMS + IPI;
+            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0 } = bracket.distribution;
+            
+            // Exportação de serviços é isenta de PIS, COFINS e ISS.
+            // Exportação de produtos é isenta de PIS, COFINS, IPI e ICMS.
+            const exportExemptionFactor = (originalAnnex === 'I' || originalAnnex === 'II') 
+                ? (PIS + COFINS + ICMS) // IPI já é zero na distribuição do Anexo I
+                : (PIS + COFINS + ISS);
+
             dasForActivity -= (activity.revenue * effectiveRate * exportExemptionFactor);
+
             if (!notes.some(n => n.includes('exportação'))) {
-                notes.push("Receitas de exportação têm isenção de PIS, COFINS, ISS, IPI e ICMS no Simples Nacional.");
+                notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS/ICMS no Simples Nacional.");
             }
         }
         
@@ -193,8 +200,13 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    const regimeName = "Simples Nacional";
+    const regimeName = proLaboreValuesOverride
+        ? "Simples Nacional"
+        : (hasAnnexVActivity ? "Simples Nacional" : "Simples Nacional");
+
     let annexLabel = `Anexo ${[...finalAnnexes].sort().join(', ')}`;
+    if (proLaboreValuesOverride) annexLabel = `Anexo III`;
+    else if (finalAnnexes.has('V')) annexLabel = `Anexo V`;
     
     const displayDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
     const effectiveRateResult = totalRevenue > 0 ? (totalTax || 0) / totalRevenue : 0;
@@ -304,7 +316,7 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
 
 export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
   const { fiscalConfig, totalSalaryExpense, proLaboreDetails, cnaeCodes, domesticActivities, exportActivities, exchangeRate } = input;
-  const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
+  const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => act.revenue * exchangeRate, 0);
 
   const simplesNacionalBase = _calculateSimplesNacional(input);
   const lucroPresumido = _calculateLucroPresumido(input);
