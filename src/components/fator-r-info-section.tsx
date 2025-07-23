@@ -39,27 +39,29 @@ export default function FatorRInfoSection() {
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                <Calculator className="mr-3 text-primary" /> Como calcular o Fator R?
+                <Calculator className="mr-3 text-primary" /> Como calcular o Fator R do Simples Nacional?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O cálculo consiste na divisão de dois valores, que seguem o período de apuração de 12 meses:</p>
-                <ul className="list-disc pl-6 space-y-1">
-                    <li>Total gasto em folha de pagamento (salários, pró-labore, INSS patronal, FGTS).</li>
-                    <li>Receita bruta da empresa.</li>
-                </ul>
-                <div className="p-4 bg-muted/50 rounded-lg">
-                    <p className="font-mono text-center text-sm md:text-base">Fator R = Folha de Pagamento (12 meses) / Receita Bruta (12 meses)</p>
-                </div>
-                <div className="p-3 border-l-4 border-blue-500 bg-blue-50/80 text-blue-900 rounded-r-md">
+                <p>Para calcular o Fator R do Simples Nacional, é necessário:</p>
+                <ol className="list-decimal pl-6 space-y-2">
+                  <li>Somar todos os gastos com folha de pagamento (salários, pró-labore, INSS do titular/sócios, INSS patronal, FGTS etc) dos últimos 12 meses;</li>
+                  <li>Somar toda a receita bruta dos últimos 12 meses;</li>
+                  <li>Dividir o total da folha de pagamento pela receita bruta do mesmo período;</li>
+                  <li>Verificar se o resultado está abaixo ou acima de 28%;</li>
+                  <li>Entender por qual anexo sua empresa vai pagar impostos: Anexo III ou Anexo V.</li>
+                </ol>
+                <p>Para começar, é preciso ter o valor total da folha de pagamento da sua empresa e a receita bruta, ambos dos 12 últimos meses do período de apuração.</p>
+                 <div className="p-3 border-l-4 border-blue-500 bg-blue-50/80 text-blue-900 rounded-r-md">
                     <h4 className="font-bold">Exemplo Prático</h4>
                     <p className="mt-1">
                         Se sua empresa faturou R$ 120.000,00 e gastou R$ 60.000,00 com folha de pagamento nos últimos 12 meses:
                     </p>
-                    <p className="font-mono text-sm mt-2">R$ 60.000,00 / R$ 120.000,00 = 0,50</p>
+                    <p className="font-mono text-sm mt-2">Fator R = R$ 60.000,00 / R$ 120.000,00 = 0,50 ou <strong>50%</strong></p>
                     <p className="mt-1">
-                        O resultado é <strong>50%</strong>. Como é superior a 28%, a empresa é tributada pelo <strong>Anexo III</strong>.
+                        Como o resultado é superior a 28%, a empresa é tributada pelo <strong>Anexo III</strong>.
                     </p>
                 </div>
+                <p>Use a calculadora acima para simular e saber se sua empresa pode pagar menos impostos sendo tributada no Anexo III do Simples Nacional.</p>
               </AccordionContent>
             </AccordionItem>
 
