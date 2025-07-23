@@ -187,11 +187,11 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         
         let dasExport = 0;
         if (exportRevenueForAnnex > 0) {
-            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0 } = bracket.distribution;
             const isServiceAnnex = ['III', 'IV', 'V'].includes(annex);
             
-            // For services (Annex III, IV, V), ISS is exempt. For Commerce (I, II), ICMS/IPI are exempt.
-            const exportExemptionFactor = isServiceAnnex ? (PIS + COFINS + ISS) : (PIS + COFINS + ICMS + IPI);
+            // For services (Annex III, IV, V), ISS is exempt. For Commerce (I), ICMS is exempt.
+            const exportExemptionFactor = isServiceAnnex ? (PIS + COFINS + ISS) : (PIS + COFINS + ICMS);
             const reducedRateForExport = effectiveRate * (1 - exportExemptionFactor);
             dasExport = exportRevenueForAnnex * reducedRateForExport;
             
