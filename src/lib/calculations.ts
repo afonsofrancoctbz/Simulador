@@ -1,6 +1,6 @@
 
 
-import { getFiscalParameters, type FiscalConfig } from './fiscal';
+import type { FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -200,27 +200,22 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    const regimeName = proLaboreValuesOverride
-        ? "Simples Nacional"
-        : (hasAnnexVActivity ? "Simples Nacional" : "Simples Nacional");
-
     let annexLabel = `Anexo ${[...finalAnnexes].sort().join(', ')}`;
     if (proLaboreValuesOverride) annexLabel = `Anexo III`;
     else if (finalAnnexes.has('V')) annexLabel = `Anexo V`;
     
-    const displayDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
-    const effectiveRateResult = totalRevenue > 0 ? (totalTax || 0) / totalRevenue : 0;
+    const effectiveDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
     
     const finalResult: TaxDetails = {
-        regime: regimeName,
+        regime: "Simples Nacional",
         annex: annexLabel,
         totalTax: totalTax || 0,
         totalMonthlyCost: totalMonthlyCost || 0,
         totalRevenue,
         proLabore: totalProLaboreBruto,
         fatorR: hasAnnexVActivity ? fatorR : undefined,
-        effectiveRate: effectiveRateResult,
-        effectiveDasRate: displayDasRate,
+        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
+        effectiveDasRate: effectiveDasRate,
         contabilizeiFee,
         breakdown: [
             { name: 'DAS', value: totalDas || 0 },
@@ -315,43 +310,43 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
 // =================================================================================
 
 export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
-  const { fiscalConfig, totalSalaryExpense, proLaboreDetails, cnaeCodes, domesticActivities, exportActivities, exchangeRate } = input;
-  const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => act.revenue * exchangeRate, 0);
-
-  const simplesNacionalBase = _calculateSimplesNacional(input);
+  const { fiscalConfig, totalSalaryExpense, proLaboreDetails, cnaeCodes, totalRevenue } = input;
+  
   const lucroPresumido = _calculateLucroPresumido(input);
+  const simplesNacionalBase = _calculateSimplesNacional(input);
   let simplesNacionalOtimizado: TaxDetails | null = null;
-
+  
   const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
-  const fatorRBase = simplesNacionalBase.fatorR;
-
-  // Check if optimization is possible and potentially beneficial
-  if (hasAnnexVActivity && fatorRBase !== undefined && fatorRBase < fiscalConfig.simples_nacional.limite_fator_r && totalRevenue > 0) {
+  
+  if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < fiscalConfig.simples_nacional.limite_fator_r && totalRevenue > 0) {
       const requiredPayrollForFatorR = totalRevenue * fiscalConfig.simples_nacional.limite_fator_r;
       const currentTotalPayroll = totalSalaryExpense + proLaboreDetails.reduce((sum, p) => sum + p.value, 0);
       
       if (requiredPayrollForFatorR > currentTotalPayroll) {
-          const additionalPayrollNeeded = requiredPayrollForFatorR - totalSalaryExpense;
-          const minProLaboreTotal = fiscalConfig.salario_minimo * proLaboreDetails.length;
-          const optimizedTotalProLabore = Math.max(additionalPayrollNeeded, minProLaboreTotal);
+          const additionalPayrollNeeded = requiredPayrollForFatorR - currentTotalPayroll;
+          const currentTotalProLabore = proLaboreDetails.reduce((sum, p) => sum + p.value, 0);
+          const optimizedTotalProLabore = currentTotalProLabore + additionalPayrollNeeded;
           
           const optimizedProLaborePerPartner = optimizedTotalProLabore / proLaboreDetails.length;
           const optimizedProLabores = Array(proLaboreDetails.length).fill(optimizedProLaborePerPartner);
           
-          simplesNacionalOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
+          const tempSimplesOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
+          
+          if (tempSimplesOtimizado.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
+              simplesNacionalOtimizado = tempSimplesOtimizado;
+          }
       }
   }
 
   // Set display order for the UI
-  if (simplesNacionalOtimizado) {
-    simplesNacionalOtimizado.order = 1;
-    simplesNacionalBase.order = 2;
-    lucroPresumido.order = 3;
-  } else {
-    simplesNacionalBase.order = 1;
-    lucroPresumido.order = 2;
-  }
+  let order = 1;
+  const scenarios = [simplesNacionalOtimizado, simplesNacionalBase, lucroPresumido]
+    .filter((s): s is TaxDetails => s !== null)
+    .sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
 
+  scenarios.forEach(s => {
+    s.order = order++;
+  });
 
   return {
     simplesNacionalBase,
@@ -359,6 +354,4 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
     lucroPresumido,
   };
 }
-
-
       

@@ -115,7 +115,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             if (scenario.regime === 'Simples Nacional') {
                 if (scenario.optimizationNote) {
                     title = 'Simples Nacional (Com Fator R)';
-                } else if (scenario.annex?.includes('V')) {
+                } else {
                     title = 'Simples Nacional (Sem Fator R)';
                 }
             }
