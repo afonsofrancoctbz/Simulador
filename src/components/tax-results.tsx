@@ -107,7 +107,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
           {validScenarios.sort((a, b) => a.order! - b.order!).map((scenario) => {
             if (!scenario) return null;
-            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.annex === cheapestScenario.annex && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.annex === cheapestScenario.annex && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
             

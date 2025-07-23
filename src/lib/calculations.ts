@@ -110,7 +110,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
-    // Sanity check: if there's no revenue and no past revenue, return a zeroed-out result.
     if (totalRevenue === 0 && effectiveRbt12 === 0) {
         return {
             regime: "Simples Nacional",
@@ -140,19 +139,13 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const finalAnnexes = new Set<Annex>();
     const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
 
-    // Group revenues by their effective annex
-    const revenueByAnnex: Record<Annex, { domestic: number; export: number }> = {
-        'I': { domestic: 0, export: 0 },
-        'II': { domestic: 0, export: 0 },
-        'III': { domestic: 0, export: 0 },
-        'IV': { domestic: 0, export: 0 },
-        'V': { domestic: 0, export: 0 },
-    };
+    const revenueByAnnex: Record<Annex, { domestic: number; export: number }> = { 'I':{d:0,e:0},'II':{d:0,e:0},'III':{d:0,e:0},'IV':{d:0,e:0},'V':{d:0,e:0} } as any;
 
     input.domesticActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
         const effectiveAnnex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
+        if(!revenueByAnnex[effectiveAnnex]) revenueByAnnex[effectiveAnnex] = {domestic: 0, export: 0};
         revenueByAnnex[effectiveAnnex].domestic += activity.revenue;
     });
 
@@ -160,36 +153,27 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
         const effectiveAnnex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
+        if(!revenueByAnnex[effectiveAnnex]) revenueByAnnex[effectiveAnnex] = {domestic: 0, export: 0};
         revenueByAnnex[effectiveAnnex].export += (activity.revenue * exchangeRate);
     });
 
-    // Calculate DAS for each annex group
     for (const annexStr in revenueByAnnex) {
         const annex = annexStr as Annex;
-        const { domestic, export: exportRevenueForAnnex } = revenueByAnnex[annex];
-        const annexRevenue = domestic + exportRevenueForAnnex;
+        const { domestic: domesticRevenueForAnnex, export: exportRevenueForAnnex } = revenueByAnnex[annex];
+        const annexRevenue = domesticRevenueForAnnex + exportRevenueForAnnex;
 
         if (annexRevenue === 0) continue;
-
         finalAnnexes.add(annex);
 
         const annexTable = fiscalConfig.simples_nacional[annex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         
-        if (!bracket) {
-            console.error(`Could not find tax bracket for RBT12 ${effectiveRbt12} in annex ${annex}`);
-            continue;
-        }
-
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * bracket.rate) - bracket.deduction) / effectiveRbt12 : bracket.rate;
-        
-        const dasDomestic = domestic * effectiveRate;
+        const dasDomestic = domesticRevenueForAnnex * effectiveRate;
         
         let dasExport = 0;
         if (exportRevenueForAnnex > 0) {
             const { IRPJ = 0, CSLL = 0, CPP = 0 } = bracket.distribution;
-            
-            // The export tax is calculated only on the portions of IRPJ, CSLL, and CPP.
             const exportTaxProportion = IRPJ + CSLL + CPP;
             const exportEffectiveRate = effectiveRate * exportTaxProportion;
             dasExport = exportRevenueForAnnex * exportEffectiveRate;
@@ -213,7 +197,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
-    
     const effectiveDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
     
     const finalResult: TaxDetails = {
@@ -342,15 +325,10 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
           const optimizedProLaborePerPartner = optimizedTotalProLabore / proLaboreDetails.length;
           const optimizedProLabores = Array(proLaboreDetails.length).fill(optimizedProLaborePerPartner);
           
-          const tempSimplesOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
-          
-          if (tempSimplesOtimizado.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
-              simplesNacionalOtimizado = tempSimplesOtimizado;
-          }
+          simplesNacionalOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
       }
   }
 
-  // Set display order for the UI
   const scenarios: (TaxDetails | null)[] = [lucroPresumido, simplesNacionalBase, simplesNacionalOtimizado];
   const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null);
   
