@@ -56,7 +56,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     return null;
   }
 
-  let scenarios: TaxDetails[] = [];
+  let scenarios: (TaxDetails | null)[] = [];
   if (year === 2025 && 'simplesNacionalBase' in results) {
     scenarios.push(results.lucroPresumido);
     if (results.simplesNacionalBase) scenarios.push(results.simplesNacionalBase);
@@ -71,22 +71,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   if (scenarios.length === 0) return null;
     
-  const validScenarios = scenarios.filter(s => s && (s.totalRevenue > 0 || s.proLabore > 0));
+  const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || s.proLabore > 0));
   const cheapestScenario = validScenarios.length > 0 ? validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current)) : null;
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
-        'IMPOSTOS S/ FATURAMENTO': [],
-        'ENCARGOS S/ FOLHA E PRÓ-LABORE': [],
+        'IMPOSTOS E ENCARGOS': [],
         'OUTROS CUSTOS': [],
     };
 
     details.breakdown.forEach(item => {
-        if (['DAS', 'PIS', 'COFINS', 'ISS', 'ICMS', 'IPI', 'IRPJ', 'CSLL', 'IVA'].includes(item.name)) {
-            groups['IMPOSTOS S/ FATURAMENTO'].push(item);
-        } else if (['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].includes(item.name)) {
-            groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
-        }
+        groups['IMPOSTOS E ENCARGOS'].push(item);
     });
 
     groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
@@ -105,7 +100,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         </div>
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
-          {validScenarios.sort((a, b) => a.order! - b.order!).map((scenario) => {
+          {validScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
             if (!scenario) return null;
             const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
@@ -155,8 +150,8 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                       rateInfo = `(Alíq. Efetiva: ${formatPercent(scenario.effectiveDasRate)})`;
                                   } else if (item.name === 'INSS s/ Pró-labore') {
                                       rateInfo = '(11,00%)';
-                                  } else if (item.name === 'CPP (INSS Patronal)' && scenario.regime !== 'Lucro Presumido') {
-                                      // Only show CPP rate for LP
+                                  } else if (item.name === 'CPP (INSS Patronal)' && scenario.regime !== 'Lucro Presumido' && !scenario.annex?.includes('IV')) {
+                                      // Only show CPP rate for LP and Anexo IV
                                   } else if (item.name === 'CPP (INSS Patronal)') {
                                       rateInfo = '(20,00%)'
                                   }
@@ -186,6 +181,13 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                           <span>Fator R: {formatPercent(scenario.fatorR)}</span>
                       </div>
                       )}
+                      {scenario.optimizationNote && (
+                         <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground">
+                            <AlertDescription className="text-sm text-primary/90 font-medium">
+                                {scenario.optimizationNote}
+                            </AlertDescription>
+                        </Alert>
+                      )}
                       <div className={cn("p-4 rounded-lg bg-muted/30")}>
                           <div className="w-full space-y-2 text-center">
                               <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>
@@ -214,4 +216,3 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     </div>
   );
 };
-
