@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useMemo } from 'react';
-import { FormProvider } from "react-hook-form";
+import { useEffect, useMemo } from 'react';
+import { FormProvider, useFormContext } from "react-hook-form";
 import { getCnaeData } from '@/lib/cnae-helpers';
 import { useTaxCalculator } from '@/hooks/use-tax-calculator';
 
@@ -11,9 +11,10 @@ import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
 import TaxCalculatorForm from './tax-calculator-form';
 import TaxResults from './tax-results';
+import type { CalculatorFormValues } from './tax-calculator-form';
 
 
-export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
+export default function TaxCalculator({ year, onExportRevenueChange }: { year: 2025 | 2026, onExportRevenueChange: (show: boolean) => void }) {
   const {
     form,
     onSubmit,
@@ -26,6 +27,7 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
   } = useTaxCalculator(year);
   
   const selectedCnaes = form.watch("selectedCnaes");
+  const revenues = form.watch("revenues");
 
   const hasHealthOrVetCnae = useMemo(() => {
     return selectedCnaes.some(code => {
@@ -40,6 +42,11 @@ export default function TaxCalculator({ year }: { year: 2025 | 2026 }) {
       return cnae?.category === 'Odontologia';
     });
   }, [selectedCnaes]);
+  
+  useEffect(() => {
+    const hasExportRevenue = Object.keys(revenues).some(key => key.startsWith('export_') && revenues[key] > 0);
+    onExportRevenueChange(hasExportRevenue);
+  }, [revenues, onExportRevenueChange]);
 
   return (
     <FormProvider {...form}>
