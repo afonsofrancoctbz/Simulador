@@ -15,7 +15,6 @@ import TaxReformInfoSection from '@/components/tax-reform-info-section';
 import RocSection from '@/components/roc-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportTaxInfoSection from '@/components/export-tax-info-section';
-import TaxBreakdownInfoSection from '@/components/tax-breakdown-info-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -56,14 +55,6 @@ export default function Home() {
           </TabsContent>
         </Tabs>
         
-        {showResults && (
-           <section className="py-16 lg:py-24 bg-slate-50/70">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <TaxBreakdownInfoSection />
-            </div>
-          </section>
-        )}
-
         {showExportInfo && (
            <section className="py-16 lg:py-24 bg-background">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">

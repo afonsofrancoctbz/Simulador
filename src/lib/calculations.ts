@@ -140,72 +140,45 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const finalAnnexes = new Set<Annex>();
     const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
     
-    const revenueByAnnex: Record<string, { domestic: number, export: number }> = {};
-
-    input.cnaeCodes.forEach(code => {
-        const cnaeInfo = getCnaeData(code);
+    const allActivities = [...input.domesticActivities, ...input.exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
+    
+    allActivities.forEach(activity => {
+        const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
-        
+
         let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
-        if (!revenueByAnnex[effectiveAnnex]) revenueByAnnex[effectiveAnnex] = { domestic: 0, export: 0 };
+        finalAnnexes.add(effectiveAnnex);
         
-        const domesticForCnae = input.domesticActivities.find(a => a.code === code)?.revenue || 0;
-        const exportForCnae = (input.exportActivities.find(a => a.code === code)?.revenue || 0) * exchangeRate;
-        
-        revenueByAnnex[effectiveAnnex].domestic += domesticForCnae;
-        revenueByAnnex[effectiveAnnex].export += exportForCnae;
-    });
-
-    for (const annexStr in revenueByAnnex) {
-        const annex = annexStr as Annex;
-        finalAnnexes.add(annex);
-
-        const { domestic: domesticRevenueForAnnex, export: exportRevenueForAnnex } = revenueByAnnex[annex];
-        const annexTable = fiscalConfig.simples_nacional[annex];
+        const isExport = input.exportActivities.some(ex => ex.code === activity.code && ex.revenue > 0);
+        const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const { rate, deduction, distribution } = bracket;
         
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
         
-        let dasDomestic = 0;
-        if (domesticRevenueForAnnex > 0) {
-            let taxRate = effectiveRate;
-            let issDistribution = distribution.ISS || 0;
-            let effectiveIssRate = taxRate * issDistribution;
+        let dasForActivity = 0;
 
-            if (effectiveIssRate > 0.05) {
-                const excessIssValue = domesticRevenueForAnnex * (effectiveIssRate - 0.05);
-                const federalTaxesPortion = (distribution.IRPJ || 0) + (distribution.CSLL || 0) + (distribution.PIS || 0) + (distribution.COFINS || 0);
-                
-                // This logic is complex, for the calculator a direct reduction is acceptable
-                // The correct way is to redistribute among federal taxes, but it is too complex for this scope
-                // so we just reduce the total tax by the excess
-                taxRate = taxRate - (effectiveIssRate - 0.05);
-
-            }
-            dasDomestic = domesticRevenueForAnnex * taxRate;
-        }
-        
-        let dasExport = 0;
-        if (exportRevenueForAnnex > 0) {
+        if (isExport) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
             const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
             const exportTaxRate = effectiveRate * (1 - exportExemptionRatio);
-            dasExport = exportRevenueForAnnex * exportTaxRate;
-            if (!notes.some(n => n.includes('exportação'))) {
+            dasForActivity = activity.revenue * exportTaxRate;
+             if (!notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS/ICMS no Simples Nacional.");
             }
+        } else {
+             dasForActivity = activity.revenue * effectiveRate;
         }
-        
-        totalDasTaxes += dasDomestic + dasExport;
-        
-        if (annex === 'IV') {
+
+        totalDasTaxes += dasForActivity;
+
+        if (effectiveAnnex === 'IV') {
             cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
             if (!notes.some(n => n.includes('Anexo IV'))) {
                 notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal) sobre a folha, fora do DAS.`);
             }
         }
-    }
+    });
     
     const totalTax = totalDasTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
@@ -227,7 +200,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         totalRevenue,
         proLabore: totalProLaboreBruto,
         fatorR: hasAnnexVActivity ? fatorR : undefined,
-        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
+        effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
         effectiveDasRate: totalRevenue > 0 ? totalDasTaxes / totalRevenue : 0,
         contabilizeiFee,
         breakdown,
@@ -248,7 +221,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
  * Calculates the total cost under the Lucro Presumido regime.
  * Follows the rules specified in the requirements document.
  */
-function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
+function calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
     const { fiscalConfig, cnaeData, totalSalaryExpense, selectedPlan, exchangeRate } = input;
     
     const proLabores = input.proLaboreDetails;
@@ -268,19 +241,11 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
     const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS;
     const iss = domesticRevenue * fiscalConfig.lucro_presumido_rates.ISS;
 
-    const allActivities = [...input.domesticActivities, ...input.exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
-    const presumedProfitBaseIRPJ = allActivities.reduce((sum, activity) => {
-        const cnaeInfo = cnaeData.find(c => c?.code === activity.code);
-        return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateIRPJ ?? 0.32));
-    }, 0);
-
+    const presumedProfitBaseIRPJ = totalRevenue * 0.32;
     const irpj = presumedProfitBaseIRPJ * fiscalConfig.lucro_presumido_rates.IRPJ_BASE;
     const irpjAdicional = Math.max(0, (presumedProfitBaseIRPJ - fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
     
-    const presumedProfitBaseCSLL = allActivities.reduce((sum, activity) => {
-        const cnaeInfo = cnaeData.find(c => c?.code === activity.code);
-        return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateCSLL ?? 0.32));
-    }, 0);
+    const presumedProfitBaseCSLL = totalRevenue * 0.32;
     const csll = presumedProfitBaseCSLL * fiscalConfig.lucro_presumido_rates.CSLL;
 
     const cpp = _calculateCpp(monthlyPayroll, fiscalConfig);
@@ -321,7 +286,7 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
 export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
   const { fiscalConfig, totalSalaryExpense, proLaboreDetails, cnaeCodes } = input;
   
-  const lucroPresumido = _calculateLucroPresumido(input);
+  const lucroPresumido = calculateLucroPresumido(input);
   const simplesNacionalBase = _calculateSimplesNacional(input);
   let simplesNacionalOtimizado: TaxDetails | null = null;
   
@@ -345,29 +310,8 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
       }
   }
 
-  const scenarios: (TaxDetails | null)[] = [lucroPresumido, simplesNacionalBase, simplesNacionalOtimizado];
-  const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && s.totalRevenue > 0);
-  
-  if (validScenarios.length === 0 && simplesNacionalBase.totalRevenue === 0) {
-      validScenarios.push(simplesNacionalBase);
-  }
-
-  if (simplesNacionalOtimizado && simplesNacionalBase.totalMonthlyCost <= simplesNacionalOtimizado.totalMonthlyCost) {
-      simplesNacionalOtimizado = null;
-  }
-  
-  if (simplesNacionalOtimizado === null && hasAnnexVActivity) {
-      const requiredPayrollForFatorR = totalRevenue * fiscalConfig.simples_nacional.limite_fator_r;
-      const currentTotalPayroll = totalSalaryExpense + proLaboreDetails.reduce((sum, p) => sum + p.value, 0);
-      if(currentTotalPayroll >= requiredPayrollForFatorR) {
-        simplesNacionalBase.optimizationNote = `Sua empresa já se enquadra no Fator R, tributando pelo Anexo III.`;
-      }
-  }
-
-
   const finalScenarios: (TaxDetails | null)[] = [lucroPresumido, simplesNacionalBase, simplesNacionalOtimizado];
   const finalValidScenarios = finalScenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || s.proLabore > 0));
-
 
   finalValidScenarios.sort((a, b) => {
     if (a.totalMonthlyCost === b.totalMonthlyCost) {

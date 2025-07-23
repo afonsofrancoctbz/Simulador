@@ -147,11 +147,9 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   let rateInfo: string | null = null;
                                   
                                   if (item.name === 'DAS' && scenario.effectiveDasRate) {
-                                      rateInfo = `(Alíq. Efetiva: ${formatPercent(scenario.effectiveDasRate)})`;
+                                      rateInfo = `(${formatPercent(scenario.effectiveDasRate)})`;
                                   } else if (item.name === 'INSS s/ Pró-labore') {
                                       rateInfo = '(11,00%)';
-                                  } else if (item.name === 'CPP (INSS Patronal)' && scenario.regime !== 'Lucro Presumido' && !scenario.annex?.includes('IV')) {
-                                      // Only show CPP rate for LP and Anexo IV
                                   } else if (item.name === 'CPP (INSS Patronal)') {
                                       rateInfo = '(20,00%)'
                                   }
