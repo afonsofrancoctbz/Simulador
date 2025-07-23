@@ -81,7 +81,6 @@ export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): num
 function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): TaxDetails {
     const { totalSalaryExpense, selectedPlan, exchangeRate, proLabores } = values;
 
-    // Passo 1: Calcular Base de Impostos e Encargos
     const domesticRevenue = values.domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenueBRL = values.exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenueBRL;
@@ -91,7 +90,6 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
     
-    // Passo 2: Calcular Impostos sobre Faturamento
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
     const iss = domesticRevenue * (values.issRate ?? config.lucro_presumido_rates.ISS); 
@@ -103,10 +101,8 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const irpj = irpjBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
     const csll = csllBase * config.lucro_presumido_rates.CSLL;
 
-    // Passo 3: Calcular Encargos sobre Folha
     const cpp = _calculateCpp(monthlyPayroll, config);
 
-    // Passo 4: Calcular Custo Total
     const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
@@ -158,12 +154,10 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
-    // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
     const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
     
-    // Passo 2: Calcular Alíquota Efetiva e DAS
     let totalDas = 0;
     const finalAnnexes = new Set<Annex>();
     let hasAnnexIVActivity = false;
@@ -192,23 +186,20 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
         
-        let dasForActivity = 0;
+        let dasForActivity = revenueForActivity * effectiveRate;
+        
         if (isExport) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
             const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-            const exportTaxRate = effectiveRate * (1 - exportExemptionRatio);
-            dasForActivity = revenueForActivity * exportTaxRate;
-        } else {
-            dasForActivity = revenueForActivity * effectiveRate;
+            const exportReductionFactor = 1 - exportExemptionRatio;
+            dasForActivity *= exportReductionFactor;
         }
         
         totalDas += dasForActivity;
     });
 
-    // Passo 3: Calcular CPP (Apenas para Anexo IV)
     const cppFromAnnexIV = hasAnnexIVActivity ? _calculateCpp(monthlyPayroll, config) : 0;
     
-    // Passo 4: Calcular Custo Total
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
@@ -270,11 +261,11 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
       
       if (additionalPayrollNeeded > 0) {
           const newTotalProLabore = totalProLaboreBruto + additionalPayrollNeeded;
-          const optimizedProLaborePerPartner = newTotalProLabore / values.proLabores.length;
           
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => ({ 
               ...p, 
-              value: optimizedProLaborePerPartner 
+              // Distribute the total required pro-labore equally among partners
+              value: newTotalProLabore / values.proLabores.length,
           }));
           
           simplesNacionalOtimizado = _calculateSimplesNacional(values, config, optimizedProLabores);
@@ -282,8 +273,11 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
   }
 
   return {
-    simplesNacionalBase,
-    simplesNacionalOtimizado,
-    lucroPresumido,
+    simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2 : 1 },
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
+    lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+
+    
