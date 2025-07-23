@@ -107,7 +107,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
           {validScenarios.sort((a, b) => a.order! - b.order!).map((scenario) => {
             if (!scenario) return null;
-            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.annex === cheapestScenario.annex && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
             
@@ -151,12 +151,14 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   let itemName = item.name;
                                   let rateInfo: string | null = null;
                                   
-                                  if(item.name === 'DAS' && scenario.effectiveDasRate) {
+                                  if (item.name === 'DAS' && scenario.effectiveDasRate) {
                                       rateInfo = `(Alíq. Efetiva: ${formatPercent(scenario.effectiveDasRate)})`;
                                   } else if (item.name === 'INSS s/ Pró-labore') {
                                       rateInfo = '(11,00%)';
+                                  } else if (item.name === 'CPP (INSS Patronal)' && scenario.regime !== 'Lucro Presumido') {
+                                      // Only show CPP rate for LP
                                   } else if (item.name === 'CPP (INSS Patronal)') {
-                                      rateInfo = '(20,00%)';
+                                      rateInfo = '(20,00%)'
                                   }
 
                                   return (
@@ -212,3 +214,4 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     </div>
   );
 };
+
