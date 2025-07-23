@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from 'react';
@@ -14,9 +15,11 @@ import TaxReformInfoSection from '@/components/tax-reform-info-section';
 import RocSection from '@/components/roc-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportTaxInfoSection from '@/components/export-tax-info-section';
+import TaxBreakdownInfoSection from '@/components/tax-breakdown-info-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   return (
     <>
@@ -39,7 +42,7 @@ export default function Home() {
           <TabsContent value="2025">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="-mt-16">
-                  <TaxCalculator key="2025" year={2025} onExportRevenueChange={setShowExportInfo} />
+                  <TaxCalculator key="2025" year={2025} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults}/>
                 </div>
             </div>
           </TabsContent>
@@ -47,12 +50,20 @@ export default function Home() {
             <TaxReformInfoSection />
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="lg:-mt-8">
-                  <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} />
+                  <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
                 </div>
             </div>
           </TabsContent>
         </Tabs>
         
+        {showResults && (
+           <section className="py-16 lg:py-24 bg-slate-50/70">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <TaxBreakdownInfoSection />
+            </div>
+          </section>
+        )}
+
         {showExportInfo && (
            <section className="py-16 lg:py-24 bg-background">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useMemo } from 'react';
@@ -14,7 +15,7 @@ import TaxResults from './tax-results';
 import type { CalculatorFormValues } from './tax-calculator-form';
 
 
-export default function TaxCalculator({ year, onExportRevenueChange }: { year: 2025 | 2026, onExportRevenueChange: (show: boolean) => void }) {
+export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange }: { year: 2025 | 2026, onExportRevenueChange: (show: boolean) => void, onResultsChange: (show: boolean) => void }) {
   const {
     form,
     onSubmit,
@@ -47,6 +48,10 @@ export default function TaxCalculator({ year, onExportRevenueChange }: { year: 2
     const hasExportRevenue = Object.keys(revenues).some(key => key.startsWith('export_') && revenues[key] > 0);
     onExportRevenueChange(hasExportRevenue);
   }, [revenues, onExportRevenueChange]);
+
+  useEffect(() => {
+    onResultsChange(results !== null || error !== null);
+  }, [results, error, onResultsChange]);
 
   return (
     <FormProvider {...form}>
