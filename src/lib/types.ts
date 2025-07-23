@@ -76,6 +76,7 @@ export const TaxDetailsSchema = z.object({
     regime: z.enum([
       "Simples Nacional", 
       "Lucro Presumido",
+      "Simples Nacional (Otimizado)",
     ]),
     totalTax: z.number(),
     totalMonthlyCost: z.number(),

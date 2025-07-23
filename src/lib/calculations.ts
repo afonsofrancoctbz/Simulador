@@ -240,7 +240,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
 
     if (proLaboreValuesOverride) {
         finalResult.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`;
-        finalResult.regime = "Simples Nacional (Otimizado)";
     }
 
     return finalResult;
