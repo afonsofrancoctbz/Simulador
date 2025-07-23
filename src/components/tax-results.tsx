@@ -145,19 +145,27 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                     {groupName}
                                 </h4>
                                 <div className="space-y-3">
-                                {filteredItems.map(item => (
+                                {filteredItems.map(item => {
+                                  let itemName = item.name;
+                                  let rateInfo: string | null = null;
+                                  
+                                  if(item.name === 'DAS' && scenario.effectiveDasRate) {
+                                      rateInfo = `(Alíq. Efetiva: ${formatPercent(scenario.effectiveDasRate)})`;
+                                  } else if (item.name === 'INSS s/ Pró-labore') {
+                                      rateInfo = '(11,00%)';
+                                  } else if (item.name === 'CPP (INSS Patronal)') {
+                                      rateInfo = '(20,00%)';
+                                  }
+
+                                  return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-muted-foreground flex items-center gap-1.5">
-                                        {item.name}
-                                        {item.name === 'DAS' && scenario.effectiveDasRate ? (
-                                          <span className="text-xs text-muted-foreground/80 font-medium">
-                                            (Alíq. Efetiva: {formatPercent(scenario.effectiveDasRate)})
-                                          </span>
-                                        ) : null}
+                                        {itemName}
+                                        {rateInfo && <span className="text-xs text-muted-foreground/80 font-medium">{rateInfo}</span>}
                                       </span>
                                       <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
                                   </div>
-                                ))}
+                                )})}
                                 </div>
                             </div>
                         )

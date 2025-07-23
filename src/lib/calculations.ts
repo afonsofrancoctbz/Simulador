@@ -1,4 +1,5 @@
 
+
 import { getFiscalParameters, type FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -108,7 +109,8 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         const fee = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, 0)?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
         const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
         return {
-            regime: "Simples Nacional",
+            regime: "Simples Nacional (Sem Fator R)",
+            annex: "Anexo V",
             totalTax: totalINSSRetido + totalIRRFRetido,
             totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
             totalRevenue: 0,
@@ -155,7 +157,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         }
         
         const effectiveAnnexTable = fiscalConfig.simples_nacional[effectiveAnnex];
-
         finalAnnexes.add(effectiveAnnex);
         
         const bracket = findBracket(effectiveAnnexTable, effectiveRbt12);
@@ -188,7 +189,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         if (originalAnnex === 'IV') {
             cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
              if (!notes.some(n => n.includes('Anexo IV'))) {
-                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
+                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal) sobre a folha, fora do DAS.`);
             }
         }
     });
@@ -196,26 +197,33 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    let annexLabel = `Anexos (${[...finalAnnexes].join(', ')})`;
+    let annexLabel = `Anexo ${[...finalAnnexes].join(', ')}`;
+    let regimeLabel = "Simples Nacional";
+
     if (finalAnnexes.size === 1) {
         const singleAnnex = [...finalAnnexes][0];
-        if ((singleAnnex === 'III' && hasAnnexVActivity) || singleAnnex === 'V') {
-           annexLabel = fatorR >= fiscalConfig.simples_nacional.limite_fator_r ? 'Anexo III (pelo Fator R)' : 'Anexo V';
-        } else {
-            annexLabel = `Anexo ${singleAnnex}`;
+        if (singleAnnex === 'III' && hasAnnexVActivity) {
+           regimeLabel = 'Simples Nacional (Com Fator R)';
+           annexLabel = 'Anexo III';
+        } else if (singleAnnex === 'V') {
+            regimeLabel = 'Simples Nacional (Sem Fator R)';
+            annexLabel = 'Anexo V';
         }
+    } else if (finalAnnexes.size > 1) {
+        regimeLabel = "Simples Nacional";
+        annexLabel = `Anexos (${[...finalAnnexes].sort().join(', ')})`
     }
     
     const effectiveDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
 
     return {
-        regime: "Simples Nacional",
+        regime: regimeLabel,
+        annex: annexLabel,
         totalTax: totalTax || 0,
         totalMonthlyCost: totalMonthlyCost || 0,
         totalRevenue,
         proLabore: totalProLaboreBruto,
         fatorR: hasAnnexVActivity ? fatorR : undefined,
-        annex: annexLabel,
         effectiveRate: totalRevenue > 0 ? (totalTax || 0) / totalRevenue : 0,
         effectiveDasRate: effectiveDasRate || 0,
         contabilizeiFee,
@@ -224,7 +232,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV || 0 },
             { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0 },
             { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
-        ].filter(item => item.value > 0),
+        ].filter(item => item.value > 0.001),
         notes,
         partnerTaxes,
     };
@@ -294,7 +302,7 @@ function _calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
           { name: 'CPP (INSS Patronal)', value: cpp },
           { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
           { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
-        ].filter(item => item.value > 0),
+        ].filter(item => item.value > 0.001),
         notes,
         partnerTaxes,
     };
@@ -331,7 +339,8 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
           
           simplesNacionalOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
           if (simplesNacionalOtimizado) {
-              simplesNacionalOtimizado.annex = `Anexo III (Com Fator R Otimizado)`
+              simplesNacionalOtimizado.regime = `Simples Nacional (Com Fator R)`;
+              simplesNacionalOtimizado.annex = 'Anexo III'
               simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`
           }
       }
@@ -339,15 +348,13 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
 
   // Set display order for the UI
   lucroPresumido.order = 3;
-  if (simplesNacionalOtimizado && simplesNacionalOtimizado.totalMonthlyCost < simplesNacionalBase.totalMonthlyCost) {
-    simplesNacionalBase.order = 2;
+  if (simplesNacionalOtimizado) {
     simplesNacionalOtimizado.order = 1;
+    simplesNacionalBase.order = 2;
   } else {
     simplesNacionalBase.order = 1;
-    if(simplesNacionalOtimizado) {
-       simplesNacionalOtimizado.order = 2;
-    }
   }
+
 
   return {
     simplesNacionalBase,
