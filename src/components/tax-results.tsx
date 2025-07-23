@@ -127,7 +127,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                       </Badge>
                       )}
                       <h3 className="text-xl font-bold text-foreground mt-4">{title}</h3>
-                      {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
+                      {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
                   </div>
 
                   <div className="px-6 pb-6 pt-0 flex-grow text-base">

@@ -141,7 +141,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
 
     // Group revenues by their effective annex
-    const revenueByAnnex: Record<Annex, { domestic: number, export: number }> = {
+    const revenueByAnnex: Record<Annex, { domestic: number; export: number }> = {
         'I': { domestic: 0, export: 0 },
         'II': { domestic: 0, export: 0 },
         'III': { domestic: 0, export: 0 },
@@ -190,6 +190,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const isServiceAnnex = ['III', 'IV', 'V'].includes(annex);
             
+            // For services (Annex III, IV, V), ISS is exempt. For Commerce (I, II), ICMS/IPI are exempt.
             const exportExemptionFactor = isServiceAnnex ? (PIS + COFINS + ISS) : (PIS + COFINS + ICMS + IPI);
             const reducedRateForExport = effectiveRate * (1 - exportExemptionFactor);
             dasExport = exportRevenueForAnnex * reducedRateForExport;
@@ -212,7 +213,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
+    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
     
     const effectiveDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
     
