@@ -33,10 +33,7 @@ const calculateTaxesFlow = ai.defineFlow(
     // Transform the form data into the pure calculation function input
     const calculationInput: TaxCalculationInput = {
       domesticActivities: formValues.domesticActivities,
-      exportActivities: formValues.exportActivities.map(act => ({
-        ...act,
-        revenue: act.revenue * formValues.exchangeRate, // Convert export revenue to BRL
-      })),
+      exportActivities: formValues.exportActivities,
       rbt12: formValues.rbt12,
       fp12: formValues.fp12,
       proLaboreDetails: formValues.proLabores,
@@ -45,6 +42,7 @@ const calculateTaxesFlow = ai.defineFlow(
       fiscalConfig: fiscalConfig,
       cnaeData: CNAE_DATA_RAW,
       selectedPlan: formValues.selectedPlan,
+      exchangeRate: formValues.exchangeRate,
     };
     
     // Here we call the new, pure calculation logic.
