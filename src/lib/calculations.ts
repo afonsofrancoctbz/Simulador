@@ -15,7 +15,7 @@ import {
     type CnaeItem,
     type Plan,
 } from './types';
-import { formatPercent, findBracket, findFeeBracket } from './utils';
+import { findBracket, findFeeBracket } from './utils';
 
 // =================================================================================
 // 1. INPUT/OUTPUT STRUCTURES FOR THE PURE CALCULATION MODULE
@@ -110,7 +110,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
         return {
             regime: "Simples Nacional",
-            annex: "Anexo V",
+            annex: hasAnnexVActivity ? "Anexo V" : "N/A",
             totalTax: totalINSSRetido + totalIRRFRetido,
             totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
             totalRevenue: 0,
@@ -165,7 +165,8 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             console.error(`Could not find tax bracket for RBT12 ${effectiveRbt12} in annex ${effectiveAnnex}`);
             return;
         }
-
+        
+        // Calculate effective rate with full precision
         const effectiveRate = effectiveRbt12 > 0 
             ? ((effectiveRbt12 * bracket.rate) - bracket.deduction) / effectiveRbt12
             : bracket.rate;
@@ -198,11 +199,9 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
     let annexLabel = `Anexo ${[...finalAnnexes].sort().join(', ')}`;
-    if (finalAnnexes.size === 1) {
-        annexLabel = `Anexo ${[...finalAnnexes][0]}`
-    }
     
-    const effectiveDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
+    // Create a separate, rounded rate just for display purposes
+    const displayDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
 
     return {
         regime: 'Simples Nacional',
@@ -213,7 +212,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         proLabore: totalProLaboreBruto,
         fatorR: hasAnnexVActivity ? fatorR : undefined,
         effectiveRate: totalRevenue > 0 ? (totalTax || 0) / totalRevenue : 0,
-        effectiveDasRate: effectiveDasRate || 0,
+        effectiveDasRate: displayDasRate,
         contabilizeiFee,
         breakdown: [
             { name: 'DAS', value: totalDas || 0 },
@@ -349,3 +348,6 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
     lucroPresumido,
   };
 }
+
+
+      
