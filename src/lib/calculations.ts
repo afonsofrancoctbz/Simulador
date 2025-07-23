@@ -187,13 +187,12 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         
         let dasExport = 0;
         if (exportRevenueForAnnex > 0) {
-            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0 } = bracket.distribution;
-            const isServiceAnnex = ['III', 'IV', 'V'].includes(annex);
+            const { IRPJ = 0, CSLL = 0, CPP = 0 } = bracket.distribution;
             
-            // For services (Annex III, IV, V), ISS is exempt. For Commerce (I), ICMS is exempt.
-            const exportExemptionFactor = isServiceAnnex ? (PIS + COFINS + ISS) : (PIS + COFINS + ICMS);
-            const reducedRateForExport = effectiveRate * (1 - exportExemptionFactor);
-            dasExport = exportRevenueForAnnex * reducedRateForExport;
+            // The export tax is calculated only on the portions of IRPJ, CSLL, and CPP.
+            const exportTaxProportion = IRPJ + CSLL + CPP;
+            const exportEffectiveRate = effectiveRate * exportTaxProportion;
+            dasExport = exportRevenueForAnnex * exportEffectiveRate;
             
             if (!notes.some(n => n.includes('exportação'))) {
                 notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS/ICMS no Simples Nacional.");
@@ -239,6 +238,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     };
 
     if (proLaboreValuesOverride) {
+        finalResult.regime = "Simples Nacional (Otimizado)";
         finalResult.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`;
     }
 
@@ -356,7 +356,6 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
   
   validScenarios.sort((a, b) => {
     if (a.totalMonthlyCost === b.totalMonthlyCost) {
-        // If costs are equal, prefer Simples Otimizado > Simples Base > Lucro Presumido
         const orderMap: Record<string, number> = {
             'Simples Nacional (Otimizado)': 1,
             'Simples Nacional': 2,
