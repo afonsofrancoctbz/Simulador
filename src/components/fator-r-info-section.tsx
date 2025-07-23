@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -15,9 +16,6 @@ export default function FatorRInfoSection() {
       <Card className="shadow-lg border-primary/20 bg-card">
         <CardHeader className="text-center">
            <Calculator className="mx-auto h-8 w-8 text-primary mb-2" />
-          <CardTitle className="text-2xl font-bold text-primary">
-            Entendendo o Fator R e a Elisão Fiscal
-          </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
             Conceitos essenciais para a otimização de impostos no Simples Nacional.
           </CardDescription>
