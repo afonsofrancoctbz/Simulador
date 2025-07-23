@@ -101,24 +101,26 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
     const domesticRevenue = input.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
-    const exportRevenue = input.exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
-    const totalRevenue = domesticRevenue + exportRevenue;
+    const exportRevenueBRL = input.exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
+    const totalRevenue = domesticRevenue + exportRevenueBRL;
+
+    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig);
+    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+    const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     // Sanity check: if there's no revenue and no past revenue, return a zeroed-out result.
     if (totalRevenue === 0 && rbt12 === 0) {
-        const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig);
-        const fee = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, 0)?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
         const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
         return {
             regime: "Simples Nacional",
             annex: hasAnnexVActivity ? "Anexo V" : "N/A",
             totalTax: totalINSSRetido + totalIRRFRetido,
-            totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
+            totalMonthlyCost: totalINSSRetido + totalIRRFRetido + contabilizeiFee,
             totalRevenue: 0,
             proLabore: totalProLaboreBruto,
             fatorR: hasAnnexVActivity ? 0 : undefined,
             effectiveDasRate: 0,
-            contabilizeiFee: fee,
+            contabilizeiFee: contabilizeiFee,
             partnerTaxes,
             breakdown: [
                 { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
@@ -132,10 +134,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
     
     const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
-    
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig);
-    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-    const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
     let totalDas = 0;
     let cppFromAnnexIV = 0;
@@ -152,7 +150,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         let originalAnnex: Annex = cnaeInfo.annex;
         let effectiveAnnex: Annex = originalAnnex;
         
-        // Fator R Rule: Decide the effective annex to be used for calculation
         if (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) {
             effectiveAnnex = 'III';
         }
@@ -167,14 +164,12 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             return;
         }
         
-        // Calculate effective rate with full precision
         const effectiveRate = effectiveRbt12 > 0 
             ? ((effectiveRbt12 * bracket.rate) - bracket.deduction) / effectiveRbt12
             : bracket.rate;
 
         let dasForActivity = activity.revenue * effectiveRate;
         
-        // Export Exemption
         const isExport = input.exportActivities.some(exp => exp.code === activity.code && exp.revenue * exchangeRate === activity.revenue);
         if (isExport) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
@@ -187,7 +182,6 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         
         totalDas += dasForActivity;
 
-        // Anexo IV CPP Rule
         if (originalAnnex === 'IV') {
             cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
              if (!notes.some(n => n.includes('Anexo IV'))) {
@@ -199,19 +193,21 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
+    const regimeName = "Simples Nacional";
     let annexLabel = `Anexo ${[...finalAnnexes].sort().join(', ')}`;
     
     const displayDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
-
-    return {
-        regime: 'Simples Nacional',
+    const effectiveRateResult = totalRevenue > 0 ? (totalTax || 0) / totalRevenue : 0;
+    
+    const finalResult: TaxDetails = {
+        regime: regimeName,
         annex: annexLabel,
         totalTax: totalTax || 0,
         totalMonthlyCost: totalMonthlyCost || 0,
         totalRevenue,
         proLabore: totalProLaboreBruto,
         fatorR: hasAnnexVActivity ? fatorR : undefined,
-        effectiveRate: totalRevenue > 0 ? (totalTax || 0) / totalRevenue : 0,
+        effectiveRate: effectiveRateResult,
         effectiveDasRate: displayDasRate,
         contabilizeiFee,
         breakdown: [
@@ -223,6 +219,12 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         notes,
         partnerTaxes,
     };
+
+    if (proLaboreValuesOverride) {
+        finalResult.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`;
+    }
+
+    return finalResult;
 }
 
 
@@ -325,9 +327,6 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
           const optimizedProLabores = Array(proLaboreDetails.length).fill(optimizedProLaborePerPartner);
           
           simplesNacionalOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
-          if (simplesNacionalOtimizado) {
-              simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`
-          }
       }
   }
 
