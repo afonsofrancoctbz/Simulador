@@ -59,7 +59,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
   let scenarios: TaxDetails[] = [];
   if (year === 2025 && 'simplesNacionalBase' in results) {
     scenarios.push(results.lucroPresumido);
-    scenarios.push(results.simplesNacionalBase);
+    if (results.simplesNacionalBase) scenarios.push(results.simplesNacionalBase);
     if (results.simplesNacionalOtimizado) {
       scenarios.push(results.simplesNacionalOtimizado);
     }
@@ -107,18 +107,11 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
           {validScenarios.sort((a, b) => a.order! - b.order!).map((scenario) => {
             if (!scenario) return null;
-            const isRecommended = cheapestScenario !== null && scenario.totalMonthlyCost === cheapestScenario.totalMonthlyCost && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.annex === cheapestScenario.annex && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
             
             let title = scenario.regime;
-            if (scenario.regime === 'Simples Nacional') {
-                if (scenario.optimizationNote) {
-                    title = 'Simples Nacional (Com Fator R)';
-                } else {
-                    title = 'Simples Nacional (Sem Fator R)';
-                }
-            }
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
