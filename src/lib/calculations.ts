@@ -109,7 +109,7 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         const fee = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, 0)?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
         const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
         return {
-            regime: "Simples Nacional (Sem Fator R)",
+            regime: "Simples Nacional",
             annex: "Anexo V",
             totalTax: totalINSSRetido + totalIRRFRetido,
             totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
@@ -156,10 +156,10 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             effectiveAnnex = 'III';
         }
         
-        const effectiveAnnexTable = fiscalConfig.simples_nacional[effectiveAnnex];
+        const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         finalAnnexes.add(effectiveAnnex);
         
-        const bracket = findBracket(effectiveAnnexTable, effectiveRbt12);
+        const bracket = findBracket(annexTable, effectiveRbt12);
         
         if (!bracket) {
             console.error(`Could not find tax bracket for RBT12 ${effectiveRbt12} in annex ${effectiveAnnex}`);
@@ -197,27 +197,15 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const totalTax = (totalDas || 0) + (cppFromAnnexIV || 0) + (totalINSSRetido || 0) + (totalIRRFRetido || 0);
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    let annexLabel = `Anexo ${[...finalAnnexes].join(', ')}`;
-    let regimeLabel = "Simples Nacional";
-
+    let annexLabel = `Anexo ${[...finalAnnexes].sort().join(', ')}`;
     if (finalAnnexes.size === 1) {
-        const singleAnnex = [...finalAnnexes][0];
-        if (singleAnnex === 'III' && hasAnnexVActivity) {
-           regimeLabel = 'Simples Nacional (Com Fator R)';
-           annexLabel = 'Anexo III';
-        } else if (singleAnnex === 'V') {
-            regimeLabel = 'Simples Nacional (Sem Fator R)';
-            annexLabel = 'Anexo V';
-        }
-    } else if (finalAnnexes.size > 1) {
-        regimeLabel = "Simples Nacional";
-        annexLabel = `Anexos (${[...finalAnnexes].sort().join(', ')})`
+        annexLabel = `Anexo ${[...finalAnnexes][0]}`
     }
     
     const effectiveDasRate = totalRevenue > 0 ? (totalDas || 0) / totalRevenue : 0;
 
     return {
-        regime: regimeLabel,
+        regime: 'Simples Nacional',
         annex: annexLabel,
         totalTax: totalTax || 0,
         totalMonthlyCost: totalMonthlyCost || 0,
@@ -339,20 +327,19 @@ export function calculateTaxes(input: TaxCalculationInput): CalculationResults {
           
           simplesNacionalOtimizado = _calculateSimplesNacional(input, optimizedProLabores);
           if (simplesNacionalOtimizado) {
-              simplesNacionalOtimizado.regime = `Simples Nacional (Com Fator R)`;
-              simplesNacionalOtimizado.annex = 'Anexo III'
               simplesNacionalOtimizado.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`
           }
       }
   }
 
   // Set display order for the UI
-  lucroPresumido.order = 3;
   if (simplesNacionalOtimizado) {
     simplesNacionalOtimizado.order = 1;
     simplesNacionalBase.order = 2;
+    lucroPresumido.order = 3;
   } else {
     simplesNacionalBase.order = 1;
+    lucroPresumido.order = 2;
   }
 
 

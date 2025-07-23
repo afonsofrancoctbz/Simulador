@@ -111,8 +111,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
             
+            let title = scenario.regime;
+            if (scenario.regime === 'Simples Nacional') {
+                if (scenario.optimizationNote) {
+                    title = 'Simples Nacional (Com Fator R)';
+                } else if (scenario.annex?.includes('V')) {
+                    title = 'Simples Nacional (Sem Fator R)';
+                }
+            }
+
             return (
-              <div key={scenario.regime + (scenario.annex || '')}
+              <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
                   "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm",
                   isRecommended ? "border-primary shadow-lg" : "border-border"
@@ -124,7 +133,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                           Recomendado
                       </Badge>
                       )}
-                      <h3 className="text-xl font-bold text-foreground mt-4">{scenario.regime}</h3>
+                      <h3 className="text-xl font-bold text-foreground mt-4">{title}</h3>
                       {scenario.annex && <p className="font-semibold text-primary">{scenario.annex}</p>}
                   </div>
 
