@@ -75,14 +75,6 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
     return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
 }
 
-
-/**
- * Calculates the Contribuição Previdenciária Patronal (CPP).
- */
-export function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): number {
-    return baseDeCalculo * config.aliquotas_cpp_patronal.base;
-}
-
 // =================================================================================
 // 3. REGIME-SPECIFIC CALCULATION FUNCTIONS
 // =================================================================================
@@ -92,7 +84,7 @@ export function _calculateCpp(baseDeCalculo: number, config: FiscalConfig): numb
  * Follows the rules specified in the requirements document.
  */
 function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOverride?: number[]): TaxDetails {
-    const { fiscalConfig, selectedPlan, totalSalaryExpense, fp12, rbt12, cnaeCodes, exchangeRate } = input;
+    const { fiscalConfig, selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate } = input;
     
     const proLaboresToUse = proLaboreValuesOverride 
         ? input.proLaboreDetails.map((p, i) => ({ ...p, value: proLaboreValuesOverride[i] || p.value }))
@@ -108,40 +100,19 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
+    // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-
-    if (totalRevenue === 0 && effectiveRbt12 === 0) {
-        return {
-            regime: "Simples Nacional",
-            annex: "N/A",
-            totalTax: totalINSSRetido + totalIRRFRetido,
-            totalMonthlyCost: totalINSSRetido + totalIRRFRetido + contabilizeiFee,
-            totalRevenue: 0,
-            proLabore: totalProLaboreBruto,
-            fatorR: undefined,
-            effectiveDasRate: 0,
-            contabilizeiFee: contabilizeiFee,
-            partnerTaxes,
-            breakdown: [
-                { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
-                { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
-            ].filter(i => i.value > 0),
-            notes: [],
-        };
-    }
-
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
     const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
     
-    let totalDasTaxes = 0;
-    let cppFromAnnexIV = 0;
-
-    const notes: string[] = [];
+    // Passo 2: Calcular Alíquota Efetiva e DAS
+    let totalDas = 0;
     const finalAnnexes = new Set<Annex>();
-    const hasAnnexVActivity = cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
+    const hasAnnexVActivity = input.cnaeCodes.some(code => getCnaeData(code)?.requiresFatorR);
+    let hasAnnexIVActivity = false;
     
-    const allActivities = [...input.domesticActivities, ...input.exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
-    
+    const allActivities = [...input.domesticActivities, ...input.exportActivities];
+
     allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
@@ -149,7 +120,15 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
         finalAnnexes.add(effectiveAnnex);
         
+        if (effectiveAnnex === 'IV') {
+            hasAnnexIVActivity = true;
+        }
+
         const isExport = input.exportActivities.some(ex => ex.code === activity.code && ex.revenue > 0);
+        const revenueForActivity = isExport ? activity.revenue * exchangeRate : activity.revenue;
+
+        if (revenueForActivity === 0) return;
+
         const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const { rate, deduction, distribution } = bracket;
@@ -162,31 +141,28 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
             const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
             const exportTaxRate = effectiveRate * (1 - exportExemptionRatio);
-            dasForActivity = activity.revenue * exportTaxRate;
-             if (!notes.some(n => n.includes('exportação'))) {
-                notes.push("Receitas de exportação têm isenção de PIS, COFINS e ISS/ICMS no Simples Nacional.");
-            }
+            dasForActivity = revenueForActivity * exportTaxRate;
         } else {
-             dasForActivity = activity.revenue * effectiveRate;
+            dasForActivity = revenueForActivity * effectiveRate;
         }
 
-        totalDasTaxes += dasForActivity;
-
-        if (effectiveAnnex === 'IV') {
-            cppFromAnnexIV = _calculateCpp(monthlyPayroll, fiscalConfig);
-            if (!notes.some(n => n.includes('Anexo IV'))) {
-                notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal) sobre a folha, fora do DAS.`);
-            }
-        }
+        totalDas += dasForActivity;
     });
+
+    // Passo 3: Calcular CPP (Apenas para Anexo IV)
+    let cppFromAnnexIV = 0;
+    if (hasAnnexIVActivity) {
+      cppFromAnnexIV = monthlyPayroll * 0.20;
+    }
     
-    const totalTax = totalDasTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
+    // Passo 4: Calcular Custo Total
+    const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
     
     const breakdown = [
-        { name: 'DAS', value: totalDasTaxes },
+        { name: 'DAS', value: totalDas },
         { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
         { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0 },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
@@ -201,10 +177,10 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
         proLabore: totalProLaboreBruto,
         fatorR: hasAnnexVActivity ? fatorR : undefined,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
-        effectiveDasRate: totalRevenue > 0 ? totalDasTaxes / totalRevenue : 0,
+        effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
         contabilizeiFee,
         breakdown,
-        notes,
+        notes: [],
         partnerTaxes,
     };
     
@@ -222,35 +198,38 @@ function _calculateSimplesNacional(input: TaxCalculationInput, proLaboreValuesOv
  * Follows the rules specified in the requirements document.
  */
 function calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
-    const { fiscalConfig, cnaeData, totalSalaryExpense, selectedPlan, exchangeRate } = input;
+    const { fiscalConfig, totalSalaryExpense, selectedPlan, exchangeRate } = input;
     
     const proLabores = input.proLaboreDetails;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     
     const domesticRevenue = input.domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenue = input.exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
-    const totalRevenue = domesticRevenue + exportRevenue;
     
+    // Passo 1: Calcular Base de Impostos e Encargos
+    const totalRevenue = domesticRevenue + exportRevenue;
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
 
+    // Passo 2: Calcular Impostos sobre Faturamento
     const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS;
     const iss = domesticRevenue * fiscalConfig.lucro_presumido_rates.ISS;
 
     const presumedProfitBaseIRPJ = totalRevenue * 0.32;
-    const irpj = presumedProfitBaseIRPJ * fiscalConfig.lucro_presumido_rates.IRPJ_BASE;
-    const irpjAdicional = Math.max(0, (presumedProfitBaseIRPJ - fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
+    const irpj = presumedProfitBaseIRPJ * fiscalConfig.lucro_presumido_rates.IRPJ_BASE + Math.max(0, (presumedProfitBaseIRPJ - fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
     
     const presumedProfitBaseCSLL = totalRevenue * 0.32;
     const csll = presumedProfitBaseCSLL * fiscalConfig.lucro_presumido_rates.CSLL;
 
-    const cpp = _calculateCpp(monthlyPayroll, fiscalConfig);
+    // Passo 3: Calcular Encargos sobre Folha
+    const cpp = monthlyPayroll > 0 ? monthlyPayroll * 0.20 : 0;
 
-    const totalTax = pis + cofins + iss + irpj + irpjAdicional + csll + cpp + totalINSSRetido + totalIRRFRetido;
+    // Passo 4: Calcular Custo Total
+    const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
     const notes = exportRevenue > 0 ? ["Receitas de exportação de serviços são isentas de PIS, COFINS e ISS."] : [];
@@ -267,7 +246,7 @@ function calculateLucroPresumido(input: TaxCalculationInput): TaxDetails {
           { name: 'PIS', value: pis },
           { name: 'COFINS', value: cofins },
           { name: 'ISS', value: iss },
-          { name: 'IRPJ', value: irpj + irpjAdicional },
+          { name: 'IRPJ', value: irpj },
           { name: 'CSLL', value: csll },
           { name: 'CPP (INSS Patronal)', value: cpp },
           { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
