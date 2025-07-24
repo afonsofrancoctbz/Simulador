@@ -22,8 +22,8 @@
     --muted: 220 13% 91%;
     --muted-foreground: 217 19% 50%; /* cinza-texto: #64748b */
 
-    --accent: 120 73% 82%; /* verde-claro: #90EE90 */
-    --accent-foreground: 215 28% 17%; /* cinza-escuro */
+    --accent: 158 64% 45%; /* verde-contabilizei: #27B06E */
+    --accent-foreground: 0 0% 98%; /* branco */
     
     --destructive: 3 84% 60%; /* #ef4444 */
     --destructive-foreground: 0 0% 98%;
