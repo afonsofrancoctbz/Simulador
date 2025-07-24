@@ -201,9 +201,9 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                             {...field}
                                             onChange={(e) => {
                                             const value = parseFloat(e.target.value);
-                                            field.onChange(isNaN(value) ? undefined : value / 100);
+                                            field.onChange(isNaN(value) ? undefined : value);
                                             }}
-                                            value={field.value !== undefined ? field.value * 100 : ''}
+                                            value={field.value !== undefined ? field.value : ''}
                                         />
                                         </FormControl>
                                         <FormDescription className="text-xs">

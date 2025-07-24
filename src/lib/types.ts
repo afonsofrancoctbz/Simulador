@@ -45,7 +45,7 @@ export const TaxFormValuesSchema = z.object({
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
-  issRate: z.coerce.number().min(0).max(0.05).optional(),
+  issRate: z.coerce.number().min(0).max(5).optional(), // ISS Rate as a percentage
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
@@ -88,7 +88,7 @@ export const TaxDetailsSchema = z.object({
     effectiveDasRate: z.number().optional(),
     contabilizeiFee: z.number(),
     breakdown: z.array(TaxBreakdownItemSchema),
-    notes: z.array(z.string()).optional(),
+    notes: z.array(z.string()),
     annex: z.string().optional(),
     optimizationNote: z.string().optional(),
     partnerTaxes: z.array(PartnerTaxDetailsSchema),

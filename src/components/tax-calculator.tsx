@@ -20,9 +20,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
     form,
     onSubmit,
     results,
-    advice,
     isLoading,
-    isAdviceLoading,
     error,
     selectedCity,
   } = useTaxCalculator(year);
@@ -80,9 +78,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
       <TaxResults
         year={year}
         isLoading={isLoading}
-        isAdviceLoading={isAdviceLoading}
         results={results}
-        advice={advice}
         error={error}
       />
     </FormProvider>

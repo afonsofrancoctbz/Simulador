@@ -112,8 +112,6 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + contabilizeiFee;
     
-    const notes = exportRevenueBRL > 0 ? ["Receitas de exportação de serviços são isentas de PIS, COFINS e ISS."] : [];
-
     return {
         regime: 'Lucro Presumido',
         totalTax,
@@ -132,7 +130,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
           { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
           { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
         ].filter(item => item.value > 0.001),
-        notes,
+        notes:[],
         partnerTaxes,
     };
 }
@@ -166,14 +164,13 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     let hasAnnexIVActivity = false;
     const finalAnnexes = new Set<Annex>();
 
-    const allActivities = [...values.domesticActivities, ...values.exportActivities];
+    const allActivities = [...values.domesticActivities.map(a => ({...a, isExport: false})), ...values.exportActivities.map(a => ({...a, isExport: true}))];
 
     allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
 
-        const isExport = values.exportActivities.some(ex => ex.code === activity.code && ex.revenue === activity.revenue);
-        const revenueForActivity = isExport ? activity.revenue * exchangeRate : activity.revenue;
+        const revenueForActivity = activity.isExport ? activity.revenue * exchangeRate : activity.revenue;
 
         if (revenueForActivity === 0) return;
 
@@ -195,13 +192,10 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         let dasDaAtividade = revenueForActivity * effectiveRate;
         
         // Aplicar isenção de exportação
-        if (isExport) {
+        if (activity.isExport) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
             const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-            
-            // Recalcula o DAS da atividade com a isenção, não apenas o fator.
-            const dasWithoutExemptTaxes = dasDaAtividade * (1 - exportExemptionRatio);
-            dasDaAtividade = dasWithoutExemptTaxes;
+            dasDaAtividade *= (1 - exportExemptionRatio);
         }
         
         totalDas += dasDaAtividade;
@@ -223,7 +217,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
     
     const breakdown = [
-        { name: 'DAS', value: totalDas },
+        { name: `DAS (${(totalRevenue > 0 ? totalDas / totalRevenue : 0) * 100}%)`, value: totalDas },
         { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
         { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0 },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
@@ -246,7 +240,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     };
     
     if (proLaboreOverride) {
-        finalResult.optimizationNote = `Pró-labore ajustado para aumentar o Fator R e tributar pelo Anexo III, mais vantajoso.`;
+        finalResult.optimizationNote = `Pró-labore ajustado para R$ ${totalProLaboreBruto.toFixed(2)} para atingir o Fator R e tributar pelo Anexo III.`;
     }
 
     return finalResult;
@@ -270,14 +264,14 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
   // Condição para otimização do Fator R
   if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < config.simples_nacional.limite_fator_r && totalRevenue > 0) {
       
-      const totalProLaboreBruto = values.proLabores.reduce((acc, p) => acc + p.value, 0);
-      const currentPayroll = values.totalSalaryExpense + totalProLaboreBruto;
+      const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
+      const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
       const requiredPayroll = totalRevenue * config.simples_nacional.limite_fator_r;
       const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
       
       if (additionalProLaboreNeeded > 0) {
-          const newTotalProLabore = totalProLaboreBruto + additionalProLaboreNeeded;
+          const newTotalProLabore = currentTotalProLabore + additionalProLaboreNeeded;
           
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
               ? values.proLabores.map(p => ({ 
@@ -295,24 +289,15 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
           // Se o otimizado ficou mais caro, não o considere
           if (simplesNacionalOtimizado.totalMonthlyCost > simplesNacionalBase.totalMonthlyCost) {
               simplesNacionalOtimizado = null;
+          } else {
+            simplesNacionalOtimizado.regime = "Simples Nacional (Otimizado)";
           }
       }
   }
 
-  // Define a ordem de exibição
-  const scenarios: (TaxDetails | null)[] = [lucroPresumido, simplesNacionalBase, simplesNacionalOtimizado];
-  const sortedScenarios = scenarios
-    .filter((s): s is TaxDetails => s !== null)
-    .sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost);
-
-  let order = 1;
-  sortedScenarios.forEach(s => {
-    s.order = order++;
-  });
-
   return {
-    simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalBase.order || 99 },
-    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: simplesNacionalOtimizado.order || 99, regime: "Simples Nacional (Otimizado)" } : null,
-    lucroPresumido: { ...lucroPresumido, order: lucroPresumido.order || 99 },
+    simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
+    lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }

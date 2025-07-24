@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState } from 'react';
@@ -15,9 +14,7 @@ import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/ta
 
 export function useTaxCalculator(year: 2025 | 2026) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
-    const [advice, setAdvice] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [isAdviceLoading, setIsAdviceLoading] = useState(false);
     const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
     const [error, setError] = useState<string | null>(null);
 
@@ -102,7 +99,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
             selectedPlan: values.selectedPlan,
             rbt12: values.rbt12 ?? 0,
             fp12: values.fp12 ?? 0,
-            issRate: values.issRate,
+            issRate: (values.issRate ?? 5) / 100, // Convert percentage to decimal
             domesticActivities,
             exportActivities,
             exportCurrency: values.exportCurrency,
@@ -117,7 +114,6 @@ export function useTaxCalculator(year: 2025 | 2026) {
     async function onSubmit(values: CalculatorFormValues) {
         setIsLoading(true);
         setResults(null);
-        setAdvice(null);
         setError(null);
         setSelectedCity(values.city);
 
@@ -156,9 +152,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
         form,
         onSubmit,
         results,
-        advice,
         isLoading,
-        isAdviceLoading,
         error,
         selectedCity
     };
