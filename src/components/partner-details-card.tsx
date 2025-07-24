@@ -6,20 +6,22 @@ import { formatCurrencyBRL } from "@/lib/utils";
 import type { TaxDetails } from "@/lib/types";
 import { Users } from "lucide-react";
 
-export function PartnerDetailsCard({ details }: { details: TaxDetails }) {
-  if (!details.partnerTaxes || details.partnerTaxes.length === 0) {
+export function PartnerDetailsCard({ details }: { details: TaxDetails | null }) {
+  if (!details || !details.partnerTaxes || details.partnerTaxes.length === 0) {
     return null;
   }
+  
+  const regimeTitle = details.regime.replace(' (Otimizado)', '');
 
   return (
     <Card className="shadow-lg border bg-card w-full max-w-5xl mx-auto">
         <CardHeader className="text-center">
             <Users className="mx-auto h-8 w-8 text-primary mb-2" />
             <CardTitle className="text-2xl font-bold text-primary">
-                Detalhamento por Sócio (Cenário Recomendado)
+                Detalhamento por Sócio ({regimeTitle})
             </CardTitle>
             <CardDescription className="text-md mt-2 text-muted-foreground">
-                Valores individuais de pró-labore e impostos retidos no cenário mais econômico.
+                Valores individuais de pró-labore e impostos retidos no cenário selecionado.
             </CardDescription>
         </CardHeader>
         <CardContent>

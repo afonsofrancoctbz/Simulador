@@ -1,7 +1,8 @@
 
 "use client";
 
-import { AlertTriangle, CheckCircle, Info, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,7 +11,6 @@ import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
-import { getFiscalParameters } from '@/config/fiscal';
 
 interface TaxResultsProps {
   year: 2025 | 2026;
@@ -20,6 +20,31 @@ interface TaxResultsProps {
 }
 
 export default function TaxResults({ year, isLoading, results, error }: TaxResultsProps) {
+  const [selectedDetails, setSelectedDetails] = useState<TaxDetails | null>(null);
+
+  useEffect(() => {
+    if (results) {
+        let scenarios: (TaxDetails | null)[] = [];
+        if ('simplesNacionalBase' in results) {
+            scenarios = [results.simplesNacionalOtimizado, results.simplesNacionalBase, results.lucroPresumido];
+        } else if ('simplesNacionalTradicional' in results) {
+            scenarios = [results.simplesNacionalTradicional, results.simplesNacionalHibrido, results.lucroPresumido];
+        }
+        
+        const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && s.totalMonthlyCost > 0);
+        
+        if (validScenarios.length > 0) {
+            const cheapest = [...validScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
+            setSelectedDetails(cheapest);
+        } else {
+            setSelectedDetails(null);
+        }
+    } else {
+        setSelectedDetails(null);
+    }
+}, [results]);
+
+
   if (isLoading) {
     return (
       <div id="results-section" className="mt-12 w-full">
@@ -74,7 +99,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
   const validScenarios = orderedScenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
   if (validScenarios.length === 0) return null;
     
-  const cheapestScenario = [...validScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
+  const cheapestScenario = selectedDetails;
   
   const scenariosToShow = orderedScenarios.filter(s => s !== null);
   
@@ -139,6 +164,8 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
 
             const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+            const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && scenario.optimizationNote === selectedDetails.optimizationNote;
+
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
@@ -148,15 +175,17 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll/));
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
             const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
-            
+
             const domesticRevenue = scenario.breakdown
-                .filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss') || (i.name.toLowerCase().startsWith('das') && !scenario.notes.some(n => n.includes('exportação'))))
+                .filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss') || (i.name.toLowerCase().startsWith('das')))
                 .reduce((sum, item) => {
-                    // This logic is an approximation to back-calculate revenue from tax, it has limitations
                     const rateMatch = item.name.match(/\(([^)]+)\)/);
                     if (!rateMatch) return sum;
                     const rateString = rateMatch[1].replace('%', '').replace(',', '.').trim();
                     const rate = parseFloat(rateString) / 100;
+                    if (item.name.toLowerCase().startsWith('das') && scenario.effectiveDasRate) {
+                        return sum + (item.value / scenario.effectiveDasRate);
+                    }
                     return rate > 0 ? sum + (item.value / rate) : sum;
             }, 0);
 
@@ -164,9 +193,11 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
+                onClick={() => setSelectedDetails(scenario)}
                 className={cn(
-                  "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative",
-                  isRecommended ? "border-primary shadow-lg" : "border-border bg-card"
+                  "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer",
+                  isRecommended ? "border-primary shadow-lg" : "border-border bg-card",
+                  isSelected && !isRecommended && "ring-2 ring-primary"
                 )}
               >
                   {isRecommended && (
@@ -186,7 +217,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                       <div className='text-center py-1 my-1 bg-muted/40 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
-                        {(domesticRevenue > 0 || exportRevenue > 0) && (
+                        {exportRevenue > 0 && (
                             <div className="text-xs text-muted-foreground">
                                 {domesticRevenue > 0 && <span>Nac: {formatCurrencyBRL(domesticRevenue)}</span>}
                                 {domesticRevenue > 0 && exportRevenue > 0 && <span> + </span>}
@@ -301,14 +332,11 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
         </div>
       </div>
 
-      {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
-        <>
-          <Separator className="my-16" />
-          <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
-          <Separator className="my-16" />
-          <ProfitStatementCard details={cheapestScenario as TaxDetails} />
-        </>
-      )}
+      <Separator className="my-16" />
+      <PartnerDetailsCard details={selectedDetails} />
+      <Separator className="my-16" />
+      <ProfitStatementCard details={selectedDetails} />
+
     </div>
   );
 };

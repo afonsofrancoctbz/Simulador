@@ -7,7 +7,7 @@ import type { TaxDetails } from "@/lib/types";
 import { DollarSign } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-export function ProfitStatementCard({ details }: { details: TaxDetails }) {
+export function ProfitStatementCard({ details }: { details: TaxDetails | null }) {
   if (!details || details.totalRevenue <= 0) {
     return null;
   }
@@ -15,16 +15,18 @@ export function ProfitStatementCard({ details }: { details: TaxDetails }) {
   const proLaboreLiquidoTotal = details.partnerTaxes.reduce((sum, partner) => sum + partner.proLaboreLiquido, 0);
 
   const profit = details.totalRevenue - details.totalTax - proLaboreLiquidoTotal - details.contabilizeiFee;
+  
+  const regimeTitle = details.regime.replace(' (Otimizado)', '');
 
   return (
     <Card className="shadow-lg border bg-card w-full max-w-5xl mx-auto">
         <CardHeader className="text-center">
             <DollarSign className="mx-auto h-8 w-8 text-primary mb-2" />
             <CardTitle className="text-2xl font-bold text-primary">
-                Demonstrativo de Lucro (Cenário Recomendado)
+                Demonstrativo de Lucro ({regimeTitle})
             </CardTitle>
             <CardDescription className="text-md mt-2 text-muted-foreground">
-                Uma visão simplificada do resultado da sua empresa no cenário mais econômico.
+                Uma visão simplificada do resultado da sua empresa no cenário selecionado.
             </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-4 space-y-4">
