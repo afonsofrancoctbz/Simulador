@@ -6,7 +6,7 @@ const fiscalConfig = getFiscalParameters(2025);
 
 describe('Tax Calculation Engine', () => {
 
-  // Teste 1: Cenário de Referência (Otimização Fator R)
+  // Teste 1: Cenário de Referência (Otimização Fator R) - O "Teste de Gabarito"
   test('should match reference calculation for Fator R optimization scenario', () => {
     const input: TaxFormValues = {
       selectedCnaes: ['7020-4/00'], // Anexo V
@@ -58,7 +58,7 @@ describe('Tax Calculation Engine', () => {
     expect(result.lucroPresumido.totalTax).toBeCloseTo(7056.75, 2);
   });
 
-  // Teste 2: Anexo IV
+  // Teste 2: Anexo IV - Teste de Regressão
   test('should calculate CPP correctly for Simples Nacional Anexo IV', () => {
     const input: TaxFormValues = {
       selectedCnaes: ['6911-7/01'], // Advocacia, Anexo IV
@@ -94,7 +94,7 @@ describe('Tax Calculation Engine', () => {
     expect(result.simplesNacionalBase.totalTax).toBeCloseTo(1610, 2);
   });
 
-  // Teste 3: Lucro Presumido com CPP
+  // Teste 3: Lucro Presumido com CPP - Teste de Regressão
   test('should calculate CPP correctly for Lucro Presumido', () => {
     const input: TaxFormValues = {
       selectedCnaes: ['7020-4/00'], // Serviço qualquer
