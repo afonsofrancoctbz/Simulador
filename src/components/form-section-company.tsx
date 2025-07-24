@@ -38,7 +38,7 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
 
 
     return (
-        <Card className='border-none shadow-none'>
+        <Card className='shadow-xl overflow-hidden border bg-card'>
             <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
                  <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
                     <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
@@ -46,9 +46,9 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                     </div>
                     1. Dados da Empresa e Folha
                 </h3>
-                <p className='text-base text-muted-foreground mt-1'>Informações sobre seus custos com pessoal e localização.</p>
+                <p className='text-sm text-muted-foreground mt-1'>Informações sobre seus custos com pessoal e localização.</p>
             </CardHeader>
-            <CardContent className='p-4 pt-6 grid grid-cols-1 lg:grid-cols-2 gap-8'>
+            <CardContent className='p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
                 <div className='space-y-6'>
                     <FormField
                         control={form.control}
@@ -118,7 +118,7 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                 </div>
                 <div className="space-y-4">
                     <FormLabel>Pró-labore e Vínculos dos Sócios</FormLabel>
-                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 -mr-2">
                         {fields.map((item, index) => (
                             <div key={item.id} className="p-4 border rounded-lg bg-muted/30">
                                 <h4 className="font-semibold text-foreground mb-4">Sócio {index + 1}</h4>
@@ -158,7 +158,7 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                                             control={form.control}
                                             name={`proLabores.${index}.hasOtherInssContribution`}
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background">
+                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background shadow-sm">
                                                     <div className="space-y-0.5">
                                                         <FormLabel>Outro vínculo INSS?</FormLabel>
                                                         <FormDescription className='text-xs'>
@@ -184,7 +184,7 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                                                     field.onChange(Number(digitsOnly) / 100);
                                                 };
                                                 return(
-                                                <FormItem className={cn(!form.watch(`proLabores.${index}.hasOtherInssContribution`) && 'invisible h-0 opacity-0 transition-all')}>
+                                                <FormItem className={cn("transition-all duration-300", !form.watch(`proLabores.${index}.hasOtherInssContribution`) ? 'invisible h-0 opacity-0' : 'opacity-100' )}>
                                                     <FormLabel>Salário de Contribuição</FormLabel>
                                                     <FormControl>
                                                         <Input

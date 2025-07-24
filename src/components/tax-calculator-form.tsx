@@ -8,7 +8,7 @@ import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
 import { PlanEnumSchema, ProLaboreFormSchema } from '@/lib/types';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { FormSectionCompany } from "./form-section-company";
 import { FormSectionRevenue } from "./form-section-revenue";
 import { FormSectionPlan } from "./form-section-plan";
@@ -75,19 +75,17 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
 
     return (
         <>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left">
-                <Card className="shadow-xl overflow-hidden border bg-card max-w-7xl mx-auto">
-                    <CardContent className="p-6 md:p-8 space-y-8">
-                        
-                        <FormSectionCompany year={year} />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
+                
+                <FormSectionCompany year={year} />
 
-                        <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
-                        
-                        <FormSectionPlan />
+                <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
+                
+                <FormSectionPlan />
 
-                    </CardContent>
-                    <CardFooter className="bg-muted/30 border-t p-6">
-                        <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                <Card className="shadow-xl border bg-card">
+                    <CardFooter className="p-4">
+                        <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
                         {isLoading ? <Loader2 className="animate-spin" /> : null}
                         {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
                         </Button>

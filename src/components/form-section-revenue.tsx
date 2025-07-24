@@ -98,7 +98,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     };
 
     return (
-        <Card className='border-none shadow-none'>
+        <Card className='shadow-xl overflow-hidden border bg-card'>
             <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
                  <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
                      <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
@@ -106,9 +106,9 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                     </div>
                     2. Atividades e Faturamento Mensal
                 </h3>
-                <p className='text-base text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
+                <p className='text-sm text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
             </CardHeader>
-             <CardContent className='p-4 pt-6 space-y-8'>
+             <CardContent className='p-6 md:p-8 space-y-8'>
                  <div>
                     <FormLabel>Atividades (CNAEs) da empresa</FormLabel>
                     <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[40px] bg-background">
@@ -126,11 +126,11 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                     </Button>
                     <FormMessage>{form.formState.errors.selectedCnaes?.message}</FormMessage>
                     {selectedCnaes.length === 0 && (
-                        <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
+                         <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
                     )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 items-start">
                      <FormField control={form.control} name="rbt12" render={({ field }) => {
                             const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                 const { value } = e.target;
@@ -197,36 +197,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             );
                         }} />
                 </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    <div></div>
-                    <FormField
-                        control={form.control}
-                        name="issRate"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-xs text-muted-foreground">Alíquota de ISS (%) <span className="font-normal">(Opcional)</span></FormLabel>
-                            <FormControl>
-                            <Input
-                                type="number"
-                                placeholder="Padrão: 5%"
-                                {...field}
-                                onChange={(e) => {
-                                const value = parseFloat(e.target.value);
-                                field.onChange(isNaN(value) ? undefined : value / 100);
-                                }}
-                                value={field.value !== undefined ? field.value * 100 : ''}
-                                className="h-9"
-                            />
-                            </FormControl>
-                            <FormDescription className="text-xs">
-                                Se souber a alíquota de ISS do seu município (entre 2% e 5%), informe aqui.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                 </div>
-                
+                 
                 {year === 2026 && (
                   <FormField
                     control={form.control}
@@ -259,8 +230,8 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                 {revenueGroups.length > 0 && <Separator />}
 
                 {revenueGroups.length > 0 && (
-                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6'>
-                        <div className='space-y-4'>
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
+                        <div className='space-y-6'>
                             <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
                             {revenueGroups.map(annex => (
                                 <FormField
@@ -292,9 +263,34 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                         </FormItem>
                                     )}} />
                             ))}
+                             <FormField
+                                control={form.control}
+                                name="issRate"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-sm">Alíquota de ISS (%) <span className="font-normal text-muted-foreground">(Opcional)</span></FormLabel>
+                                    <FormControl>
+                                    <Input
+                                        type="number"
+                                        placeholder="Padrão: 5%"
+                                        {...field}
+                                        onChange={(e) => {
+                                        const value = parseFloat(e.target.value);
+                                        field.onChange(isNaN(value) ? undefined : value / 100);
+                                        }}
+                                        value={field.value !== undefined ? field.value * 100 : ''}
+                                    />
+                                    </FormControl>
+                                    <FormDescription className="text-xs">
+                                        Se souber a alíquota de ISS do seu município (entre 2% e 5%), informe aqui.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
                         </div>
                         
-                        <div className='space-y-4'>
+                        <div className='space-y-6'>
                             <h4 className="font-medium text-md text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <FormField control={form.control} name="exportCurrency" render={({ field }) => (
