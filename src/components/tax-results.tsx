@@ -67,6 +67,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
   let orderedScenarios: (TaxDetails | null)[] = [];
 
   if ('simplesNacionalBase' in results) {
+    // Always show all 3 scenarios when Fator R is in play
     orderedScenarios = [
       results.simplesNacionalOtimizado,
       results.simplesNacionalBase,
@@ -79,17 +80,9 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
       results.lucroPresumido,
     ];
   }
-
-  scenariosToShow = orderedScenarios.filter(s => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
-
-  const hasFatorRActivity = validScenarios.some(s => s.fatorR !== undefined);
-
-  if (hasFatorRActivity) {
-    scenariosToShow = orderedScenarios;
-  } else {
-    scenariosToShow = [results.simplesNacionalBase, results.lucroPresumido];
-  }
-
+  
+  scenariosToShow = orderedScenarios.filter(s => s !== null);
+  
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
         'IMPOSTOS S/ FATURAMENTO MENSAL': [],
@@ -184,7 +177,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                       Recomendado
                   </Badge>
                   )}
-                  <div className={cn("p-4 rounded-t-xl text-center overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
+                  <div className={cn("p-2 rounded-t-xl text-center overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
 
                       <h3 className="text-xl font-bold text-foreground mt-2">{title}</h3>
                       {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
@@ -193,7 +186,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                   </div>
 
                   <div className="px-4 pb-4 pt-2 flex-grow space-y-1">
-                      <div className='text-center py-2 my-1 bg-muted/40 rounded-md'>
+                      <div className='text-center py-1 my-1 bg-muted/40 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
                         {(domesticRevenue > 0 || exportRevenue > 0) && (
@@ -205,7 +198,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                         )}
                       </div>
                       
-                      <div className='text-center py-2 mb-1 bg-muted/40 rounded-md'>
+                      <div className='text-center py-1 mb-1 bg-muted/40 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>Pró-labore Bruto</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.proLabore)}</div>
                       </div>
@@ -223,7 +216,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                                 {groupName}
                             </h4>
                             {isTrimestral && <p className='text-muted-foreground -mt-2' style={{fontSize: '0.6rem'}}>Valores provisionados mensalmente.</p>}
-                            <div className="space-y-1.5">
+                            <div className="space-y-1">
                             {filteredItems.map(item => {
                               const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
                               
