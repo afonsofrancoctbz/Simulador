@@ -195,7 +195,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         }} />
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    <div></div>
+                     <div/>
                     <FormField
                         control={form.control}
                         name="issRate"
@@ -254,7 +254,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                 
                 {revenueGroups.length > 0 && <Separator />}
 
-                {revenueGroups.length > 0 && (
+                {revenueGroups.length > 0 ? (
                     <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6'>
                         <div className='space-y-4'>
                             <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
@@ -359,11 +359,10 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             </div>
                         </div>
                     </div>
+                ): (
+                  <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
                 )}
-                {revenueGroups.length === 0 && <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>}
             </CardContent>
         </Card>
     );
 }
-
-    
