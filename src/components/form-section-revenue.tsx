@@ -125,9 +125,12 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                     </Button>
                     <FormMessage>{form.formState.errors.selectedCnaes?.message}</FormMessage>
+                    {selectedCnaes.length === 0 && (
+                        <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
+                    )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                      <FormField control={form.control} name="rbt12" render={({ field }) => {
                             const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                 const { value } = e.target;
@@ -165,7 +168,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             </FormItem>
                             );
                         }} />
-                     <FormField control={form.control} name="fp12" render={({ field }) => {
+                    <FormField control={form.control} name="fp12" render={({ field }) => {
                             const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                 const { value } = e.target;
                                 const digitsOnly = value.replace(/\D/g, '');
@@ -195,13 +198,13 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         }} />
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                     <div/>
+                    <div></div>
                     <FormField
                         control={form.control}
                         name="issRate"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-muted-foreground">Alíquota de ISS (%) <span className="text-xs font-normal">(Opcional)</span></FormLabel>
+                            <FormLabel className="text-xs text-muted-foreground">Alíquota de ISS (%) <span className="font-normal">(Opcional)</span></FormLabel>
                             <FormControl>
                             <Input
                                 type="number"
@@ -212,9 +215,10 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                 field.onChange(isNaN(value) ? undefined : value / 100);
                                 }}
                                 value={field.value !== undefined ? field.value * 100 : ''}
+                                className="h-9"
                             />
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-xs">
                                 Se souber a alíquota de ISS do seu município (entre 2% e 5%), informe aqui.
                             </FormDescription>
                             <FormMessage />
@@ -254,7 +258,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                 
                 {revenueGroups.length > 0 && <Separator />}
 
-                {revenueGroups.length > 0 ? (
+                {revenueGroups.length > 0 && (
                     <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6'>
                         <div className='space-y-4'>
                             <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
@@ -359,8 +363,6 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             </div>
                         </div>
                     </div>
-                ): (
-                  <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
                 )}
             </CardContent>
         </Card>
