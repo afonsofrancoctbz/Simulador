@@ -176,42 +176,44 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name={`proLabores.${index}.otherContributionSalary`}
-                                            render={({ field }) => {
-                                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const { value } = e.target;
-                                                    const digitsOnly = value.replace(/\D/g, '');
-                                                    field.onChange(Number(digitsOnly) / 100);
-                                                };
-                                                return(
-                                                <FormItem className={cn("transition-all duration-300", !form.watch(`proLabores.${index}.hasOtherInssContribution`) ? 'h-0 opacity-0 invisible' : 'opacity-100' )}>
-                                                    <FormLabel>Salário de Contribuição no outro vínculo</FormLabel>
-                                                     <div className="relative">
-                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="text"
-                                                                inputMode="decimal"
-                                                                placeholder="0,00"
-                                                                onChange={handleChange}
-                                                                onBlur={field.onBlur}
-                                                                value={field.value ? formatBRL(field.value) : ''}
-                                                                name={field.name}
-                                                                ref={field.ref}
-                                                                className="pl-9"
-                                                            />
-                                                        </FormControl>
-                                                     </div>
-                                                    <FormDescription className="text-xs">
-                                                        Salário base no outro vínculo (teto {formatBRL(fiscalConfig.teto_inss)}).
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                                )
-                                            }}
-                                        />
+                                        <div className={cn("space-y-2 transition-all duration-300", !form.watch(`proLabores.${index}.hasOtherInssContribution`) ? 'h-0 opacity-0 invisible' : 'h-auto opacity-100 visible' )}>
+                                            <FormField
+                                                control={form.control}
+                                                name={`proLabores.${index}.otherContributionSalary`}
+                                                render={({ field }) => {
+                                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = e.target;
+                                                        const digitsOnly = value.replace(/\D/g, '');
+                                                        field.onChange(Number(digitsOnly) / 100);
+                                                    };
+                                                    return(
+                                                    <FormItem>
+                                                        <FormLabel>Salário de Contribuição no outro vínculo</FormLabel>
+                                                        <div className="relative">
+                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="text"
+                                                                    inputMode="decimal"
+                                                                    placeholder="0,00"
+                                                                    onChange={handleChange}
+                                                                    onBlur={field.onBlur}
+                                                                    value={field.value ? formatBRL(field.value) : ''}
+                                                                    name={field.name}
+                                                                    ref={field.ref}
+                                                                    className="pl-9"
+                                                                />
+                                                            </FormControl>
+                                                        </div>
+                                                        <FormDescription className="text-xs">
+                                                            Salário base no outro vínculo (teto {formatBRL(fiscalConfig.teto_inss)}).
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                    )
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
