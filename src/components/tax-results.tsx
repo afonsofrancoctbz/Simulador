@@ -211,12 +211,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                   </div>
 
                   <div className="px-4 pb-4 pt-2 flex-grow">
-                      <div className='text-center py-2 my-3 bg-muted/30 rounded-md'>
+                      <div className='text-center py-1 my-2 bg-muted/30 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-base font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
                       </div>
                       
-                      <div className='text-center py-2 mb-3 bg-muted/30 rounded-md'>
+                      <div className='text-center py-1 mb-2 bg-muted/30 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>Pró-labore Bruto</div>
                         <div className='text-base font-bold text-foreground'>{formatCurrencyBRL(scenario.proLabore)}</div>
                       </div>
@@ -228,13 +228,13 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                         const isTrimestral = groupName.includes('TRIMESTRAL');
 
                         return (
-                            <div key={groupName} className="space-y-2">
-                                <Separator className="my-2"/>
-                                <h4 className="font-bold text-primary text-xs uppercase tracking-wider">
+                            <div key={groupName} className="space-y-1">
+                                <Separator className="my-1"/>
+                                <h4 className="font-bold text-primary text-xs uppercase tracking-wider pt-1">
                                     {groupName}
                                 </h4>
                                 {isTrimestral && <p className='text-xs text-muted-foreground -mt-2' style={{fontSize: '0.65rem'}}>Valores provisionados mensalmente.</p>}
-                                <div className="space-y-2">
+                                <div className="space-y-1">
                                 {filteredItems.map(item => {
                                   const rateInfo = getRateInfo(item.name, item.value);
                                   const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
@@ -254,14 +254,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   </div>
                                 )})}
                                 </div>
-                                {groupName.includes('MENSAL') && scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
-                                  <div className="text-center rounded-lg p-2 mt-2 text-sm font-semibold flex items-center justify-center gap-2 bg-blue-100/80 text-blue-900 border border-blue-200/80">
-                                    <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
-                                  </div>
-                                )}
                             </div>
                         )
                       })}
+                       {scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
+                          <>
+                          <Separator className="my-2"/>
+                          <div className="text-center rounded-lg p-1.5 mt-2 text-sm font-semibold flex items-center justify-center gap-2 border border-blue-200/80 bg-blue-50 text-blue-800">
+                            <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
+                          </div>
+                          </>
+                        )}
                       
                   </div>
                 
