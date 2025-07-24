@@ -94,14 +94,14 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Impostos sobre Faturamento
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    const iss = domesticRevenue * (values.issRate ?? config.lucro_presumido_rates.ISS); 
+    const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
+    const iss = domesticRevenue * issValue;
 
-    const irpjBase = totalRevenue * 0.32;
-    const csllBase = totalRevenue * 0.32;
-
-    const irpjAdicional = Math.max(0, (irpjBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
-    const irpj = irpjBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
-    const csll = csllBase * config.lucro_presumido_rates.CSLL;
+    // Presunção sobre a receita total
+    const presumedProfitBase = totalRevenue * 0.32;
+    const irpjAdicional = Math.max(0, (presumedProfitBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
+    const irpj = presumedProfitBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
+    const csll = presumedProfitBase * config.lucro_presumido_rates.CSLL;
 
     // Encargos sobre Folha
     const cpp = _calculateCpp(monthlyPayroll, config);
@@ -125,7 +125,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         breakdown: [
           { name: 'PIS', value: pis },
           { name: 'COFINS', value: cofins },
-          { name: 'ISS', value: iss },
+          { name: `ISS (${(issValue * 100).toFixed(2)}%)`, value: iss },
           { name: 'IRPJ', value: irpj },
           { name: 'CSLL', value: csll },
           { name: 'CPP (INSS Patronal)', value: cpp },
@@ -172,7 +172,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
 
-        const isExport = values.exportActivities.some(ex => ex.code === activity.code && ex.revenue > 0);
+        const isExport = values.exportActivities.some(ex => ex.code === activity.code && ex.revenue === activity.revenue);
         const revenueForActivity = isExport ? activity.revenue * exchangeRate : activity.revenue;
 
         if (revenueForActivity === 0) return;
@@ -198,8 +198,10 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         if (isExport) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
             const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-            const exportReductionFactor = 1 - exportExemptionRatio;
-            dasDaAtividade *= exportReductionFactor;
+            
+            // Recalcula o DAS da atividade com a isenção, não apenas o fator.
+            const dasWithoutExemptTaxes = dasDaAtividade * (1 - exportExemptionRatio);
+            dasDaAtividade = dasWithoutExemptTaxes;
         }
         
         totalDas += dasDaAtividade;
@@ -257,30 +259,43 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
 export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): CalculationResults {
   
-  const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * values.exchangeRate), 0);
+  const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
+  
   const lucroPresumido = calculateLucroPresumido(values, config);
   const simplesNacionalBase = _calculateSimplesNacional(values, config);
   let simplesNacionalOtimizado: TaxDetails | null = null;
   
   const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
   
+  // Condição para otimização do Fator R
   if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < config.simples_nacional.limite_fator_r && totalRevenue > 0) {
       
       const totalProLaboreBruto = values.proLabores.reduce((acc, p) => acc + p.value, 0);
-      const monthlyPayroll = values.totalSalaryExpense + totalProLaboreBruto;
-
-      const requiredPayrollForFatorR = totalRevenue * config.simples_nacional.limite_fator_r;
-      const additionalPayrollNeeded = Math.max(0, requiredPayrollForFatorR - monthlyPayroll);
+      const currentPayroll = values.totalSalaryExpense + totalProLaboreBruto;
       
-      if (additionalPayrollNeeded > 0) {
-          const newTotalProLabore = totalProLaboreBruto + additionalPayrollNeeded;
+      const requiredPayroll = totalRevenue * config.simples_nacional.limite_fator_r;
+      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
+      
+      if (additionalProLaboreNeeded > 0) {
+          const newTotalProLabore = totalProLaboreBruto + additionalProLaboreNeeded;
           
-          const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => ({ 
-              ...p, 
-              value: newTotalProLabore / values.proLabores.length,
-          }));
+          const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
+              ? values.proLabores.map(p => ({ 
+                  ...p, 
+                  value: newTotalProLabore / values.proLabores.length,
+                }))
+              : [{ 
+                  value: newTotalProLabore, 
+                  hasOtherInssContribution: false, 
+                  otherContributionSalary: 0 
+                }];
           
           simplesNacionalOtimizado = _calculateSimplesNacional(values, config, optimizedProLabores);
+
+          // Se o otimizado ficou mais caro, não o considere
+          if (simplesNacionalOtimizado.totalMonthlyCost > simplesNacionalBase.totalMonthlyCost) {
+              simplesNacionalOtimizado = null;
+          }
       }
   }
 

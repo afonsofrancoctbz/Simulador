@@ -76,20 +76,14 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
-        'IMPOSTOS S/ FATURAMENTO': [],
-        'ENCARGOS': [],
-        'OUTROS CUSTOS': [],
+        'IMPOSTOS E ENCARGOS': [],
     };
 
     details.breakdown.forEach(item => {
-        if (['PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'DAS'].some(tax => item.name.startsWith(tax))) {
-            groups['IMPOSTOS S/ FATURAMENTO'].push(item);
-        } else if (['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(charge => item.name.startsWith(charge))) {
-            groups['ENCARGOS'].push(item);
-        }
+        groups['IMPOSTOS E ENCARGOS'].push(item);
     });
 
-    groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+    groups['IMPOSTOS E ENCARGOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
     return groups;
   };
@@ -116,7 +110,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
-                  "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm",
+                  "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl",
                   isRecommended ? "border-primary shadow-lg" : "border-border"
                 )}
               >
@@ -174,7 +168,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                       })}
                   </div>
                 
-                  <div className="p-6 mt-auto space-y-4">
+                  <div className="p-6 mt-auto space-y-4 bg-muted/20 rounded-b-xl">
                       {scenario.fatorR !== undefined && (
                       <div className={cn(
                           "text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2",
@@ -191,14 +185,14 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                             </AlertDescription>
                         </Alert>
                       )}
-                      <div className={cn("p-4 rounded-lg bg-muted/30")}>
+                      <div className={cn("p-4 rounded-lg bg-card")}>
                           <div className="w-full space-y-2 text-center">
                               <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>
                               <div className="text-3xl font-bold text-primary">
                                   {formatCurrencyBRL(scenario.totalMonthlyCost)}
                               </div>
                               <div className="w-full bg-muted rounded-full h-2.5 mt-2">
-                                  <div className="bg-gradient-to-r from-primary/70 to-primary h-2.5 rounded-full" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                                  <div className="bg-gradient-to-r from-primary/70 to-primary h-2.5 rounded-full transition-all" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
                               </div>
                               <p className='text-sm text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
                           </div>
@@ -212,7 +206,9 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
       {cheapestScenario && cheapestScenario.totalRevenue > 0 && (
         <>
+          <Separator className="my-16" />
           <PartnerDetailsCard details={cheapestScenario as TaxDetails} />
+          <Separator className="my-16" />
           <ProfitStatementCard details={cheapestScenario as TaxDetails} />
         </>
       )}

@@ -101,6 +101,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
             selectedPlan: values.selectedPlan,
             rbt12: values.rbt12 ?? 0,
             fp12: values.fp12 ?? 0,
+            issRate: values.issRate,
             domesticActivities,
             exportActivities,
             exportCurrency: values.exportCurrency,

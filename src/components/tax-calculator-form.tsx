@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -14,6 +15,7 @@ import { FormSectionPlan } from "./form-section-plan";
 import { CnaeSelector } from './cnae-selector';
 import { getCnaeData } from "@/lib/cnae-helpers";
 import type { Annex } from "@/lib/types";
+import { Loader2 } from "lucide-react";
 
 export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
@@ -24,7 +26,8 @@ export const CalculatorFormSchema = z.object({
   fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
-  exchangeRate: z.coerce.number(),
+  exchangeRate: z.coerce.number().optional(),
+  issRate: z.coerce.number().min(0.02, "O ISS deve ser no mínimo 2%.").max(0.05, "O ISS não pode ser maior que 5%.").optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
   proLabores: z.array(ProLaboreFormSchema).min(1),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
@@ -85,6 +88,7 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
                     </CardContent>
                     <CardFooter className="bg-muted/30 border-t p-6">
                         <Button type="submit" size="lg" disabled={isLoading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                        {isLoading ? <Loader2 className="animate-spin" /> : null}
                         {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
                         </Button>
                     </CardFooter>

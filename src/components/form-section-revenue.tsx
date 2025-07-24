@@ -194,6 +194,33 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             );
                         }} />
                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="issRate"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Alíquota de ISS (%)</FormLabel>
+                            <FormControl>
+                            <Input
+                                type="number"
+                                placeholder="Ex: 5"
+                                {...field}
+                                onChange={(e) => {
+                                const value = parseFloat(e.target.value);
+                                field.onChange(isNaN(value) ? undefined : value / 100);
+                                }}
+                                value={field.value !== undefined ? field.value * 100 : ''}
+                            />
+                            </FormControl>
+                            <FormDescription>
+                            Alíquota de ISS do seu município (entre 2% e 5%). Se deixado em branco, será usado 5%.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                 </div>
                 
                 {year === 2026 && (
                   <FormField
