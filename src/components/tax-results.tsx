@@ -119,29 +119,26 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             let title = scenario.regime;
             if (title === "Simples Nacional (Otimizado)") title = "Simples Nacional";
 
-            const getRateInfo = (itemName: string): string | null => {
-              if (itemName === 'DAS' && scenario.effectiveDasRate) {
-                return formatPercent(scenario.effectiveDasRate);
+            const getRateInfo = (itemName: string, itemValue: number): string | null => {
+              if (scenario.totalRevenue <= 0) return null;
+              
+              const nameLower = itemName.toLowerCase();
+              
+              if (nameLower.startsWith('das') && scenario.effectiveDasRate) {
+                  return formatPercent(scenario.effectiveDasRate);
               }
-               if (itemName === 'IRPJ') {
-                  return formatPercent(config.lucro_presumido_rates.IRPJ_BASE);
-              }
-              if(itemName === 'CSLL'){
-                  return formatPercent(config.lucro_presumido_rates.CSLL);
-              }
-              if (itemName.toLowerCase().includes('cpp')) {
-                  return formatPercent(config.aliquotas_cpp_patronal.total);
-              }
-              if (itemName.toLowerCase().includes('inss s/ pró-labore')) {
-                  return formatPercent(config.aliquota_inss_prolabore);
-              }
-              if (itemName === 'PIS') return formatPercent(config.lucro_presumido_rates.PIS);
-              if (itemName === 'COFINS') return formatPercent(config.lucro_presumido_rates.COFINS);
-              if (itemName.startsWith('ISS')) {
-                  const breakdownItem = scenario.breakdown.find(b => b.name === itemName);
-                  const rateMatch = breakdownItem?.name.match(/\((.*?)\)/);
+              if (nameLower.startsWith('iss')) {
+                  const rateMatch = itemName.match(/\((.*?)\)/);
                   return rateMatch ? rateMatch[1] : null;
               }
+              // For other taxes, calculate effective rate based on total revenue
+              if (itemValue > 0 && ['pis', 'cofins', 'irpj', 'csll', 'cpp'].some(tax => nameLower.includes(tax))) {
+                  return formatPercent(itemValue / scenario.totalRevenue);
+              }
+               if (nameLower.includes('inss s/ pró-labore') && scenario.proLabore > 0) {
+                  return formatPercent(itemValue / scenario.proLabore);
+              }
+
               return null;
             };
 
@@ -177,21 +174,19 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                         return (
                             <div key={groupName} className="space-y-3">
                                 <Separator className="my-3"/>
-                                <h4 className="font-semibold text-primary text-xs uppercase tracking-wider">
+                                <h4 className="font-bold text-primary text-xs uppercase tracking-wider">
                                     {groupName}
                                 </h4>
                                 <div className="space-y-3">
                                 {filteredItems.map(item => {
-                                  let itemName = item.name;
-                                  const rateInfo = getRateInfo(itemName);
-                                  
-                                  const nameWithoutRate = itemName.replace(/\s*\([^)]+\)$/, '');
+                                  const rateInfo = getRateInfo(item.name, item.value);
+                                  const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
                                   
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-foreground flex items-center gap-1.5">
                                         {nameWithoutRate}
-                                        {rateInfo && !itemName.toLowerCase().includes('irrf') && (
+                                        {rateInfo && !item.name.toLowerCase().includes('irrf') && (
                                             <span className="text-primary font-semibold">({rateInfo})</span>
                                         )}
                                       </span>
