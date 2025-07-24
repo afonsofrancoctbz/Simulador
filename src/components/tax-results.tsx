@@ -124,26 +124,24 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                 return formatPercent(scenario.effectiveDasRate);
               }
                if (itemName === 'IRPJ') {
-                  return "15%";
+                  return formatPercent(config.lucro_presumido_rates.IRPJ_BASE);
               }
               if(itemName === 'CSLL'){
-                  return "9%";
+                  return formatPercent(config.lucro_presumido_rates.CSLL);
               }
               if (itemName.toLowerCase().includes('cpp')) {
-                  return `${(config.aliquotas_cpp_patronal.total * 100).toFixed(2).replace('.', ',')}%`;
+                  return formatPercent(config.aliquotas_cpp_patronal.total);
               }
               if (itemName.toLowerCase().includes('inss s/ pró-labore')) {
-                  return `${(config.aliquota_inss_prolabore * 100).toFixed(2).replace('.', ',')}%`;
+                  return formatPercent(config.aliquota_inss_prolabore);
               }
-              if (itemName === 'PIS') return `${(config.lucro_presumido_rates.PIS * 100).toFixed(2).replace('.', ',')}%`;
-              if (itemName === 'COFINS') return `${(config.lucro_presumido_rates.COFINS * 100).toFixed(2).replace('.', ',')}%`;
+              if (itemName === 'PIS') return formatPercent(config.lucro_presumido_rates.PIS);
+              if (itemName === 'COFINS') return formatPercent(config.lucro_presumido_rates.COFINS);
               if (itemName.startsWith('ISS')) {
                   const breakdownItem = scenario.breakdown.find(b => b.name === itemName);
                   const rateMatch = breakdownItem?.name.match(/\((.*?)\)/);
                   return rateMatch ? rateMatch[1] : null;
               }
-              // IRPJ e CSLL são sobre o lucro presumido, não o faturamento. Opcional exibir.
-              // IRRF não tem uma alíquota única.
               return null;
             };
 
@@ -179,20 +177,22 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                         return (
                             <div key={groupName} className="space-y-3">
                                 <Separator className="my-3"/>
-                                <h4 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+                                <h4 className="font-semibold text-primary text-xs uppercase tracking-wider">
                                     {groupName}
                                 </h4>
                                 <div className="space-y-3">
                                 {filteredItems.map(item => {
                                   let itemName = item.name;
                                   const rateInfo = getRateInfo(itemName);
-
+                                  
+                                  const nameWithoutRate = itemName.replace(/\s*\([^)]+\)$/, '');
+                                  
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-foreground flex items-center gap-1.5">
-                                        {itemName}
+                                        {nameWithoutRate}
                                         {rateInfo && !itemName.toLowerCase().includes('irrf') && (
-                                            <span className="text-muted-foreground font-semibold">({rateInfo})</span>
+                                            <span className="text-primary font-semibold">({rateInfo})</span>
                                         )}
                                       </span>
                                       <span className="font-medium text-foreground">
