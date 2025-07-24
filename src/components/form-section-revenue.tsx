@@ -191,14 +191,9 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                         )}} />
                                 ))}
                                 
-                                <div className='space-y-4'>
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background shadow-sm">
-                                        <div className="space-y-0.5">
-                                            <FormLabel>Alterar alíquota de ISS?</FormLabel>
-                                            <FormDescription className="text-xs">
-                                                O padrão é 5%. Ative para inserir um valor diferente.
-                                            </FormDescription>
-                                        </div>
+                                <FormItem className="flex flex-row items-center gap-4 space-y-0">
+                                    <FormLabel className="whitespace-nowrap pt-1">Alíquota de ISS (%)</FormLabel>
+                                    <div className="flex items-center gap-2">
                                         <FormControl>
                                             <Switch
                                                 checked={showIssInput}
@@ -210,34 +205,31 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                                 }}
                                             />
                                         </FormControl>
-                                    </FormItem>
-                                    
-                                    <div className={cn("space-y-2 transition-all duration-300", !showIssInput ? 'h-0 opacity-0 invisible' : 'h-auto opacity-100 visible' )}>
-                                        <FormField
-                                            control={form.control}
-                                            name="issRate"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-sm">Nova Alíquota de ISS (%)</FormLabel>
+                                        {showIssInput && (
+                                            <FormField
+                                                control={form.control}
+                                                name="issRate"
+                                                render={({ field }) => (
                                                     <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Ex: 2.5"
-                                                        step="0.01"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                        const value = parseFloat(e.target.value);
-                                                        field.onChange(isNaN(value) ? undefined : value);
-                                                        }}
-                                                        value={field.value !== undefined ? field.value : ''}
-                                                    />
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="5,0"
+                                                            step="0.01"
+                                                            className="h-9 w-32"
+                                                            {...field}
+                                                            onChange={(e) => {
+                                                                const value = parseFloat(e.target.value);
+                                                                field.onChange(isNaN(value) ? undefined : value);
+                                                            }}
+                                                            value={field.value !== undefined ? field.value : ''}
+                                                        />
                                                     </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                                )}
+                                            />
+                                        )}
                                     </div>
-                                </div>
+                                    <FormMessage>{form.formState.errors.issRate?.message}</FormMessage>
+                                </FormItem>
                             </div>
                             
                             <div className='space-y-6'>
