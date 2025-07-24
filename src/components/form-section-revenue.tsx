@@ -191,7 +191,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                     control={form.control}
                                     name="issRate"
                                     render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="w-full sm:w-1/2">
                                         <FormLabel className="text-sm">Alíquota de ISS (%) <span className="font-normal text-muted-foreground">(Opcional)</span></FormLabel>
                                         <FormControl>
                                         <Input
@@ -204,6 +204,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                             field.onChange(isNaN(value) ? undefined : value);
                                             }}
                                             value={field.value !== undefined ? field.value : ''}
+                                            className="text-sm"
                                         />
                                         </FormControl>
                                         <FormDescription className="text-xs">
