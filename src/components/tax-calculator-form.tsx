@@ -17,6 +17,7 @@ import type { Annex } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormSectionPayroll } from "./form-section-payroll";
+import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
 
 
 export const CalculatorFormSchema = z.object({
@@ -77,11 +78,12 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         <>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
                 <Tabs defaultValue="company" className="w-full">
-                    <TabsList className="mb-8 grid w-full grid-cols-4">
+                    <TabsList className="mb-8 grid w-full grid-cols-5">
                         <TabsTrigger value="company">1. Empresa</TabsTrigger>
                         <TabsTrigger value="payroll">2. Folha e Sócios</TabsTrigger>
-                        <TabsTrigger value="revenue">3. Faturamento</TabsTrigger>
-                        <TabsTrigger value="plan">4. Plano</TabsTrigger>
+                        <TabsTrigger value="annual-revenue">3. Receita Anual</TabsTrigger>
+                        <TabsTrigger value="monthly-revenue">4. Faturamento Mensal</TabsTrigger>
+                        <TabsTrigger value="plan">5. Plano</TabsTrigger>
                     </TabsList>
                     <TabsContent value="company">
                          <FormSectionCompany />
@@ -89,7 +91,10 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
                      <TabsContent value="payroll">
                          <FormSectionPayroll year={year} />
                     </TabsContent>
-                    <TabsContent value="revenue">
+                    <TabsContent value="annual-revenue">
+                        <FormSectionAnnualRevenue />
+                    </TabsContent>
+                    <TabsContent value="monthly-revenue">
                         <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
                     </TabsContent>
                     <TabsContent value="plan">

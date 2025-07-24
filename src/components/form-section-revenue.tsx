@@ -31,27 +31,6 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
     const [isFetchingRate, setIsFetchingRate] = useState(false);
     
-    const rbt12Value = form.watch("rbt12");
-    const watchedRevenues = form.watch("revenues");
-
-    const projectedAnnualRevenue = useMemo(() => {
-        const domestic = Object.keys(watchedRevenues)
-            .filter(k => k.startsWith('domestic_'))
-            .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
-        
-        const exportVal = Object.keys(watchedRevenues)
-            .filter(k => k.startsWith('export_'))
-            .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
-
-        const exchangeRate = form.getValues('exportCurrency') !== 'BRL' ? (form.getValues('exchangeRate') || 1) : 1;
-        
-        return (domestic + (exportVal * exchangeRate)) * 12;
-    }, [watchedRevenues, form]);
-      
-    const SIMPLES_NACIONAL_LIMIT = 4800000;
-    const showSimplesLimitWarning = (rbt12Value ?? 0) === 0 && projectedAnnualRevenue > SIMPLES_NACIONAL_LIMIT;
-
-    const exportCurrency = form.watch("exportCurrency");
     const selectedCnaes = form.watch("selectedCnaes");
 
     const revenueGroups = useMemo(() => {
@@ -97,6 +76,8 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         form.setValue('selectedCnaes', newCnaes, { shouldValidate: true });
     };
 
+    const exportCurrency = form.watch("exportCurrency");
+
     return (
         <Card className='shadow-lg overflow-hidden border bg-card'>
             <CardHeader className='border-b bg-muted/30'>
@@ -105,8 +86,8 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         <Briefcase className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl">Atividades e Faturamento</CardTitle>
-                        <CardDescription>Selecione suas atividades (CNAEs) e informe suas receitas.</CardDescription>
+                        <CardTitle className="text-xl">Atividades e Faturamento Mensal</CardTitle>
+                        <CardDescription>Selecione suas atividades e informe a estimativa de receita para o mês.</CardDescription>
                     </div>
                 </div>
             </CardHeader>
@@ -132,90 +113,6 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                     )}
                 </div>
                 
-                 <Separator />
-
-                <div className="space-y-6">
-                    <h4 className="font-semibold text-lg text-foreground flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-primary"/>
-                        Receita Bruta (Últimos 12 meses)
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
-                        <FormField control={form.control} name="rbt12" render={({ field }) => {
-                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const { value } = e.target;
-                                    const digitsOnly = value.replace(/\D/g, '');
-                                    field.onChange(Number(digitsOnly) / 100);
-                                };
-                                return (
-                                <FormItem>
-                                    <FormLabel>Faturamento Total (RBT12)</FormLabel>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                        <FormControl>
-                                            <Input 
-                                                type="text" 
-                                                inputMode="decimal"
-                                                placeholder="Ex: 250.000,00"
-                                                onChange={handleChange}
-                                                onBlur={field.onBlur}
-                                                value={field.value ? formatBRL(field.value) : ''}
-                                                name={field.name}
-                                                ref={field.ref}
-                                                className="pl-9"
-                                            />
-                                        </FormControl>
-                                    </div>
-                                    <FormDescription>
-                                        Se for o primeiro mês, pode deixar em R$ 0,00.
-                                    </FormDescription>
-                                    <FormMessage />
-                                    {showSimplesLimitWarning && (
-                                        <Alert variant="destructive" className="mt-2">
-                                            <AlertTriangle className="h-4 w-4" />
-                                            <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
-                                            <AlertDescription>
-                                                Sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões.
-                                            </AlertDescription>
-                                        </Alert>
-                                    )}
-                                </FormItem>
-                                );
-                            }} />
-                        <FormField control={form.control} name="fp12" render={({ field }) => {
-                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const { value } = e.target;
-                                    const digitsOnly = value.replace(/\D/g, '');
-                                    field.onChange(Number(digitsOnly) / 100);
-                                };
-                                return (
-                                <FormItem>
-                                    <FormLabel>Folha de Pagamento (FP12)</FormLabel>
-                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                        <FormControl>
-                                            <Input 
-                                                type="text" 
-                                                inputMode="decimal"
-                                                placeholder="Ex: 70.000,00"
-                                                onChange={handleChange}
-                                                onBlur={field.onBlur}
-                                                value={field.value ? formatBRL(field.value) : ''}
-                                                name={field.name}
-                                                ref={field.ref}
-                                                className="pl-9"
-                                            />
-                                        </FormControl>
-                                    </div>
-                                    <FormDescription>
-                                        Soma de salários e pró-labore do último ano.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                                );
-                            }} />
-                    </div>
-                </div>
-                 
                 {year === 2026 && (
                   <FormField
                     control={form.control}
