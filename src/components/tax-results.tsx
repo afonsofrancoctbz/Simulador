@@ -189,6 +189,43 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll/));
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
             const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
+            
+            const renderGroup = (groupName: string, items: { name: string; value: number }[]) => {
+              const filteredItems = items.filter(item => item.value > 0.001 || item.name.includes("Mensalidade"));
+              if (filteredItems.length === 0) return null;
+
+              const isTrimestral = groupName.includes('TRIMESTRAL');
+
+              return (
+                <div key={groupName} className="space-y-1">
+                  <Separator className="my-1"/>
+                  <h4 className="font-bold text-primary text-xs uppercase tracking-wider pt-1">
+                      {groupName}
+                  </h4>
+                  {isTrimestral && <p className='text-xs text-muted-foreground -mt-2' style={{fontSize: '0.65rem'}}>Valores provisionados mensalmente.</p>}
+                  <div className="space-y-1">
+                  {filteredItems.map(item => {
+                    const rateInfo = getRateInfo(item.name, item.value);
+                    const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
+                    const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
+
+                    return (
+                    <div key={item.name} className="flex justify-between items-center text-sm">
+                        <span className="text-foreground flex items-center gap-1.5">
+                          {nameWithoutRate}
+                          {showRate && rateInfo && (
+                              <span className="text-primary font-semibold text-xs">{rateInfo}</span>
+                          )}
+                        </span>
+                        <span className="font-medium text-foreground">
+                          {formatCurrencyBRL(item.value)}
+                        </span>
+                    </div>
+                  )})}
+                  </div>
+                </div>
+              );
+            };
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
@@ -221,50 +258,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                         <div className='text-base font-bold text-foreground'>{formatCurrencyBRL(scenario.proLabore)}</div>
                       </div>
 
-                      {Object.entries(groupedTaxes).map(([groupName, items]) => {
-                        const filteredItems = items.filter(item => item.value > 0.001 || item.name.includes("Mensalidade"));
-                        if (filteredItems.length === 0) return null;
-                        
-                        const isTrimestral = groupName.includes('TRIMESTRAL');
-
-                        return (
-                            <div key={groupName} className="space-y-1">
-                                <Separator className="my-1"/>
-                                <h4 className="font-bold text-primary text-xs uppercase tracking-wider pt-1">
-                                    {groupName}
-                                </h4>
-                                {isTrimestral && <p className='text-xs text-muted-foreground -mt-2' style={{fontSize: '0.65rem'}}>Valores provisionados mensalmente.</p>}
-                                <div className="space-y-1">
-                                {filteredItems.map(item => {
-                                  const rateInfo = getRateInfo(item.name, item.value);
-                                  const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
-                                  const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
-
-                                  return (
-                                  <div key={item.name} className="flex justify-between items-center text-sm">
-                                      <span className="text-foreground flex items-center gap-1.5">
-                                        {nameWithoutRate}
-                                        {showRate && rateInfo && (
-                                            <span className="text-primary font-semibold text-xs">{rateInfo}</span>
-                                        )}
-                                      </span>
-                                      <span className="font-medium text-foreground">
-                                        {formatCurrencyBRL(item.value)}
-                                      </span>
-                                  </div>
-                                )})}
-                                </div>
-                            </div>
-                        )
-                      })}
-                       {scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
-                          <>
-                          <Separator className="my-2"/>
-                          <div className="text-center rounded-lg p-1.5 mt-2 text-sm font-semibold flex items-center justify-center gap-2 border border-blue-200/80 bg-blue-50 text-blue-800">
-                            <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
-                          </div>
-                          </>
-                        )}
+                      {renderGroup('IMPOSTOS S/ FATURAMENTO MENSAL', groupedTaxes['IMPOSTOS S/ FATURAMENTO MENSAL'] || [])}
+                      {renderGroup('IMPOSTOS S/ FATURAMENTO TRIMESTRAL', groupedTaxes['IMPOSTOS S/ FATURAMENTO TRIMESTRAL'] || [])}
+                      
+                      {scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
+                        <div className="text-center rounded-lg p-1.5 mt-2 text-sm font-semibold flex items-center justify-center gap-2 border border-blue-200/80 bg-blue-50 text-blue-800">
+                          <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
+                        </div>
+                      )}
+                      
+                      {renderGroup('ENCARGOS S/ FOLHA E PRÓ-LABORE', groupedTaxes['ENCARGOS S/ FOLHA E PRÓ-LABORE'] || [])}
+                      {renderGroup('OUTROS CUSTOS', groupedTaxes['OUTROS CUSTOS'] || [])}
                       
                   </div>
                 
