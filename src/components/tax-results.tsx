@@ -55,28 +55,31 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
   if (!results) {
     return null;
   }
-
-  let scenarios: (TaxDetails | null)[] = [];
   
-  if (year === 2025 && 'simplesNacionalBase' in results) {
-    // Define a ordem fixa de exibição conforme a regra de negócio
-    scenarios = [
-      results.simplesNacionalOtimizado,
-      results.simplesNacionalBase,
-      results.lucroPresumido,
-    ];
-  } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
-    const isCommerceOnly = results.lucroPresumido.breakdown.length === 0 && results.lucroPresumido.totalRevenue > 0;
-    scenarios.push(results.simplesNacionalTradicional as TaxDetails, results.simplesNacionalHibrido as TaxDetails);
-    if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
-  }
+  const scenarios = 'simplesNacionalBase' in results 
+    ? [results.simplesNacionalOtimizado, results.simplesNacionalBase, results.lucroPresumido]
+    : [results.simplesNacionalTradicional, results.simplesNacionalHibrido, results.lucroPresumido];
 
   const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || s.proLabore > 0));
   if (validScenarios.length === 0) return null;
     
   const cheapestScenario = [...validScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
   
-  const scenariosToShow = validScenarios;
+  let scenariosToShow: (TaxDetails | null)[] = [];
+
+  if ('simplesNacionalBase' in results) {
+    scenariosToShow = [
+      results.simplesNacionalOtimizado,
+      results.simplesNacionalBase,
+      results.lucroPresumido,
+    ];
+  } else if ('simplesNacionalTradicional' in results) {
+     scenariosToShow = [
+      results.simplesNacionalTradicional,
+      results.simplesNacionalHibrido,
+      results.lucroPresumido,
+    ];
+  }
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
@@ -207,7 +210,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                               } else if (item.value > 0 && scenario.regime === 'Lucro Presumido' && (item.name.toLowerCase().includes('irpj') || item.name.toLowerCase().includes('csll'))) {
                                   rateInfo = `(${(item.value / scenario.totalRevenue * 100).toFixed(2).replace('.', ',')}%)`;
                               } else if (item.value > 0 && scenario.regime === 'Lucro Presumido' && (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins'))) {
-                                    const domesticRevenue = details.breakdown.filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss')).reduce((sum, i) => {
+                                    const domesticRevenue = scenario.breakdown.filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss')).reduce((sum, i) => {
                                       const rate = parseFloat(i.name.match(/\(([^)]+)\)/)?.[1].replace(',','.') || '0') / 100;
                                       return rate > 0 ? sum + (i.value / rate) : sum;
                                     }, 0);
