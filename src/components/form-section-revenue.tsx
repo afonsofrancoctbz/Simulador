@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from "react-hook-form";
-import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote } from 'lucide-react';
+import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote, Pencil } from 'lucide-react';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { Annex } from '@/lib/types';
 import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
@@ -19,6 +19,7 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Slider } from './ui/slider';
 import type { CalculatorFormValues } from './tax-calculator-form';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface FormSectionRevenueProps {
     year: 2025 | 2026;
@@ -30,6 +31,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     const { toast } = useToast();
     const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
     const [isFetchingRate, setIsFetchingRate] = useState(false);
+    const [showIssInput, setShowIssInput] = useState(false);
     
     const selectedCnaes = form.watch("selectedCnaes");
 
@@ -187,33 +189,45 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                             </FormItem>
                                         )}} />
                                 ))}
-                                <FormField
-                                    control={form.control}
-                                    name="issRate"
-                                    render={({ field }) => (
-                                    <FormItem className="w-full sm:w-1/2">
-                                        <FormLabel className="text-sm">Alíquota de ISS (%) <span className="font-normal text-muted-foreground">(Opcional)</span></FormLabel>
-                                        <FormControl>
-                                        <Input
-                                            type="number"
-                                            placeholder="Padrão: 5"
-                                            step="0.01"
-                                            {...field}
-                                            onChange={(e) => {
-                                            const value = parseFloat(e.target.value);
-                                            field.onChange(isNaN(value) ? undefined : value);
-                                            }}
-                                            value={field.value !== undefined ? field.value : ''}
-                                            className="text-sm"
-                                        />
-                                        </FormControl>
-                                        <FormDescription className="text-xs">
-                                            Se souber a alíquota de ISS do seu município (entre 2 e 5), informe aqui.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
+                                
+                                {showIssInput ? (
+                                    <FormField
+                                        control={form.control}
+                                        name="issRate"
+                                        render={({ field }) => (
+                                            <div className="space-y-2">
+                                                <FormItem className="w-full sm:w-1/2">
+                                                    <FormLabel className="text-sm">Alíquota de ISS (%)</FormLabel>
+                                                    <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Padrão: 5"
+                                                        step="0.01"
+                                                        {...field}
+                                                        onChange={(e) => {
+                                                        const value = parseFloat(e.target.value);
+                                                        field.onChange(isNaN(value) ? undefined : value);
+                                                        }}
+                                                        value={field.value !== undefined ? field.value : ''}
+                                                        className="text-sm"
+                                                    />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                                <Button type="button" variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => {
+                                                    form.setValue('issRate', undefined, { shouldValidate: true });
+                                                    setShowIssInput(false);
+                                                }}>
+                                                    Usar Padrão (5%)
+                                                </Button>
+                                            </div>
+                                        )}
+                                    />
+                                ) : (
+                                    <Button type="button" variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => setShowIssInput(true)}>
+                                       <Pencil className="mr-1 h-3 w-3" /> Alterar alíquota de ISS (padrão: 5%)
+                                    </Button>
+                                )}
                             </div>
                             
                             <div className='space-y-6'>
