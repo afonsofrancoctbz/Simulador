@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { AlertTriangle, CheckCircle, Info, Loader2 } from 'lucide-react';
@@ -58,11 +57,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
   }
 
   let scenarios: (TaxDetails | null)[] = [];
-    // Fixed display order as requested
   if (year === 2025 && 'simplesNacionalBase' in results) {
-    scenarios.push(results.simplesNacionalOtimizado);
-    scenarios.push(results.simplesNacionalBase);
-    scenarios.push(results.lucroPresumido);
+    scenarios = [
+      results.simplesNacionalOtimizado,
+      results.simplesNacionalBase,
+      results.lucroPresumido,
+    ];
   } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
     const isCommerceOnly = results.lucroPresumido.breakdown.length === 0 && results.lucroPresumido.totalRevenue > 0;
     scenarios.push(results.simplesNacionalTradicional as TaxDetails, results.simplesNacionalHibrido as TaxDetails);
@@ -98,7 +98,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             }
         }
 
-        if (name.includes('inss') || name.includes('cpp')) { // IRRF is now handled separately
+        if (name.includes('inss') || name.includes('cpp')) {
             groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
         }
 
@@ -112,7 +112,6 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
     groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
     
-    // Cleanup empty groups
     for (const key in groups) {
       if (groups[key].length === 0) {
         delete groups[key];
@@ -154,8 +153,8 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                   return `(${(scenario.effectiveDasRate * 100).toFixed(2).replace('.',',')}%)`;
               }
               if (nameLower.includes('iss')) {
-                  const rateMatch = itemName.match(/\(([^)]+)\)/);
-                  return rateMatch ? `(${rateMatch[1]})` : null;
+                  const rateFromName = parseFloat(itemName.match(/\(([^)]+)\)/)?.[1] || '0') / 100;
+                  return `(${(rateFromName * 100).toFixed(2).replace('.', ',')}%)`;
               }
               if (itemValue > 0 && scenario.regime === 'Lucro Presumido' && (nameLower.includes('irpj') || nameLower.includes('csll'))) {
                  return `(${(itemValue / scenario.totalRevenue * 100).toFixed(2).replace('.', ',')}%)`;
@@ -163,7 +162,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
               if (itemValue > 0 && scenario.regime === 'Lucro Presumido' && (nameLower.includes('pis') || nameLower.includes('cofins'))) {
                    const domesticRevenue = scenario.breakdown.reduce((sum, item) => {
                       if (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins') || item.name.toLowerCase().includes('iss')) {
-                          const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1] || '0') / 100;
+                          const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1].replace(',','.') || '0') / 100;
                           if (rateFromName > 0) return sum + (item.value / rateFromName);
                       }
                       return sum;
@@ -182,17 +181,18 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
-                  "border bg-card/80 rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl",
+                  "border bg-card/80 rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative",
                   isRecommended ? "border-primary shadow-lg" : "border-border"
                 )}
               >
-                  <div className={cn("p-4 rounded-t-xl text-center relative overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
-                      {isRecommended && (
-                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-md">
-                          Recomendado
-                      </Badge>
-                      )}
-                      <h3 className="text-xl font-bold text-foreground mt-4">{title}</h3>
+                  {isRecommended && (
+                  <Badge className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-md z-10">
+                      Recomendado
+                  </Badge>
+                  )}
+                  <div className={cn("p-4 rounded-t-xl text-center overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
+
+                      <h3 className="text-xl font-bold text-foreground mt-2">{title}</h3>
                       {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
                       {scenario.optimizationNote && <p className="text-sm text-primary/90 mt-1">Com Fator R</p>}
                       {!scenario.optimizationNote && scenario.regime.includes("Simples") && <p className="text-sm text-muted-foreground mt-1">Sem Fator R</p>}
@@ -212,6 +212,8 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                       {Object.entries(groupedTaxes).map(([groupName, items]) => {
                         const filteredItems = items.filter(item => item.value > 0.001 || item.name.includes("Mensalidade"));
                         if (filteredItems.length === 0) return null;
+                        
+                        const isTrimestral = groupName.includes('TRIMESTRAL');
 
                         return (
                             <div key={groupName} className="space-y-2">
@@ -219,7 +221,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                 <h4 className="font-bold text-primary text-xs uppercase tracking-wider">
                                     {groupName}
                                 </h4>
-                                {groupName.includes('TRIMESTRAL') && <p className='text-xs text-muted-foreground -mt-2' style={{fontSize: '0.65rem'}}>Valores provisionados mensalmente.</p>}
+                                {isTrimestral && <p className='text-xs text-muted-foreground -mt-2' style={{fontSize: '0.65rem'}}>Valores provisionados mensalmente.</p>}
                                 <div className="space-y-2">
                                 {filteredItems.map(item => {
                                   const rateInfo = getRateInfo(item.name, item.value);
@@ -299,3 +301,5 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     </div>
   );
 };
+
+    
