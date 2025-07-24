@@ -20,6 +20,7 @@ import { Slider } from './ui/slider';
 import type { CalculatorFormValues } from './tax-calculator-form';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Switch } from './ui/switch';
 
 interface FormSectionRevenueProps {
     year: 2025 | 2026;
@@ -190,18 +191,38 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                         )}} />
                                 ))}
                                 
-                                {showIssInput ? (
-                                    <FormField
-                                        control={form.control}
-                                        name="issRate"
-                                        render={({ field }) => (
-                                            <div className="space-y-2">
-                                                <FormItem className="w-full sm:w-1/2">
-                                                    <FormLabel className="text-sm">Alíquota de ISS (%)</FormLabel>
+                                <div className='space-y-4'>
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-background shadow-sm">
+                                        <div className="space-y-0.5">
+                                            <FormLabel>Alterar alíquota de ISS?</FormLabel>
+                                            <FormDescription className="text-xs">
+                                                O padrão é 5%. Ative para inserir um valor diferente.
+                                            </FormDescription>
+                                        </div>
+                                        <FormControl>
+                                            <Switch
+                                                checked={showIssInput}
+                                                onCheckedChange={(checked) => {
+                                                    setShowIssInput(checked);
+                                                    if (!checked) {
+                                                        form.setValue('issRate', undefined, { shouldValidate: true });
+                                                    }
+                                                }}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                    
+                                    <div className={cn("space-y-2 transition-all duration-300", !showIssInput ? 'h-0 opacity-0 invisible' : 'h-auto opacity-100 visible' )}>
+                                        <FormField
+                                            control={form.control}
+                                            name="issRate"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-sm">Nova Alíquota de ISS (%)</FormLabel>
                                                     <FormControl>
                                                     <Input
                                                         type="number"
-                                                        placeholder="Padrão: 5"
+                                                        placeholder="Ex: 2.5"
                                                         step="0.01"
                                                         {...field}
                                                         onChange={(e) => {
@@ -209,25 +230,14 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                                         field.onChange(isNaN(value) ? undefined : value);
                                                         }}
                                                         value={field.value !== undefined ? field.value : ''}
-                                                        className="text-sm"
                                                     />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
-                                                <Button type="button" variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => {
-                                                    form.setValue('issRate', undefined, { shouldValidate: true });
-                                                    setShowIssInput(false);
-                                                }}>
-                                                    Usar Padrão (5%)
-                                                </Button>
-                                            </div>
-                                        )}
-                                    />
-                                ) : (
-                                    <Button type="button" variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => setShowIssInput(true)}>
-                                       <Pencil className="mr-1 h-3 w-3" /> Alterar alíquota de ISS (padrão: 5%)
-                                    </Button>
-                                )}
+                                            )}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             
                             <div className='space-y-6'>
@@ -310,3 +320,5 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
+
+    
