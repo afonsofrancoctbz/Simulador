@@ -194,17 +194,18 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             );
                         }} />
                 </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div></div>
                     <FormField
                         control={form.control}
                         name="issRate"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Alíquota de ISS (%)</FormLabel>
+                            <FormLabel className="text-muted-foreground">Alíquota de ISS (%) <span className="text-xs font-normal">(Opcional)</span></FormLabel>
                             <FormControl>
                             <Input
                                 type="number"
-                                placeholder="Ex: 5"
+                                placeholder="Padrão: 5%"
                                 {...field}
                                 onChange={(e) => {
                                 const value = parseFloat(e.target.value);
@@ -214,7 +215,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             />
                             </FormControl>
                             <FormDescription>
-                            Alíquota de ISS do seu município (entre 2% e 5%). Se deixado em branco, será usado 5%.
+                                Se souber a alíquota de ISS do seu município (entre 2% e 5%), informe aqui.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -364,3 +365,5 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
+
+    
