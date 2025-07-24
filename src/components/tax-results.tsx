@@ -83,11 +83,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         'ENCARGOS S/ FOLHA E PRÓ-LABORE': [],
         'OUTROS CUSTOS': []
     };
+
+    if (details.regime === 'Lucro Presumido') {
+        groups['IMPOSTOS S/ FATURAMENTO TRIMESTRAL'] = groups['IMPOSTOS S/ FATURAMENTO'];
+        delete groups['IMPOSTOS S/ FATURAMENTO'];
+    }
     
     details.breakdown.forEach(item => {
         const name = item.name.toLowerCase();
         if (name.includes('das') || name.includes('pis') || name.includes('cofins') || name.includes('iss') || name.includes('irpj') || name.includes('csll') || name.includes('iva')) {
-            groups['IMPOSTOS S/ FATURAMENTO'].push(item);
+            const key = details.regime === 'Lucro Presumido' ? 'IMPOSTOS S/ FATURAMENTO TRIMESTRAL' : 'IMPOSTOS S/ FATURAMENTO';
+            groups[key].push(item);
         } else if (name.includes('inss') || name.includes('irrf') || name.includes('cpp')) {
             groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
         }
@@ -120,23 +126,22 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             if (title === "Simples Nacional (Otimizado)") title = "Simples Nacional";
 
             const getRateInfo = (itemName: string, itemValue: number): string | null => {
+              const nameLower = itemName.toLowerCase();
+
+              if (nameLower.includes('inss s/ pró-labore')) return `(11,00%)`;
+              if (nameLower.includes('cpp (inss patronal')) return `(20,00%)`;
+
               if (scenario.totalRevenue <= 0) return null;
               
-              const nameLower = itemName.toLowerCase();
-              
               if (nameLower.startsWith('das') && scenario.effectiveDasRate) {
-                  return formatPercent(scenario.effectiveDasRate);
+                  return `(${formatPercent(scenario.effectiveDasRate).replace('%','')})%`;
               }
               if (nameLower.startsWith('iss')) {
-                  const rateMatch = itemName.match(/\((.*?)\)/);
-                  return rateMatch ? rateMatch[1] : null;
+                  const rateMatch = itemName.match(/\(([^)]+)\)/);
+                  return rateMatch ? `(${rateMatch[1]})` : null;
               }
-              // For other taxes, calculate effective rate based on total revenue
-              if (itemValue > 0 && ['pis', 'cofins', 'irpj', 'csll', 'cpp'].some(tax => nameLower.includes(tax))) {
-                  return formatPercent(itemValue / scenario.totalRevenue);
-              }
-               if (nameLower.includes('inss s/ pró-labore') && scenario.proLabore > 0) {
-                  return formatPercent(itemValue / scenario.proLabore);
+              if (itemValue > 0 && ['pis', 'cofins', 'irpj', 'csll'].some(tax => nameLower.includes(tax))) {
+                  return `(${(formatPercent(itemValue / scenario.totalRevenue)).replace('%','')})%`;
               }
 
               return null;
@@ -166,6 +171,11 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
                       </div>
+                      
+                      <div className='text-center py-3 mb-4 bg-muted/30 rounded-md'>
+                        <div className='text-xs uppercase text-muted-foreground font-semibold'>Pró-labore Bruto</div>
+                        <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.proLabore)}</div>
+                      </div>
 
                       {Object.entries(groupedTaxes).map(([groupName, items]) => {
                         const filteredItems = items.filter(item => item.value > 0.001 || item.name.includes("Mensalidade"));
@@ -177,17 +187,19 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                 <h4 className="font-bold text-primary text-xs uppercase tracking-wider">
                                     {groupName}
                                 </h4>
+                                {groupName.includes('TRIMESTRAL') && <p className='text-xs text-muted-foreground -mt-2'>Valores provisionados mensalmente.</p>}
                                 <div className="space-y-3">
                                 {filteredItems.map(item => {
                                   const rateInfo = getRateInfo(item.name, item.value);
                                   const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
-                                  
+                                  const showRate = !item.name.toLowerCase().includes('irrf');
+
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-foreground flex items-center gap-1.5">
                                         {nameWithoutRate}
-                                        {rateInfo && !item.name.toLowerCase().includes('irrf') && (
-                                            <span className="text-primary font-semibold">({rateInfo})</span>
+                                        {showRate && rateInfo && (
+                                            <span className="text-primary font-semibold">{rateInfo}</span>
                                         )}
                                       </span>
                                       <span className="font-medium text-foreground">
