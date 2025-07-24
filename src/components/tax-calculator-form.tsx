@@ -16,6 +16,7 @@ import { getCnaeData } from "@/lib/cnae-helpers";
 import type { Annex } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FormSectionPayroll } from "./form-section-payroll";
 
 
 export const CalculatorFormSchema = z.object({
@@ -76,13 +77,17 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         <>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
                 <Tabs defaultValue="company" className="w-full">
-                    <TabsList className="mb-8 grid w-full grid-cols-3">
-                        <TabsTrigger value="company">1. Empresa e Folha</TabsTrigger>
-                        <TabsTrigger value="revenue">2. Atividades e Faturamento</TabsTrigger>
-                        <TabsTrigger value="plan">3. Plano Contabilizei</TabsTrigger>
+                    <TabsList className="mb-8 grid w-full grid-cols-4">
+                        <TabsTrigger value="company">1. Empresa</TabsTrigger>
+                        <TabsTrigger value="payroll">2. Folha e Sócios</TabsTrigger>
+                        <TabsTrigger value="revenue">3. Faturamento</TabsTrigger>
+                        <TabsTrigger value="plan">4. Plano</TabsTrigger>
                     </TabsList>
                     <TabsContent value="company">
-                         <FormSectionCompany year={year} />
+                         <FormSectionCompany />
+                    </TabsContent>
+                     <TabsContent value="payroll">
+                         <FormSectionPayroll year={year} />
                     </TabsContent>
                     <TabsContent value="revenue">
                         <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
