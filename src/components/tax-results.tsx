@@ -63,11 +63,9 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
     
   const cheapestScenario = [...validScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
   
-  let scenariosToShow: (TaxDetails | null)[] = [];
   let orderedScenarios: (TaxDetails | null)[] = [];
 
   if ('simplesNacionalBase' in results) {
-    // Always show all 3 scenarios when Fator R is in play
     orderedScenarios = [
       results.simplesNacionalOtimizado,
       results.simplesNacionalBase,
@@ -81,7 +79,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
     ];
   }
   
-  scenariosToShow = orderedScenarios.filter(s => s !== null);
+  const scenariosToShow = orderedScenarios.filter(s => s !== null);
   
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
@@ -154,16 +152,17 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
             const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
             
-            const domesticBreakdown = scenario.breakdown.filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss'));
-            const domesticRevenue = domesticBreakdown.reduce((sum, item) => {
-                const rateMatch = item.name.match(/\(([^)]+)\)/);
-                if (!rateMatch) return sum;
-                const rateString = rateMatch[1].replace('%', '').replace(',', '.').trim();
-                const rate = parseFloat(rateString) / 100;
-                return rate > 0 ? sum + (item.value / rate) : sum;
+            const domesticRevenue = scenario.breakdown
+                .filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss') || (i.name.toLowerCase().startsWith('das') && !scenario.notes.some(n => n.includes('exportação'))))
+                .reduce((sum, item) => {
+                    const rateMatch = item.name.match(/\(([^)]+)\)/);
+                    if (!rateMatch) return sum;
+                    const rateString = rateMatch[1].replace('%', '').replace(',', '.').trim();
+                    const rate = parseFloat(rateString) / 100;
+                    return rate > 0 ? sum + (item.value / rate) : sum;
             }, 0);
 
-            const exportRevenue = scenario.totalRevenue > 0 ? scenario.totalRevenue - domesticRevenue : 0;
+            const exportRevenue = scenario.totalRevenue > 0 ? Math.max(0, scenario.totalRevenue - domesticRevenue) : 0;
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
@@ -231,13 +230,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                               } else if (item.value > 0 && scenario.regime === 'Lucro Presumido' && (item.name.toLowerCase().includes('irpj') || item.name.toLowerCase().includes('csll'))) {
                                   rateInfo = `(${(item.value / scenario.totalRevenue * 100).toFixed(2).replace('.', ',')}%)`;
                               } else if (item.value > 0 && scenario.regime === 'Lucro Presumido' && (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins'))) {
-                                    const domesticRevForRate = domesticBreakdown.reduce((sum, i) => {
-                                      const rateMatch = i.name.match(/\(([^)]+)\)/);
-                                      if (!rateMatch) return sum;
-                                      const rate = parseFloat(rateMatch[1].replace(',','.') || '0') / 100;
-                                      return rate > 0 ? sum + (i.value / rate) : sum;
-                                    }, 0);
-                                    if (domesticRevForRate > 0) rateInfo = `(${(item.value / domesticRevForRate * 100).toFixed(2).replace('.',',')}%)`;
+                                    if (domesticRevenue > 0) rateInfo = `(${(item.value / domesticRevenue * 100).toFixed(2).replace('.',',')}%)`;
                               }
                               
                               const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
