@@ -80,8 +80,13 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     
   const cheapestScenario = validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current));
 
+  const hasFatorRActivity = validScenarios.some(s => s.fatorR !== undefined);
+  if (hasFatorRActivity) {
+    alwaysShowAll = true;
+  }
+  
   // Aplica a regra de mostrar todos se o Fator R estiver em jogo, caso contrário, mostra apenas o mais barato.
-  const scenariosToShow = alwaysShowAll ? validScenarios : [cheapestScenario];
+  const scenariosToShow = alwaysShowAll ? validScenarios.sort((a,b) => (a.order ?? 99) - (b.order ?? 99)) : [cheapestScenario];
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
@@ -168,11 +173,10 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                  return `(${(itemValue / scenario.totalRevenue * 100).toFixed(2).replace('.', ',')}%)`;
               }
               if (itemValue > 0 && scenario.regime === 'Lucro Presumido' && (nameLower.includes('pis') || nameLower.includes('cofins'))) {
-                   const domesticRevenue = scenario.breakdown.reduce((sum, item) => {
-                      if (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins') || item.name.toLowerCase().includes('iss')) {
-                          const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1].replace(',','.') || '0') / 100;
-                          if (rateFromName > 0) return sum + (item.value / rateFromName);
-                      }
+                   const domesticRevenueBreakdown = scenario.breakdown.filter(item => item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins') || item.name.toLowerCase().includes('iss'));
+                   const domesticRevenue = domesticRevenueBreakdown.reduce((sum, item) => {
+                      const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1].replace(',','.') || '0') / 100;
+                      if (rateFromName > 0) return sum + (item.value / rateFromName);
                       return sum;
                    }, 0);
                    
@@ -190,7 +194,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
                   "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative",
-                  isRecommended ? "border-primary shadow-lg" : "border-border bg-card/50"
+                  isRecommended ? "border-primary shadow-lg" : "border-border bg-card"
                 )}
               >
                   {isRecommended && (
@@ -250,7 +254,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   </div>
                                 )})}
                                 </div>
-                                {groupName.includes('TRIMESTRAL') && scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
+                                {groupName.includes('MENSAL') && scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
                                   <div className="text-center rounded-lg p-2 mt-2 text-sm font-semibold flex items-center justify-center gap-2 bg-blue-100/80 text-blue-900 border border-blue-200/80">
                                     <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
                                   </div>
@@ -279,7 +283,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                             </AlertDescription>
                         </Alert>
                       )}
-                      <div className={cn("p-3 rounded-lg bg-card")}>
+                      <div className={cn("p-3 rounded-lg bg-background")}>
                           <div className="w-full space-y-1 text-center">
                               <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>
                               <div className="text-2xl font-bold text-primary">
