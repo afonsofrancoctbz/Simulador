@@ -123,6 +123,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
               if (itemName === 'DAS' && scenario.effectiveDasRate) {
                 return formatPercent(scenario.effectiveDasRate);
               }
+               if (itemName === 'IRPJ') {
+                  return "15%";
+              }
+              if(itemName === 'CSLL'){
+                  return "9%";
+              }
               if (itemName.toLowerCase().includes('cpp')) {
                   return `${(config.aliquotas_cpp_patronal.total * 100).toFixed(2).replace('.', ',')}%`;
               }
@@ -183,11 +189,13 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
-                                      <span className="text-muted-foreground flex items-center gap-1.5">
+                                      <span className="text-foreground flex items-center gap-1.5">
                                         {itemName}
+                                        {rateInfo && !itemName.toLowerCase().includes('irrf') && (
+                                            <span className="text-muted-foreground font-semibold">({rateInfo})</span>
+                                        )}
                                       </span>
                                       <span className="font-medium text-foreground">
-                                        {rateInfo && !itemName.toLowerCase().includes('irrf') && <span className="text-xs text-muted-foreground/80 font-semibold mr-2">({rateInfo})</span>}
                                         {formatCurrencyBRL(item.value)}
                                       </span>
                                   </div>
