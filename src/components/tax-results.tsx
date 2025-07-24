@@ -79,27 +79,41 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
+        'IMPOSTOS S/ FATURAMENTO MENSAL': [],
+        'IMPOSTOS S/ FATURAMENTO TRIMESTRAL': [],
         'IMPOSTOS S/ FATURAMENTO': [],
         'ENCARGOS S/ FOLHA E PRÓ-LABORE': [],
         'OUTROS CUSTOS': []
     };
 
-    if (details.regime === 'Lucro Presumido') {
-        groups['IMPOSTOS S/ FATURAMENTO TRIMESTRAL'] = groups['IMPOSTOS S/ FATURAMENTO'];
-        delete groups['IMPOSTOS S/ FATURAMENTO'];
-    }
-    
     details.breakdown.forEach(item => {
         const name = item.name.toLowerCase();
-        if (name.includes('das') || name.includes('pis') || name.includes('cofins') || name.includes('iss') || name.includes('irpj') || name.includes('csll') || name.includes('iva')) {
-            const key = details.regime === 'Lucro Presumido' ? 'IMPOSTOS S/ FATURAMENTO TRIMESTRAL' : 'IMPOSTOS S/ FATURAMENTO';
-            groups[key].push(item);
-        } else if (name.includes('inss') || name.includes('irrf') || name.includes('cpp')) {
+        
+        if (details.regime === 'Lucro Presumido') {
+            if (name.includes('pis') || name.includes('cofins') || name.includes('iss')) {
+                groups['IMPOSTOS S/ FATURAMENTO MENSAL'].push(item);
+            } else if (name.includes('irpj') || name.includes('csll')) {
+                groups['IMPOSTOS S/ FATURAMENTO TRIMESTRAL'].push(item);
+            }
+        } else {
+            if (name.includes('das') || name.includes('iva')) {
+                groups['IMPOSTOS S/ FATURAMENTO'].push(item);
+            }
+        }
+
+        if (name.includes('inss') || name.includes('irrf') || name.includes('cpp')) {
             groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
         }
     });
 
     groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+    
+    // Cleanup empty groups
+    for (const key in groups) {
+      if (groups[key].length === 0) {
+        delete groups[key];
+      }
+    }
     
     return groups;
   };
@@ -140,17 +154,33 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                   const rateMatch = itemName.match(/\(([^)]+)\)/);
                   return rateMatch ? `(${rateMatch[1]})` : null;
               }
-              if (itemValue > 0 && ['pis', 'cofins', 'irpj', 'csll'].some(tax => nameLower.includes(tax))) {
+              if (itemValue > 0 && (nameLower.includes('irpj') || nameLower.includes('csll'))) {
                   return `(${(formatPercent(itemValue / scenario.totalRevenue)).replace('%','')})%`;
               }
+               if (itemValue > 0 && (nameLower.includes('pis') || nameLower.includes('cofins'))) {
+                   const domesticRevenue = scenario.breakdown.reduce((sum, item) => {
+                      const lowerName = item.name.toLowerCase();
+                      if (lowerName.includes('pis') || lowerName.includes('cofins') || lowerName.includes('iss')) {
+                          return sum + item.value / (parseFloat(lowerName.match(/\(([^)]+)\)/)?.[1] || 1) / 100);
+                      }
+                      return sum;
+                   }, 0);
+                   
+                  if (domesticRevenue > 0) return `(${(formatPercent(itemValue / domesticRevenue)).replace('%','')})%`;
+              }
+
 
               return null;
             };
+            
+            const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva/));
+            const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
+            const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
-                  "border bg-card/60 rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl",
+                  "border bg-card/80 rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl",
                   isRecommended ? "border-primary shadow-lg" : "border-border"
                 )}
               >
@@ -192,7 +222,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                 {filteredItems.map(item => {
                                   const rateInfo = getRateInfo(item.name, item.value);
                                   const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
-                                  const showRate = !item.name.toLowerCase().includes('irrf');
+                                  const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
 
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
@@ -222,6 +252,11 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                           {scenario.fatorR >= 0.28 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                           <span>Fator R: {formatPercent(scenario.fatorR)}</span>
                       </div>
+                      )}
+                      {scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
+                        <div className="text-center rounded-lg p-3 text-sm font-semibold flex items-center justify-center gap-2 bg-blue-100/80 text-blue-900 border border-blue-200/80">
+                           <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
+                        </div>
                       )}
                       {scenario.optimizationNote && !scenario.regime.includes('2026') && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground">
