@@ -285,13 +285,7 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
                 }];
           
           simplesNacionalOtimizado = _calculateSimplesNacional(values, config, optimizedProLabores);
-
-          // Se o otimizado ficou mais caro, não o considere
-          if (simplesNacionalOtimizado.totalMonthlyCost > simplesNacionalBase.totalMonthlyCost) {
-              simplesNacionalOtimizado = null;
-          } else {
-            simplesNacionalOtimizado.regime = "Simples Nacional (Otimizado)";
-          }
+          simplesNacionalOtimizado.regime = "Simples Nacional (Otimizado)";
       }
   }
 
