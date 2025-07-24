@@ -58,15 +58,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   let scenarios: (TaxDetails | null)[] = [];
   if (year === 2025 && 'simplesNacionalBase' in results) {
-    scenarios.push(results.lucroPresumido);
-    if (results.simplesNacionalBase) scenarios.push(results.simplesNacionalBase);
+    // Fixed display order as requested
     if (results.simplesNacionalOtimizado) {
       scenarios.push(results.simplesNacionalOtimizado);
     }
+    if (results.simplesNacionalBase) scenarios.push(results.simplesNacionalBase);
+    scenarios.push(results.lucroPresumido);
+
   } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
     const isCommerceOnly = results.lucroPresumido.breakdown.length === 0 && results.lucroPresumido.totalRevenue > 0;
-    if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
     scenarios.push(results.simplesNacionalTradicional as TaxDetails, results.simplesNacionalHibrido as TaxDetails);
+    if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
   }
 
   if (scenarios.length === 0) return null;
@@ -76,14 +78,22 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
-        'IMPOSTOS E ENCARGOS': [],
+        'FOLHA': [],
+        'IMPOSTOS': [],
+        'MENSALIDADE': []
     };
 
     details.breakdown.forEach(item => {
-        groups['IMPOSTOS E ENCARGOS'].push(item);
+        if (item.name.includes('INSS') || item.name.includes('IRRF')) {
+            groups['FOLHA'].push(item);
+        } else if(item.name.includes('Mensalidade')) {
+            groups['MENSALIDADE'].push(item);
+        } else {
+            groups['IMPOSTOS'].push(item);
+        }
     });
-
-    groups['IMPOSTOS E ENCARGOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+    
+    groups['MENSALIDADE'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
     return groups;
   };
@@ -99,18 +109,20 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         </div>
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
-          {validScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99)).map((scenario) => {
+          {validScenarios.map((scenario) => {
             if (!scenario) return null;
             const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
             
             let title = scenario.regime;
+            if (title === "Simples Nacional (Otimizado)") title = "Simples Nacional";
+
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
-                  "border bg-card rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl",
+                  "border bg-card/60 rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl",
                   isRecommended ? "border-primary shadow-lg" : "border-border"
                 )}
               >
@@ -122,6 +134,8 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                       )}
                       <h3 className="text-xl font-bold text-foreground mt-4">{title}</h3>
                       {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
+                      {scenario.optimizationNote && <p className="text-sm text-primary/90 mt-1">Com Fator R</p>}
+                      {!scenario.optimizationNote && scenario.regime.includes("Simples") && <p className="text-sm text-muted-foreground mt-1">Sem Fator R</p>}
                   </div>
 
                   <div className="px-6 pb-6 pt-0 flex-grow text-base">
@@ -136,7 +150,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
                         return (
                             <div key={groupName} className="space-y-3">
-                                <Separator className="my-4"/>
+                                <Separator className="my-3"/>
                                 <h4 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
                                     {groupName}
                                 </h4>
@@ -147,19 +161,19 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   
                                   if (item.name === 'DAS' && scenario.effectiveDasRate) {
                                       rateInfo = `(${formatPercent(scenario.effectiveDasRate)})`;
-                                  } else if (item.name === 'INSS s/ Pró-labore') {
-                                      rateInfo = '(11,00%)';
                                   } else if (item.name === 'CPP (INSS Patronal)') {
-                                      rateInfo = '(20,00%)'
+                                      rateInfo = `(${(20.00).toFixed(2).replace('.',',')}%)`;
                                   }
 
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
                                       <span className="text-muted-foreground flex items-center gap-1.5">
                                         {itemName}
-                                        {rateInfo && <span className="text-xs text-muted-foreground/80 font-medium">{rateInfo}</span>}
                                       </span>
-                                      <span className="font-medium text-foreground">{formatCurrencyBRL(item.value)}</span>
+                                      <span className="font-medium text-foreground">
+                                        {rateInfo && <span className="text-xs text-muted-foreground/80 font-semibold mr-2">{rateInfo}</span>}
+                                        {formatCurrencyBRL(item.value)}
+                                      </span>
                                   </div>
                                 )})}
                                 </div>
@@ -178,7 +192,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                           <span>Fator R: {formatPercent(scenario.fatorR)}</span>
                       </div>
                       )}
-                      {scenario.optimizationNote && (
+                      {scenario.optimizationNote && !scenario.regime.includes('2026') && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground">
                             <AlertDescription className="text-sm text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
