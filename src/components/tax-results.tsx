@@ -57,23 +57,31 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
   }
 
   let scenarios: (TaxDetails | null)[] = [];
+  let alwaysShowAll = false;
+  
   if (year === 2025 && 'simplesNacionalBase' in results) {
     scenarios = [
       results.simplesNacionalOtimizado,
       results.simplesNacionalBase,
       results.lucroPresumido,
     ];
+    // A regra de negócio é: se a otimização de Fator R foi possível, mostre todos os cenários.
+    if (results.simplesNacionalOtimizado) {
+      alwaysShowAll = true;
+    }
   } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
     const isCommerceOnly = results.lucroPresumido.breakdown.length === 0 && results.lucroPresumido.totalRevenue > 0;
     scenarios.push(results.simplesNacionalTradicional as TaxDetails, results.simplesNacionalHibrido as TaxDetails);
     if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
   }
 
-
   const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || s.proLabore > 0));
   if (validScenarios.length === 0) return null;
     
   const cheapestScenario = validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current));
+
+  // Aplica a regra de mostrar todos se o Fator R estiver em jogo, caso contrário, mostra apenas o mais barato.
+  const scenariosToShow = alwaysShowAll ? validScenarios : [cheapestScenario];
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
@@ -132,9 +140,9 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
         </div>
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
-          {validScenarios.map((scenario) => {
+          {scenariosToShow.map((scenario) => {
             if (!scenario) return null;
-            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
+            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
@@ -143,10 +151,10 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
             const getRateInfo = (itemName: string, itemValue: number): string | null => {
               const nameLower = itemName.toLowerCase();
-
+              
               if (nameLower.includes('inss s/ pró-labore')) return `(11,00%)`;
               if (nameLower.includes('cpp (inss patronal')) return `(20,00%)`;
-
+              
               if (scenario.totalRevenue <= 0) return null;
               
               if (nameLower.startsWith('das') && scenario.effectiveDasRate) {
@@ -181,12 +189,12 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 className={cn(
-                  "border bg-card/80 rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative",
-                  isRecommended ? "border-primary shadow-lg" : "border-border"
+                  "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative",
+                  isRecommended ? "border-primary shadow-lg" : "border-border bg-card/50"
                 )}
               >
                   {isRecommended && (
-                  <Badge className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-md z-10">
+                   <Badge className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10" variant="default" >
                       Recomendado
                   </Badge>
                   )}
@@ -242,15 +250,15 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                   </div>
                                 )})}
                                 </div>
+                                {groupName.includes('TRIMESTRAL') && scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
+                                  <div className="text-center rounded-lg p-2 mt-2 text-sm font-semibold flex items-center justify-center gap-2 bg-blue-100/80 text-blue-900 border border-blue-200/80">
+                                    <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
+                                  </div>
+                                )}
                             </div>
                         )
                       })}
                       
-                      {scenario.regime === 'Lucro Presumido' && scenario.totalRevenue > 0 && (
-                        <div className="text-center rounded-lg p-2 mt-2 text-sm font-semibold flex items-center justify-center gap-2 bg-blue-100/80 text-blue-900 border border-blue-200/80">
-                           <span>Alíquota Efetiva sobre Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
-                        </div>
-                      )}
                   </div>
                 
                   <div className="p-4 mt-auto space-y-3 bg-muted/20 rounded-b-xl">
@@ -301,5 +309,3 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     </div>
   );
 };
-
-    
