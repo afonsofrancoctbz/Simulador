@@ -3,16 +3,18 @@
 
 import { useEffect } from 'react';
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { Building2 } from 'lucide-react';
+import { Building2, Users, Wallet, Plus, Minus } from 'lucide-react';
 import { getFiscalParameters } from '@/config/fiscal';
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
 import { cn, formatBRL } from "@/lib/utils";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from './ui/switch';
 import type { CalculatorFormValues } from './tax-calculator-form';
+import { Button } from './ui/button';
+import { Separator } from './ui/separator';
 
 export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
     const form = useFormContext<CalculatorFormValues>();
@@ -28,8 +30,10 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
 
     useEffect(() => {
         const currentProLabores = form.getValues('proLabores');
-        if (currentProLabores.length !== numberOfPartners) {
-            const newProLabores = Array.from({ length: numberOfPartners }, (_, i) => {
+        const numPartners = isNaN(numberOfPartners) ? 1 : Math.max(1, numberOfPartners);
+
+        if (currentProLabores.length !== numPartners) {
+            const newProLabores = Array.from({ length: numPartners }, (_, i) => {
                 return currentProLabores[i] || { value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 };
             });
             replace(newProLabores);
@@ -38,18 +42,20 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
 
 
     return (
-        <Card className='shadow-xl overflow-hidden border bg-card'>
-            <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
-                 <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
-                    <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
-                       <Building2 className="h-5 w-5 text-primary" />
+        <Card className='shadow-lg overflow-hidden border bg-card'>
+            <CardHeader className='border-b bg-muted/30'>
+                 <div className="flex items-center gap-4">
+                    <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                        <Building2 className="h-6 w-6 text-primary" />
                     </div>
-                    1. Dados da Empresa e Folha
-                </h3>
-                <p className='text-sm text-muted-foreground mt-1'>Informações sobre seus custos com pessoal e localização.</p>
+                    <div>
+                        <CardTitle className="text-xl">Dados da Empresa e Folha</CardTitle>
+                        <CardDescription>Informações sobre sua localização, sócios e custos com pessoal.</CardDescription>
+                    </div>
+                </div>
             </CardHeader>
-            <CardContent className='p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
-                <div className='space-y-6'>
+            <CardContent className='p-6 md:p-8 space-y-8'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6'>
                     <FormField
                         control={form.control}
                         name="city"
@@ -70,8 +76,8 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                                     ))}
                                     </SelectContent>
                                 </Select>
-                                <FormDescription className='text-sm'>
-                                    Informação usada para taxas e prazos de abertura.
+                                <FormDescription>
+                                    Isso afeta taxas e prazos de abertura.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -86,41 +92,62 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                         return (
                         <FormItem>
                             <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    type="text" 
-                                    inputMode="decimal"
-                                    placeholder="0,00"
-                                    onChange={handleChange}
-                                    onBlur={field.onBlur}
-                                    value={field.value ? formatBRL(field.value) : ''}
-                                    name={field.name}
-                                    ref={field.ref}
-                                />
-                            </FormControl>
-                            <FormDescription className='text-sm'>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                <FormControl>
+                                    <Input 
+                                        type="text" 
+                                        inputMode="decimal"
+                                        placeholder="0,00"
+                                        onChange={handleChange}
+                                        onBlur={field.onBlur}
+                                        value={field.value ? formatBRL(field.value) : ''}
+                                        name={field.name}
+                                        ref={field.ref}
+                                        className="pl-9"
+                                    />
+                                </FormControl>
+                            </div>
+                             <FormDescription>
                                 Custo total mensal com funcionários.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
                         );
                     }} />
-                     <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Número de Sócios</FormLabel>
-                            <FormControl><Input type="number" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} /></FormControl>
-                             <FormDescription className='text-sm'>
-                                Quantos sócios administram a empresa.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
                 </div>
-                <div className="space-y-4">
-                    <FormLabel>Pró-labore e Vínculos dos Sócios</FormLabel>
+                 <Separator />
+                 <div className="space-y-6">
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 items-center'>
+                         <div>
+                            <h4 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                                <Users className="h-5 w-5 text-primary"/>
+                                Quadro Societário
+                            </h4>
+                            <p className="text-sm text-muted-foreground mt-1">Configure o pró-labore e os vínculos de cada sócio.</p>
+                        </div>
+                        <FormField control={form.control} name="numberOfPartners" render={({ field }) => (
+                            <FormItem className="w-full sm:w-auto sm:justify-self-end">
+                                <FormLabel>Número de Sócios</FormLabel>
+                                <div className="flex items-center gap-2">
+                                     <Button type="button" variant="outline" size="icon" className="h-8 w-8" onClick={() => field.onChange(Math.max(1, (field.value || 1) - 1))} disabled={field.value <= 1}>
+                                        <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <FormControl>
+                                        <Input type="number" className="w-20 text-center" step="1" min="1" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 1)} />
+                                    </FormControl>
+                                    <Button type="button" variant="outline" size="icon" className="h-8 w-8" onClick={() => field.onChange((field.value || 0) + 1)}>
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
+
                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 -mr-2">
                         {fields.map((item, index) => (
-                            <div key={item.id} className="p-4 border rounded-lg bg-muted/30">
+                            <div key={item.id} className="p-4 border rounded-lg bg-muted/20">
                                 <h4 className="font-semibold text-foreground mb-4">Sócio {index + 1}</h4>
                                 <div className="space-y-4">
                                     <FormField
@@ -135,18 +162,22 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                                             return (
                                                 <FormItem>
                                                 <FormLabel>Pró-labore Mensal</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                    type="text"
-                                                    inputMode="decimal"
-                                                    placeholder={formatBRL(MINIMUM_WAGE)}
-                                                    onChange={handleChange}
-                                                    onBlur={field.onBlur}
-                                                    value={field.value ? formatBRL(field.value) : ''}
-                                                    name={field.name}
-                                                    ref={field.ref}
-                                                    />
-                                                </FormControl>
+                                                <div className="relative">
+                                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                    <FormControl>
+                                                        <Input
+                                                        type="text"
+                                                        inputMode="decimal"
+                                                        placeholder={formatBRL(MINIMUM_WAGE)}
+                                                        onChange={handleChange}
+                                                        onBlur={field.onBlur}
+                                                        value={field.value ? formatBRL(field.value) : ''}
+                                                        name={field.name}
+                                                        ref={field.ref}
+                                                        className="pl-9"
+                                                        />
+                                                    </FormControl>
+                                                </div>
                                                 <FormMessage />
                                                 </FormItem>
                                             );
@@ -184,20 +215,24 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                                                     field.onChange(Number(digitsOnly) / 100);
                                                 };
                                                 return(
-                                                <FormItem className={cn("transition-all duration-300", !form.watch(`proLabores.${index}.hasOtherInssContribution`) ? 'invisible h-0 opacity-0' : 'opacity-100' )}>
-                                                    <FormLabel>Salário de Contribuição</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="text"
-                                                            inputMode="decimal"
-                                                            placeholder="0,00"
-                                                            onChange={handleChange}
-                                                            onBlur={field.onBlur}
-                                                            value={field.value ? formatBRL(field.value) : ''}
-                                                            name={field.name}
-                                                            ref={field.ref}
-                                                        />
-                                                    </FormControl>
+                                                <FormItem className={cn("transition-all duration-300", !form.watch(`proLabores.${index}.hasOtherInssContribution`) ? 'h-0 opacity-0 invisible' : 'opacity-100' )}>
+                                                    <FormLabel>Salário de Contribuição no outro vínculo</FormLabel>
+                                                     <div className="relative">
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="text"
+                                                                inputMode="decimal"
+                                                                placeholder="0,00"
+                                                                onChange={handleChange}
+                                                                onBlur={field.onBlur}
+                                                                value={field.value ? formatBRL(field.value) : ''}
+                                                                name={field.name}
+                                                                ref={field.ref}
+                                                                className="pl-9"
+                                                            />
+                                                        </FormControl>
+                                                     </div>
                                                     <FormDescription className="text-xs">
                                                         Salário base no outro vínculo (teto {formatBRL(fiscalConfig.teto_inss)}).
                                                     </FormDescription>
@@ -211,7 +246,7 @@ export function FormSectionCompany({ year }: { year: 2025 | 2026 }) {
                             </div>
                         ))}
                     </div>
-                </div>
+                 </div>
             </CardContent>
         </Card>
     );

@@ -8,14 +8,15 @@ import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
 import { PlanEnumSchema, ProLaboreFormSchema } from '@/lib/types';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { FormSectionCompany } from "./form-section-company";
 import { FormSectionRevenue } from "./form-section-revenue";
 import { FormSectionPlan } from "./form-section-plan";
 import { CnaeSelector } from './cnae-selector';
 import { getCnaeData } from "@/lib/cnae-helpers";
 import type { Annex } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Briefcase, Building2, ListChecks } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
@@ -50,15 +51,21 @@ interface TaxCalculatorFormProps {
     isLoading: boolean;
 }
 
+const formSections = [
+    { id: 'company', icon: Building2, title: 'Empresa e Folha' },
+    { id: 'revenue', icon: Briefcase, title: 'Atividades e Faturamento' },
+    { id: 'plan', icon: ListChecks, title: 'Plano Contabilizei' }
+];
+
 export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalculatorFormProps) {
     const form = useFormContext<CalculatorFormValues>();
     const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
-    
+    const [currentStep, setCurrentStep] = useState(0);
+
     const selectedCnaes = form.watch("selectedCnaes");
     
     const handleCnaeConfirm = (codes: string[]) => {
         form.setValue('selectedCnaes', codes, { shouldValidate: true });
-        // After confirming, we should update the `revenues` object to only keep annexes that are still present
         const newRevenues: Record<string, number | undefined> = {};
         const newAnnexes = new Set(codes.map(code => getCnaeData(code)?.annex).filter(Boolean));
         const currentRevenues = form.getValues('revenues');
@@ -72,25 +79,44 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         form.setValue('revenues', newRevenues);
     };
 
-
     return (
         <>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
-                
-                <FormSectionCompany year={year} />
+                <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] lg:gap-12">
+                    <aside className="hidden lg:flex flex-col gap-4 sticky top-24 h-fit">
+                        {formSections.map((section, index) => (
+                           <div key={section.id} className="flex flex-col">
+                             <button
+                                type="button"
+                                onClick={() => setCurrentStep(index)}
+                                className={cn(
+                                    "flex items-center gap-4 p-3 rounded-lg text-left transition-colors",
+                                    currentStep === index ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:bg-muted/50"
+                                )}
+                            >
+                                <section.icon className="h-5 w-5" />
+                                <span>{section.title}</span>
+                            </button>
+                             {index < formSections.length - 1 && (
+                                <Separator orientation="vertical" className="mx-auto h-4 w-px bg-border my-1"/>
+                            )}
+                           </div>
+                        ))}
+                    </aside>
 
-                <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
-                
-                <FormSectionPlan />
+                    <main className="space-y-8">
+                        <FormSectionCompany year={year} />
+                        <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
+                        <FormSectionPlan />
 
-                <Card className="shadow-xl border bg-card">
-                    <CardFooter className="p-4">
-                        <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
-                        {isLoading ? <Loader2 className="animate-spin" /> : null}
-                        {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
-                        </Button>
-                    </CardFooter>
-                </Card>
+                        <div className="bg-card rounded-lg border shadow-lg p-4">
+                            <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
+                                {isLoading ? <Loader2 className="animate-spin" /> : null}
+                                {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                            </Button>
+                        </div>
+                    </main>
+                </div>
             </form>
             <CnaeSelector
                 open={isCnaeSelectorOpen}

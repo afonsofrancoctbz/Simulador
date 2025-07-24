@@ -4,12 +4,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from "react-hook-form";
-import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle } from 'lucide-react';
+import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote } from 'lucide-react';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { Annex } from '@/lib/types';
 import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -57,7 +57,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     const revenueGroups = useMemo(() => {
         const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is any => !!c);
         const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
-        return annexes;
+        return annexes.sort();
     }, [selectedCnaes]);
 
     const fetchRates = async () => {
@@ -98,104 +98,122 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     };
 
     return (
-        <Card className='shadow-xl overflow-hidden border bg-card'>
-            <CardHeader className='bg-muted/40 p-4 rounded-t-lg border-b'>
-                 <h3 className="font-semibold text-lg text-foreground flex items-center gap-3">
-                     <div className='p-2 bg-primary/10 rounded-md border border-primary/20'>
-                        <Briefcase className="h-5 w-5 text-primary" />
+        <Card className='shadow-lg overflow-hidden border bg-card'>
+            <CardHeader className='border-b bg-muted/30'>
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                        <Briefcase className="h-6 w-6 text-primary" />
                     </div>
-                    2. Atividades e Faturamento Mensal
-                </h3>
-                <p className='text-sm text-muted-foreground mt-1'>Selecione suas atividades e informe a receita correspondente.</p>
+                    <div>
+                        <CardTitle className="text-xl">Atividades e Faturamento</CardTitle>
+                        <CardDescription>Selecione suas atividades (CNAEs) e informe suas receitas.</CardDescription>
+                    </div>
+                </div>
             </CardHeader>
              <CardContent className='p-6 md:p-8 space-y-8'>
                  <div>
                     <FormLabel>Atividades (CNAEs) da empresa</FormLabel>
-                    <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[40px] bg-background">
+                    <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[44px] bg-background">
                         {selectedCnaes.length > 0 ? selectedCnaes.map(code => (
                             <Badge key={code} variant="secondary" className="text-sm">
                                 {code}
-                                <Button variant="ghost" size="icon" className="h-4 w-4 ml-1 hover:bg-destructive/20" onClick={() => handleCnaeBadgeRemove(code)}>
-                                    <XCircle className="h-3 w-3 text-destructive/80" />
-                                </Button>
+                                <button type="button" className="ml-1 rounded-full p-0.5 hover:bg-destructive/20" onClick={() => handleCnaeBadgeRemove(code)}>
+                                    <XCircle className="h-3.5 w-3.5 text-destructive/80" />
+                                </button>
                             </Badge>
                         )) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="mt-2" onClick={onCnaeSelectorOpen}>
+                     <FormMessage className="mt-2">{form.formState.errors.selectedCnaes?.message}</FormMessage>
+                    <Button type="button" variant="outline" size="sm" className="mt-3" onClick={onCnaeSelectorOpen}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                     </Button>
-                    <FormMessage>{form.formState.errors.selectedCnaes?.message}</FormMessage>
-                    {selectedCnaes.length === 0 && (
+                     {selectedCnaes.length === 0 && (
                          <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
                     )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 items-start">
-                     <FormField control={form.control} name="rbt12" render={({ field }) => {
-                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                const { value } = e.target;
-                                const digitsOnly = value.replace(/\D/g, '');
-                                field.onChange(Number(digitsOnly) / 100);
-                            };
-                            return (
-                            <FormItem>
-                                <FormLabel>Faturamento dos Últimos 12 Meses (RBT12)</FormLabel>
-                                <FormControl>
-                                    <Input 
-                                        type="text" 
-                                        inputMode="decimal"
-                                        placeholder="Ex: 250.000,00"
-                                        onChange={handleChange}
-                                        onBlur={field.onBlur}
-                                        value={field.value ? formatBRL(field.value) : ''}
-                                        name={field.name}
-                                        ref={field.ref}
-                                    />
-                                </FormControl>
-                                <FormDescription className='text-sm'>
-                                    Para empresas com menos de 12 meses, calcule a média mensal desde a abertura e multiplique por 12. Se for o primeiro mês, pode deixar em R$ 0,00.
-                                </FormDescription>
-                                <FormMessage />
-                                {showSimplesLimitWarning && (
-                                    <Alert variant="destructive" className="mt-2">
-                                        <AlertTriangle className="h-4 w-4" />
-                                        <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
-                                        <AlertDescription>
-                                            Sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões.
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-                            </FormItem>
-                            );
-                        }} />
-                    <FormField control={form.control} name="fp12" render={({ field }) => {
-                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                const { value } = e.target;
-                                const digitsOnly = value.replace(/\D/g, '');
-                                field.onChange(Number(digitsOnly) / 100);
-                            };
-                            return (
-                            <FormItem>
-                                <FormLabel>Folha de Pagamento dos Últimos 12 Meses (FP12)</FormLabel>
-                                <FormControl>
-                                    <Input 
-                                        type="text" 
-                                        inputMode="decimal"
-                                        placeholder="Ex: 70.000,00"
-                                        onChange={handleChange}
-                                        onBlur={field.onBlur}
-                                        value={field.value ? formatBRL(field.value) : ''}
-                                        name={field.name}
-                                        ref={field.ref}
-                                    />
-                                </FormControl>
-                                <FormDescription className='text-sm'>
-                                    Soma de salários e pró-labore do último ano.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                            );
-                        }} />
+                 <Separator />
+
+                <div className="space-y-6">
+                    <h4 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                        <FileText className="h-5 w-5 text-primary"/>
+                        Receita Bruta (Últimos 12 meses)
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
+                        <FormField control={form.control} name="rbt12" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
+                                <FormItem>
+                                    <FormLabel>Faturamento Total (RBT12)</FormLabel>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                        <FormControl>
+                                            <Input 
+                                                type="text" 
+                                                inputMode="decimal"
+                                                placeholder="Ex: 250.000,00"
+                                                onChange={handleChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value ? formatBRL(field.value) : ''}
+                                                name={field.name}
+                                                ref={field.ref}
+                                                className="pl-9"
+                                            />
+                                        </FormControl>
+                                    </div>
+                                    <FormDescription>
+                                        Se for o primeiro mês, pode deixar em R$ 0,00.
+                                    </FormDescription>
+                                    <FormMessage />
+                                    {showSimplesLimitWarning && (
+                                        <Alert variant="destructive" className="mt-2">
+                                            <AlertTriangle className="h-4 w-4" />
+                                            <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
+                                            <AlertDescription>
+                                                Sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                </FormItem>
+                                );
+                            }} />
+                        <FormField control={form.control} name="fp12" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
+                                <FormItem>
+                                    <FormLabel>Folha de Pagamento (FP12)</FormLabel>
+                                     <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                        <FormControl>
+                                            <Input 
+                                                type="text" 
+                                                inputMode="decimal"
+                                                placeholder="Ex: 70.000,00"
+                                                onChange={handleChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value ? formatBRL(field.value) : ''}
+                                                name={field.name}
+                                                ref={field.ref}
+                                                className="pl-9"
+                                            />
+                                        </FormControl>
+                                    </div>
+                                    <FormDescription>
+                                        Soma de salários e pró-labore do último ano.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                );
+                            }} />
+                    </div>
                 </div>
                  
                 {year === 2026 && (
@@ -230,107 +248,19 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                 {revenueGroups.length > 0 && <Separator />}
 
                 {revenueGroups.length > 0 && (
-                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
-                        <div className='space-y-6'>
-                            <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
-                            {revenueGroups.map(annex => (
-                                <FormField
-                                    key={`domestic_${annex}`}
-                                    control={form.control}
-                                    name={`revenues.domestic_${annex}`}
-                                    render={({ field }) => {
-                                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                            const { value } = e.target;
-                                            const digitsOnly = value.replace(/\D/g, '');
-                                            field.onChange(Number(digitsOnly) / 100);
-                                        };
-                                        return (
-                                        <FormItem>
-                                            <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    inputMode="decimal"
-                                                    placeholder="0,00"
-                                                    onChange={handleChange}
-                                                    onBlur={field.onBlur}
-                                                    value={field.value ? formatBRL(field.value) : ''}
-                                                    name={field.name}
-                                                    ref={field.ref}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}} />
-                            ))}
-                             <FormField
-                                control={form.control}
-                                name="issRate"
-                                render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm">Alíquota de ISS (%) <span className="font-normal text-muted-foreground">(Opcional)</span></FormLabel>
-                                    <FormControl>
-                                    <Input
-                                        type="number"
-                                        placeholder="Padrão: 5%"
-                                        {...field}
-                                        onChange={(e) => {
-                                        const value = parseFloat(e.target.value);
-                                        field.onChange(isNaN(value) ? undefined : value / 100);
-                                        }}
-                                        value={field.value !== undefined ? field.value * 100 : ''}
-                                    />
-                                    </FormControl>
-                                    <FormDescription className="text-xs">
-                                        Se souber a alíquota de ISS do seu município (entre 2% e 5%), informe aqui.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                                )}
-                            />
-                        </div>
-                        
-                        <div className='space-y-6'>
-                            <h4 className="font-medium text-md text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                <FormField control={form.control} name="exportCurrency" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Moeda</FormLabel>
-                                        <Select onValueChange={(value) => {
-                                            field.onChange(value)
-                                            if (exchangeRates[value]) {
-                                                form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true })
-                                            } else if (value === 'BRL') {
-                                                form.setValue('exchangeRate', 1, { shouldValidate: true })
-                                            }
-                                        }} defaultValue={field.value}>
-                                            <FormControl><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger></FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="BRL">Real (BRL)</SelectItem>
-                                                <SelectItem value="USD">Dólar (USD)</SelectItem>
-                                                <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )} />
-                                {exportCurrency !== 'BRL' && (
-                                    <FormField control={form.control} name="exchangeRate" render={({ field }) => (
-                                        <FormItem className='md:col-span-2'>
-                                            <FormLabel>Taxa de Câmbio ({exportCurrency})</FormLabel>
-                                            <div className="relative">
-                                                <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} disabled={isFetchingRate} /></FormControl>
-                                            </div>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                )}
-                            </div>
-                             <div className="space-y-4">
+                     <div className="space-y-6">
+                        <h4 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                            <Banknote className="h-5 w-5 text-primary"/>
+                            Faturamento Mensal Estimado
+                        </h4>
+                        <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
+                            <div className='space-y-6'>
+                                <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
                                 {revenueGroups.map(annex => (
                                     <FormField
-                                        key={`export_${annex}`}
+                                        key={`domestic_${annex}`}
                                         control={form.control}
-                                        name={`revenues.export_${annex}`}
+                                        name={`revenues.domestic_${annex}`}
                                         render={({ field }) => {
                                             const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                                 const { value } = e.target;
@@ -340,25 +270,129 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                             return (
                                             <FormItem>
                                                 <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="text"
-                                                        inputMode="decimal"
-                                                        placeholder="0,00"
-                                                        onChange={handleChange}
-                                                        onBlur={field.onBlur}
-                                                        value={field.value ? formatBRL(field.value) : ''}
-                                                        name={field.name}
-                                                        ref={field.ref}
-                                                    />
-                                                </FormControl>
+                                                <div className="relative">
+                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            placeholder="0,00"
+                                                            onChange={handleChange}
+                                                            onBlur={field.onBlur}
+                                                            value={field.value ? formatBRL(field.value) : ''}
+                                                            name={field.name}
+                                                            ref={field.ref}
+                                                            className="pl-9"
+                                                        />
+                                                    </FormControl>
+                                                </div>
                                                 <FormMessage />
                                             </FormItem>
                                         )}} />
                                 ))}
+                                <FormField
+                                    control={form.control}
+                                    name="issRate"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-sm">Alíquota de ISS (%) <span className="font-normal text-muted-foreground">(Opcional)</span></FormLabel>
+                                        <FormControl>
+                                        <Input
+                                            type="number"
+                                            placeholder="Padrão: 5"
+                                            step="0.01"
+                                            {...field}
+                                            onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            field.onChange(isNaN(value) ? undefined : value / 100);
+                                            }}
+                                            value={field.value !== undefined ? field.value * 100 : ''}
+                                        />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Se souber a alíquota de ISS do seu município (entre 2 e 5), informe aqui.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                            </div>
+                            
+                            <div className='space-y-6'>
+                                <h4 className="font-medium text-md text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <FormField control={form.control} name="exportCurrency" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Moeda</FormLabel>
+                                            <Select onValueChange={(value) => {
+                                                field.onChange(value)
+                                                if (exchangeRates[value]) {
+                                                    form.setValue('exchangeRate', exchangeRates[value], { shouldValidate: true })
+                                                } else if (value === 'BRL') {
+                                                    form.setValue('exchangeRate', 1, { shouldValidate: true })
+                                                }
+                                            }} defaultValue={field.value}>
+                                                <FormControl><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger></FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="BRL">Real (BRL)</SelectItem>
+                                                    <SelectItem value="USD">Dólar (USD)</SelectItem>
+                                                    <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormItem>
+                                    )} />
+                                    {exportCurrency !== 'BRL' && (
+                                        <FormField control={form.control} name="exchangeRate" render={({ field }) => (
+                                            <FormItem className='md:col-span-2'>
+                                                <FormLabel>Taxa de Câmbio</FormLabel>
+                                                <div className="relative">
+                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{exportCurrency}</span>
+                                                    <FormControl><Input type="number" step="0.0001" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} disabled={isFetchingRate} className="pl-12"/></FormControl>
+                                                </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    )}
+                                </div>
+                                <div className="space-y-4">
+                                    {revenueGroups.map(annex => (
+                                        <FormField
+                                            key={`export_${annex}`}
+                                            control={form.control}
+                                            name={`revenues.export_${annex}`}
+                                            render={({ field }) => {
+                                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                    const { value } = e.target;
+                                                    const digitsOnly = value.replace(/\D/g, '');
+                                                    field.onChange(Number(digitsOnly) / 100);
+                                                };
+                                                return (
+                                                <FormItem>
+                                                    <FormLabel>Faturamento do Mês (Anexo {annex})</FormLabel>
+                                                    <div className="relative">
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{exportCurrency === 'BRL' ? 'R$' : exportCurrency}</span>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="text"
+                                                                inputMode="decimal"
+                                                                placeholder="0,00"
+                                                                onChange={handleChange}
+                                                                onBlur={field.onBlur}
+                                                                value={field.value ? formatBRL(field.value) : ''}
+                                                                name={field.name}
+                                                                ref={field.ref}
+                                                                className="pl-10"
+                                                            />
+                                                        </FormControl>
+                                                    </div>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}} />
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                     </div>
                 )}
             </CardContent>
         </Card>
