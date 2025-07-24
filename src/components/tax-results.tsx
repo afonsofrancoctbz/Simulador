@@ -11,6 +11,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
+import { getFiscalParameters } from '@/config/fiscal';
 
 interface TaxResultsProps {
   year: 2025 | 2026;
@@ -62,7 +63,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     if (results.simplesNacionalOtimizado) {
       scenarios.push(results.simplesNacionalOtimizado);
     }
-    if (results.simplesNacionalBase) scenarios.push(results.simplesNacionalBase);
+    scenarios.push(results.simplesNacionalBase);
     scenarios.push(results.lucroPresumido);
 
   } else if (year === 2026 && 'simplesNacionalTradicional' in results) {
@@ -71,30 +72,29 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
     if (!isCommerceOnly) scenarios.push(results.lucroPresumido as TaxDetails);
   }
 
-  if (scenarios.length === 0) return null;
-    
   const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || s.proLabore > 0));
+  if (validScenarios.length === 0) return null;
+    
   const cheapestScenario = validScenarios.length > 0 ? validScenarios.reduce((prev, current) => (prev.totalMonthlyCost < current.totalMonthlyCost ? prev : current)) : null;
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
-        'FOLHA': [],
-        'IMPOSTOS': [],
-        'MENSALIDADE': []
+        'IMPOSTOS S/ FATURAMENTO': [],
+        'ENCARGOS S/ FOLHA E PRÓ-LABORE': [],
+        'OUTROS CUSTOS': []
     };
-
+    
     details.breakdown.forEach(item => {
-        if (item.name.includes('INSS') || item.name.includes('IRRF')) {
-            groups['FOLHA'].push(item);
-        } else if(item.name.includes('Mensalidade')) {
-            groups['MENSALIDADE'].push(item);
-        } else {
-            groups['IMPOSTOS'].push(item);
+        const name = item.name.toLowerCase();
+        if (name.includes('das') || name.includes('pis') || name.includes('cofins') || name.includes('iss') || name.includes('irpj') || name.includes('csll') || name.includes('iva')) {
+            groups['IMPOSTOS S/ FATURAMENTO'].push(item);
+        } else if (name.includes('inss') || name.includes('irrf') || name.includes('cpp')) {
+            groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
         }
     });
-    
-    groups['MENSALIDADE'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
 
+    groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });
+    
     return groups;
   };
     
@@ -114,10 +114,32 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
             const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && validScenarios.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
-            
+            const config = getFiscalParameters(year);
+
             let title = scenario.regime;
             if (title === "Simples Nacional (Otimizado)") title = "Simples Nacional";
 
+            const getRateInfo = (itemName: string): string | null => {
+              if (itemName === 'DAS' && scenario.effectiveDasRate) {
+                return formatPercent(scenario.effectiveDasRate);
+              }
+              if (itemName.toLowerCase().includes('cpp')) {
+                  return `${(config.aliquotas_cpp_patronal.total * 100).toFixed(2).replace('.', ',')}%`;
+              }
+              if (itemName.toLowerCase().includes('inss s/ pró-labore')) {
+                  return `${(config.aliquota_inss_prolabore * 100).toFixed(2).replace('.', ',')}%`;
+              }
+              if (itemName === 'PIS') return `${(config.lucro_presumido_rates.PIS * 100).toFixed(2).replace('.', ',')}%`;
+              if (itemName === 'COFINS') return `${(config.lucro_presumido_rates.COFINS * 100).toFixed(2).replace('.', ',')}%`;
+              if (itemName.startsWith('ISS')) {
+                  const breakdownItem = scenario.breakdown.find(b => b.name === itemName);
+                  const rateMatch = breakdownItem?.name.match(/\((.*?)\)/);
+                  return rateMatch ? rateMatch[1] : null;
+              }
+              // IRPJ e CSLL são sobre o lucro presumido, não o faturamento. Opcional exibir.
+              // IRRF não tem uma alíquota única.
+              return null;
+            };
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
@@ -126,7 +148,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                   isRecommended ? "border-primary shadow-lg" : "border-border"
                 )}
               >
-                  <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden")}>
+                  <div className={cn("p-6 rounded-t-xl text-center relative overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
                       {isRecommended && (
                       <Badge className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[-50%] bg-primary text-primary-foreground font-bold px-4 py-1.5 shadow-md">
                           Recomendado
@@ -139,7 +161,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                   </div>
 
                   <div className="px-6 pb-6 pt-0 flex-grow text-base">
-                      <div className='text-center py-3 mb-4 bg-muted/30 rounded-md'>
+                      <div className='text-center py-3 my-4 bg-muted/30 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
                       </div>
@@ -157,13 +179,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                 <div className="space-y-3">
                                 {filteredItems.map(item => {
                                   let itemName = item.name;
-                                  let rateInfo: string | null = null;
-                                  
-                                  if (item.name === 'DAS' && scenario.effectiveDasRate) {
-                                      rateInfo = `(${formatPercent(scenario.effectiveDasRate)})`;
-                                  } else if (item.name === 'CPP (INSS Patronal)') {
-                                      rateInfo = `(${(20.00).toFixed(2).replace('.',',')}%)`;
-                                  }
+                                  const rateInfo = getRateInfo(itemName);
 
                                   return (
                                   <div key={item.name} className="flex justify-between items-center text-sm">
@@ -171,7 +187,7 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                                         {itemName}
                                       </span>
                                       <span className="font-medium text-foreground">
-                                        {rateInfo && <span className="text-xs text-muted-foreground/80 font-semibold mr-2">{rateInfo}</span>}
+                                        {rateInfo && !itemName.toLowerCase().includes('irrf') && <span className="text-xs text-muted-foreground/80 font-semibold mr-2">({rateInfo})</span>}
                                         {formatCurrencyBRL(item.value)}
                                       </span>
                                   </div>
