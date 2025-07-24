@@ -54,23 +54,15 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
     return null;
   }
   
-  const scenarios = 'simplesNacionalBase' in results 
-    ? [results.simplesNacionalOtimizado, results.simplesNacionalBase, results.lucroPresumido]
-    : [results.simplesNacionalTradicional, results.simplesNacionalHibrido, results.lucroPresumido];
-
-  const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
-  if (validScenarios.length === 0) return null;
-    
-  const cheapestScenario = [...validScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
-  
   let orderedScenarios: (TaxDetails | null)[] = [];
 
   if ('simplesNacionalBase' in results) {
-    orderedScenarios = [
+     orderedScenarios = [
       results.simplesNacionalOtimizado,
       results.simplesNacionalBase,
       results.lucroPresumido,
-    ];
+    ].sort((a, b) => (a?.order ?? 99) - (b?.order ?? 99));
+
   } else if ('simplesNacionalTradicional' in results) {
      orderedScenarios = [
       results.simplesNacionalTradicional,
@@ -78,6 +70,11 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
       results.lucroPresumido,
     ];
   }
+
+  const validScenarios = orderedScenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
+  if (validScenarios.length === 0) return null;
+    
+  const cheapestScenario = [...validScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
   
   const scenariosToShow = orderedScenarios.filter(s => s !== null);
   
@@ -155,6 +152,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const domesticRevenue = scenario.breakdown
                 .filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss') || (i.name.toLowerCase().startsWith('das') && !scenario.notes.some(n => n.includes('exportação'))))
                 .reduce((sum, item) => {
+                    // This logic is an approximation to back-calculate revenue from tax, it has limitations
                     const rateMatch = item.name.match(/\(([^)]+)\)/);
                     if (!rateMatch) return sum;
                     const rateString = rateMatch[1].replace('%', '').replace(',', '.').trim();
@@ -252,7 +250,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                             
                             {scenario.regime === 'Lucro Presumido' && groupName.includes('TRIMESTRAL') && (
                                 <div className="text-right rounded-lg pt-1 text-xs font-semibold flex items-center justify-end gap-2">
-                                  <div className='border border-primary/50 text-primary/90 rounded-md px-2 py-0.5'>
+                                  <div className='border-primary/50 text-primary/90 rounded-md px-2 py-0.5 text-sm'>
                                     <span>Alíquota Efetiva s/ Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
                                   </div>
                                 </div>
@@ -278,7 +276,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
                                 <span>
                                     {scenario.optimizationNote && `Pró-labore ajustado para ${formatCurrencyBRL(scenario.proLabore)} para atingir o Fator R e tributar pelo Anexo III.`}
-                                    {exportRevenue > 0 && scenario.regime.includes('Simples') && " A alíquota do DAS foi reduzida na parcela de exportação devido à isenção de PIS, COFINS e ISS."}
+                                    {exportRevenue > 0 && scenario.regime.includes('Simples') && " No Simples Nacional, PIS, COFINS e ISS não incidem sobre a receita de exportação, o que reduz a alíquota efetiva do DAS."}
                                     {exportRevenue > 0 && scenario.regime === 'Lucro Presumido' && " PIS, COFINS e ISS não incidem sobre a receita de exportação."}
                                 </span>
                             </AlertDescription>
