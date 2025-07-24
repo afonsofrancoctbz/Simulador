@@ -2,7 +2,7 @@
 
 "use client";
 
-import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, Loader2 } from 'lucide-react';
 import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -180,8 +180,9 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                       )}
                       {scenario.optimizationNote && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground">
-                            <AlertDescription className="text-sm text-primary/90 font-medium">
-                                {scenario.optimizationNote}
+                            <AlertDescription className="text-sm text-primary/90 font-medium flex items-start gap-2">
+                                <Info className="h-4 w-4 mt-0.5 shrink-0"/>
+                                <span>{scenario.optimizationNote}</span>
                             </AlertDescription>
                         </Alert>
                       )}
@@ -191,8 +192,8 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
                               <div className="text-3xl font-bold text-primary">
                                   {formatCurrencyBRL(scenario.totalMonthlyCost)}
                               </div>
-                              <div className="w-full bg-muted rounded-full h-2.5 mt-2">
-                                  <div className="bg-gradient-to-r from-primary/70 to-primary h-2.5 rounded-full transition-all" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                              <div className="w-full bg-muted rounded-full h-2.5 mt-2 overflow-hidden">
+                                  <div className="bg-gradient-to-r from-green-300 via-primary to-blue-800 h-2.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
                               </div>
                               <p className='text-sm text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
                           </div>

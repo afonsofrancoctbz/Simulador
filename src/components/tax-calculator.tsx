@@ -3,7 +3,7 @@
 "use client";
 
 import { useEffect, useMemo } from 'react';
-import { FormProvider, useFormContext } from "react-hook-form";
+import { FormProvider } from "react-hook-form";
 import { getCnaeData } from '@/lib/cnae-helpers';
 import { useTaxCalculator } from '@/hooks/use-tax-calculator';
 
