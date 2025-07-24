@@ -76,12 +76,17 @@ export default function TaxResults({ year, isLoading, isAdviceLoading, results, 
 
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
-        'IMPOSTOS E ENCARGOS': [],
+        'IMPOSTOS S/ FATURAMENTO': [],
+        'ENCARGOS': [],
         'OUTROS CUSTOS': [],
     };
 
     details.breakdown.forEach(item => {
-        groups['IMPOSTOS E ENCARGOS'].push(item);
+        if (['PIS', 'COFINS', 'ISS', 'IRPJ', 'CSLL', 'DAS'].some(tax => item.name.startsWith(tax))) {
+            groups['IMPOSTOS S/ FATURAMENTO'].push(item);
+        } else if (['CPP (INSS Patronal)', 'INSS s/ Pró-labore', 'IRRF s/ Pró-labore'].some(charge => item.name.startsWith(charge))) {
+            groups['ENCARGOS'].push(item);
+        }
     });
 
     groups['OUTROS CUSTOS'].push({ name: 'Mensalidade Contabilizei', value: details.contabilizeiFee });

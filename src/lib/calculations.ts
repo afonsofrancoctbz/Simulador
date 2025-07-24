@@ -1,4 +1,5 @@
 
+
 import type { FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -156,7 +157,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
-    const fatorR = totalRevenue > 0 ? effectiveFp12 / totalRevenue : 0; // Fator R mensalizado
+    const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
 

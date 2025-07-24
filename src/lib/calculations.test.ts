@@ -38,10 +38,10 @@ describe('Tax Calculation Engine', () => {
         // Pró-labore otimizado = 40331.75 * 0.28 = 11292.89
         // RBT12 = 480000. Alíquota efetiva Anexo III, Faixa 3: (480000 * 0.135 - 17640) / 480000 = 0.09825
         // DAS = 40331.75 * 0.09825 = 3962.59
-        // INSS Sócio = 8157.41 * 0.11 = 897.31 (Teto)
-        // IRRF Sócio: Base = 11292.89 - 897.31 = 10395.58. IRRF = 10395.58 * 0.275 - 896 = 1962.78
-        // Total Tax = 3962.59 + 897.31 + 1962.78 = 6822.68
-        expect(result.simplesNacionalOtimizado.totalTax).toBeCloseTo(6822.68, 2);
+        // INSS Sócio = 8157.41 * 0.11 = 897.32 (Teto)
+        // IRRF Sócio: Base = 11292.89 - 897.32 = 10395.57. IRRF = 10395.57 * 0.275 - 896 = 1962.78
+        // Total Tax = 3962.59 + 897.32 + 1962.78 = 6822.69
+        expect(result.simplesNacionalOtimizado.totalTax).toBeCloseTo(6822.69, 2);
     }
     
     // Cenário Lucro Presumido
