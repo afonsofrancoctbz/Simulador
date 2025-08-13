@@ -26,7 +26,6 @@ import type { CnaeData } from "@/lib/types"
 
 const categories = [
   { name: "Busca", icon: Search },
-  { name: "Adicionar em Massa", icon: List },
   { name: "Tecnologia da Informação", icon: Code },
   { name: "Saúde e Bem-estar", icon: HeartPulse },
   { name: "Engenharia, Arquitetura e Design", icon: HardHat },
@@ -87,11 +86,8 @@ function CnaeSelectorComponent({
             cnae.category?.toLowerCase().includes(lowercasedSearch)
         ).slice(0, 100);
     }
-    if (activeView !== "Adicionar em Massa") {
-        const cnaesForCategory = categoryToCnaeMap[activeView] || []
-        return CNAE_DATA.filter((cnae) => cnaesForCategory.includes(cnae.code)).slice(0,100)
-    }
-    return []
+    const cnaesForCategory = categoryToCnaeMap[activeView] || []
+    return CNAE_DATA.filter((cnae) => cnaesForCategory.includes(cnae.code)).slice(0,100)
   }, [search, activeView]);
 
   const handleToggleCnae = (code: string) => {
@@ -141,7 +137,7 @@ function CnaeSelectorComponent({
     });
 
     setSelectedCodes(Array.from(newSelected));
-    toast({ title: "Processamento Concluído", description: `${addedCount} CNAEs adicionados. ${invalidCount} inválidos. ${duplicateCount} já estavam na lista.` });
+    toast({ title: "Processamento Concluído", description: `${addedCount} CNAEs adicionados, ${invalidCount} inválidos e ${duplicateCount} já selecionados.` });
     if (limitReached) toast({ title: "Limite Atingido", description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`, variant: "destructive" });
     setCodesToPaste("");
   }
@@ -158,7 +154,8 @@ function CnaeSelectorComponent({
 
         <div className="flex-grow min-h-0 flex">
             {/* Left Panel - Navigation */}
-            <div className="w-1/5 min-w-[220px] border-r flex flex-col bg-muted/30 p-4">
+            <div className="w-1/4 min-w-[240px] border-r flex flex-col bg-muted/30 p-4">
+                <p className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Categorias</p>
                 <ScrollArea>
                     <div className="space-y-2">
                         {categories.map(cat => (
@@ -177,38 +174,38 @@ function CnaeSelectorComponent({
             </div>
 
             {/* Center Panel - List/Inputs */}
-            <div className="w-2/5 border-r flex flex-col">
+            <div className="w-1/2 border-r flex flex-col">
                 <div className="p-4 border-b shrink-0">
                     <h3 className="text-lg font-semibold text-foreground">{activeView}</h3>
                 </div>
-                <div className="p-4 space-y-4">
-                    {activeView === 'Busca' && (
+                 {activeView === 'Busca' && (
+                    <div className="p-4 space-y-4">
+                         <div className="p-4 border rounded-lg bg-background/50">
+                            <Label htmlFor="cnae-paste" className="font-semibold text-base">Adicionar em Massa</Label>
+                            <p className="text-sm text-muted-foreground mb-3">Cole uma lista de códigos CNAE abaixo.</p>
+                            <Textarea
+                                id="cnae-paste"
+                                placeholder="Ex: 7020-4/00, 6201501, 8630504..."
+                                value={codesToPaste}
+                                onChange={(e) => setCodesToPaste(e.target.value)}
+                                rows={4}
+                            />
+                            <Button onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="w-full mt-3">
+                                <PlusCircle className="mr-2 h-4 w-4"/> Adicionar CNAEs à Seleção
+                            </Button>
+                        </div>
+                        <Separator />
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Buscar por código ou descrição..."
+                                placeholder="Ou busque por código ou descrição..."
                                 className="pl-9"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
-                    )}
-                    {activeView === 'Adicionar em Massa' && (
-                        <div className="space-y-4">
-                            <Label htmlFor="cnae-paste" className="font-semibold">Adicionar em Massa</Label>
-                            <Textarea
-                                id="cnae-paste"
-                                placeholder="Cole uma lista de códigos CNAE aqui. Ex: 7020-4/00, 6201501..."
-                                value={codesToPaste}
-                                onChange={(e) => setCodesToPaste(e.target.value)}
-                                rows={8}
-                            />
-                            <Button onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="w-full">
-                                <PlusCircle className="mr-2 h-4 w-4"/> Adicionar CNAEs à Seleção
-                            </Button>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
                 <ScrollArea className="flex-grow">
                      <div className="p-4 pt-0 space-y-2">
                         {(activeView !== 'Busca' || search.length >= 2) && (
@@ -228,7 +225,7 @@ function CnaeSelectorComponent({
                                                 <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
                                                     Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
                                                 </Badge>
-                                                {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
+                                                {cnae.isRegulated && <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">Regulamentado</Badge>}
                                             </div>
                                         </div>
                                          <Button size="sm" variant="ghost" className="ml-4 shrink-0">
@@ -247,15 +244,14 @@ function CnaeSelectorComponent({
             </div>
 
             {/* Right Panel - Details & Selection */}
-            <div className="w-2/5 flex flex-col bg-muted/30">
-                <div className="p-6 flex-grow flex flex-col">
+            <div className="w-1/4 flex flex-col bg-muted/30">
+                <div className="p-6 flex-grow flex flex-col min-h-0">
                     <h4 className="font-semibold text-foreground mb-4 shrink-0">Análise de Impacto</h4>
                     {hoveredCnae ? (
                         <div className="p-4 border rounded-lg bg-background space-y-3 text-sm">
                            <h5 className="font-bold">{hoveredCnae.code} - {hoveredCnae.description}</h5>
                             <div className="space-y-1">
-                                <Badge>Anexo Simples Nacional:</Badge>
-                                <span className="ml-2 font-medium">{hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</span>
+                                <Badge>Anexo Simples Nacional: {hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</Badge>
                             </div>
                            {hoveredCnae.notes && <p className="text-xs text-muted-foreground italic flex gap-2 pt-2"><Info className="h-4 w-4 shrink-0 mt-0.5"/>{hoveredCnae.notes}</p>}
                         </div>
@@ -269,7 +265,7 @@ function CnaeSelectorComponent({
                     )}
                 </div>
                 
-                <div className="p-6 border-t shrink-0 h-1/2 flex flex-col">
+                <div className="p-6 border-t shrink-0 h-1/2 flex flex-col min-h-0">
                     <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
                     <ScrollArea className="flex-grow bg-background border rounded-lg">
                         <div className="space-y-2 p-3">
