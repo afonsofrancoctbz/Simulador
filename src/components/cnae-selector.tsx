@@ -181,47 +181,49 @@ function CnaeSelectorComponent({
                 <div className="p-4 border-b shrink-0">
                     <h3 className="text-lg font-semibold text-foreground">{activeView}</h3>
                 </div>
+                <div className="p-4 space-y-4">
+                    {activeView === 'Busca' && (
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Buscar por código ou descrição..."
+                                className="pl-9"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                    )}
+                    {activeView === 'Adicionar em Massa' && (
+                        <div className="space-y-4">
+                            <Label htmlFor="cnae-paste" className="font-semibold">Adicionar em Massa</Label>
+                            <Textarea
+                                id="cnae-paste"
+                                placeholder="Cole uma lista de códigos CNAE aqui. Ex: 7020-4/00, 6201501..."
+                                value={codesToPaste}
+                                onChange={(e) => setCodesToPaste(e.target.value)}
+                                rows={8}
+                            />
+                            <Button onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="w-full">
+                                <PlusCircle className="mr-2 h-4 w-4"/> Adicionar CNAEs à Seleção
+                            </Button>
+                        </div>
+                    )}
+                </div>
                 <ScrollArea className="flex-grow">
-                    <div className="p-4 space-y-4">
-                        {activeView === 'Busca' && (
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Buscar por código ou descrição..."
-                                    className="pl-9"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
-                            </div>
-                        )}
-                        {activeView === 'Adicionar em Massa' && (
-                            <div className="space-y-2">
-                                <Label htmlFor="cnae-paste">Cole os códigos CNAE aqui</Label>
-                                <Textarea
-                                    id="cnae-paste"
-                                    placeholder="Ex: 7020-4/00, 6201501..."
-                                    value={codesToPaste}
-                                    onChange={(e) => setCodesToPaste(e.target.value)}
-                                    rows={5}
-                                />
-                                <Button onClick={handleAddPastedCnaes} disabled={!codesToPaste}>
-                                    <PlusCircle className="mr-2 h-4 w-4"/> Adicionar CNAEs
-                                </Button>
-                            </div>
-                        )}
-                        
+                     <div className="p-4 pt-0 space-y-2">
                         {(activeView !== 'Busca' || search.length >= 2) && (
-                            <div className="space-y-2">
+                            <>
                                 {filteredCnaes.length > 0 ? filteredCnaes.map(cnae => (
                                     <div
                                         key={cnae.code}
                                         onMouseEnter={() => setHoveredCnae(cnae)}
                                         onMouseLeave={() => setHoveredCnae(null)}
-                                        className={cn("p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between", selectedCodes.includes(cnae.code) && "border-primary ring-1 ring-primary/80")}
+                                        onClick={() => handleToggleCnae(cnae.code)}
+                                        className={cn("p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between hover:bg-muted/50", selectedCodes.includes(cnae.code) && "border-primary ring-1 ring-primary/80")}
                                     >
                                         <div className="flex-grow">
                                             <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
-                                            <div className="flex flex-wrap gap-2 mt-2">
+                                            <div className="flex flex-wrap gap-1.5 mt-2">
                                                 <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
                                                 <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
                                                     Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
@@ -229,9 +231,8 @@ function CnaeSelectorComponent({
                                                 {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
                                             </div>
                                         </div>
-                                        <Button size="sm" variant={selectedCodes.includes(cnae.code) ? 'outline' : 'default'} className="ml-4" onClick={() => handleToggleCnae(cnae.code)}>
-                                            {selectedCodes.includes(cnae.code) ? <X className="mr-2 h-4 w-4"/> : <PlusCircle className="mr-2 h-4 w-4"/>}
-                                            {selectedCodes.includes(cnae.code) ? 'Remover' : 'Adicionar'}
+                                         <Button size="sm" variant="ghost" className="ml-4 shrink-0">
+                                            {selectedCodes.includes(cnae.code) ? <Check className="h-5 w-5 text-primary"/> : <PlusCircle className="h-5 w-5 text-muted-foreground"/>}
                                         </Button>
                                     </div>
                                 )) : (
@@ -239,7 +240,7 @@ function CnaeSelectorComponent({
                                         <p>Nenhum CNAE encontrado.</p>
                                     </div>
                                 )}
-                            </div>
+                            </>
                         )}
                     </div>
                 </ScrollArea>
@@ -247,32 +248,34 @@ function CnaeSelectorComponent({
 
             {/* Right Panel - Details & Selection */}
             <div className="w-2/5 flex flex-col bg-muted/30">
-                {hoveredCnae ? (
-                    <div className="p-4 flex-grow flex flex-col">
-                        <h4 className="font-semibold text-foreground mb-2 shrink-0">Análise de Impacto</h4>
+                <div className="p-6 flex-grow flex flex-col">
+                    <h4 className="font-semibold text-foreground mb-4 shrink-0">Análise de Impacto</h4>
+                    {hoveredCnae ? (
                         <div className="p-4 border rounded-lg bg-background space-y-3 text-sm">
                            <h5 className="font-bold">{hoveredCnae.code} - {hoveredCnae.description}</h5>
-                           <p><Badge>Anexo Simples Nacional:</Badge> {hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</p>
-                           <p><Badge>Presunção de Lucro (LP):</Badge> {hoveredCnae.presumedProfitRateIRPJ ? `${hoveredCnae.presumedProfitRateIRPJ * 100}%` : 'N/A'}</p>
-                           {hoveredCnae.notes && <p className="text-xs text-muted-foreground italic flex gap-2"><Info className="h-4 w-4 shrink-0"/>{hoveredCnae.notes}</p>}
+                            <div className="space-y-1">
+                                <Badge>Anexo Simples Nacional:</Badge>
+                                <span className="ml-2 font-medium">{hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</span>
+                            </div>
+                           {hoveredCnae.notes && <p className="text-xs text-muted-foreground italic flex gap-2 pt-2"><Info className="h-4 w-4 shrink-0 mt-0.5"/>{hoveredCnae.notes}</p>}
                         </div>
-                    </div>
-                ) : (
-                    <div className="p-4 flex-grow flex items-center justify-center">
-                        <div className="text-center text-muted-foreground">
-                            <FileSearch className="mx-auto h-12 w-12 opacity-50 mb-4"/>
-                            <p>Passe o mouse sobre uma atividade<br/>para ver a análise de impacto fiscal.</p>
+                    ) : (
+                        <div className="p-4 flex-grow flex items-center justify-center">
+                            <div className="text-center text-muted-foreground">
+                                <FileSearch className="mx-auto h-12 w-12 opacity-50 mb-4"/>
+                                <p>Passe o mouse sobre uma atividade<br/>para ver a análise de impacto fiscal.</p>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
                 
-                <div className="p-4 border-t shrink-0 h-1/2 flex flex-col">
-                    <h4 className="font-semibold text-foreground mb-2 shrink-0">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
-                    <ScrollArea className="flex-grow">
-                        <div className="space-y-2 pr-4">
+                <div className="p-6 border-t shrink-0 h-1/2 flex flex-col">
+                    <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
+                    <ScrollArea className="flex-grow bg-background border rounded-lg">
+                        <div className="space-y-2 p-3">
                            {selectedCodes.length > 0 ? selectedCodes.map(code => (
-                            <div key={code} className="flex items-center justify-between bg-background p-2 rounded-md border">
-                                <span className="text-sm font-medium">{code} - {CNAE_DATA.find(c=>c.code===code)?.description}</span>
+                            <div key={code} className="flex items-center justify-between bg-muted/40 p-2 rounded-md border">
+                                <span className="text-sm font-medium flex-grow pr-2">{code} - {CNAE_DATA.find(c=>c.code===code)?.description}</span>
                                 <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(code)}>
                                     <X className="h-4 w-4 text-destructive"/>
                                 </Button>
@@ -292,7 +295,7 @@ function CnaeSelectorComponent({
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
                 <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Confirmar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : ''}
+                    Confirmar {selectedCodes.length > 0 ? `(${selectedCodes.length})` : ''}
                 </Button>
             </div>
         </DialogFooter>
