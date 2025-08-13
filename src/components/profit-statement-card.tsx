@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,8 +50,8 @@ export function ProfitStatementCard({ details }: { details: TaxDetails | null })
                 </div>
             </div>
             <Separator className="my-4"/>
-             <div className="flex justify-between items-center text-xl font-bold text-primary pt-2">
-                <span>(=) Lucro Disponível para Distribuição</span>
+             <div className="flex justify-between items-center text-2xl font-bold text-primary pt-2">
+                <span>(=) Lucro Disponível</span>
                 <span>{formatCurrencyBRL(profit)}</span>
             </div>
 

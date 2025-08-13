@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from "react-hook-form";
-import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote, Pencil } from 'lucide-react';
+import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote, Pencil, Info } from 'lucide-react';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { Annex } from '@/lib/types';
 import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
@@ -21,6 +21,7 @@ import type { CalculatorFormValues } from './tax-calculator-form';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Switch } from './ui/switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface FormSectionRevenueProps {
     year: 2025 | 2026;
@@ -96,7 +97,8 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
             </CardHeader>
              <CardContent className='p-6 md:p-8 space-y-8'>
                  <div>
-                    <FormLabel>Atividades (CNAEs) da empresa</FormLabel>
+                    <FormLabel>1. Selecione suas Atividades (CNAEs)</FormLabel>
+                    <FormDescription className="text-xs mb-2">A escolha do CNAE define os anexos e as alíquotas de imposto aplicáveis.</FormDescription>
                     <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[44px] bg-background">
                         {selectedCnaes.length > 0 ? selectedCnaes.map(code => (
                             <Badge key={code} variant="secondary" className="text-sm">
@@ -108,7 +110,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         )) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
                     </div>
                      <FormMessage className="mt-2">{form.formState.errors.selectedCnaes?.message}</FormMessage>
-                    <Button type="button" variant="outline" size="sm" className="mt-3" onClick={onCnaeSelectorOpen}>
+                    <Button type="button" variant="default" size="sm" className="mt-3" onClick={onCnaeSelectorOpen}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                     </Button>
                      {selectedCnaes.length === 0 && (
@@ -151,7 +153,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                      <div className="space-y-6">
                         <h4 className="font-semibold text-lg text-foreground flex items-center gap-3">
                             <Banknote className="h-5 w-5 text-primary"/>
-                            Faturamento Mensal Estimado
+                            2. Informe o Faturamento Mensal Estimado
                         </h4>
                         <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
                             <div className='space-y-6'>
@@ -192,7 +194,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                 ))}
                                 
                                 <FormItem className="flex flex-row items-center gap-4 space-y-0">
-                                    <FormLabel className="whitespace-nowrap pt-1">Alíquota de ISS (%)</FormLabel>
+                                    <FormLabel className="text-sm whitespace-nowrap pt-1">Alíquota de ISS (%)</FormLabel>
                                     <div className="flex items-center gap-2">
                                         <FormControl>
                                             <Switch
@@ -233,7 +235,17 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                             </div>
                             
                             <div className='space-y-6'>
-                                <h4 className="font-medium text-md text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
+                                <div className="flex items-center gap-2">
+                                    <h4 className="font-medium text-md text-foreground flex items-center gap-2"><Rocket className="h-5 w-5 text-primary/80" />Receita de Exportação</h4>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger type='button'><Info className="h-4 w-4 text-muted-foreground cursor-help" /></TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Receitas de exportação de serviços são isentas de PIS, COFINS e ISS,<br /> resultando em uma carga tributária menor.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <FormField control={form.control} name="exportCurrency" render={({ field }) => (
                                         <FormItem>
