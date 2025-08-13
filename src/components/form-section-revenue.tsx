@@ -215,7 +215,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                                     <FormControl>
                                                         <Input
                                                             type="number"
-                                                            placeholder="5,0"
+                                                            placeholder="5"
                                                             step="0.01"
                                                             className="h-9 w-32"
                                                             {...field}
@@ -325,4 +325,5 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     );
 }
 
+    
     

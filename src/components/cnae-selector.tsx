@@ -162,7 +162,7 @@ function CnaeSelectorComponent({
       }
       
       const normalizedCode = rawCode.replace(/[^\d]/g, '');
-      const formattedCode = `${normalizedCode.slice(0, 4)}-${normalizedCode.slice(4, 5)}/${normalizedCode.slice(5, 7)}`;
+      const formattedCode = `${'${normalizedCode.slice(0, 4)}'}-${'${normalizedCode.slice(4, 5)}'}/${'${normalizedCode.slice(5, 7)}'}`;
       
       if (allCnaeCodes.includes(formattedCode)) {
         if (newSelected.has(formattedCode)) {
@@ -180,13 +180,13 @@ function CnaeSelectorComponent({
     
     toast({
       title: "Processamento Concluído",
-      description: `${addedCount} CNAEs adicionados. ${invalidCount} inválidos. ${duplicateCount} já estavam na lista.`,
+      description: `${'${addedCount}'} CNAEs adicionados. ${'${invalidCount}'} inválidos. ${'${duplicateCount}'} já estavam na lista.`,
     });
 
     if (limitReached) {
        toast({
         title: "Limite Atingido",
-        description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`,
+        description: `O limite de ${'${MAX_SELECTION}'} CNAEs foi alcançado.`,
         variant: "destructive",
       });
     }
@@ -253,7 +253,7 @@ function CnaeSelectorComponent({
             <div className="px-6 py-3 flex items-center justify-between border-b shrink-0 bg-muted/30">
                 <p className="text-sm text-muted-foreground">
                     {filteredCnaes.length > 0
-                        ? `${filteredCnaes.length} resultados na visão atual.`
+                        ? `${'${filteredCnaes.length}'} resultados na visão atual.`
                         : "Nenhum CNAE encontrado."}
                 </p>
                 {filteredCnaes.length > 0 && (
@@ -316,7 +316,7 @@ function CnaeSelectorComponent({
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
                 <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Confirmar {selectedCodes.length > 0 ? `${selectedCodes.length} atividade(s)` : ''}
+                    Confirmar {selectedCodes.length > 0 ? `${'${selectedCodes.length}'} atividade(s)` : ''}
                 </Button>
             </div>
         </DialogFooter>
@@ -327,4 +327,5 @@ function CnaeSelectorComponent({
 
 export const CnaeSelector = React.memo(CnaeSelectorComponent);
 
+    
     

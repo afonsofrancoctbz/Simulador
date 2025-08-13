@@ -94,7 +94,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Impostos sobre Faturamento
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
+    const issValue = (values.issRate ?? config.lucro_presumido_rates.ISS * 100) / 100;
     const iss = domesticRevenue * issValue;
 
     // Presunção sobre a receita total
@@ -214,7 +214,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
+    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${'${a}'}`).join(', ') || "N/A";
     
     const breakdown = [
         { name: `DAS (${(totalRevenue > 0 ? totalDas / totalRevenue : 0) * 100}%)`, value: totalDas },
@@ -240,7 +240,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     };
     
     if (proLaboreOverride) {
-        finalResult.optimizationNote = `Pró-labore ajustado para R$ ${totalProLaboreBruto.toFixed(2)} para atingir o Fator R e tributar pelo Anexo III.`;
+        finalResult.optimizationNote = `Pró-labore ajustado para R$ ${'${totalProLaboreBruto.toFixed(2)}'} para atingir o Fator R e tributar pelo Anexo III.`;
     }
 
     return finalResult;
@@ -295,3 +295,5 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+    

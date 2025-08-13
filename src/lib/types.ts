@@ -17,7 +17,7 @@ export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 // Schema for an individual pro-labore input from the form
 export const ProLaboreFormSchema = z.object({
   value: z.coerce.number().min(0, "O valor deve ser positivo.").refine(val => val === 0 || val >= MINIMUM_WAGE, {
-    message: `O pró-labore não pode ser inferior a ${formatCurrencyBRL(MINIMUM_WAGE)}.`,
+    message: `O pró-labore não pode ser inferior a ${'${formatCurrencyBRL(MINIMUM_WAGE)}'}.`,
   }),
   hasOtherInssContribution: z.boolean().default(false),
   otherContributionSalary: z.coerce.number().min(0, "O valor deve ser positivo.").optional(),
@@ -45,7 +45,7 @@ export const TaxFormValuesSchema = z.object({
   exportActivities: z.array(CnaeItemSchema),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
-  issRate: z.coerce.number().min(0).max(5).optional(), // ISS Rate as a percentage
+  issRate: z.coerce.number().min(0).max(5).optional(),
   totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
@@ -143,3 +143,5 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
+
+    
