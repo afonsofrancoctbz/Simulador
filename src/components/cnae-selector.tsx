@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info } from "lucide-react"
+import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle } from "lucide-react"
 
 import { CNAE_DATA_RAW as CNAE_DATA } from "@/lib/cnaes-raw"
 import { Badge } from "@/components/ui/badge"
@@ -140,7 +140,34 @@ function CnaeSelectorComponent({
     toast({ title: "Processamento Concluído", description: `${addedCount} CNAEs adicionados, ${invalidCount} inválidos e ${duplicateCount} já selecionados.` });
     if (limitReached) toast({ title: "Limite Atingido", description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`, variant: "destructive" });
     setCodesToPaste("");
-  }
+  };
+
+  const handleSelectAll = () => {
+    const newSelected = new Set(selectedCodes);
+    let limitReached = false;
+    for (const cnae of filteredCnaes) {
+      if (newSelected.size >= MAX_SELECTION) {
+        limitReached = true;
+        break;
+      }
+      newSelected.add(cnae.code);
+    }
+    setSelectedCodes(Array.from(newSelected));
+    if (limitReached) {
+      toast({
+        title: "Limite Atingido",
+        description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado. Nem todos os itens puderam ser adicionados.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleClearCategorySelection = () => {
+    const categoryCnaeCodes = new Set(filteredCnaes.map(c => c.code));
+    const newSelectedCodes = selectedCodes.filter(code => !categoryCnaeCodes.has(code));
+    setSelectedCodes(newSelectedCodes);
+  };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -175,8 +202,20 @@ function CnaeSelectorComponent({
 
             {/* Center Panel - List/Inputs */}
             <div className="w-1/2 border-r flex flex-col">
-                <div className="p-4 border-b shrink-0">
+                <div className="p-4 border-b shrink-0 flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-foreground">{activeView}</h3>
+                    {activeView !== 'Busca' && filteredCnaes.length > 0 && (
+                      <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" onClick={handleSelectAll}>
+                              <CheckCheck className="mr-2 h-4 w-4"/>
+                              Selecionar todos
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={handleClearCategorySelection}>
+                               <XCircle className="mr-2 h-4 w-4"/>
+                              Limpar seleção
+                          </Button>
+                      </div>
+                    )}
                 </div>
                  {activeView === 'Busca' && (
                     <div className="p-4 space-y-4">
@@ -301,6 +340,8 @@ function CnaeSelectorComponent({
 }
 
 export const CnaeSelector = React.memo(CnaeSelectorComponent);
+
+    
 
     
 
