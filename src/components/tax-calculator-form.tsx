@@ -78,13 +78,15 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         <>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
                 <Tabs defaultValue="company" className="w-full">
-                    <TabsList className="grid w-full grid-cols-5 mb-8">
-                        <TabsTrigger value="company">1. Empresa</TabsTrigger>
-                        <TabsTrigger value="payroll">2. Folha e Sócios</TabsTrigger>
-                        <TabsTrigger value="annual-revenue">3. Receita Anual</TabsTrigger>
-                        <TabsTrigger value="monthly-revenue">4. Atividades e Faturamento Mensal</TabsTrigger>
-                        <TabsTrigger value="plan">5. Plano</TabsTrigger>
-                    </TabsList>
+                    <div className="flex justify-center">
+                        <TabsList className="flex w-full mb-8">
+                            <TabsTrigger value="company">1. Empresa</TabsTrigger>
+                            <TabsTrigger value="payroll">2. Folha e Sócios</TabsTrigger>
+                            <TabsTrigger value="annual-revenue">3. Receita Anual</TabsTrigger>
+                            <TabsTrigger value="monthly-revenue">4. Atividades e Faturamento Mensal</TabsTrigger>
+                            <TabsTrigger value="plan">5. Plano</TabsTrigger>
+                        </TabsList>
+                    </div>
                     <TabsContent value="company">
                          <FormSectionCompany />
                     </TabsContent>
@@ -118,5 +120,3 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         </>
     );
 }
-
-    
