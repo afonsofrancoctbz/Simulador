@@ -80,11 +80,11 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
                 <Tabs defaultValue="company" className="w-full">
                     <div className="flex justify-center">
                         <TabsList className="flex w-full mb-8">
-                            <TabsTrigger value="company">1. Empresa</TabsTrigger>
-                            <TabsTrigger value="payroll">2. Folha e Sócios</TabsTrigger>
-                            <TabsTrigger value="annual-revenue">3. Receita Anual</TabsTrigger>
-                            <TabsTrigger value="monthly-revenue">4. Atividades e Faturamento Mensal</TabsTrigger>
-                            <TabsTrigger value="plan">5. Plano</TabsTrigger>
+                            <TabsTrigger value="company" className="flex-1">1. Empresa</TabsTrigger>
+                            <TabsTrigger value="payroll" className="flex-1">2. Folha e Sócios</TabsTrigger>
+                            <TabsTrigger value="annual-revenue" className="flex-1">3. Receita Anual</TabsTrigger>
+                            <TabsTrigger value="monthly-revenue" className="flex-1">4. Atividades e Faturamento Mensal</TabsTrigger>
+                            <TabsTrigger value="plan" className="flex-1">5. Plano</TabsTrigger>
                         </TabsList>
                     </div>
                     <TabsContent value="company">
