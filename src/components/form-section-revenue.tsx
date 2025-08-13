@@ -324,6 +324,3 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
-
-    
-    
