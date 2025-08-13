@@ -82,7 +82,7 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
                         <TabsTrigger value="company">1. Empresa</TabsTrigger>
                         <TabsTrigger value="payroll">2. Folha e Sócios</TabsTrigger>
                         <TabsTrigger value="annual-revenue">3. Receita Anual</TabsTrigger>
-                        <TabsTrigger value="monthly-revenue">4. Faturamento Mensal</TabsTrigger>
+                        <TabsTrigger value="monthly-revenue">4. Atividades e Faturamento Mensal</TabsTrigger>
                         <TabsTrigger value="plan">5. Plano</TabsTrigger>
                     </TabsList>
                     <TabsContent value="company">
