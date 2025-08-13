@@ -232,9 +232,9 @@ function CnaeSelectorComponent({
                     </div>
                 </div>
                 <Separator />
-                <div className="p-4">
-                    <h4 className="font-semibold text-foreground mb-2">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
-                    <ScrollArea className="h-48">
+                <div className="flex-grow p-4 flex flex-col min-h-0">
+                    <h4 className="font-semibold text-foreground mb-2 shrink-0">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
+                    <ScrollArea className="flex-grow">
                         <div className="space-y-2 pr-4">
                            {selectedCodes.length > 0 ? selectedCodes.map(code => (
                             <div key={code} className="flex items-center justify-between bg-background p-2 rounded-md border">
@@ -251,7 +251,7 @@ function CnaeSelectorComponent({
                         </div>
                     </ScrollArea>
                 </div>
-                <div className="mt-auto p-4 border-t">
+                <div className="mt-auto p-4 border-t shrink-0">
                      <Tabs value={selectedCategory || ''} onValueChange={handleCategoryChange} className="w-full">
                         <Label>Ou filtre por categoria</Label>
                         <TabsList className="h-auto flex-wrap justify-start gap-1 mt-2">
