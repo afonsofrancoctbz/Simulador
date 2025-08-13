@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search, PlusCircle, X } from "lucide-react"
+import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info } from "lucide-react"
 
 import { CNAE_DATA_RAW as CNAE_DATA } from "@/lib/cnaes-raw"
 import { Badge } from "@/components/ui/badge"
@@ -18,41 +18,35 @@ import {
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs"
 import { Textarea } from "./ui/textarea"
 import { Label } from "./ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Separator } from "./ui/separator"
+import type { CnaeData } from "@/lib/types"
 
-const mainCategories = [
-  "Consultoria",
-  "Desenvolvimento de Software",
-  "Educação",
-  "Administração",
-  "Advocacia",
-  "Engenharia",
-  "Tecnologia",
-  "Serviços Médicos",
-  "Publicidade",
-  "Turismo",
-  "Arquitetura",
-  "Corretagem de Imóveis",
-]
+const categories = [
+  { name: "Busca", icon: Search },
+  { name: "Adicionar em Massa", icon: List },
+  { name: "Tecnologia da Informação", icon: Code },
+  { name: "Saúde e Bem-estar", icon: HeartPulse },
+  { name: "Engenharia, Arquitetura e Design", icon: HardHat },
+  { name: "Publicidade e Marketing", icon: Megaphone },
+  { name: "Consultoria e Gestão Empresarial", icon: Briefcase },
+  { name: "Outras Atividades", icon: Leaf },
+];
 
 const categoryToCnaeMap: Record<string, string[]> = {
-    Consultoria: ["6911-7/01", "6612-6/05", "7020-4/00", "7319-0/04", "6204-0/00", "6920-6/02"],
-    "Desenvolvimento de Software": ["6201-5/01", "6203-1/00", "6202-3/00"],
-    Educação: ["8511-2/00", "8512-1/00", "8513-9/00", "8520-1/00", "8531-7/00", "8532-5/00", "8533-3/00", "8541-4/00", "8542-2/00", "8550-3/02", "8599-6/03", "8599-6/04", "8599-6/99"],
-    Administração: ["8211-3/00", "8219-9/99"],
-    Advocacia: ["6911-7/01"],
-    Engenharia: ["7112-0/00", "7119-7/03", "7119-7/99"],
-    Tecnologia: ["6204-0/00", "6202-3/00", "6209-1/00", "6201-5/01", "6203-1/00", "6201-5/02"],
-    "Serviços Médicos": ["8630-5/03", "8630-5/02", "8610-1/02", "8630-5/01", "8610-1/01"],
-    Publicidade: ["7311-4/00", "7319-0/02", "7319-0/03", "7319-0/04", "7319-0/99"],
-    Turismo: ["7912-1/00", "7911-2/00", "7990-2/00"],
-    Arquitetura: ["7111-1/00", "7119-7/03", "7119-7/99"],
-    "Corretagem de Imóveis": ["6821-8/01", "6821-8/02", "6822-6/00"],
+    "Tecnologia da Informação": ["6201-5/01", "6201-5/02", "6202-3/00", "6203-1/00", "6204-0/00", "6209-1/00", "6311-9/00", "6319-4/00", "6399-2/00"],
+    "Saúde e Bem-estar": ["7500-1/00", "8610-1/01", "8610-1/02", "8621-6/01", "8621-6/02", "8622-4/00", "8630-5/01", "8630-5/02", "8630-5/03", "8630-5/06", "8630-5/07", "8630-5/99", "8640-2/01", "8640-2/02", "8640-2/03", "8640-2/04", "8640-2/05", "8640-2/06", "8640-2/07", "8640-2/08", "8640-2/09", "8640-2/10", "8640-2/11", "8640-2/12", "8640-2/13", "8640-2/14", "8640-2/99", "8650-0/01", "8650-0/02", "8650-0/03", "8650-0/04", "8650-0/05", "8650-0/06", "8650-0/07", "8650-0/99", "8660-7/00", "8690-9/01", "8690-9/02", "8690-9/03", "8690-9/04", "8690-9/99", "8711-5/01", "8711-5/02", "8712-3/00", "3250-7/09"],
+    "Odontologia": ["8630-5/04", "3250-7/06"],
+    "Engenharia, Arquitetura e Design": ["7111-1/00", "7112-0/00", "7119-7/01", "7119-7/02", "7119-7/03", "7119-7/04", "7119-7/99", "7120-1/00", "7410-2/02", "7410-2/03", "7410-2/99"],
+    "Consultoria e Gestão Empresarial": ["7020-4/00", "7210-0/00", "7220-7/00", "7320-3/00", "7490-1/03"],
+    "Publicidade e Marketing": ["7311-4/00", "7312-2/00", "7319-0/01", "7319-0/02", "7319-0/03", "7319-0/04", "7319-0/99", "5911-1/02"],
+    "Educação e Treinamento": ["8511-2/00", "8512-1/00", "8513-9/00", "8520-1/00", "8531-7/00", "8532-5/00", "8533-3/00", "8541-4/00", "8542-2/00", "8550-3/02", "8591-1/00", "8592-9/01", "8592-9/02", "8592-9/03", "8592-9/99", "8593-7/00", "8599-6/01", "8599-6/02", "8599-6/03", "8599-6/04", "8599-6/05", "8599-6/99"],
+    "Outras Atividades": [] // Preenchido dinamicamente
 };
+const allCategorizedCnaes = new Set(Object.values(categoryToCnaeMap).flat());
+categoryToCnaeMap["Outras Atividades"] = CNAE_DATA.filter(c => !allCategorizedCnaes.has(c.code)).map(c => c.code);
 
 const MAX_SELECTION = 20;
 
@@ -68,35 +62,37 @@ function CnaeSelectorComponent({
   initialSelectedCodes?: string[]
 }) {
   const [search, setSearch] = React.useState("")
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(mainCategories[0])
+  const [activeView, setActiveView] = React.useState("Busca")
   const [selectedCodes, setSelectedCodes] = React.useState<string[]>(initialSelectedCodes)
   const [codesToPaste, setCodesToPaste] = React.useState("");
+  const [hoveredCnae, setHoveredCnae] = React.useState<CnaeData | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
     if (open) {
-      setSelectedCodes(initialSelectedCodes)
+      setSelectedCodes(initialSelectedCodes);
+      setActiveView("Busca");
+      setSearch("");
     }
   }, [open, initialSelectedCodes])
 
   const filteredCnaes = React.useMemo(() => {
-    let results = CNAE_DATA
-    const lowercasedSearch = search.toLowerCase().trim()
-    if (lowercasedSearch.length > 1) {
-      results = results.filter(
-        (cnae) =>
-          cnae.code.includes(lowercasedSearch) ||
-          cnae.description.toLowerCase().includes(lowercasedSearch) ||
-          cnae.category?.toLowerCase().includes(lowercasedSearch)
-      )
-    } else if (selectedCategory) {
-      const cnaesForCategory = categoryToCnaeMap[selectedCategory] || []
-      results = results.filter((cnae) => cnaesForCategory.includes(cnae.code))
-    } else {
-      return []
+    if (activeView === "Busca") {
+        const lowercasedSearch = search.toLowerCase().trim()
+        if (lowercasedSearch.length < 2) return [];
+        return CNAE_DATA.filter(
+            (cnae) =>
+            cnae.code.includes(lowercasedSearch) ||
+            cnae.description.toLowerCase().includes(lowercasedSearch) ||
+            cnae.category?.toLowerCase().includes(lowercasedSearch)
+        ).slice(0, 100);
     }
-    return results.slice(0, 100)
-  }, [search, selectedCategory])
+    if (activeView !== "Adicionar em Massa") {
+        const cnaesForCategory = categoryToCnaeMap[activeView] || []
+        return CNAE_DATA.filter((cnae) => cnaesForCategory.includes(cnae.code)).slice(0,100)
+    }
+    return []
+  }, [search, activeView]);
 
   const handleToggleCnae = (code: string) => {
     setSelectedCodes((current) => {
@@ -111,7 +107,7 @@ function CnaeSelectorComponent({
         description: `Você só pode selecionar até ${MAX_SELECTION} atividades.`,
         variant: "destructive",
       });
-      return current; // Limit reached
+      return current;
     });
   }
 
@@ -119,74 +115,40 @@ function CnaeSelectorComponent({
     onConfirm(selectedCodes)
     onOpenChange(false)
   }
-
-  const handleCategoryChange = (category: string) => {
-    setSearch('');
-    setSelectedCategory(category);
-  }
   
   const handleAddPastedCnaes = () => {
     const rawCodes = codesToPaste.match(/(\d{4}-?\d\/?\d{2})|(\d{7})/g) || [];
     
     if (rawCodes.length === 0) {
-      toast({
-        title: "Nenhum CNAE encontrado",
-        description: "O texto informado não contém códigos de CNAE válidos.",
-        variant: "destructive",
-      });
+      toast({ title: "Nenhum CNAE encontrado", description: "O texto informado não contém códigos de CNAE válidos.", variant: "destructive" });
       return;
     }
     
     const allCnaeCodes = CNAE_DATA.map(c => c.code);
-    let addedCount = 0;
-    let invalidCount = 0;
-    let duplicateCount = 0;
-    let limitReached = false;
-    
+    let addedCount = 0, invalidCount = 0, duplicateCount = 0, limitReached = false;
     const newSelected = new Set(selectedCodes);
 
     rawCodes.forEach(rawCode => {
-      if (newSelected.size >= MAX_SELECTION) {
-        limitReached = true;
-        return;
-      }
+      if (newSelected.size >= MAX_SELECTION) { limitReached = true; return; }
       
       const normalizedCode = rawCode.replace(/[^\d]/g, '');
       const formattedCode = `${normalizedCode.slice(0, 4)}-${normalizedCode.slice(4, 5)}/${normalizedCode.slice(5, 7)}`;
       
       if (allCnaeCodes.includes(formattedCode)) {
-        if (newSelected.has(formattedCode)) {
-          duplicateCount++;
-        } else {
-          newSelected.add(formattedCode);
-          addedCount++;
-        }
-      } else {
-        invalidCount++;
-      }
+        if (newSelected.has(formattedCode)) duplicateCount++;
+        else { newSelected.add(formattedCode); addedCount++; }
+      } else invalidCount++;
     });
 
     setSelectedCodes(Array.from(newSelected));
-    
-    toast({
-      title: "Processamento Concluído",
-      description: `${addedCount} CNAEs adicionados. ${invalidCount} inválidos. ${duplicateCount} já estavam na lista.`,
-    });
-
-    if (limitReached) {
-       toast({
-        title: "Limite Atingido",
-        description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`,
-        variant: "destructive",
-      });
-    }
-
+    toast({ title: "Processamento Concluído", description: `${addedCount} CNAEs adicionados. ${invalidCount} inválidos. ${duplicateCount} já estavam na lista.` });
+    if (limitReached) toast({ title: "Limite Atingido", description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`, variant: "destructive" });
     setCodesToPaste("");
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-screen-xl h-[90vh] flex flex-col p-0 gap-0">
         <DialogHeader className="p-6 border-b shrink-0">
           <DialogTitle className="text-2xl font-bold">Selecionar Atividades (CNAE)</DialogTitle>
           <DialogDescription>
@@ -195,51 +157,123 @@ function CnaeSelectorComponent({
         </DialogHeader>
 
         <div className="flex-grow min-h-0 flex">
-            {/* Left Panel */}
-            <div className="w-1/3 min-w-[350px] border-r flex flex-col bg-muted/30">
-                <div className="p-4 space-y-4">
+            {/* Left Panel - Navigation */}
+            <div className="w-1/5 min-w-[220px] border-r flex flex-col bg-muted/30 p-4">
+                <ScrollArea>
                     <div className="space-y-2">
-                        <Label htmlFor="cnae-search">Pesquisar por código ou descrição</Label>
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                            id="cnae-search"
-                            placeholder="Ex: consultoria, 7112-0/00..."
-                            className="pl-9 bg-background"
-                            value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value)
-                                if(selectedCategory) setSelectedCategory(null);
-                            }}
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="cnae-paste">Adicionar CNAEs em massa</Label>
-                        <div className="flex items-start gap-2">
-                            <Textarea
-                                id="cnae-paste"
-                                placeholder="Cole códigos aqui..."
-                                value={codesToPaste}
-                                onChange={(e) => setCodesToPaste(e.target.value)}
-                                rows={2}
-                                className="bg-background"
-                            />
-                            <Button type="button" onClick={handleAddPastedCnaes} disabled={!codesToPaste} className="h-auto py-2 px-3 self-stretch" title="Adicionar CNAEs colados">
-                                <PlusCircle className="h-4 w-4"/>
+                        {categories.map(cat => (
+                            <Button
+                                key={cat.name}
+                                variant={activeView === cat.name ? "secondary" : "ghost"}
+                                className="w-full justify-start text-sm"
+                                onClick={() => setActiveView(cat.name)}
+                            >
+                                <cat.icon className="mr-2 h-4 w-4" />
+                                {cat.name}
                             </Button>
+                        ))}
+                    </div>
+                </ScrollArea>
+            </div>
+
+            {/* Center Panel - List/Inputs */}
+            <div className="w-2/5 border-r flex flex-col">
+                <div className="p-4 border-b shrink-0">
+                    <h3 className="text-lg font-semibold text-foreground">{activeView}</h3>
+                </div>
+                <ScrollArea className="flex-grow">
+                    <div className="p-4 space-y-4">
+                        {activeView === 'Busca' && (
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Buscar por código ou descrição..."
+                                    className="pl-9"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </div>
+                        )}
+                        {activeView === 'Adicionar em Massa' && (
+                            <div className="space-y-2">
+                                <Label htmlFor="cnae-paste">Cole os códigos CNAE aqui</Label>
+                                <Textarea
+                                    id="cnae-paste"
+                                    placeholder="Ex: 7020-4/00, 6201501..."
+                                    value={codesToPaste}
+                                    onChange={(e) => setCodesToPaste(e.target.value)}
+                                    rows={5}
+                                />
+                                <Button onClick={handleAddPastedCnaes} disabled={!codesToPaste}>
+                                    <PlusCircle className="mr-2 h-4 w-4"/> Adicionar CNAEs
+                                </Button>
+                            </div>
+                        )}
+                        
+                        {(activeView !== 'Busca' || search.length >= 2) && (
+                            <div className="space-y-2">
+                                {filteredCnaes.length > 0 ? filteredCnaes.map(cnae => (
+                                    <div
+                                        key={cnae.code}
+                                        onMouseEnter={() => setHoveredCnae(cnae)}
+                                        onMouseLeave={() => setHoveredCnae(null)}
+                                        className={cn("p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between", selectedCodes.includes(cnae.code) && "border-primary ring-1 ring-primary/80")}
+                                    >
+                                        <div className="flex-grow">
+                                            <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
+                                                <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                                                    Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
+                                                </Badge>
+                                                {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
+                                            </div>
+                                        </div>
+                                        <Button size="sm" variant={selectedCodes.includes(cnae.code) ? 'outline' : 'default'} className="ml-4" onClick={() => handleToggleCnae(cnae.code)}>
+                                            {selectedCodes.includes(cnae.code) ? <X className="mr-2 h-4 w-4"/> : <PlusCircle className="mr-2 h-4 w-4"/>}
+                                            {selectedCodes.includes(cnae.code) ? 'Remover' : 'Adicionar'}
+                                        </Button>
+                                    </div>
+                                )) : (
+                                    <div className="text-center text-muted-foreground py-16">
+                                        <p>Nenhum CNAE encontrado.</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </ScrollArea>
+            </div>
+
+            {/* Right Panel - Details & Selection */}
+            <div className="w-2/5 flex flex-col bg-muted/30">
+                {hoveredCnae ? (
+                    <div className="p-4 flex-grow flex flex-col">
+                        <h4 className="font-semibold text-foreground mb-2 shrink-0">Análise de Impacto</h4>
+                        <div className="p-4 border rounded-lg bg-background space-y-3 text-sm">
+                           <h5 className="font-bold">{hoveredCnae.code} - {hoveredCnae.description}</h5>
+                           <p><Badge>Anexo Simples Nacional:</Badge> {hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</p>
+                           <p><Badge>Presunção de Lucro (LP):</Badge> {hoveredCnae.presumedProfitRateIRPJ ? `${hoveredCnae.presumedProfitRateIRPJ * 100}%` : 'N/A'}</p>
+                           {hoveredCnae.notes && <p className="text-xs text-muted-foreground italic flex gap-2"><Info className="h-4 w-4 shrink-0"/>{hoveredCnae.notes}</p>}
                         </div>
                     </div>
-                </div>
-                <Separator />
-                <div className="flex-grow p-4 flex flex-col min-h-0">
+                ) : (
+                    <div className="p-4 flex-grow flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                            <FileSearch className="mx-auto h-12 w-12 opacity-50 mb-4"/>
+                            <p>Passe o mouse sobre uma atividade<br/>para ver a análise de impacto fiscal.</p>
+                        </div>
+                    </div>
+                )}
+                
+                <div className="p-4 border-t shrink-0 h-1/2 flex flex-col">
                     <h4 className="font-semibold text-foreground mb-2 shrink-0">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
                     <ScrollArea className="flex-grow">
                         <div className="space-y-2 pr-4">
                            {selectedCodes.length > 0 ? selectedCodes.map(code => (
                             <div key={code} className="flex items-center justify-between bg-background p-2 rounded-md border">
-                                <span className="text-sm font-medium">{code}</span>
-                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleToggleCnae(code)}>
+                                <span className="text-sm font-medium">{code} - {CNAE_DATA.find(c=>c.code===code)?.description}</span>
+                                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(code)}>
                                     <X className="h-4 w-4 text-destructive"/>
                                 </Button>
                             </div>
@@ -251,67 +285,6 @@ function CnaeSelectorComponent({
                         </div>
                     </ScrollArea>
                 </div>
-                <div className="mt-auto p-4 border-t shrink-0">
-                     <Tabs value={selectedCategory || ''} onValueChange={handleCategoryChange} className="w-full">
-                        <Label>Ou filtre por categoria</Label>
-                        <TabsList className="h-auto flex-wrap justify-start gap-1 mt-2">
-                            {mainCategories.slice(0, 6).map((category) => ( // Show first 6 for brevity
-                                <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </Tabs>
-                </div>
-            </div>
-
-            {/* Right Panel */}
-            <div className="flex-1 flex flex-col">
-                <div className="px-6 py-3 border-b shrink-0 bg-background">
-                    <p className="text-sm text-muted-foreground">
-                        {filteredCnaes.length > 0
-                            ? `Mostrando ${filteredCnaes.length} resultados para sua busca.`
-                            : "Nenhum CNAE encontrado para os filtros atuais."}
-                    </p>
-                </div>
-                <ScrollArea className="flex-grow">
-                     <div className="p-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                        {filteredCnaes.length > 0 ? (
-                        filteredCnaes.map((cnae) => (
-                            <button
-                            key={cnae.code}
-                            className={cn(
-                                "w-full text-left p-3 border rounded-lg cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring relative transition-colors bg-card",
-                                selectedCodes.includes(cnae.code) && "border-primary ring-2 ring-primary/50"
-                            )}
-                            onClick={() => handleToggleCnae(cnae.code)}
-                            >
-                            <div className="flex justify-between items-start">
-                                <p className="font-semibold text-sm pr-6">{cnae.code} - {cnae.description}</p>
-                                {selectedCodes.includes(cnae.code) && (
-                                    <div className="bg-primary text-primary-foreground rounded-full p-0.5">
-                                        <Check className="h-3 w-3" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex flex-wrap gap-2 mt-3">
-                                <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
-                                <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
-                                    Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
-                                </Badge>
-                                {cnae.isRegulated && <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">Regulamentado</Badge>}
-                            </div>
-                            </button>
-                        ))
-                        ) : (
-                        <div className="text-center text-muted-foreground py-16 col-span-full">
-                            <p>
-                            {search.length > 1 || selectedCategory
-                                ? "Nenhum CNAE encontrado com os filtros atuais."
-                                : "Busque por um termo ou selecione uma categoria para ver os CNAEs."}
-                            </p>
-                        </div>
-                        )}
-                    </div>
-                </ScrollArea>
             </div>
         </div>
 
