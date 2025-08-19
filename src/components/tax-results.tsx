@@ -153,14 +153,14 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
   return (
     <div id="results-section" className="mt-16 w-full space-y-12">
       <div>
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 print-hidden">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
           <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
             Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
           </p>
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8 results-grid">
           {scenariosToShow.map((scenario) => {
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
 
@@ -196,13 +196,13 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 onClick={() => setSelectedDetails(scenario)}
                 className={cn(
-                  "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer",
+                  "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer printable-card",
                   isRecommended ? "border-primary shadow-lg" : "border-border bg-card",
                   isSelected && !isRecommended && "ring-2 ring-primary"
                 )}
               >
                   {isRecommended && (
-                   <Badge className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10" variant="default" >
+                   <Badge className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 print-hidden" variant="default" >
                       Recomendado
                   </Badge>
                   )}
@@ -320,7 +320,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                               <div className="text-2xl font-bold text-primary">
                                   {formatCurrencyBRL(scenario.totalMonthlyCost)}
                               </div>
-                              <div className="w-full bg-muted rounded-full h-2 mt-1 overflow-hidden">
+                              <div className="w-full bg-muted rounded-full h-2 mt-1 overflow-hidden print-hidden">
                                   <div className="bg-gradient-to-r from-green-300 via-primary to-blue-800 h-2.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
                               </div>
                               <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
@@ -333,10 +333,14 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
         </div>
       </div>
 
-      <Separator className="my-16" />
-      <PartnerDetailsCard details={selectedDetails} />
-      <Separator className="my-16" />
-      <ProfitStatementCard details={selectedDetails} />
+      <Separator className="my-16 separator-print" />
+      <div className="details-card">
+        <PartnerDetailsCard details={selectedDetails} />
+      </div>
+      <Separator className="my-16 separator-print" />
+      <div className="profit-card">
+        <ProfitStatementCard details={selectedDetails} />
+      </div>
 
     </div>
   );

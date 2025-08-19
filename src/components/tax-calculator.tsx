@@ -52,35 +52,39 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   }, [results, error, onResultsChange]);
 
   return (
-    <FormProvider {...form}>
-      <TaxCalculatorForm
-        year={year}
-        onSubmit={onSubmit}
-        isLoading={isLoading}
-      />
+    <div className='printable-section'>
+        <div className="print-hidden">
+            <FormProvider {...form}>
+            <TaxCalculatorForm
+                year={year}
+                onSubmit={onSubmit}
+                isLoading={isLoading}
+            />
 
-      <div className="mt-12">
-        <CityInfoRenderer city={selectedCity} />
-      </div>
+            <div className="mt-12">
+                <CityInfoRenderer city={selectedCity} />
+            </div>
 
-      {hasHealthOrVetCnae && (
-        <div className="mt-12">
-          <HealthInfoSection />
+            {hasHealthOrVetCnae && (
+                <div className="mt-12">
+                <HealthInfoSection />
+                </div>
+            )}
+
+            {hasOdontologyCnae && (
+                <div className="mt-12">
+                <OdontologyInfoSection />
+                </div>
+            )}
+            </FormProvider>
         </div>
-      )}
 
-      {hasOdontologyCnae && (
-        <div className="mt-12">
-          <OdontologyInfoSection />
-        </div>
-      )}
-
-      <TaxResults
-        year={year}
-        isLoading={isLoading}
-        results={results}
-        error={error}
-      />
-    </FormProvider>
+        <TaxResults
+            year={year}
+            isLoading={isLoading}
+            results={results}
+            error={error}
+        />
+    </div>
   );
 }

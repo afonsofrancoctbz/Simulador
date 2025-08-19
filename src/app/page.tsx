@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <>
       <AppHeader />
-      <main>
+      <main className="print-hidden">
         <section className="bg-slate-50/70 border-b">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center">
               <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
