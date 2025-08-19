@@ -43,7 +43,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   }, [selectedCnaes]);
   
   useEffect(() => {
-    const hasExportRevenue = Object.keys(revenues).some(key => key.startsWith('export_') && revenues[key] > 0);
+    const hasExportRevenue = Object.keys(revenues).some(key => key.startsWith('export_') && (revenues[key] ?? 0) > 0);
     onExportRevenueChange(hasExportRevenue);
   }, [revenues, onExportRevenueChange]);
 
@@ -79,12 +79,14 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
             </FormProvider>
         </div>
 
-        <TaxResults
-            year={year}
-            isLoading={isLoading}
-            results={results}
-            error={error}
-        />
+        <div className='mt-8'>
+             <TaxResults
+                year={year}
+                isLoading={isLoading}
+                results={results}
+                error={error}
+            />
+        </div>
     </div>
   );
 }
