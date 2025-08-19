@@ -214,7 +214,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${'${a}'}`).join(', ') || "N/A";
+    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
     
     const breakdown = [
         { name: `DAS (${(totalRevenue > 0 ? totalDas / totalRevenue : 0) * 100}%)`, value: totalDas },

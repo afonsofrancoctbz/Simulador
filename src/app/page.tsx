@@ -33,28 +33,30 @@ export default function Home() {
                   </p>
                 </div>
             </section>
-            <Tabs defaultValue="2025" className="w-full">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-                <div className="w-full flex justify-center">
-                    <TabsList className="mb-8 w-full flex-wrap h-auto">
-                        <TabsTrigger value="2025" className='flex-1'>Cenário Atual (2025)</TabsTrigger>
-                        <TabsTrigger value="2026" className='flex-1'>Reforma Tributária (Simulação 2026)</TabsTrigger>
-                    </TabsList>
-                </div>
-                <TabsContent value="2025">
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <TaxCalculator key="2025" year={2025} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults}/>
-                    </div>
-                </TabsContent>
-                <TabsContent value="2026">
-                    <TaxReformInfoSection />
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-                        <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
-                    </div>
-                </TabsContent>
-              </div>
-            </Tabs>
         </div>
+        <Tabs defaultValue="2025" className="w-full">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
+            <div className="w-full flex justify-center">
+                <TabsList className="mb-8 w-full flex-wrap h-auto">
+                    <TabsTrigger value="2025" className='flex-1'>Cenário Atual (2025)</TabsTrigger>
+                    <TabsTrigger value="2026" className='flex-1'>Reforma Tributária (Simulação 2026)</TabsTrigger>
+                </TabsList>
+            </div>
+          </div>
+            <TabsContent value="2025">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <TaxCalculator key="2025" year={2025} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults}/>
+                </div>
+            </TabsContent>
+            <TabsContent value="2026">
+                <div className="print-hidden">
+                  <TaxReformInfoSection />
+                </div>
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+                    <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
+                </div>
+            </TabsContent>
+        </Tabs>
         
         {showExportInfo && (
            <section className="py-16 lg:py-24 bg-background print-hidden">
