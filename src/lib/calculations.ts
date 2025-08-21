@@ -94,7 +94,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Impostos sobre Faturamento
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    const issValue = (values.issRate ?? config.lucro_presumido_rates.ISS * 100) / 100;
+    const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
     const iss = domesticRevenue * issValue;
 
     // Presunção sobre a receita total
@@ -123,7 +123,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         breakdown: [
           { name: 'PIS', value: pis },
           { name: 'COFINS', value: cofins },
-          { name: `ISS (${(issValue * 100).toFixed(2)}%)`, value: iss },
+          { name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss },
           { name: 'IRPJ', value: irpj },
           { name: 'CSLL', value: csll },
           { name: 'CPP (INSS Patronal)', value: cpp },
@@ -214,7 +214,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
-    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ') || "N/A";
+    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
     
     const breakdown = [
         { name: `DAS (${(totalRevenue > 0 ? totalDas / totalRevenue : 0) * 100}%)`, value: totalDas },
@@ -240,7 +240,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     };
     
     if (proLaboreOverride) {
-        finalResult.optimizationNote = `Pró-labore ajustado para R$ ${'${totalProLaboreBruto.toFixed(2)}'} para atingir o Fator R e tributar pelo Anexo III.`;
+        finalResult.optimizationNote = `Pró-labore ajustado para R$ ${totalProLaboreBruto.toFixed(2)} para atingir o Fator R e tributar pelo Anexo III.`;
     }
 
     return finalResult;
