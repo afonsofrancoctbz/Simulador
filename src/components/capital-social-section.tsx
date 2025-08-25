@@ -23,7 +23,7 @@ export default function CapitalSocialSection() {
         {/* Right Column: Steps */}
         <div className="lg:col-span-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 items-start relative">
-                {/* Timeline Line - This will be tricky to place perfectly with grid, absolute positioning is better */}
+                {/* Timeline Line */}
                 <div className="absolute top-8 left-1/2 w-2/3 h-0.5 bg-border -translate-x-1/2 hidden md:block" aria-hidden="true" />
                 
                 {/* Step 1: Definição do valor */}
