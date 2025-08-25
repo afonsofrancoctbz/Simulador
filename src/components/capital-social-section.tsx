@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SearchDollar, CalendarDays, AlertTriangle } from "lucide-react";
+import { Search, CalendarDays, AlertTriangle } from "lucide-react";
 
 export default function CapitalSocialSection() {
   return (
@@ -28,7 +28,7 @@ export default function CapitalSocialSection() {
                 <div className="flex flex-col items-center text-center relative z-10">
                     <div className="relative mb-4">
                         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                            <SearchDollar className="w-8 h-8 text-primary" />
+                            <Search className="w-8 h-8 text-primary" />
                         </div>
                     </div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Definição do valor</h3>
