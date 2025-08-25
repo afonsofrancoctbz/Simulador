@@ -15,6 +15,7 @@ import TaxReformInfoSection from '@/components/tax-reform-info-section';
 import RocSection from '@/components/roc-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportTaxInfoSection from '@/components/export-tax-info-section';
+import CapitalSocialSection from '@/components/capital-social-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -37,7 +38,7 @@ export default function Home() {
         <Tabs defaultValue="2025" className="w-full">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
             <div className="w-full flex justify-center">
-                <TabsList className="mb-8 w-full flex-wrap h-auto">
+                <TabsList className="mb-8 w-full flex-wrap h-auto flex">
                     <TabsTrigger value="2025" className='flex-1'>Cenário Atual (2025)</TabsTrigger>
                     <TabsTrigger value="2026" className='flex-1'>Reforma Tributária (Simulação 2026)</TabsTrigger>
                 </TabsList>
@@ -57,6 +58,8 @@ export default function Home() {
                 </div>
             </TabsContent>
         </Tabs>
+        
+        <div id="results-print-only" className='hidden print:block'></div>
         
         {showExportInfo && (
            <section className="py-16 lg:py-24 bg-background print-hidden">
@@ -84,20 +87,26 @@ export default function Home() {
                 <PjAccountSection />
               </div>
             </section>
-
+            
             <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <BenefitsSection />
+                <CapitalSocialSection />
               </div>
             </section>
 
             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <BenefitsSection />
+              </div>
+            </section>
+
+            <section className="py-16 lg:py-24 bg-background">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <MultibenefitsSection />
               </div>
             </section>
 
-             <section className="py-16 lg:py-24 bg-background">
+             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <FaqSection />
               </div>
