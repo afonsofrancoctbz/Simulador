@@ -1,7 +1,5 @@
 
-
 import { z } from "zod";
-import { formatCurrencyBRL } from "./utils";
 
 // This constant is now defined here to break a circular dependency.
 export const MINIMUM_WAGE = 1518.00;
@@ -16,9 +14,7 @@ export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
 // Schema for an individual pro-labore input from the form
 export const ProLaboreFormSchema = z.object({
-  value: z.coerce.number().min(0, "O valor deve ser positivo.").refine(val => val === 0 || val >= MINIMUM_WAGE, {
-    message: `O pró-labore não pode ser inferior a ${'${formatCurrencyBRL(MINIMUM_WAGE)}'}.`,
-  }),
+  value: z.coerce.number().min(0, "O valor deve ser positivo."),
   hasOtherInssContribution: z.boolean().default(false),
   otherContributionSalary: z.coerce.number().min(0, "O valor deve ser positivo.").optional(),
 }).superRefine((data, ctx) => {

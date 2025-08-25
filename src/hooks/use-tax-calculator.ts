@@ -10,6 +10,7 @@ import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
+import { MINIMUM_WAGE } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
 
 export function useTaxCalculator(year: 2025 | 2026) {
@@ -32,7 +33,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
             exportCurrency: 'BRL',
             exchangeRate: 1,
             totalSalaryExpense: 0,
-            proLabores: [{ value: fiscalConfig.salario_minimo, hasOtherInssContribution: false, otherContributionSalary: 0 }],
+            proLabores: [{ value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 }],
             numberOfPartners: 1,
             b2bRevenuePercentage: 50,
             selectedPlan: 'expertsEssencial',
