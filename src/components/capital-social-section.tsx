@@ -21,39 +21,39 @@ export default function CapitalSocialSection() {
         </div>
 
         {/* Right Column: Steps */}
-        <div className="lg:col-span-2 space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 items-start relative">
-             {/* Timeline Line */}
-            <div className="absolute top-8 left-1/2 w-2/3 h-0.5 bg-border -translate-x-1/2 hidden md:block" aria-hidden="true" />
-
-            {/* Step 1: Definição do valor */}
-            <div className="flex flex-col items-center text-center relative z-10">
-                <div className="relative mb-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                        <SearchDollar className="w-8 h-8 text-primary" />
+        <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 items-start relative">
+                {/* Timeline Line - This will be tricky to place perfectly with grid, absolute positioning is better */}
+                <div className="absolute top-8 left-1/2 w-2/3 h-0.5 bg-border -translate-x-1/2 hidden md:block" aria-hidden="true" />
+                
+                {/* Step 1: Definição do valor */}
+                <div className="flex flex-col items-center text-center relative z-10">
+                    <div className="relative mb-4">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                            <SearchDollar className="w-8 h-8 text-primary" />
+                        </div>
+                        <div className="absolute top-full mt-1 w-3 h-3 bg-primary rounded-full left-1/2 -translate-x-1/2 border-2 border-background" />
                     </div>
-                    <div className="absolute top-full mt-1 w-3 h-3 bg-primary rounded-full left-1/2 -translate-x-1/2 border-2 border-background" />
+                    <h3 className="text-xl font-bold text-foreground mb-2">Definição do valor</h3>
+                    <p className="text-muted-foreground text-base max-w-sm">
+                        A indicação é que se registre, no mínimo, R$ 1.000,00 (quantia válida para as modalidades Empresário Individual e Sociedade Limitada) e o valor pode ser alterado posteriormente.
+                    </p>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Definição do valor</h3>
-                <p className="text-muted-foreground text-base max-w-sm">
-                    A indicação é que se registre, no mínimo, R$ 1.000,00 (quantia válida para as modalidades Empresário Individual e Sociedade Limitada) e o valor pode ser alterado posteriormente.
-                </p>
-            </div>
 
-            {/* Step 2: Como usar? */}
-             <div className="flex flex-col items-center text-center relative z-10">
-                <div className="relative mb-4">
-                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                        <CalendarDays className="w-8 h-8 text-primary" />
+                {/* Step 2: Como usar? */}
+                <div className="flex flex-col items-center text-center relative z-10">
+                    <div className="relative mb-4">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                            <CalendarDays className="w-8 h-8 text-primary" />
+                        </div>
+                        <div className="absolute top-full mt-1 w-3 h-3 bg-primary rounded-full left-1/2 -translate-x-1/2 border-2 border-background" />
                     </div>
-                     <div className="absolute top-full mt-1 w-3 h-3 bg-primary rounded-full left-1/2 -translate-x-1/2 border-2 border-background" />
+                    <h3 className="text-xl font-bold text-foreground mb-2">Como usar?</h3>
+                    <p className="text-muted-foreground text-base max-w-sm">
+                        O valor do capital social pode ser utilizado para arcar com as despesas da sua empresa, como impostos e mensalidades da Contabilizei. Ao acabar, não há obrigatoriedade de reposição deste valor.
+                    </p>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Como usar?</h3>
-                <p className="text-muted-foreground text-base max-w-sm">
-                     O valor do capital social pode ser utilizado para arcar com as despesas da sua empresa, como impostos e mensalidades da Contabilizei. Ao acabar, não há obrigatoriedade de reposição deste valor.
-                </p>
             </div>
-          </div>
         </div>
       </div>
 
