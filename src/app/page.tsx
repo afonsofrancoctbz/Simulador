@@ -38,7 +38,7 @@ export default function Home() {
         <Tabs defaultValue="2025" className="w-full">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
             <div className="w-full flex justify-center">
-                <TabsList className="mb-8 w-full flex-wrap h-auto flex">
+                <TabsList className="mb-8 w-full flex">
                     <TabsTrigger value="2025" className='flex-1'>Cenário Atual (2025)</TabsTrigger>
                     <TabsTrigger value="2026" className='flex-1'>Reforma Tributária (Simulação 2026)</TabsTrigger>
                 </TabsList>
@@ -82,7 +82,7 @@ export default function Home() {
               </div>
             </section>
 
-            <section className="pb-16 lg:pb-24 bg-slate-50/70">
+            <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <PjAccountSection />
               </div>
