@@ -1,9 +1,4 @@
-
 import { z } from "zod";
-
-// This constant is now defined here to break a circular dependency.
-export const MINIMUM_WAGE = 1518.00;
-
 
 // Schema for an individual CNAE item
 export const CnaeItemSchema = z.object({
@@ -139,5 +134,3 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
-
-    

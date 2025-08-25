@@ -6,6 +6,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const MINIMUM_WAGE = 1518.00;
+
 export const formatCurrencyBRL = (value: number) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);

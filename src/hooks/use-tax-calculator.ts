@@ -10,7 +10,7 @@ import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
-import { MINIMUM_WAGE } from '@/lib/types';
+import { MINIMUM_WAGE } from '@/lib/utils';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
 
 export function useTaxCalculator(year: 2025 | 2026) {
