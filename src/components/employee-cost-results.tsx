@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
 import { formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import type { EmployeeCostResult } from "@/lib/employee-cost-calculations";
-import { PiggyBank, HandCoins, Landmark, FileText, BadgePercent } from 'lucide-react';
+import { PiggyBank, HandCoins, Landmark, FileText, BadgePercent, Gift } from 'lucide-react';
 import { Separator } from './ui/separator';
 
 const CustomTooltip = ({ active, payload, label }: any) => {  
@@ -14,7 +14,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div className="p-2 bg-background border rounded-lg shadow-lg">
           <p className="font-bold text-lg">{label}</p>
           {payload.map((entry: any, index: number) => (
-             <p key={`item-${index}`} style={{ color: entry.color }}>
+             <p key={`item-${index}`} style={{ color: entry.fill }}>
                 {`${entry.name}: ${formatCurrencyBRL(entry.value)}`}
             </p>
           ))}
@@ -96,8 +96,10 @@ export default function EmployeeCostResults({ results }: { results: EmployeeCost
                                     <XAxis type="number" tickFormatter={(value) => formatCurrencyBRL(value)} />
                                     <YAxis type="category" dataKey="name" width={100} tick={{fontSize: 12}} />
                                     <Tooltip content={<CustomTooltip />} cursor={{fill: 'hsl(var(--muted))'}}/>
-                                    <Bar dataKey="value" name="Custo">
-                                        <LabelList dataKey="value" position="right" formatter={(value: number) => formatCurrencyBRL(value)} className="font-semibold" />
+                                    <Bar dataKey="value" name="Custo" barSize={40}>
+                                        {chartData.map((entry, index) => (
+                                            <LabelList key={`label-${index}`} dataKey="value" position="right" formatter={(value: number) => formatCurrencyBRL(value)} className="font-semibold" />
+                                        ))}
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
