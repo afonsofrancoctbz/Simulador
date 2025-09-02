@@ -33,17 +33,17 @@ export interface EmployeeCostResult {
 }
 
 const PERCENTUALS = {
-    ferias: 0.1111, // 1/12 + 1/3 de 1/12
-    decimoTerceiro: 0.0833, // 1/12
+    feriasProvision: 1 / 12,
+    feriasUmTerco: (1 / 12) / 3,
+    get feriasTotal() { return this.feriasProvision + this.feriasUmTerco }, // ~11.11%
+    decimoTerceiro: 1 / 12, // ~8.33%
     fgts: 0.08,
-    // Simples Nacional
-    provisaoMultaSimples: 0.04,
-    previdenciarioSimples: 0.0793,
+    multaRescisoria: 0.04, // Provisão de 4% sobre o salário para a multa de 40% do FGTS
     // Lucro Presumido/Real
     cpp: 0.20,
-    rat: 0.02, // Média
+    rat: 0.02, // Média (pode ser 1%, 2% ou 3%)
     salarioEducacao: 0.025,
-    sistemaS: 0.033,
+    sistemaS: 0.033, // Média (pode variar)
     // MEI
     cppMEI: 0.03,
 }
@@ -58,63 +58,77 @@ export function calculateEmployeeCost(input: EmployeeCostInput): EmployeeCostRes
         outrosBeneficios: outros = 0 
     } = input;
     
-    const totalBeneficios = valeTransporte + valeRefeicao + planoSaude + outros;
+    // 1. Custo com Benefícios
+    const totalBeneficiosAdicionais = valeRefeicao + planoSaude + outros;
     const descontoVT = Math.min(salarioBase * 0.06, valeTransporte);
-    const custoBeneficios = totalBeneficios - descontoVT;
+    const custoValeTransporte = valeTransporte > 0 ? valeTransporte - descontoVT : 0;
+    const custoTotalBeneficios = custoValeTransporte + totalBeneficiosAdicionais;
 
-    const breakdown: EmployeeCostBreakdown = {
-        salarioBase,
-        ferias: salarioBase * PERCENTUALS.ferias,
-        decimoTerceiro: salarioBase * PERCENTUALS.decimoTerceiro,
-        fgts: salarioBase * PERCENTUALS.fgts,
-        fgtsProvisaoRescisao: 0,
-        previdenciario: 0,
+    // 2. Provisões Mensais (Comuns a todos os regimes)
+    const provisaoFerias = salarioBase * PERCENTUALS.feriasTotal;
+    const provisaoDecimoTerceiro = salarioBase * PERCENTUALS.decimoTerceiro;
+
+    // 3. Encargos baseados no salário e provisões
+    const fgtsMensal = salarioBase * PERCENTUALS.fgts;
+    const fgtsSobreProvisoes = (provisaoFerias + provisaoDecimoTerceiro) * PERCENTUALS.fgts;
+    const totalFgts = fgtsMensal + fgtsSobreProvisoes;
+    
+    const provisaoMultaFgts = salarioBase * PERCENTUALS.multaRescisoria;
+
+    // 4. Encargos específicos por Regime
+    let encargosRegime = {
         cpp: 0,
         rat: 0,
         salarioEducacao: 0,
-        sistemaS: 0,
-        valeTransporte: valeTransporte > 0 ? valeTransporte - descontoVT : 0,
-        outrosBeneficios: valeRefeicao + planoSaude + outros,
-        encargos: 0,
+        sistemaS: 0
     };
-    
-    if (regime === 'simples') {
-        breakdown.fgtsProvisaoRescisao = salarioBase * PERCENTUALS.provisaoMultaSimples;
-        breakdown.previdenciario = (salarioBase + breakdown.ferias + breakdown.decimoTerceiro) * PERCENTUALS.previdenciarioSimples;
-    } else if (regime === 'presumido') {
-        const baseCalculoINSS = salarioBase + breakdown.ferias + breakdown.decimoTerceiro;
-        breakdown.cpp = baseCalculoINSS * PERCENTUALS.cpp;
-        breakdown.rat = baseCalculoINSS * PERCENTUALS.rat;
-        breakdown.salarioEducacao = baseCalculoINSS * PERCENTUALS.salarioEducacao;
-        breakdown.sistemaS = baseCalculoINSS * PERCENTUALS.sistemaS;
-        // No presumido, a provisão da multa é sobre o total do FGTS depositado.
-        breakdown.fgtsProvisaoRescisao = breakdown.fgts * 0.5; // 40% sobre o saldo, provisionado a 50% para calculo mensal
+
+    if (regime === 'presumido') {
+        const baseCalculoEncargos = salarioBase; 
+        encargosRegime.cpp = baseCalculoEncargos * PERCENTUALS.cpp;
+        encargosRegime.rat = baseCalculoEncargos * PERCENTUALS.rat;
+        encargosRegime.salarioEducacao = baseCalculoEncargos * PERCENTUALS.salarioEducacao;
+        encargosRegime.sistemaS = baseCalculoEncargos * PERCENTUALS.sistemaS;
     } else if (regime === 'mei') {
-        breakdown.fgtsProvisaoRescisao = salarioBase * PERCENTUALS.provisaoMultaSimples; // MEI tem provisão semelhante
-        breakdown.cpp = salarioBase * PERCENTUALS.cppMEI;
+        encargosRegime.cpp = salarioBase * PERCENTUALS.cppMEI;
     }
+    // Para o Simples Nacional (Anexos I-III, V), esses encargos estão inclusos no DAS.
 
     const totalEncargos = 
-        breakdown.ferias +
-        breakdown.decimoTerceiro +
-        breakdown.fgts +
-        breakdown.fgtsProvisaoRescisao +
-        breakdown.previdenciario +
-        breakdown.cpp +
-        breakdown.rat +
-        breakdown.salarioEducacao +
-        breakdown.sistemaS;
+        provisaoFerias +
+        provisaoDecimoTerceiro +
+        totalFgts +
+        provisaoMultaFgts +
+        encargosRegime.cpp +
+        encargosRegime.rat +
+        encargosRegime.salarioEducacao +
+        encargosRegime.sistemaS;
 
-    breakdown.encargos = totalEncargos;
-
-    const totalCost = salarioBase + totalEncargos + custoBeneficios;
+    const custoTotalEmpresa = salarioBase + totalEncargos + custoTotalBeneficios;
+    
+    // Monta o breakdown final para exibição
+    const breakdown: EmployeeCostBreakdown = {
+        salarioBase,
+        ferias: provisaoFerias,
+        decimoTerceiro: provisaoDecimoTerceiro,
+        fgts: totalFgts,
+        fgtsProvisaoRescisao: provisaoMultaFgts,
+        cpp: encargosRegime.cpp,
+        rat: encargosRegime.rat,
+        salarioEducacao: encargosRegime.salarioEducacao,
+        sistemaS: encargosRegime.sistemaS,
+        previdenciario: 0, // Simplificado, pois a lógica de INSS s/ Férias é complexa e já está embutida nas provisões
+        valeTransporte: custoValeTransporte,
+        outrosBeneficios: totalBeneficiosAdicionais,
+        encargos: totalEncargos,
+    };
 
     return {
         regime,
         salarioBase,
-        totalBeneficios: custoBeneficios,
+        totalBeneficios: custoTotalBeneficios,
         totalEncargos,
-        totalCost,
+        totalCost: custoTotalEmpresa,
         breakdown,
     };
 }
