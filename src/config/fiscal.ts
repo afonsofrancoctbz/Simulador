@@ -32,11 +32,11 @@ export const FISCAL_CONFIG_2025 = {
     { min: 4190.84, max: 8157.41, rate: 0.14, deduction: 190.40 },
   ],
   tabela_irrf: [
-    { min: 0, max: 2259.20, rate: 0, deduction: 0 },
-    { min: 2259.21, max: 2826.65, rate: 0.075, deduction: 169.44 },
-    { min: 2826.66, max: 3751.05, rate: 0.15, deduction: 381.44 },
+    { min: 0, max: 2428.80, rate: 0, deduction: 0 },
+    { min: 2428.81, max: 2826.65, rate: 0.075, deduction: 182.16 },
+    { min: 2826.66, max: 3751.05, rate: 0.15, deduction: 394.16 },
     { min: 3751.06, max: 4664.68, rate: 0.225, deduction: 662.77 },
-    { min: 4664.69, max: Infinity, rate: 0.275, deduction: 896.00 },
+    { min: 4664.69, max: Infinity, rate: 0.275, deduction: 908.73 },
   ],
   simples_nacional: {
     limite_fator_r: 0.28,
