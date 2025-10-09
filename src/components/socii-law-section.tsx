@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -10,7 +11,7 @@ import { Scale, ShieldCheck, Calendar, Clock, BadgePercent, ArrowRight } from 'l
 
 const partnershipInfo = {
     title: "Informações da Parceria",
-    logoUrl: "https://www.contabilizei.com.br/wp-content/uploads/2023/11/sociilaw-contabilizei.png",
+    logoUrl: "https://www.contabilizei.com.br/wp-content/uploads/2023/11/logo-sociilaw-e-c.png",
     logoAlt: "SociiLaw e Contabilizei Parceria",
     services: {
         trademark: {
