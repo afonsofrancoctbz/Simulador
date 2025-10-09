@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle } from "lucide-react"
+import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle, Stethoscope, DraftingCompass, Building, Handshake, Clapperboard, ShoppingCart, Utensils, VenetianMask } from "lucide-react"
 
 import { CNAE_DATA_RAW as CNAE_DATA } from "@/lib/cnaes-raw"
 import { Badge } from "@/components/ui/badge"
@@ -25,27 +25,27 @@ import { Separator } from "./ui/separator"
 import type { CnaeData } from "@/lib/types"
 
 const categories = [
-  { name: "Busca", icon: Search },
-  { name: "Tecnologia da Informação", icon: Code },
-  { name: "Saúde e Bem-estar", icon: HeartPulse },
-  { name: "Engenharia, Arquitetura e Design", icon: HardHat },
-  { name: "Publicidade e Marketing", icon: Megaphone },
-  { name: "Consultoria e Gestão Empresarial", icon: Briefcase },
-  { name: "Outras Atividades", icon: Leaf },
+  { name: "Busca", icon: Search, cnaeCodes: [] },
+  { name: "Tecnologia da Informação", icon: Code, cnaeCodes: ["6201-5/01", "6201-5/02", "6202-3/00", "6203-1/00", "6204-0/00", "6209-1/00", "6311-9/00", "6319-4/00", "6399-2/00", "4751-2/02"] },
+  { name: "Saúde e Bem-estar", icon: HeartPulse, cnaeCodes: ["8610-1/01", "8610-1/02", "8621-6/01", "8621-6/02", "8622-4/00", "8630-5/01", "8630-5/02", "8630-5/03", "8630-5/06", "8630-5/07", "8630-5/99", "8640-2/01", "8640-2/02", "8640-2/03", "8640-2/04", "8640-2/05", "8640-2/06", "8640-2/07", "8640-2/08", "8640-2/09", "8640-2/10", "8640-2/11", "8640-2/12", "8640-2/13", "8640-2/14", "8640-2/99", "8650-0/01", "8650-0/02", "8650-0/03", "8650-0/04", "8650-0/05", "8650-0/06", "8650-0/07", "8650-0/99", "8660-7/00", "8690-9/01", "8690-9/02", "8690-9/03", "8690-9/04", "8690-9/99", "8711-5/01", "8711-5/02", "8712-3/00", "3250-7/09"] },
+  { name: "Odontologia", icon: Stethoscope, cnaeCodes: ["8630-5/04", "3250-7/06"] },
+  { name: "Engenharia, Arquitetura e Design", icon: DraftingCompass, cnaeCodes: ["7111-1/00", "7112-0/00", "7119-7/01", "7119-7/02", "7119-7/03", "7119-7/04", "7119-7/99", "7120-1/00", "7410-2/02", "7410-2/03", "7410-2/99"] },
+  { name: "Consultoria e Gestão Empresarial", icon: Briefcase, cnaeCodes: ["7020-4/00", "7210-0/00", "7220-7/00", "7320-3/00", "7490-1/03"] },
+  { name: "Publicidade e Marketing", icon: Megaphone, cnaeCodes: ["7311-4/00", "7312-2/00", "7319-0/01", "7319-0/02", "7319-0/03", "7319-0/04", "7319-0/99", "5911-1/02"] },
+  { name: "Educação e Treinamento", icon: FileSearch, cnaeCodes: ["8511-2/00", "8512-1/00", "8513-9/00", "8520-1/00", "8531-7/00", "8532-5/00", "8533-3/00", "8541-4/00", "8542-2/00", "8550-3/02", "8591-1/00", "8592-9/01", "8592-9/02", "8592-9/03", "8592-9/99", "8593-7/00", "8599-6/01", "8599-6/02", "8599-6/03", "8599-6/04", "8599-6/05", "8599-6/99"] },
+  { name: "Construção Civil", icon: HardHat, cnaeCodes: ["4399-1/01", "4211-1/02", "4221-9/03", "4221-9/05", "4313-4/00", "4321-5/00", "4322-3/01", "4322-3/02", "4322-3/03", "4329-1/01", "4329-1/02", "4329-1/03", "4329-1/04", "4329-1/05", "4399-1/02", "8121-4/00", "8122-2/00", "8129-0/00", "8130-3/00"] },
+  { name: "Representação Comercial", icon: Handshake, cnaeCodes: ["4512-9/01", "4530-7/06", "4542-1/01", "4611-7/00", "4612-5/00", "4613-3/00", "4614-1/00", "4615-0/00", "4616-8/00", "4617-6/00", "4618-4/01", "4618-4/02", "4618-4/03", "4618-4/99", "4619-2/00"] },
+  { name: "Serviços Administrativos e de Apoio", icon: Building, cnaeCodes: ["8211-3/00", "8219-9/01", "8219-9/99", "8220-2/00", "8291-1/00", "8299-7/01", "8299-7/03", "8299-7/07", "8299-7/99"] },
+  { name: "Atividades artísticas, criativas e de espetáculos", icon: VenetianMask, cnaeCodes: ["9001-9/01", "9001-9/02", "9001-9/03", "9001-9/04", "9001-9/05", "9001-9/06", "9001-9/99"] },
+  { name: "Fotografia e Audiovisual", icon: Clapperboard, cnaeCodes: ["7420-0/01", "7420-0/02", "7420-0/03", "7420-0/04", "7420-0/05", "5911-1/99", "5912-0/01", "5912-0/02", "5912-0/99", "5913-8/00", "5914-6/00", "5920-1/00", "5911-1/01"] },
+  { name: "Comércio Varejista", icon: ShoppingCart, cnaeCodes: ["4511-1/01", "4530-7/03", "4530-7/04", "4530-7/05", "4541-2/03", "4541-2/04", "4541-2/06", "4541-2/07", "4711-3/01", "4711-3/02", "4712-1/00", "4713-0/02", "4713-0/04", "4729-6/01", "4722-9/02", "4729-6/02", "4741-5/00", "4742-3/00", "4743-1/00", "4744-0/01", "4744-0/02", "4744-0/03", "4744-0/04", "4744-0/05", "4744-0/06", "4744-0/99", "4751-2/01", "4752-1/00", "4753-9/00", "4754-7/01", "4754-7/02", "4754-7/03", "4755-5/01", "4755-5/02", "4755-5/03", "4756-3/00", "4757-1/00", "4759-8/01", "4759-8/99", "4761-0/01", "4761-0/02", "4761-0/03", "4762-8/00", "4763-6/01", "4763-6/02", "4763-6/03", "4763-6/04", "4763-6/05", "4771-7/04", "4772-5/00", "4773-3/00", "4774-1/00", "4781-4/00", "4782-2/01", "4782-2/02", "4783-1/02", "4785-7/01", "4785-7/99", "4789-0/01", "4789-0/02", "4789-0/03", "4789-0/05", "4789-0/06", "4789-0/07", "4789-0/08", "4789-0/09", "4789-0/99"] },
+  { name: "Hospedagem e Alimentação", icon: Utensils, cnaeCodes: ["5510-8/01", "5510-8/02", "5510-8/03", "5590-6/01", "5590-6/02", "5590-6/03", "5590-6/99", "5611-2/01", "5611-2/03", "5611-2/04", "5620-1/01", "5620-1/02", "5620-1/03", "5620-1/04", "4721-1/02", "4721-1/03", "4721-1/04", "4723-7/00", "4724-5/00", "4729-6/99"] },
 ];
 
-const categoryToCnaeMap: Record<string, string[]> = {
-    "Tecnologia da Informação": ["6201-5/01", "6201-5/02", "6202-3/00", "6203-1/00", "6204-0/00", "6209-1/00", "6311-9/00", "6319-4/00", "6399-2/00"],
-    "Saúde e Bem-estar": ["7500-1/00", "8610-1/01", "8610-1/02", "8621-6/01", "8621-6/02", "8622-4/00", "8630-5/01", "8630-5/02", "8630-5/03", "8630-5/06", "8630-5/07", "8630-5/99", "8640-2/01", "8640-2/02", "8640-2/03", "8640-2/04", "8640-2/05", "8640-2/06", "8640-2/07", "8640-2/08", "8640-2/09", "8640-2/10", "8640-2/11", "8640-2/12", "8640-2/13", "8640-2/14", "8640-2/99", "8650-0/01", "8650-0/02", "8650-0/03", "8650-0/04", "8650-0/05", "8650-0/06", "8650-0/07", "8650-0/99", "8660-7/00", "8690-9/01", "8690-9/02", "8690-9/03", "8690-9/04", "8690-9/99", "8711-5/01", "8711-5/02", "8712-3/00", "3250-7/09"],
-    "Odontologia": ["8630-5/04", "3250-7/06"],
-    "Engenharia, Arquitetura e Design": ["7111-1/00", "7112-0/00", "7119-7/01", "7119-7/02", "7119-7/03", "7119-7/04", "7119-7/99", "7120-1/00", "7410-2/02", "7410-2/03", "7410-2/99"],
-    "Consultoria e Gestão Empresarial": ["7020-4/00", "7210-0/00", "7220-7/00", "7320-3/00", "7490-1/03"],
-    "Publicidade e Marketing": ["7311-4/00", "7312-2/00", "7319-0/01", "7319-0/02", "7319-0/03", "7319-0/04", "7319-0/99", "5911-1/02"],
-    "Educação e Treinamento": ["8511-2/00", "8512-1/00", "8513-9/00", "8520-1/00", "8531-7/00", "8532-5/00", "8533-3/00", "8541-4/00", "8542-2/00", "8550-3/02", "8591-1/00", "8592-9/01", "8592-9/02", "8592-9/03", "8592-9/99", "8593-7/00", "8599-6/01", "8599-6/02", "8599-6/03", "8599-6/04", "8599-6/05", "8599-6/99"],
-    "Outras Atividades": [] // Preenchido dinamicamente
-};
-const allCategorizedCnaes = new Set(Object.values(categoryToCnaeMap).flat());
-categoryToCnaeMap["Outras Atividades"] = CNAE_DATA.filter(c => !allCategorizedCnaes.has(c.code)).map(c => c.code);
+const allCategorizedCnaes = new Set(categories.flatMap(c => c.cnaeCodes));
+const otherCnaes = CNAE_DATA.filter(c => !allCategorizedCnaes.has(c.code)).map(c => c.code);
+categories.push({ name: "Outras Atividades", icon: Leaf, cnaeCodes: otherCnaes });
+
 
 const MAX_SELECTION = 20;
 
@@ -86,7 +86,8 @@ function CnaeSelectorComponent({
             cnae.category?.toLowerCase().includes(lowercasedSearch)
         ).slice(0, 100);
     }
-    const cnaesForCategory = categoryToCnaeMap[activeView] || []
+    const category = categories.find(c => c.name === activeView);
+    const cnaesForCategory = category?.cnaeCodes || [];
     return CNAE_DATA.filter((cnae) => cnaesForCategory.includes(cnae.code)).slice(0,100)
   }, [search, activeView]);
 
@@ -305,7 +306,7 @@ function CnaeSelectorComponent({
                 </div>
                 
                 <div className="p-6 border-t shrink-0 h-1/2 flex flex-col min-h-0">
-                    <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCodes.length}/{MAX_SELECTION})</h4>
+                    <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCodes.length}/${MAX_SELECTION})</h4>
                     <ScrollArea className="flex-grow bg-background border rounded-lg">
                         <div className="space-y-2 p-3">
                            {selectedCodes.length > 0 ? selectedCodes.map(code => (
@@ -340,5 +341,7 @@ function CnaeSelectorComponent({
 }
 
 export const CnaeSelector = React.memo(CnaeSelectorComponent);
+
+    
 
     
