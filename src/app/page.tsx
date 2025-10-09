@@ -16,6 +16,7 @@ import RocSection from '@/components/roc-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportTaxInfoSection from '@/components/export-tax-info-section';
 import CapitalSocialSection from '@/components/capital-social-section';
+import SociiLawSection from '@/components/socii-law-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -105,8 +106,14 @@ export default function Home() {
                 <MultibenefitsSection />
               </div>
             </section>
-
+            
              <section className="py-16 lg:py-24 bg-slate-50/70">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <SociiLawSection />
+              </div>
+            </section>
+
+             <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <FaqSection />
               </div>
