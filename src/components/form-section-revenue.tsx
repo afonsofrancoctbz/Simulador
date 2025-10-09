@@ -99,15 +99,18 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                  <div>
                     <FormLabel>1. Selecione suas Atividades (CNAEs)</FormLabel>
                     <FormDescription className="text-xs mb-2">A escolha do CNAE define os anexos e as alíquotas de imposto aplicáveis.</FormDescription>
-                    <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-md min-h-[44px] bg-background">
-                        {selectedCnaes.length > 0 ? selectedCnaes.map(code => (
-                            <Badge key={code} variant="secondary" className="text-sm">
-                                {code}
-                                <button type="button" className="ml-1 rounded-full p-0.5 hover:bg-destructive/20" onClick={() => handleCnaeBadgeRemove(code)}>
-                                    <XCircle className="h-3.5 w-3.5 text-destructive/80" />
-                                </button>
-                            </Badge>
-                        )) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
+                    <div className="flex flex-col gap-2 mt-2 p-3 border rounded-md min-h-[44px] bg-background">
+                        {selectedCnaes.length > 0 ? selectedCnaes.map(code => {
+                            const cnae = getCnaeData(code);
+                            return (
+                                <Badge key={code} variant="secondary" className="text-sm justify-between w-full py-1.5 px-3">
+                                    <span className='font-normal'><b className='font-semibold'>{code}</b> - {cnae?.description}</span>
+                                    <button type="button" className="ml-2 rounded-full p-0.5 hover:bg-destructive/20" onClick={() => handleCnaeBadgeRemove(code)}>
+                                        <XCircle className="h-4 w-4 text-destructive/80" />
+                                    </button>
+                                </Badge>
+                            )
+                        }) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
                     </div>
                      <FormMessage className="mt-2">{form.formState.errors.selectedCnaes?.message}</FormMessage>
                     <Button type="button" variant="default" size="sm" className="mt-3" onClick={onCnaeSelectorOpen}>
@@ -324,7 +327,3 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
-
-    
-
-    

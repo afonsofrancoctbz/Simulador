@@ -309,14 +309,17 @@ function CnaeSelectorComponent({
                     <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCodes.length}/${MAX_SELECTION})</h4>
                     <ScrollArea className="flex-grow bg-background border rounded-lg">
                         <div className="space-y-2 p-3">
-                           {selectedCodes.length > 0 ? selectedCodes.map(code => (
-                            <div key={code} className="flex items-center justify-between bg-muted/40 p-2 rounded-md border">
-                                <span className="text-sm font-medium flex-grow pr-2">{code} - {CNAE_DATA.find(c=>c.code===code)?.description}</span>
-                                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(code)}>
-                                    <X className="h-4 w-4 text-destructive"/>
-                                </Button>
-                            </div>
-                           )) : (
+                           {selectedCodes.length > 0 ? selectedCodes.map(code => {
+                               const cnae = CNAE_DATA.find(c=>c.code===code);
+                               return (
+                                <div key={code} className="flex items-center justify-between bg-muted/40 p-2 rounded-md border">
+                                    <span className="text-sm font-medium flex-grow pr-2">{cnae ? `${code} - ${cnae.description}` : code}</span>
+                                    <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(code)}>
+                                        <X className="h-4 w-4 text-destructive"/>
+                                    </Button>
+                                </div>
+                               )
+                            }) : (
                             <div className="text-center text-sm text-muted-foreground py-8">
                                 Nenhuma atividade selecionada.
                             </div>
@@ -341,7 +344,3 @@ function CnaeSelectorComponent({
 }
 
 export const CnaeSelector = React.memo(CnaeSelectorComponent);
-
-    
-
-    
