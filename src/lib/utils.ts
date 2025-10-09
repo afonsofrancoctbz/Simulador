@@ -34,7 +34,7 @@ export function findBracket<T extends { max: number }>(table: T[], value: number
     // This should not happen with valid config, but as a safeguard:
     throw new Error("Invalid tax table provided to findBracket.");
   }
-  return table.find(bracket => value <= bracket.max) || table[0];
+  return table.find(bracket => value <= bracket.max) || table[table.length - 1];
 }
 
 /**
@@ -46,3 +46,5 @@ export function findBracket<T extends { max: number }>(table: T[], value: number
 export function findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
     return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
 }
+
+    

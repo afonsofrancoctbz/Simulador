@@ -104,7 +104,7 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
                     </TabsContent>
                 </Tabs>
 
-                <div className="bg-card rounded-lg border shadow-lg p-4">
+                <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
                     <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
                         {isLoading ? <Loader2 className="animate-spin" /> : null}
                         {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
@@ -120,3 +120,5 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         </>
     );
 }
+
+    

@@ -175,7 +175,7 @@ function CnaeSelectorComponent({
         <DialogHeader className="p-6 border-b shrink-0">
           <DialogTitle className="text-2xl font-bold">Selecionar Atividades (CNAE)</DialogTitle>
           <DialogDescription>
-            Pesquise, filtre por categoria ou cole uma lista de códigos para definir as atividades da sua empresa. Máximo de {MAX_SELECTION} atividades.
+            Pesquise, filtre por categoria ou cole uma lista de códigos para definir as atividades da sua empresa. Máximo de ${MAX_SELECTION} atividades.
           </DialogDescription>
         </DialogHeader>
 
@@ -340,9 +340,5 @@ function CnaeSelectorComponent({
 }
 
 export const CnaeSelector = React.memo(CnaeSelectorComponent);
-
-    
-
-    
 
     
