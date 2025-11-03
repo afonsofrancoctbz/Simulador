@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Coins, List, Target, ShieldBan, Calendar, CheckSquare } from "lucide-react";
+import { Coins, List, Target, ShieldBan, Calendar, CheckSquare, Building } from "lucide-react";
 
 export default function SinTaxInfoSection() {
   return (
@@ -66,30 +66,31 @@ export default function SinTaxInfoSection() {
               </AccordionContent>
             </AccordionItem>
             
+            <AccordionItem value="item-simples">
+              <AccordionTrigger className="text-lg font-semibold">
+                <Building className="mr-3 text-primary h-5 w-5" />
+                E as empresas do Simples Nacional?
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>Em regra geral, empresas do Simples Nacional que sejam fabricantes ou importadoras dos itens alcançados deverão recolher o Imposto Seletivo <strong>fora do DAS</strong> (Documento de Arrecadação do Simples Nacional), ou seja, adicionalmente ao regime simplificado.</p>
+                <p>Isso cria uma situação de "Simples Nacional Híbrido" apenas para o IS, onde a empresa mantém os benefícios do regime para os demais tributos, mas recolhe o Imposto Seletivo de forma separada.</p>
+                <p>Além disso, a Reforma Tributária permite que empresas do Simples optem por recolher também o <strong>IBS e a CBS por fora do DAS</strong>. Essa pode ser uma boa opção para empresas que vendem para outras pessoas jurídicas (B2B) e desejam gerar crédito tributário para seus clientes, mantendo-se competitivas.</p>
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
                 <Calendar className="mr-3 text-primary h-5 w-5" />
-                Como o IS se encaixa na Reforma e quando começa?
+                Quando o Imposto do Pecado começa a valer?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                  <p>A reforma cria três novos impostos principais. O IS funciona em paralelo ao sistema do IVA-Dual:</p>
-                  <ul className="list-decimal pl-6 space-y-3">
-                        <li>
-                            <strong>Contribuição sobre Bens e Serviços (CBS):</strong> Tributo federal que substitui PIS/COFINS (e parte do IPI).
-                        </li>
-                        <li>
-                            <strong>Imposto sobre Bens e Serviços (IBS):</strong> Tributo estadual/municipal que substitui ICMS/ISS.
-                        </li>
-                        <li>
-                            <strong>Imposto Seletivo (IS):</strong> Tributo federal com função regulatória, assumindo o papel que era em parte do IPI.
-                        </li>
-                  </ul>
+                  <p>O Imposto Seletivo entrará em vigor a partir de <strong>2027</strong>, mas sua aplicação ainda depende de regulamentação complementar para detalhar as alíquotas e as regras específicas.</p>
                    <Alert variant="default" className="bg-sky-50/80 border-sky-200 text-sky-900 mt-4">
-                      <AlertTitle className="font-semibold">Cronograma de Vigência</AlertTitle>
+                      <AlertTitle className="font-semibold">Cronograma de Vigência da Reforma</AlertTitle>
                       <AlertDescription>
                           <ul className="list-disc pl-5 mt-2">
                             <li><strong>2026:</strong> Período de teste, com alíquotas simbólicas de CBS (0,9%) e IBS (0,1%) destacadas em nota para adaptação dos sistemas.</li>
-                            <li><strong>2027:</strong> Início da vigência e cobrança efetiva tanto da <strong>CBS</strong> quanto do <strong>Imposto Seletivo (IS)</strong>.</li>
+                            <li><strong>2027:</strong> Início da cobrança efetiva tanto da <strong>CBS</strong> quanto do <strong>Imposto Seletivo (IS)</strong>.</li>
                             <li><strong>2029-2033:</strong> Período de transição e consolidação completa do <strong>IBS</strong>.</li>
                           </ul>
                       </AlertDescription>
