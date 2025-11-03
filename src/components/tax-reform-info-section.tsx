@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Library, AlertTriangle, Scale, Percent, CheckSquare, Users, Briefcase, LandPlot, Building } from "lucide-react";
+import { Library, AlertTriangle, Scale, Percent, CheckSquare, Users, Briefcase, LandPlot, Building, Calendar } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
@@ -48,7 +48,7 @@ export default function TaxReformInfoSection() {
                     <li><strong>Imposto sobre Bens e Serviços (IBS):</strong> Substituirá ICMS (estadual) e ISS (municipal), com alíquota estimada em <strong>18,7%</strong>.</li>
                     <li><strong>Alíquota Padrão (IVA):</strong> A soma (CBS + IBS) resultará em uma alíquota total estimada em torno de <strong>28%</strong>.</li>
                     <li><strong>Não Cumulatividade Plena:</strong> O imposto pago na compra de insumos vira crédito para abater do imposto devido na venda.</li>
-                    <li className="font-semibold text-destructive"><strong>Ponto Crítico para Serviços:</strong> A mão de obra (folha de pagamento) não gera créditos de IBS/CBS, o que impacta diretamente empresas com alto custo de pessoal.</li>
+                    <li className="font-semibold text-destructive"><strong>Ponto Crítico para Serviços:</strong> O principal "insumo" de uma empresa de software é a mão de obra (folha de pagamento). A Reforma Tributária não permite o crédito de IBS/CBS sobre a folha de pagamento.</li>
                 </ul>
               </AccordionContent>
             </AccordionItem>
@@ -95,11 +95,26 @@ export default function TaxReformInfoSection() {
                   </ul>
               </AccordionContent>
             </AccordionItem>
+            
+            <AccordionItem value="item-5">
+              <AccordionTrigger className="text-lg font-semibold">
+                <Calendar className="mr-3 text-primary h-5 w-5" />
+                4. Cronograma de Transição
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                  <p>A CBS começa a valer de forma parcial a partir de 2026, com um período de transição gradual até 2033.</p>
+                  <ul className="list-disc pl-6 space-y-3">
+                      <li><strong>2026 (Período de Simulação):</strong> As empresas começarão a simular a cobrança da CBS e IBS na nota fiscal, mas sem alterar o valor efetivo dos tributos pagos. Será um ano de teste para adaptação ao novo sistema.</li>
+                      <li><strong>2027 (Início da Cobrança):</strong> A CBS passa a ser tributada integralmente, substituindo PIS e COFINS, e as alíquotas de IPI são zeradas. O IBS coexistirá com ICMS e ISS, que começarão seu processo de extinção gradual.</li>
+                      <li><strong>2033 (Consolidação Completa):</strong> A transição total para o novo sistema tributário, com a cobrança plena do IBS, está prevista para ser concluída, extinguindo completamente ICMS e ISS.</li>
+                  </ul>
+              </AccordionContent>
+            </AccordionItem>
 
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
                 <CheckSquare className="mr-3 text-primary h-5 w-5" />
-                4. Simulação: Empresa de Software (CNAE 6201-5/01)
+                5. Simulação: Empresa de Software (CNAE 6201-5/01)
               </AccordionTrigger>
               <AccordionContent className="space-y-6 pt-2 text-base text-muted-foreground">
                 <p>Cenário: Faturamento de R$ 100 mil/mês, folha de R$ 30 mil (Fator R de 30% = Anexo III), e R$ 20 mil em insumos geradores de crédito.</p>
@@ -147,5 +162,3 @@ export default function TaxReformInfoSection() {
     </div>
   );
 }
-
-    
