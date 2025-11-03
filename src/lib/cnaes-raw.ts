@@ -13,7 +13,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CRMV. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
   },
   {
     code: '8610-1/01',
@@ -133,7 +133,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRM. Não é obrigatório.'
   },
   {
     code: '8630-5/99',
@@ -313,7 +313,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRM. Não é obrigatório.'
   },
   {
     code: '8640-2/99',
@@ -337,7 +337,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo COREN. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo COREN. Não é obrigatório.'
   },
   {
     code: '8650-0/02',
@@ -349,7 +349,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRN. Necessário RQE se exercido por médico. Não é obrigatório.'
   },
   {
     code: '8650-0/03',
@@ -361,7 +361,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRP. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CFP/CRP. RQE necessário quando exercido Psiquiatria por médico. Não é obrigatório.'
   },
   {
     code: '8650-0/04',
@@ -373,7 +373,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CREFITO. Não é obrigatório.'
   },
   {
     code: '8650-0/05',
@@ -385,7 +385,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CREFITO. Não é obrigatório.'
   },
   {
     code: '8650-0/06',
@@ -397,7 +397,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CREFONO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CREFONO. Não é obrigatório.'
   },
   {
     code: '8650-0/07',
@@ -409,7 +409,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRN. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRN. Não é obrigatório.'
   },
   {
     code: '8650-0/99',
@@ -455,7 +455,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRM. Não é obrigatório.'
   },
   {
     code: '8690-9/03',
@@ -500,7 +500,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRM. Necessário RQE conforme. Não é obrigatório.'
   },
   {
     code: '8711-5/02',
@@ -512,7 +512,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRM. Necessário RQE conforme. Não é obrigatório.'
   },
   {
     code: '8712-3/00',
@@ -524,7 +524,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRM. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRM. Não é obrigatório.'
   },
   {
     code: '3250-7/09',
@@ -691,7 +691,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e um Responsável Técnico engenheiro.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
   },
   {
     code: '7119-7/01',
@@ -703,7 +703,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CRT - Conselho Técnicos Industriais'
   },
   {
     code: '7119-7/02',
@@ -715,7 +715,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
   },
   {
     code: '7119-7/03',
@@ -726,7 +726,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
-    ivaReduction: 0.3
+    ivaReduction: 0.3,
+    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...CRT - Conselho Técnicos Industriais'
   },
   {
     code: '7119-7/04',
@@ -738,7 +739,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+    notes: 'Regulamentado por CREA/RQE se houver pericia médica. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '7119-7/99',
@@ -750,7 +751,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '7120-1/00',
@@ -762,7 +763,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '7410-2/02',
@@ -772,7 +773,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...'
   },
   {
     code: '7410-2/03',
@@ -837,7 +839,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRA.'
+    notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
   {
     code: '7490-1/03',
@@ -848,7 +850,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
 
   // --- PUBLICIDADE E MARKETING ---
@@ -890,7 +892,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
   },
   {
     code: '7319-0/03',
@@ -900,7 +903,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
   },
   {
     code: '7319-0/04',
@@ -1185,7 +1189,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CRA.'
+    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
   },
   {
     code: '8219-9/01',
@@ -1278,7 +1282,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CADASTUR.'
+    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
     code: '7912-1/00',
@@ -1289,7 +1293,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CADASTUR.'
+    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
     code: '7990-2/00',
@@ -1300,7 +1304,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CADASTUR.'
+    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
     code: '8230-0/01',
@@ -1311,7 +1315,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRA.'
+    notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
   {
     code: '8230-0/02',
@@ -1406,7 +1410,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pela OAB. É obrigatório utilizar Contrato Padrão da OAB com os Advogados responsáveis.'
+    notes: 'Atividade regulamentada pela OAB. Obrigatório Utilizar Contrato Padrão da OAB com os Advs responsáveis.'
   },
   {
     code: '6920-6/01',
@@ -1451,7 +1455,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório.'
   },
   {
     code: '4530-7/06',
@@ -1462,7 +1466,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4542-1/01',
@@ -1473,7 +1477,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4611-7/00',
@@ -1484,7 +1488,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4612-5/00',
@@ -1495,7 +1499,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4613-3/00',
@@ -1506,7 +1510,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4614-1/00',
@@ -1517,7 +1521,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4615-0/00',
@@ -1528,7 +1532,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4616-8/00',
@@ -1539,7 +1543,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4617-6/00',
@@ -1550,7 +1554,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4618-4/01',
@@ -1561,7 +1565,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4618-4/02',
@@ -1572,7 +1576,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4618-4/03',
@@ -1583,7 +1587,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4618-4/99',
@@ -1594,7 +1598,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
     code: '4619-2/00',
@@ -1605,7 +1609,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
 
   // --- ATIVIDADES ARTÍSTICAS, CRIATIVAS E DE ESPETÁCULOS ---
@@ -1672,8 +1676,9 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '9001-9/99',
@@ -1890,7 +1895,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRA. O enquadramento no Anexo III depende do Fator R.'
+    notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
 
   // --- ESPORTES E LAZER ---
@@ -1913,7 +1918,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREF ou CREFITO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CREF ou CREFITO. Não é obrigatório.'
   },
   {
     code: '9319-1/99',
@@ -2018,7 +2023,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pela SUSEP, é obrigatório indicar RT no Contrato Social.'
+    notes: 'Regulamentado pela SUSEP, é obrigatório indicar RT no Contrato Social'
   },
   {
     code: '6629-1/00',
@@ -2083,7 +2088,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '7420-0/03',
@@ -2276,7 +2282,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado por CRA ou CORE.'
+    notes: 'Regulamentado por CRA/CORE. Não é obrigatório.'
   },
   {
     code: '7490-1/05',
@@ -2438,7 +2444,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado se possuir procedimentos invasivos (CRBM, CRO, COFEN, CRM, etc.).'
+    notes: 'Regulamentado se possuir procedimentos invasivos (CRBM, CRO, COFEN, CRM, etc.). Não é obrigatório.'
   },
   {
     code: '9609-2/02',
@@ -2511,7 +2517,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3312-1/03',
@@ -2522,7 +2528,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3312-1/04',
@@ -2533,7 +2539,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3313-9/01',
@@ -2544,7 +2550,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3313-9/02',
@@ -2555,7 +2561,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3313-9/99',
@@ -2566,7 +2572,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/01',
@@ -2577,7 +2583,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/02',
@@ -2588,7 +2594,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/03',
@@ -2599,7 +2605,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/04',
@@ -2610,7 +2616,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/05',
@@ -2621,7 +2627,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/06',
@@ -2632,7 +2638,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/07',
@@ -2643,7 +2649,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/08',
@@ -2654,7 +2660,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/09',
@@ -2665,7 +2671,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/10',
@@ -2676,7 +2682,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/11',
@@ -2687,7 +2693,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/12',
@@ -2698,7 +2704,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/13',
@@ -2709,7 +2715,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/14',
@@ -2720,7 +2726,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/15',
@@ -2731,7 +2737,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/16',
@@ -2742,7 +2748,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/17',
@@ -2753,7 +2759,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/18',
@@ -2764,7 +2770,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/19',
@@ -2775,7 +2781,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/20',
@@ -2786,7 +2792,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/21',
@@ -2797,7 +2803,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/22',
@@ -2808,7 +2814,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3314-7/99',
@@ -2819,7 +2825,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3315-5/00',
@@ -2830,7 +2836,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3316-3/01',
@@ -2841,7 +2847,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3316-3/02',
@@ -2852,7 +2858,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3317-1/01',
@@ -2863,7 +2869,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3317-1/02',
@@ -2874,7 +2880,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3319-8/00',
@@ -2885,7 +2891,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '3321-0/00',
@@ -2896,7 +2902,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4211-1/02',
@@ -2907,7 +2913,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4321-5/00',
@@ -2951,7 +2957,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4221-9/05',
@@ -2962,7 +2968,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4313-4/00',
@@ -2973,7 +2979,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4322-3/03',
@@ -2984,7 +2990,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4329-1/01',
@@ -2995,7 +3001,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4329-1/02',
@@ -3006,7 +3012,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4329-1/03',
@@ -3017,7 +3023,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4329-1/04',
@@ -3028,7 +3034,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4329-1/05',
@@ -3039,7 +3045,18 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
+  },
+  {
+    code: '4399-1/01',
+    description: 'Administração de obras',
+    category: 'Construção Civil',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO"" na razão social ou fantasia, desde a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
   },
   {
     code: '4399-1/02',
@@ -3050,7 +3067,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '8121-4/00',
@@ -3072,7 +3089,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '8129-0/00',
@@ -3094,7 +3111,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '4520-0/01',
@@ -3105,7 +3122,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4520-0/02',
@@ -3126,7 +3143,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4520-0/04',
@@ -3167,7 +3184,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '4520-0/08',
@@ -3192,19 +3209,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
   },
 
   
-  // --- CONSTRUÇÃO CIVIL ---
-  {
-    code: '4399-1/01',
-    description: 'Administração de obras',
-    category: 'Construção Civil',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO"" na razão social ou fantasia, desde a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
-  },
-
   // --- COMÉRCIO VAREJISTA (ANEXO I) ---
   {
     code: '4511-1/01',
@@ -4131,7 +4135,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '0162-8/03',
@@ -4142,7 +4146,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '0322-1/07',
@@ -4153,7 +4157,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
     code: '1099-6/04',
@@ -4175,7 +4179,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
+    notes: 'Regulamentado pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '9512-6/00',
@@ -4186,7 +4190,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
+    notes: 'Regulamentado pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
     code: '9521-5/00',
@@ -4197,6 +4201,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
+    notes: 'Regulamentado pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   }
 ];
