@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Users, FileText, Percent, BarChart, Gem, Calendar } from "lucide-react";
+import { Users, FileText, Percent, BarChart, Gem, Calendar, BadgePercent, CheckCircle, Wallet } from "lucide-react";
 
 export default function PfPjTaxReformSection() {
   return (
@@ -44,7 +45,7 @@ export default function PfPjTaxReformSection() {
                 <ul className="list-disc pl-6 space-y-2">
                     <li><strong>CBS (Contribuição sobre Bens e Serviços):</strong> Tributo federal.</li>
                     <li><strong>IBS (Imposto sobre Bens e Serviços):</strong> Compartilhado por estados e municípios.</li>
-                    <li><strong>Imposto Seletivo:</strong> Incidirá sobre produtos/serviços nocivos à saúde e ao meio ambiente (cigarros, bebidas, etc.).</li>
+                    <li><strong>Imposto Seletivo:</strong> Incidirá sobre produtos/serviços nocivos à saúde e ao meio ambiente.</li>
                 </ul>
                 <p>O objetivo é simplificar, acabar com o “efeito cascata” e tributar no destino (onde está o consumidor).</p>
                 <Alert variant='default' className='bg-sky-50/80 border-sky-200 text-sky-900'>
@@ -54,22 +55,24 @@ export default function PfPjTaxReformSection() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2">
+            <AccordionItem value="item-aliquota">
               <AccordionTrigger className="text-lg font-semibold">
                 <Percent className="mr-3 text-primary h-5 w-5" />
-                Quanto o profissional PJ vai pagar de impostos?
+                 Qual será a alíquota dos novos impostos?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>
-                  Hoje, um profissional PJ prestador de serviços no <strong>Lucro Presumido</strong> paga <strong>8,65%</strong> de impostos sobre o consumo (PIS, COFINS, ISS), enquanto no <strong>Lucro Real</strong> essa carga é de <strong>14,25%</strong>.
-                </p>
-                <p>
-                  Com a reforma, essa carga será unificada e fixada em <strong>26,50%</strong> (valor estimado) para ambos os regimes, com a entrada do IVA (IBS/CBS).
-                </p>
-                <h4 className="font-semibold text-foreground pt-2">Reduções e Exceções</h4>
-                <p>
-                  Para o profissional PJ liberal e da área da saúde, há cenários com redução dessa alíquota geral. Setores como saúde, educação, cultura e atividades de profissionais liberais regulamentadas terão um tratamento diferenciado, com alíquotas menores.
-                </p>
+                  <p>Haverá uma alíquota padrão estimada em torno de 27%, mas o número final depende de regulamentações e avaliação das reduções e isenções para alguns itens e serviços.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                          <h4 className="font-bold text-green-800 flex items-center gap-2"><BadgePercent className="h-5 w-5"/>Redução de 30%</h4>
+                          <p className="mt-1 text-green-900">Profissionais liberais (advogados, engenheiros, contadores, etc.) terão a alíquota reduzida para aproximadamente <strong>18,55%</strong>.</p>
+                      </div>
+                       <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                          <h4 className="font-bold text-green-800 flex items-center gap-2"><BadgePercent className="h-5 w-5"/>Redução de 60%</h4>
+                          <p className="mt-1 text-green-900">Setores essenciais como saúde, educação e cultura pagarão uma alíquota de cerca de <strong>10,60%</strong>.</p>
+                      </div>
+                  </div>
               </AccordionContent>
             </AccordionItem>
 
@@ -89,20 +92,36 @@ export default function PfPjTaxReformSection() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3">
+            <AccordionItem value="item-impacto">
               <AccordionTrigger className="text-lg font-semibold">
-                <BarChart className="mr-3 text-primary h-5 w-5" />
-                Quais os impactos diretos para a PJ?
+                <Wallet className="mr-3 text-primary h-5 w-5" />
+                Impactos diretos para o profissional PJ
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                  <p>A lógica do novo IVA é <strong>não cumulativa</strong>. Você poderá abater, como crédito, o IVA pago em suas compras (energia, aluguel, softwares, etc.), mas a <strong>folha de pagamento não gera crédito</strong>.</p>
-                <h4 className='font-semibold text-foreground pt-2'>1. Nota Fiscal</h4>
+                <h4 className='font-semibold text-foreground pt-2'>1. Nota Fiscal e Split Payment</h4>
                 <p>O imposto será destacado na nota, não mais embutido no preço. Surge também o conceito de <strong>split payment</strong>, onde o imposto pode ser recolhido automaticamente na transação.</p>
                 <h4 className='font-semibold text-foreground'>2. Apuração dos Impostos</h4>
                 <p>Para o <strong>Simples Nacional</strong>, será possível optar por pagar o IVA "por fora" do DAS para gerar crédito para clientes B2B. Para <strong>Lucro Presumido/Real</strong>, a troca de impostos por um IVA com alíquota maior exigirá uma gestão de créditos mais eficiente para mitigar o impacto.</p>
                  <h4 className='font-semibold text-foreground'>3. Precificação e Competitividade</h4>
                  <p>Com as novas regras de crédito, a forma como seu cliente percebe o custo do seu serviço pode mudar. Será essencial revisar sua precificação para se manter competitivo, especialmente em vendas para outras empresas.</p>
               </AccordionContent>
+            </AccordionItem>
+
+             <AccordionItem value="item-profissoes">
+                <AccordionTrigger className="text-lg font-semibold">
+                    <CheckCircle className="mr-3 text-primary h-5 w-5" />
+                    Quais profissões serão mais afetadas?
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 text-base text-muted-foreground space-y-4">
+                    <p>A reforma impactará todos os setores. No entanto, algumas profissões e atividades que estão expressamente destacadas na proposta são:</p>
+                    <ul className="list-disc pl-6 space-y-2">
+                        <li>Medicina e outras áreas da saúde, como Psicologia, Fonoaudiologia e Fisioterapia.</li>
+                        <li>Profissionais liberais, incluindo Advogados, Contadores, Engenheiros e Arquitetos.</li>
+                        <li>Serviços de educação.</li>
+                        <li>Comerciantes e produtores de alimentos, medicamentos, produtos de higiene pessoal e materiais de limpeza.</li>
+                    </ul>
+                </AccordionContent>
             </AccordionItem>
             
           </Accordion>
