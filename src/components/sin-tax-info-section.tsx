@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Coins, List, Target, ShieldBan, Calendar, CheckSquare, Building } from "lucide-react";
+import { Coins, List, Target, ShieldBan, Calendar, CheckSquare, Building, HelpCircle } from "lucide-react";
 
 export default function SinTaxInfoSection() {
   return (
@@ -66,6 +66,16 @@ export default function SinTaxInfoSection() {
               </AccordionContent>
             </AccordionItem>
             
+            <AccordionItem value="item-aliquota">
+                <AccordionTrigger className="text-lg font-semibold">
+                    <Coins className="mr-3 text-primary h-5 w-5" />
+                    Qual será a alíquota?
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                    <p>Não há uma alíquota única. A lógica é calibrar o imposto por impacto (teor alcoólico, açúcar, emissões, etc.). A lei complementar definirá as bases de cálculo e as faixas de alíquotas. Não há um teto constitucional expresso para o Imposto Seletivo.</p>
+                </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="item-simples">
               <AccordionTrigger className="text-lg font-semibold">
                 <Building className="mr-3 text-primary h-5 w-5" />
@@ -115,9 +125,41 @@ export default function SinTaxInfoSection() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="item-faq">
+                <AccordionTrigger className="text-lg font-semibold">
+                    <HelpCircle className="mr-3 text-primary h-5 w-5" />
+                    FAQ: Perguntas Rápidas
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 text-base text-muted-foreground">
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="faq-1">
+                            <AccordionTrigger className="text-md font-semibold">De quem é a responsabilidade pela cobrança?</AccordionTrigger>
+                            <AccordionContent className="text-base">Da União. A arrecadação não é compartilhada com estados/municípios.</AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="faq-2">
+                            <AccordionTrigger className="text-md font-semibold">Prestação de serviços entra no Imposto do Pecado?</AccordionTrigger>
+                            <AccordionContent className="text-base">O foco principal são os bens. Serviços só entram se a lei complementar estabelecer uma clara relação de dano à saúde/ambiente.</AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="faq-3">
+                            <AccordionTrigger className="text-md font-semibold">O Imposto Seletivo vai ser somado aos outros tributos?</AccordionTrigger>
+                            <AccordionContent className="text-base">Sim. O Seletivo é um imposto adicional, cobrado além do IBS/CBS.</AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="faq-4">
+                            <AccordionTrigger className="text-md font-semibold">Importação por pessoa física/e-commerce paga?</AccordionTrigger>
+                            <AccordionContent className="text-base">Quando a remessa for tributada na importação, o imposto tende a incidir. Isenções e cotas seguem normas aduaneiras específicas.</AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="faq-5">
+                            <AccordionTrigger className="text-md font-semibold">O cashback para baixa renda se aplica?</AccordionTrigger>
+                            <AccordionContent className="text-base">Não. O mecanismo de cashback (devolução de imposto) é do IBS/CBS e não se aplica ao Imposto Seletivo.</AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </AccordionContent>
+            </AccordionItem>
+
           </Accordion>
         </CardContent>
       </Card>
     </div>
   );
 }
+
