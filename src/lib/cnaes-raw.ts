@@ -2899,6 +2899,105 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
+    code: '4211-1/02',
+    description: 'Pintura para sinalização em pistas rodoviárias e aeroportos',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4221-9/03',
+    description: 'Manutenção de redes de distribuição de energia elétrica',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4221-9/05',
+    description: 'Manutenção de estações e redes de telecomunicações',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4313-4/00',
+    description: 'Obras de terraplenagem',
+    category: 'Construção Civil',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4322-3/03',
+    description: 'Instalações de sistema de prevenção contra incêndio',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4329-1/01',
+    description: 'Instalação de painéis publicitários',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4329-1/02',
+    description: 'Instalação de equipamentos para orientação à navegação marítima, fluvial e lacustre',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4329-1/03',
+    description: 'Instalação, manutenção e reparação de elevadores, escadas e esteiras rolantes',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4329-1/04',
+    description: 'Montagem e instalação de sistemas e equipamentos de iluminação e sinalização em vias públicas, portos e aeroportos',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
     code: '9511-8/00',
     description: 'Reparação e manutenção de computadores e de equipamentos periféricos',
     category: 'Manutenção e Reparo Técnico',
@@ -3038,17 +3137,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA ou CAU. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '4211-1/02',
-    description: 'Pintura para sinalização em pistas rodoviárias e aeroportos',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
   },
   {
     code: '4221-9/03',
@@ -4199,5 +4287,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CREA.'
   }
 ];
+
 
 
