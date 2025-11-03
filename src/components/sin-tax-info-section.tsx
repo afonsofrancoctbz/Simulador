@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Coins, List, Target, ShieldBan } from "lucide-react";
+import { Coins, List, Target, ShieldBan, Calendar, CheckSquare } from "lucide-react";
 
 export default function SinTaxInfoSection() {
   return (
@@ -38,12 +38,12 @@ export default function SinTaxInfoSection() {
                   O Imposto Seletivo (IS), apelidado de "Imposto do Pecado", é um novo imposto federal criado pela Reforma Tributária (EC 132/2023 e LC 214/2025) com um objetivo principal: <strong>desestimular o consumo de produtos e serviços considerados prejudiciais à saúde ou ao meio ambiente.</strong>
                 </p>
                 <p>
-                  Diferente de impostos que visam apenas arrecadar, o IS tem uma função "extrafiscal" para induzir comportamentos mais saudáveis e sustentáveis.
+                  Diferente de impostos que visam apenas arrecadar, o IS tem uma função "extrafiscal". Ele será cobrado de forma <strong>monofásica</strong> (uma única vez na cadeia) e seu valor integrará a base de cálculo do IBS e da CBS.
                 </p>
-                <Alert variant="default" className="bg-background">
-                  <AlertDescription>
-                    Ele será cobrado de forma <strong>monofásica</strong>, ou seja, incidirá uma única vez na cadeia produtiva (na importação, produção ou extração), sem gerar sistema de créditos e débitos. O valor do IS integrará a base de cálculo do IBS e da CBS.
-                  </AlertDescription>
+                 <Alert variant="default" className="bg-background">
+                    <AlertDescription>
+                        As exportações não serão tributadas pelo IS, e ele não incidirá sobre energia elétrica e telecomunicações. No entanto, a extração de minérios será taxada mesmo que destinada à exportação, com alíquota máxima de 1%.
+                    </AlertDescription>
                 </Alert>
               </AccordionContent>
             </AccordionItem>
@@ -51,50 +51,66 @@ export default function SinTaxInfoSection() {
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
                  <List className="mr-3 text-primary h-5 w-5" />
-                 Produtos e Serviços Afetados
+                 Quais produtos serão impactados?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>A Lei Complementar 214/2025 definiu os seguintes itens como passíveis de tributação pelo Imposto Seletivo:</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {['Veículos', 'Embarcações e aeronaves', 'Produtos fumígenos', 'Bebidas alcoólicas', 'Bebidas açucaradas', 'Bens minerais'].map(item => (
-                        <Badge key={item} variant="secondary" className="justify-center py-2 text-sm text-center">{item}</Badge>
-                    ))}
-                </div>
-                <Alert variant="default" className="bg-amber-50/80 border-amber-200 text-amber-900">
-                    <Coins className="h-5 w-5 text-amber-600" />
-                    <AlertTitle className="font-semibold text-amber-800">Atenção à Extração Mineral</AlertTitle>
-                    <AlertDescription className="text-amber-900/90">
-                         O IS incidirá sobre a extração de minérios mesmo que destinados à exportação. A alíquota, neste caso, será limitada a 1% do valor de mercado do produto.
-                    </AlertDescription>
-                </Alert>
-                <p className="text-sm italic">* A lista final e as alíquotas específicas ainda dependem de regulamentação complementar.</p>
+                <p>O imposto impactará fabricantes e importadores, mas o custo tende a ser repassado ao consumidor final. A Lei Complementar 214/2025 definiu a lista de produtos sujeitos à tributação, que ainda aguarda regulamentação detalhada:</p>
+                <ul className="list-disc space-y-3 pl-5">
+                    <li><strong>Tabaco e derivados:</strong> Inclui cigarros, fumos para enrolar, charutos, produtos de tabaco aquecido, vapes (quando regulados) e essências de narguilé.</li>
+                    <li><strong>Bebidas alcoólicas:</strong> Abrange cerveja, chope, destilados (cachaça, uísque, vodka), bebidas prontas (RTDs) e sidras.</li>
+                    <li><strong>Bebidas adoçadas:</strong> Refrigerantes, refrescos, chás prontos, isotônicos e energéticos, com a tendência de graduar o imposto pelo teor de açúcar.</li>
+                    <li><strong>Veículos com pior desempenho ambiental:</strong> Carros e comerciais leves com maiores emissões de CO2 ou menor eficiência energética.</li>
+                    <li><strong>Extração de recursos naturais:</strong> Minérios (ferro, ouro, etc.) e hidrocarbonetos (petróleo e gás), com cobrança na etapa de extração.</li>
+                    <li><strong>Apostas:</strong> Serviços de apostas como "bets" e fantasy sports.</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                <Coins className="mr-3 text-primary h-5 w-5" />
-                Como o IS se encaixa na Reforma?
+                <Calendar className="mr-3 text-primary h-5 w-5" />
+                Como o IS se encaixa na Reforma e quando começa?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                   <p>A reforma cria três novos impostos principais. O IS funciona em paralelo ao sistema do IVA-Dual:</p>
                   <ul className="list-decimal pl-6 space-y-3">
                         <li>
-                            <strong>Contribuição sobre Bens e Serviços (CBS):</strong> Tributo federal que substitui PIS/COFINS (e parte do IPI). Início da transição em <strong>2027</strong>.
+                            <strong>Contribuição sobre Bens e Serviços (CBS):</strong> Tributo federal que substitui PIS/COFINS (e parte do IPI).
                         </li>
                         <li>
-                            <strong>Imposto sobre Bens e Serviços (IBS):</strong> Tributo estadual/municipal que substitui ICMS/ISS. Início da transição em <strong>2029</strong>.
+                            <strong>Imposto sobre Bens e Serviços (IBS):</strong> Tributo estadual/municipal que substitui ICMS/ISS.
                         </li>
                         <li>
-                            <strong>Imposto Seletivo (IS):</strong> Tributo federal com função regulatória, assumindo o papel que era em parte do IPI. Vigência a partir de <strong>2027</strong>.
+                            <strong>Imposto Seletivo (IS):</strong> Tributo federal com função regulatória, assumindo o papel que era em parte do IPI.
                         </li>
                   </ul>
-                   <Alert variant="default" className="bg-sky-50/80 border-sky-200 text-sky-900">
-                      <AlertTitle className="font-semibold">E o ano de 2026?</AlertTitle>
+                   <Alert variant="default" className="bg-sky-50/80 border-sky-200 text-sky-900 mt-4">
+                      <AlertTitle className="font-semibold">Cronograma de Vigência</AlertTitle>
                       <AlertDescription>
-                          Será um período de teste. As empresas deverão destacar alíquotas simbólicas de CBS (0,9%) e IBS (0,1%) em suas notas fiscais, mas sem recolhimento efetivo, apenas para adaptação dos sistemas.
+                          <ul className="list-disc pl-5 mt-2">
+                            <li><strong>2026:</strong> Período de teste, com alíquotas simbólicas de CBS (0,9%) e IBS (0,1%) destacadas em nota para adaptação dos sistemas.</li>
+                            <li><strong>2027:</strong> Início da vigência e cobrança efetiva tanto da <strong>CBS</strong> quanto do <strong>Imposto Seletivo (IS)</strong>.</li>
+                            <li><strong>2029-2033:</strong> Período de transição e consolidação completa do <strong>IBS</strong>.</li>
+                          </ul>
                       </AlertDescription>
                    </Alert>
+              </AccordionContent>
+            </AccordionItem>
+            
+             <AccordionItem value="item-4">
+              <AccordionTrigger className="text-lg font-semibold">
+                <CheckSquare className="mr-3 text-primary h-5 w-5" />
+                Como preparar a sua empresa?
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>Você pode começar a se preparar para as mudanças com os seguintes passos:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                    <li><strong>Mapear Despesas:</strong> Identifique todas as despesas que podem gerar crédito de IBS/CBS, como mercadorias, serviços, energia, aluguel e equipamentos.</li>
+                    <li><strong>Organizar Notas Fiscais:</strong> Mantenha um controle rigoroso das notas de entrada e saída para garantir o aproveitamento de todos os créditos.</li>
+                    <li><strong>Simular Cenários:</strong> Use ferramentas como esta calculadora para comparar os regimes tributários (Simples, Presumido, Real) no novo cenário.</li>
+                    <li><strong>Ajustar Emissores de NF:</strong> Verifique se seu sistema de emissão de notas fiscais estará preparado para destacar os novos tributos e controlar os créditos.</li>
+                    <li><strong>Acompanhar a Regulamentação:</strong> Fique atento às discussões sobre alíquotas finais, setores com tratamento diferenciado e as regras do Simples Nacional para o uso de créditos.</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
 
