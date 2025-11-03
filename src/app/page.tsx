@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportTaxInfoSection from '@/components/export-tax-info-section';
 import CapitalSocialSection from '@/components/capital-social-section';
 import SociiLawSection from '@/components/socii-law-section';
+import SinTaxInfoSection from '@/components/sin-tax-info-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -73,47 +74,53 @@ export default function Home() {
         <div className='print-hidden'>
             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <DigitalCertificateSection />
+                <SinTaxInfoSection />
               </div>
             </section>
 
             <section className="py-16 lg:py-24 bg-background">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <DigitalCertificateSection />
+              </div>
+            </section>
+
+            <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <RocSection />
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-slate-50/70">
+            <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <PjAccountSection />
               </div>
             </section>
             
-            <section className="py-16 lg:py-24 bg-background">
+            <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <CapitalSocialSection />
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-slate-50/70">
+            <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <BenefitsSection />
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-background">
+            <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <MultibenefitsSection />
               </div>
             </section>
             
-             <section className="py-16 lg:py-24 bg-slate-50/70">
+             <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <SociiLawSection />
               </div>
             </section>
 
-             <section className="py-16 lg:py-24 bg-background">
+             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <FaqSection />
               </div>
