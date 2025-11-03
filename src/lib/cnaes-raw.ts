@@ -536,7 +536,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CBOO. Não é obrigatório indicar o Responsável Técnico no Contrato Social.'
+    notes: 'Atividade regulamentada pelo CBOO. Não é obrigatório.'
   },
   
   // --- ODONTOLOGIA ---
@@ -562,7 +562,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRO. Não é obrigatório indicar o Responsável Técnico no Contrato Social.'
+    notes: 'Atividade regulamentada pelo CRO. Não é obrigatório.'
   },
 
   // --- TECNOLOGIA DA INFORMAÇÃO ---
@@ -679,7 +679,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CAU. Exige registro da empresa e um Responsável Técnico arquiteto.'
+    notes: 'Atividade regulamentada pelo CAU. É permitido o uso da expressão ARQUITETURA OU URBANISMO na razão social ou fantasia, desde que a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
   },
   {
     code: '7112-0/00',
@@ -1406,7 +1406,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pela OAB. É obrigatório o registro da sociedade na OAB e deve ser composta apenas por advogados.'
+    notes: 'Atividade regulamentada pela OAB. É obrigatório utilizar Contrato Padrão da OAB com os Advogados responsáveis.'
   },
   {
     code: '6920-6/01',
@@ -1451,7 +1451,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4530-7/06',
@@ -1462,7 +1462,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4542-1/01',
@@ -1473,7 +1473,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4611-7/00',
@@ -1484,7 +1484,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4612-5/00',
@@ -1495,7 +1495,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4613-3/00',
@@ -1506,7 +1506,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4614-1/00',
@@ -1517,7 +1517,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4615-0/00',
@@ -1528,7 +1528,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4616-8/00',
@@ -1539,7 +1539,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4617-6/00',
@@ -1550,7 +1550,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4618-4/01',
@@ -1561,7 +1561,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4618-4/02',
@@ -1572,7 +1572,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4618-4/03',
@@ -1583,7 +1583,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4618-4/99',
@@ -1594,7 +1594,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
   {
     code: '4619-2/00',
@@ -1605,7 +1605,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho.'
+    notes: 'Atividade regulamentada pelo CORE. Obrigatório registro da PJ no conselho. Não é obrigatório indicar RT no contrato social.'
   },
 
   // --- ATIVIDADES ARTÍSTICAS, CRIATIVAS E DE ESPETÁCULOS ---
@@ -2018,7 +2018,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pela SUSEP, exige RT no contrato social.'
+    notes: 'Regulamentado pela SUSEP, é obrigatório indicar RT no Contrato Social.'
   },
   {
     code: '6629-1/00',
@@ -2039,7 +2039,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
+    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
   {
     code: '6821-8/02',
@@ -2050,7 +2050,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Regulamentado pelo CRECI, exige RT no contrato social.'
+    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
   {
     code: '6822-6/00',
@@ -2061,7 +2061,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRECI/CRA.'
+    notes: 'Regulamentado pelo CRECI/CRA. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
   
   // --- FOTOGRAFIA E AUDIOVISUAL ---
@@ -2910,268 +2910,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
-    code: '4221-9/03',
-    description: 'Manutenção de redes de distribuição de energia elétrica',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4221-9/05',
-    description: 'Manutenção de estações e redes de telecomunicações',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4313-4/00',
-    description: 'Obras de terraplenagem',
-    category: 'Construção Civil',
-    annex: 'IV',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4322-3/03',
-    description: 'Instalações de sistema de prevenção contra incêndio',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4329-1/01',
-    description: 'Instalação de painéis publicitários',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4329-1/02',
-    description: 'Instalação de equipamentos para orientação à navegação marítima, fluvial e lacustre',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4329-1/03',
-    description: 'Instalação, manutenção e reparação de elevadores, escadas e esteiras rolantes',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '4329-1/04',
-    description: 'Montagem e instalação de sistemas e equipamentos de iluminação e sinalização em vias públicas, portos e aeroportos',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
-  },
-  {
-    code: '9511-8/00',
-    description: 'Reparação e manutenção de computadores e de equipamentos periféricos',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
-  },
-  {
-    code: '9512-6/00',
-    description: 'Reparação e manutenção de equipamentos de comunicação',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
-  },
-  {
-    code: '9521-5/00',
-    description: 'Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e doméstico',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA.'
-  },
-  {
-    code: '4520-0/01',
-    description: 'Serviços de manutenção e reparação mecânica de veículos automotores',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-  {
-    code: '4520-0/02',
-    description: 'Serviços de lanternagem ou funilaria e pintura de veículos automotores',
-    category: 'Serviços Automotivos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-  },
-  {
-    code: '4520-0/03',
-    description: 'Serviços de manutenção e reparação elétrica de veículos automotores',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-  {
-    code: '4520-0/04',
-    description: 'Serviços de alinhamento e balanceamento de veículos automotores',
-    category: 'Serviços Automotivos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '4520-0/05',
-    description: 'Serviços de lavagem, lubrificação e polimento de veículos automotores',
-    category: 'Serviços Automotivos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '4520-0/06',
-    description: 'Serviços de borracharia para veículos automotores',
-    category: 'Serviços Automotivos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '4520-0/07',
-    description: 'Serviços de instalação, manutenção e reparação de acessórios para veículos automotores',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-  {
-    code: '4520-0/08',
-    description: 'Serviços de capotaria',
-    category: 'Serviços Automotivos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '4543-9/00',
-    description: 'Manutenção e reparação de motocicletas e motonetas',
-    category: 'Manutenção e Reparo Técnico',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-
-  
-  // --- CONSTRUÇÃO CIVIL ---
-  {
-    code: '4399-1/01',
-    description: 'Administração de obras',
-    category: 'Construção Civil',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA ou CAU. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '4221-9/03',
-    description: 'Manutenção de redes de distribuição de energia elétrica',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-  {
-    code: '4221-9/05',
-    description: 'Manutenção de estações e redes de telecomunicações',
-    category: 'Construção Civil',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-  {
-    code: '4313-4/00',
-    description: 'Obras de terraplenagem',
-    category: 'Construção Civil',
-    annex: 'IV',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
-  },
-  {
     code: '4321-5/00',
     description: 'Instalação e manutenção elétrica',
     category: 'Construção Civil',
@@ -3205,6 +2943,39 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CREA.'
   },
   {
+    code: '4221-9/03',
+    description: 'Manutenção de redes de distribuição de energia elétrica',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4221-9/05',
+    description: 'Manutenção de estações e redes de telecomunicações',
+    category: 'Construção Civil',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4313-4/00',
+    description: 'Obras de terraplenagem',
+    category: 'Construção Civil',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
     code: '4322-3/03',
     description: 'Instalações de sistema de prevenção contra incêndio',
     category: 'Construção Civil',
@@ -3213,7 +2984,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '4329-1/01',
@@ -3224,7 +2995,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '4329-1/02',
@@ -3235,7 +3006,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '4329-1/03',
@@ -3246,7 +3017,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '4329-1/04',
@@ -3257,7 +3028,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '4329-1/05',
@@ -3268,7 +3039,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA/CAU.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '4399-1/02',
@@ -3279,7 +3050,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '8121-4/00',
@@ -3324,6 +3095,114 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '4520-0/01',
+    description: 'Serviços de manutenção e reparação mecânica de veículos automotores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4520-0/02',
+    description: 'Serviços de lanternagem ou funilaria e pintura de veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+  },
+  {
+    code: '4520-0/03',
+    description: 'Serviços de manutenção e reparação elétrica de veículos automotores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4520-0/04',
+    description: 'Serviços de alinhamento e balanceamento de veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4520-0/05',
+    description: 'Serviços de lavagem, lubrificação e polimento de veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4520-0/06',
+    description: 'Serviços de borracharia para veículos automotores',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4520-0/07',
+    description: 'Serviços de instalação, manutenção e reparação de acessórios para veículos automotores',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '4520-0/08',
+    description: 'Serviços de capotaria',
+    category: 'Serviços Automotivos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false
+  },
+  {
+    code: '4543-9/00',
+    description: 'Manutenção e reparação de motocicletas e motonetas',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
+  },
+
+  
+  // --- CONSTRUÇÃO CIVIL ---
+  {
+    code: '4399-1/01',
+    description: 'Administração de obras',
+    category: 'Construção Civil',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO"" na razão social ou fantasia, desde a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
   },
 
   // --- COMÉRCIO VAREJISTA (ANEXO I) ---
@@ -4149,7 +4028,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
   },
   {
     code: '5620-1/02',
@@ -4285,8 +4165,38 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.12,
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA.'
+  },
+  {
+    code: '9511-8/00',
+    description: 'Reparação e manutenção de computadores e de equipamentos periféricos',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9512-6/00',
+    description: 'Reparação e manutenção de equipamentos de comunicação',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
+  },
+  {
+    code: '9521-5/00',
+    description: 'Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e doméstico',
+    category: 'Manutenção e Reparo Técnico',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Regulamentado pelo CREA.'
   }
 ];
-
-
-
