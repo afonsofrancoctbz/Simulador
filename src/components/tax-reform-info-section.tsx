@@ -42,7 +42,7 @@ export default function TaxReformInfoSection() {
                 1. Conceitos Centrais da Reforma
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O pilar da reforma é a unificação de cinco impostos (PIS, COFINS, IPI, ICMS, ISS) em um sistema de Imposto sobre Valor Agregado (IVA) Dual:</p>
+                <p>O pilar da reforma é a unificação de impostos sobre o consumo em um sistema de Imposto sobre Valor Agregado (IVA) Dual:</p>
                 <ul className="list-disc pl-6 space-y-2">
                     <li><strong>Contribuição sobre Bens e Serviços (CBS):</strong> Substituirá PIS e COFINS (tributos federais), com alíquota estimada em <strong>9,3%</strong>.</li>
                     <li><strong>Imposto sobre Bens e Serviços (IBS):</strong> Substituirá ICMS (estadual) e ISS (municipal), com alíquota estimada em <strong>18,7%</strong>.</li>
@@ -50,6 +50,10 @@ export default function TaxReformInfoSection() {
                     <li><strong>Não Cumulatividade Plena:</strong> O imposto pago na compra de insumos vira crédito para abater do imposto devido na venda.</li>
                     <li className="font-semibold text-destructive"><strong>Ponto Crítico para Serviços:</strong> O principal "insumo" de uma empresa de software é a mão de obra (folha de pagamento). A Reforma Tributária não permite o crédito de IBS/CBS sobre a folha de pagamento.</li>
                 </ul>
+                <div className="p-4 mt-4 border rounded-lg bg-background">
+                  <h4 className="font-bold text-foreground">Qual a diferença entre IBS e CBS?</h4>
+                  <p className="mt-2">Enquanto a CBS unifica tributos federais (PIS, COFINS), o IBS substitui os impostos de competência estadual (ICMS) e municipal (ISS). Ambos formam o IVA e incidem de forma não cumulativa, mas têm destinos de arrecadação diferentes (Governo Federal vs. Estados/Municípios).</p>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
@@ -60,23 +64,19 @@ export default function TaxReformInfoSection() {
               </AccordionTrigger>
               <AccordionContent className="space-y-6 pt-2 text-base text-muted-foreground">
                  <div>
-                    <h4 className="font-bold text-foreground">Lucro Presumido</h4>
-                    <p className="mt-1">Empresas neste regime pagarão a alíquota padrão do IVA sobre o faturamento, substituindo PIS, COFINS e ISS. Poderão se creditar de despesas com insumos (ex: aluguel, software, marketing), mas não da folha de pagamento. Os impostos sobre o lucro (IRPJ, CSLL) permanecem inalterados.</p>
+                    <h4 className="font-bold text-foreground">Como funcionará a CBS?</h4>
+                    <p className="mt-1">A preparação para a chegada da CBS varia conforme o regime tributário:</p>
                  </div>
-                 <div>
-                    <h4 className="font-bold text-foreground">Simples Nacional</h4>
-                    <p className="mt-1">O regime foi mantido, mas com uma escolha estratégica crucial para empresas que vendem para outras empresas (B2B):</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                        <Card className="p-4 bg-background">
-                            <h5 className="font-bold text-primary">Opção 1: Regime Padrão (DAS)</h5>
-                            <p className="text-sm mt-2">Continuar pagando tudo na guia única (DAS). É mais simples, mas a empresa não transfere créditos de IVA para seus clientes, o que a torna menos competitiva no mercado B2B.</p>
-                        </Card>
-                        <Card className="p-4 bg-background">
-                            <h5 className="font-bold text-primary">Opção 2: Regime Híbrido</h5>
-                            <p className="text-sm mt-2">Pagar IBS e CBS por fora do DAS. Isso permite que seu cliente PJ tome o crédito integral do imposto, tornando sua empresa mais atraente. Em contrapartida, sua empresa paga o IVA cheio e também o "DAS restante" (IRPJ, CSLL, CPP).</p>
-                        </Card>
-                    </div>
-                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                    <Card className="p-4 bg-background">
+                        <h5 className="font-bold text-primary">Simples Nacional</h5>
+                        <p className="text-sm mt-2">Você segue pagando tudo no DAS, mas pode se informar sobre as possibilidades do Simples Nacional Híbrido e recolher os impostos “por fora” para se manter competitivo no B2B. Sua alíquota do Simples não muda, mas ajustes podem vir na regulamentação.</p>
+                    </Card>
+                    <Card className="p-4 bg-background">
+                        <h5 className="font-bold text-primary">Lucro Presumido/Real</h5>
+                        <p className="text-sm mt-2">Com poucos gastos que geram crédito, a alíquota geral pode pesar. Fique atento a possíveis reduções setoriais na lei e reavalie o melhor regime (Simples, presumido ou real) com sua contabilidade.</p>
+                    </Card>
+                </div>
               </AccordionContent>
             </AccordionItem>
             
@@ -162,3 +162,5 @@ export default function TaxReformInfoSection() {
     </div>
   );
 }
+
+    
