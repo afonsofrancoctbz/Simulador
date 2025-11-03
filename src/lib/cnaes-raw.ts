@@ -536,7 +536,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CBOO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CBOO. Não é obrigatório indicar o Responsável Técnico no Contrato Social.'
   },
   
   // --- ODONTOLOGIA ---
@@ -562,7 +562,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
     ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CRO. Exige registro da empresa e indicação de Responsável Técnico.'
+    notes: 'Atividade regulamentada pelo CRO. Não é obrigatório indicar o Responsável Técnico no Contrato Social.'
   },
 
   // --- TECNOLOGIA DA INFORMAÇÃO ---
@@ -2511,7 +2511,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '3312-1/03',
@@ -2522,7 +2522,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '3312-1/04',
@@ -2533,7 +2533,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '3313-9/01',
@@ -2544,7 +2544,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '3313-9/02',
@@ -2555,7 +2555,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    notes: 'Atividade regulamentada pelo CREA.'
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
   },
   {
     code: '3313-9/99',
@@ -4152,5 +4152,51 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: false
+  },
+  // NOVOS CNAES
+  {
+    code: '0161-0/03',
+    description: 'Serviço de preparação de terreno, cultivo e colheita',
+    category: 'Agricultura e Pecuária',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '0162-8/03',
+    description: 'Serviço de manejo de animais',
+    category: 'Agricultura e Pecuária',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '0322-1/07',
+    description: 'Atividades de apoio à aqüicultura em água doce',
+    category: 'Agricultura e Pecuária',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório indicar o Responsável Técnico no Contrato Social, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório.'
+  },
+  {
+    code: '1099-6/04',
+    description: 'Fabricação de gelo comum',
+    category: 'Indústria de Transformação',
+    annex: 'II',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CREA.'
   }
 ];
+
