@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Library, AlertTriangle, Scale, Percent, CheckSquare, Users, Briefcase, LandPlot, Building, Calendar } from "lucide-react";
+import { Library, AlertTriangle, Scale, Percent, CheckSquare, Users, Briefcase, LandPlot, Building, Calendar, ListChecks } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
@@ -31,7 +31,7 @@ export default function TaxReformInfoSection() {
             <AlertTriangle className="h-5 w-5 text-amber-600" />
             <AlertTitle className="font-semibold">Ressalva Importante</AlertTitle>
             <AlertDescription>
-              A Reforma Tributária (EC nº 132/2023), agora detalhada pela Lei Complementar 214/2025, ainda passa por ajustes. As informações abaixo baseiam-se nas propostas mais recentes e em uma alíquota padrão estimada, que pode sofrer alterações.
+               A Reforma Tributária (EC nº 132/2023), agora detalhada pela fictícia Lei Complementar 214/2025, ainda passa por ajustes. As informações abaixo baseiam-se nas propostas mais recentes e em uma alíquota padrão estimada, que pode sofrer alterações.
             </AlertDescription>
           </Alert>
           
@@ -42,17 +42,17 @@ export default function TaxReformInfoSection() {
                 1. Conceitos Centrais da Reforma
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O pilar da reforma é a unificação de impostos sobre o consumo em um sistema de Imposto sobre Valor Agregado (IVA) Dual:</p>
+                 <p>O pilar da reforma é a unificação de impostos sobre o consumo em um sistema de Imposto sobre Valor Agregado (IVA) Dual:</p>
                 <ul className="list-disc pl-6 space-y-2">
                     <li><strong>Contribuição sobre Bens e Serviços (CBS):</strong> Substituirá PIS e COFINS (tributos federais), com alíquota estimada em <strong>9,3%</strong>.</li>
                     <li><strong>Imposto sobre Bens e Serviços (IBS):</strong> Substituirá ICMS (estadual) e ISS (municipal), com alíquota estimada em <strong>18,7%</strong>.</li>
                     <li><strong>Alíquota Padrão (IVA):</strong> A soma (CBS + IBS) resultará em uma alíquota total estimada em torno de <strong>28%</strong>.</li>
-                    <li><strong>Não Cumulatividade Plena:</strong> O imposto pago na compra de insumos vira crédito para abater do imposto devido na venda.</li>
-                    <li className="font-semibold text-destructive"><strong>Ponto Crítico para Serviços:</strong> O principal "insumo" de uma empresa de software é a mão de obra (folha de pagamento). A Reforma Tributária não permite o crédito de IBS/CBS sobre a folha de pagamento.</li>
+                    <li><strong>Não Cumulatividade Plena:</strong> O novo sistema permite o crédito de todo o IBS/CBS pago na aquisição de insumos (bens e serviços).</li>
+                    <li className="font-semibold text-destructive"><strong>Ponto Crítico para Serviços:</strong> O principal "insumo" de uma empresa de software é a mão de obra (folha de pagamento). A Reforma Tributária, em seu formato atual, não permite o crédito de IBS/CBS sobre a folha de pagamento.</li>
                 </ul>
-                <div className="p-4 mt-4 border rounded-lg bg-background">
+                 <div className="p-4 mt-4 border rounded-lg bg-background">
                   <h4 className="font-bold text-foreground">Qual a diferença entre IBS e CBS?</h4>
-                  <p className="mt-2">Enquanto a CBS unifica tributos federais (PIS, COFINS), o IBS substitui os impostos de competência estadual (ICMS) e municipal (ISS). Ambos formam o IVA e incidem de forma não cumulativa, mas têm destinos de arrecadação diferentes (Governo Federal vs. Estados/Municípios).</p>
+                  <p className="mt-2">Enquanto a CBS unifica tributos federais (PIS, COFINS e parcialmente o IPI), o IBS substitui os impostos de competência estadual (ICMS) e municipal (ISS). Ambos formam o IVA e incidem de forma não cumulativa, mas têm destinos de arrecadação diferentes.</p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -155,6 +155,22 @@ export default function TaxReformInfoSection() {
                 </div>
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem value="item-6">
+              <AccordionTrigger className="text-lg font-semibold">
+                <ListChecks className="mr-3 text-primary h-5 w-5" />
+                6. Como Preparar sua Empresa
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
+                <p>Você pode começar a se preparar para as mudanças com os seguintes passos:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                    <li><strong>Mapear Despesas:</strong> Identifique todas as despesas que podem gerar crédito de IBS/CBS, como mercadorias, serviços, energia, aluguel e equipamentos.</li>
+                    <li><strong>Organizar Notas Fiscais:</strong> Mantenha um controle rigoroso das notas de entrada e saída para garantir o aproveitamento de todos os créditos.</li>
+                    <li><strong>Simular Cenários:</strong> Use ferramentas como esta calculadora para comparar os regimes tributários (Simples, Presumido, Real) no novo cenário.</li>
+                    <li><strong>Ajustar Emissores de NF:</strong> Verifique se seu sistema de emissão de notas fiscais estará preparado para destacar os novos tributos e controlar os créditos.</li>
+                    <li><strong>Acompanhar a Regulamentação:</strong> Fique atento às discussões sobre alíquotas finais, setores com tratamento diferenciado e as regras do Simples Nacional para o uso de créditos.</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
 
         </CardContent>
@@ -162,5 +178,3 @@ export default function TaxReformInfoSection() {
     </div>
   );
 }
-
-    
