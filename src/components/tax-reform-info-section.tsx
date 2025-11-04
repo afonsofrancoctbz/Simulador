@@ -9,7 +9,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Library, AlertTriangle, Scale, Percent, CheckSquare, Info, Calculator, FileText, BarChart, Users } from "lucide-react";
+import { Library, AlertTriangle, FileText, BarChart, Users, Info } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
