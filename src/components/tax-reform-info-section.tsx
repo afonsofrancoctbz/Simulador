@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -10,7 +9,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Library, AlertTriangle, Scale, Percent, CheckSquare, Info, Calculator } from "lucide-react";
+import { Library, AlertTriangle, Scale, Percent, CheckSquare, Info, Calculator, FileText, BarChart, Users } from "lucide-react";
 
 export default function TaxReformInfoSection() {
   return (
@@ -19,84 +18,128 @@ export default function TaxReformInfoSection() {
         <CardHeader className="text-center">
           <Library className="mx-auto h-8 w-8 text-primary mb-2" />
           <CardTitle className="text-2xl font-bold text-primary">
-            Guia da Reforma Tributária: Metodologia de Cálculo
+            Dois Eixos de Análise: Simples Nacional e IVA Dual
           </CardTitle>
           <CardDescription className="text-md mt-2 text-muted-foreground">
-            Entenda como os novos impostos (IBS, CBS, IS) serão calculados e o impacto em cada regime.
+            A tributação pós-reforma depende do cruzamento entre o regime da empresa (que define IRPJ/CSLL) e a alíquota do novo IVA (que define o imposto sobre consumo).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 p-4 md:p-8">
 
           <Alert variant="default" className="bg-amber-50/80 border-amber-200 text-amber-900">
             <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <AlertTitle className="font-semibold">Ressalva Importante</AlertTitle>
+            <AlertTitle className="font-semibold">Simulador de Cenários</AlertTitle>
             <AlertDescription>
-               As informações abaixo baseiam-se nas propostas da Reforma Tributária (EC 132/2023) e projetos de Lei Complementar. Alíquotas e regras definitivas dependem da aprovação final e regulamentação.
+               Este simulador compara o **Simples Nacional** (com suas tabelas e Fator R) e o **Lucro Presumido** sob as novas regras do IVA (IBS/CBS). Empresas no Lucro Presumido e no Simples Híbrido ganham direito a créditos (não cumulatividade plena), uma mudança crucial em relação ao sistema atual.
             </AlertDescription>
           </Alert>
           
           <Accordion type="multiple" defaultValue={["item-1"]} className="w-full text-left">
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
-                <Calculator className="mr-3 text-primary h-5 w-5" />
-                I. Cálculo do IBS e da CBS (IVA Dual)
+                <FileText className="mr-3 text-primary h-5 w-5" />
+                Eixo 1: Classificação no Simples Nacional (Anexos I a V)
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O IBS e a CBS seguem a mecânica de um Imposto sobre Valor Agregado (IVA). Para empresas do Lucro Presumido e as do Simples Nacional que optarem pelo Regime Regular, os cálculos se baseiam em débitos e créditos.</p>
-                
-                <h4 className="font-semibold text-foreground pt-2">A. Base de Cálculo (Débito)</h4>
-                <p>A base de cálculo é o valor da operação, incluindo acréscimos e encargos. Para o cálculo "por fora", é preciso excluir o próprio IVA e outros tributos como o IPI e o Imposto Seletivo.</p>
-                
-                <h4 className="font-semibold text-foreground pt-2">B. Alíquotas</h4>
-                <p>A alíquota-padrão combinada é estimada em **26,5%**, mas o valor final será definido anualmente. Setores específicos (saúde, educação, etc.) terão alíquotas reduzidas ou isenção.</p>
-
-                <h4 className="font-semibold text-foreground pt-2">C. Não Cumulatividade (Crédito)</h4>
-                <p>O imposto devido é a diferença entre os débitos (saídas) e os créditos (entradas). O crédito pode ser apropriado sobre o valor do IBS/CBS pago na aquisição de praticamente todos os bens e serviços usados na operação, comprovado por documento fiscal eletrônico.</p>
-
+                <p>A classificação no Simples Nacional é essencial, pois o enquadramento em um Anexo determina a alíquota efetiva total paga. A CPP (Contribuição Previdenciária Patronal) pode ou não estar inclusa no DAS.</p>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead className="font-bold w-1/5">Anexo</TableHead>
+                        <TableHead className="font-bold w-2/5">Abrangência</TableHead>
+                        <TableHead className="font-bold w-2/5">Observações</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell className="font-semibold">Anexo I</TableCell>
+                            <TableCell>Comércio e atividades de Bares e Restaurantes</TableCell>
+                            <TableCell>Alíquotas totais de 4% a 19% (2025)</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold">Anexo II</TableCell>
+                            <TableCell>Indústria</TableCell>
+                            <TableCell>Não contemplado nesta calculadora.</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold">Anexo III</TableCell>
+                            <TableCell>Serviços de caráter não intelectual e serviços intelectuais com **Fator R ≥ 28%**.</TableCell>
+                            <TableCell>Alíquotas totais de 6% a 33% (2025)</TableCell>
+                        </TableRow>
+                         <TableRow>
+                            <TableCell className="font-semibold">Anexo IV</TableCell>
+                            <TableCell>Serviços com regras específicas de CPP (Construção Civil, Limpeza, Advocacia).</TableCell>
+                            <TableCell>A CPP é recolhida **por fora** do Simples.</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold">Anexo V</TableCell>
+                            <TableCell>Serviços de natureza intelectual, técnica ou científica com **Fator R < 28%** (Engenharia, Medicina, etc.).</TableCell>
+                            <TableCell>Alíquotas iniciais mais altas que o Anexo III.</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg font-semibold">
-                 <Scale className="mr-3 text-primary h-5 w-5" />
-                 II. Cálculo do Imposto Seletivo (IS)
+                 <BarChart className="mr-3 text-primary h-5 w-5" />
+                 Eixo 2: Carga Tributária do IVA Dual (Lucro Presumido / Simples Híbrido)
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                 <p>O "Imposto do Pecado" incidirá sobre a produção, importação ou comercialização de bens e serviços prejudiciais à saúde ou ao meio ambiente.</p>
-                 <ul className="list-disc pl-6 space-y-2">
-                    <li>**Lista de Incidência:** A lei definirá a lista exata de produtos e serviços.</li>
-                    <li>**Alíquota Calibrada:** A alíquota não será única, mas calibrada pelo impacto do produto (teor alcoólico, açúcar, emissões de CO2, etc.).</li>
-                    <li>**Base de Cálculo:** Será o valor da operação, mas a metodologia específica ainda será detalhada em lei.</li>
-                 </ul>
+                 <p>Para empresas no Lucro Presumido ou no Simples Híbrido, a tributação sobre o consumo (IBS/CBS) seguirá a alíquota padrão (AP) de ~26,5% ou alíquotas reduzidas, dependendo da atividade.</p>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="font-bold w-1/4">Redução</TableHead>
+                            <TableHead className="font-bold w-1/4">Alíquota Final (Est.)</TableHead>
+                            <TableHead className="font-bold w-1/2">Setores Beneficiados</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell className="font-semibold text-green-700">60%</TableCell>
+                            <TableCell className="font-semibold">10,60%</TableCell>
+                            <TableCell>Serviços de Saúde e Educação; Produções Artísticas e Culturais; Atividades Desportivas.</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold text-amber-700">40%</TableCell>
+                            <TableCell className="font-semibold">15,9%</TableCell>
+                            <TableCell>Regime Específico para Bares, Restaurantes, Hotelaria, Agências de Turismo e Parques.</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold text-blue-700">30%</TableCell>
+                            <TableCell className="font-semibold">18,55%</TableCell>
+                            <TableCell>Profissões Intelectuais Regulamentadas (Advocacia, Arquitetura, Engenharia, Contabilidade, etc.).</TableCell>
+                        </TableRow>
+                         <TableRow>
+                            <TableCell className="font-semibold text-red-700">0%</TableCell>
+                            <TableCell className="font-semibold">26,5%</TableCell>
+                            <TableCell>Alíquota Padrão. Comércio, Tecnologia e demais serviços não listados nas reduções.</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg font-semibold">
-                <Percent className="mr-3 text-primary h-5 w-5" />
-                III. Detalhes por Regime Tributário
+                <Users className="mr-3 text-primary h-5 w-5" />
+                III. Informações Específicas por Regime Tributário
               </AccordionTrigger>
               <AccordionContent className="space-y-6 pt-2 text-base text-muted-foreground">
                   <div>
                     <h4 className="font-bold text-foreground">A. Lucro Presumido (LP)</h4>
-                    <p className="mt-1">O regime do LP não será extinto, e o cálculo de IRPJ/CSLL continua o mesmo. A grande mudança é que, para os impostos sobre consumo (IBS/CBS), a empresa passará a operar no **regime não cumulativo**, podendo se creditar dos impostos pagos em suas aquisições.</p>
+                    <p className="mt-1">A Reforma Tributária **não extingue o regime de Lucro Presumido** nem altera o cálculo do IRPJ e da CSLL. O impacto principal está nos impostos sobre consumo (PIS, COFINS, ISS), que são substituídos pelo IBS e CBS, passando a operar no **regime não cumulativo** (com direito a créditos).</p>
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground">B. Simples Nacional (SN)</h4>
-                    <p className="mt-1">O Simples Nacional foi mantido, mas com alterações importantes. O conceito de Receita Bruta foi ampliado, e surge a opção do **Regime Híbrido** a partir de 2027:</p>
+                    <p className="mt-1">O Simples Nacional é mantido, mas a Lei Complementar 214/2025 traz duas grandes novidades: a base de cálculo da Receita Bruta foi ampliada para incluir receitas não operacionais, e foi criada a opção pelo **Regime Híbrido** a partir de 2027.</p>
                     <ul className="list-disc pl-6 space-y-2 mt-2">
                         <li>**Regime Tradicional:** Continua pagando tudo no DAS. O crédito gerado para o cliente é limitado à alíquota paga dentro do Simples.</li>
-                        <li>**Regime Híbrido (Opcional):** A empresa pode optar por pagar o IBS/CBS "por fora" do DAS. Isso permite gerar crédito integral para o cliente (mantendo a competitividade no B2B), mas a carga tributária total da empresa do Simples tende a aumentar.</li>
+                        <li>**Regime Híbrido (Opcional):** Permite recolher o IBS/CBS "por fora" do DAS. Isso gera crédito integral para o cliente (aumentando a competitividade no B2B), mas a carga tributária da empresa do Simples tende a aumentar.</li>
                     </ul>
                   </div>
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Regime Tributário</TableHead><TableHead>Impostos de Consumo (IBS/CBS)</TableHead><TableHead>Outros Tributos (IRPJ/CSLL)</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                        <TableRow><TableCell className="font-semibold">Lucro Presumido</TableCell><TableCell>Não cumulativo (com créditos), seguindo as regras gerais.</TableCell><TableCell>Cálculo mantido por presunção da Receita Bruta.</TableCell></TableRow>
-                        <TableRow><TableCell className="font-semibold">Simples Nacional (Tradicional)</TableCell><TableCell>Unificado no DAS. Não gera crédito integral para o cliente.</TableCell><TableCell>Cálculo pela RBT12 e Fator R.</TableCell></TableRow>
-                        <TableRow><TableCell className="font-semibold">Simples Nacional (Híbrido)</TableCell><TableCell>Não cumulativo (pago fora do DAS). Gera crédito integral.</TableCell><TableCell>Mantém-se no Simples Nacional para os demais tributos.</TableCell></TableRow>
-                    </TableBody>
-                  </Table>
               </AccordionContent>
             </AccordionItem>
             

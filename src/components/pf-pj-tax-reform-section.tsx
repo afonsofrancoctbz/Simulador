@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -59,15 +60,15 @@ export default function PfPjTaxReformSection() {
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
                 <Gem className="mr-3 text-primary h-5 w-5" />
-                O que muda nos impostos com a Reforma Tributária?
+                O que vai mudar nos impostos com a Reforma Tributária?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                 <p>
                   O modelo atual de PIS, Cofins, IPI, ICMS e ISS será substituído por um Imposto sobre Valor Agregado (IVA) em duas camadas:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
-                    <li><strong>CBS (Contribuição sobre Bens e Serviços):</strong> Tributo federal.</li>
-                    <li><strong>IBS (Imposto sobre Bens e Serviços):</strong> Compartilhado por estados e municípios.</li>
+                    <li><strong>CBS (Contribuição sobre Bens e Serviços):</strong> Tributo federal que substitui PIS, COFINS e parte do IPI.</li>
+                    <li><strong>IBS (Imposto sobre Bens e Serviços):</strong> Unifica ICMS (estadual) e ISS (municipal).</li>
                     <li><strong>Imposto Seletivo:</strong> Incidirá sobre produtos/serviços nocivos à saúde e ao meio ambiente.</li>
                 </ul>
                 <p>O objetivo é simplificar, acabar com o “efeito cascata” e tributar no destino (onde está o consumidor).</p>
@@ -111,19 +112,18 @@ export default function PfPjTaxReformSection() {
                  Qual será a alíquota dos novos impostos?
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                  <p>Haverá uma alíquota padrão estimada em torno de 27%, mas o número final depende de regulamentações. O Projeto de Lei Complementar 68/2024 estabeleceu a alíquota geral do IVA em 26,5%, sendo 17,7% para o IBS e 8,8% para a CBS.</p>
+                  <p>O Projeto de Lei Complementar 68/2024 estabeleceu a alíquota geral do IVA em **26,5%** (17,7% de IBS + 8,8% de CBS), mas o valor final pode ser ajustado. No entanto, há benefícios para setores específicos:</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                          <h4 className="font-bold text-green-800 flex items-center gap-2"><BadgePercent className="h-5 w-5"/>Redução de 30% (Alíquota de ~18,55%)</h4>
-                          <p className="mt-1 text-sm text-green-900">Profissionais liberais (advogados, engenheiros, contadores, etc.).</p>
-                      </div>
-                       <div className="p-4 rounded-lg bg-green-50 border border-green-200">
                           <h4 className="font-bold text-green-800 flex items-center gap-2"><BadgePercent className="h-5 w-5"/>Redução de 60% (Alíquota de ~10,60%)</h4>
-                          <p className="mt-1 text-sm text-green-900">Setores essenciais como saúde, educação e cultura.</p>
+                          <p className="mt-1 text-sm text-green-900">Serviços de educação, saúde, medicamentos, produções culturais e alimentos da cesta básica.</p>
+                      </div>
+                       <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                          <h4 className="font-bold text-blue-800 flex items-center gap-2"><BadgePercent className="h-5 w-5"/>Redução de 30% (Alíquota de ~18,55%)</h4>
+                          <p className="mt-1 text-sm text-blue-900">Profissionais liberais (advogados, engenheiros, contadores, arquitetos, etc.).</p>
                       </div>
                   </div>
-                   <p className="text-sm">A regra vale tanto para autônomos quanto para PJs com clínicas, escolas, etc. A legislação ainda prevê que, em 2031, a alíquota do IVA seja fixada em 26,5%, condicionada à revisão de benefícios fiscais.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -133,41 +133,24 @@ export default function PfPjTaxReformSection() {
                 Impactos Diretos para o Profissional PJ
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                 <p>A lógica do novo IVA é <strong>não cumulativa</strong>. Você poderá abater, como crédito, o IVA pago em suas compras (energia, aluguel, softwares, etc.), mas a <strong>folha de pagamento não gera crédito</strong>. Isso altera quatro frentes práticas:</p>
+                 <p>A lógica do novo IVA é **não cumulativa**. Você poderá abater, como crédito, o IVA pago em suas compras (energia, aluguel, softwares, etc.), mas a **folha de pagamento não gera crédito**. Isso altera quatro frentes práticas:</p>
                  <div>
                     <h4 className="font-semibold text-foreground">1. Nota Fiscal e Split Payment</h4>
-                    <p>O imposto será destacado na nota, não mais embutido no preço. Surge também o conceito de <strong>split payment</strong>, onde o imposto pode ser recolhido automaticamente na transação.</p>
+                    <p>O imposto será destacado na nota. Surge também o conceito de **split payment**, onde o imposto pode ser recolhido automaticamente na transação.</p>
                  </div>
                  <div>
-                    <h4 className="font-semibold text-foreground">2. Apuração dos Impostos</h4>
-                    <p>No <strong>Simples Nacional</strong>, será possível optar por pagar o IVA "por fora" do DAS para gerar crédito para clientes B2B. Para <strong>Lucro Presumido/Real</strong>, a troca de impostos por um IVA com alíquota maior exigirá uma gestão de créditos eficiente para mitigar o impacto.</p>
+                    <h4 className="font-semibold text-foreground">2. Apuração dos Impostos e Precificação</h4>
+                    <p>No **Simples Nacional**, será possível pagar o IVA "por fora" do DAS para gerar crédito a clientes B2B. Para **Lucro Presumido/Real**, a troca de impostos por um IVA maior exigirá uma gestão de créditos eficiente e uma revisão da sua precificação para manter a competitividade.</p>
                  </div>
-                 <div>
-                    <h4 className="font-semibold text-foreground">3. Precificação e Competitividade</h4>
-                    <p>Com as novas regras, o preço dos seus serviços pode precisar de ajustes para se manter competitivo, especialmente em vendas para outras empresas (B2B).</p>
-                 </div>
+                  <div>
+                        <h4 className="font-bold text-foreground">Exemplos Práticos:</h4>
+                        <ul className="list-disc pl-5 mt-2 space-y-2">
+                           <li>**Tecnologia (Alíquota Padrão de 26,5%):** Um desenvolvedor no Lucro Presumido faturando R$ 15.000/mês, que hoje paga ~R$ 1.297,50 de impostos sobre consumo, passaria a pagar ~R$ 3.975. Ele poderá abater créditos de despesas como servidores e licenças para reduzir esse valor. A exportação de serviços continua isenta.</li>
+                           <li>**Saúde (Redução de 60% - Alíquota de 10,6%):** Um médico no Lucro Presumido com o mesmo faturamento, que hoje paga ~R$ 847,50, passaria a pagar ~R$ 1.590, antes de considerar os créditos de insumos.</li>
+                           <li>**Engenharia/Arquitetura (Redução de 30% - Alíquota de 18,55%):** Um arquiteto com o mesmo faturamento, que hoje paga ~R$ 1.297,50, passaria a pagar ~R$ 2.782,50, também com a possibilidade de abater créditos.</li>
+                        </ul>
+                    </div>
               </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-profissoes">
-                <AccordionTrigger className="text-lg font-semibold">
-                    <CheckCircle className="mr-3 text-primary h-5 w-5" />
-                    Exemplos Práticos: Como Fica a Tributação?
-                </AccordionTrigger>
-                <AccordionContent className="pt-2 text-base text-muted-foreground space-y-6">
-                    <div>
-                        <h4 className="font-bold text-foreground">Profissionais de Tecnologia</h4>
-                        <p>Para este setor, a alíquota geral será de 26,5%. Um desenvolvedor no Lucro Presumido que fatura R$ 15.000/mês e hoje paga R$ 1.297,50 (8,65%) de impostos sobre consumo, passaria a pagar ~R$ 4.020,00 (26,5%). Ele poderá abater créditos de despesas como servidores e licenças para reduzir esse valor.</p>
-                    </div>
-                     <div>
-                        <h4 className="font-bold text-foreground">Médicos e Profissionais da Saúde</h4>
-                        <p>Com a redução de 60%, a alíquota sobre consumo será de 10,6%. Um médico no Lucro Presumido com faturamento de R$ 15.000, que hoje paga R$ 847,50 (5,65%), passará a pagar R$ 1.590,00 (10,6%). A carga tributária total, somando IRPJ/CSLL, subiria de ~18% para ~21%, antes de considerar os créditos.</p>
-                    </div>
-                     <div>
-                        <h4 className="font-bold text-foreground">Engenheiros, Arquitetos e Advogados</h4>
-                        <p>Estes profissionais terão redução de 30%, resultando em uma alíquota de 18,55%. Um arquiteto que fatura R$ 15.000 e hoje paga R$ 1.297,50 (8,65%) de impostos sobre consumo, passaria a pagar R$ 2.782,50 (18,55%), também com a possibilidade de abater créditos.</p>
-                    </div>
-                </AccordionContent>
             </AccordionItem>
 
              <AccordionItem value="item-simples-nacional">
@@ -179,8 +162,8 @@ export default function PfPjTaxReformSection() {
                     <p>No primeiro momento, os impactos são indiretos, pois as alíquotas do Simples não mudam. Contudo, haverá a opção de recolher o IVA por fora do DAS. Essa escolha pode ser vantajosa para quem vende para outras empresas (B2B), pois permite a transferência de crédito integral ao cliente.</p>
                     <p>No entanto, essa decisão exige cuidado, pois pode resultar em uma carga tributária maior. Alguns impactos indiretos a serem considerados são:</p>
                      <ul className="list-disc pl-6 space-y-2">
-                        <li><strong>Split Payment:</strong> O imposto será recolhido no ato do recebimento, afetando o fluxo de caixa.</li>
-                        <li><strong>Competitividade:</strong> Manter-se no DAS padrão pode gerar menos crédito para o cliente, tornando seu serviço "mais caro" para empresas do Lucro Real/Presumido.</li>
+                        <li>**Split Payment:** O imposto pode ser recolhido no ato do recebimento, afetando o fluxo de caixa.</li>
+                        <li>**Competitividade:** Manter-se no DAS padrão pode gerar menos crédito para o cliente, tornando seu serviço "mais caro" para empresas do Lucro Real/Presumido.</li>
                     </ul>
                 </AccordionContent>
             </AccordionItem>
