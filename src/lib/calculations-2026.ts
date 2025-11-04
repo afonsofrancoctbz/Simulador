@@ -41,8 +41,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
   const csll = presumedProfitBase * fiscalConfig2026.lucro_presumido_rates.CSLL;
   
   // NEW: IBS/CBS Calculation (Replaces PIS/COFINS/ISS)
-  // Credits are calculated based on a simulated input, let's assume 0 for now as it's not in the form.
-  // In a real scenario, we'd have an input for "insumos geradores de crédito".
+  // Export revenues are immune.
   const insumosGeradoresDeCredito = 0; // This should come from form if we want to calculate credits
 
   const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
@@ -83,7 +82,7 @@ function calculateLucroPresumido2026(values: TaxFormValues): TaxDetails2026 {
         { name: "INSS s/ Pró-labore", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
     ].filter(i => i.value > 0.001),
-    notes: ["Cálculo pós-reforma: PIS, COFINS e ISS são substituídos por CBS e IBS. Alíquota do IVA pode ter redução de 30% ou 60% dependendo da atividade."],
+    notes: ["Cálculo pós-reforma: PIS, COFINS e ISS são substituídos por CBS e IBS. Alíquota do IVA pode ter redução de 30% ou 60% dependendo da atividade. Receitas de exportação são imunes ao IVA."],
     partnerTaxes
   };
 }
@@ -123,7 +122,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
       };
     }
 
-    const allActivities = [...domesticActivities, ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate }))];
+    const allActivities = [...domesticActivities.map(a=>({...a, isExport: false})), ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, isExport: true }))];
     const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : (effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0);
     
     let totalDas = 0;
@@ -132,22 +131,34 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
     let hasAnnexIVActivity = false;
 
     // This block calculates the total DAS as if no IVA was paid "por fora"
-    const revenueByAnnex = allActivities.reduce((acc, activity) => {
+    const revenueByAnnex: Record<string, { revenue: number, isExport: boolean }[]> = {};
+
+    allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
-        if (!cnaeInfo) return acc;
+        if (!cnaeInfo) return;
         let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
-        if (!acc[effectiveAnnex]) acc[effectiveAnnex] = 0;
-        acc[effectiveAnnex] += activity.revenue;
-        return acc;
-    }, {} as Record<Annex, number>);
+        if (!revenueByAnnex[effectiveAnnex]) revenueByAnnex[effectiveAnnex] = [];
+        revenueByAnnex[effectiveAnnex].push({ revenue: activity.revenue, isExport: activity.isExport });
+    });
+
 
     for (const annexStr in revenueByAnnex) {
         const annex = annexStr as Annex;
-        const annexRevenue = revenueByAnnex[annex];
+        const activitiesInAnnex = revenueByAnnex[annex];
         const annexTable = fiscalConfig2026.simples_nacional[annex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
-        totalDas += annexRevenue * effectiveRate;
+        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+        const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
+
+        activitiesInAnnex.forEach(activity => {
+            let activityDas = activity.revenue * effectiveRate;
+            if (activity.isExport) {
+                activityDas *= (1 - exportExemptionRatio);
+            }
+            totalDas += activityDas;
+        });
+
         if (annex === 'IV') hasAnnexIVActivity = true;
     }
     
@@ -157,10 +168,10 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
 
     // If hybrid, adjust DAS and calculate IVA separately
     if (isHybrid) {
-      const b2bDomesticRevenue = domesticRevenue * (b2bRevenuePercentage / 100);
+      // IVA is only on domestic B2B revenue. Export is immune.
       const insumosGeradoresDeCredito = 0; // Placeholder for credit-generating inputs
 
-      // Calculate the IVA debit on B2B revenue
+      // Calculate the IVA debit on B2B domestic revenue
       const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
           const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
           const cnaeInfo = getCnaeData(activity.code);
@@ -172,7 +183,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
       const totalIvaCredit = insumosGeradoresDeCredito * fiscalConfig2026.reforma_tributaria.iva_rate;
       ivaTaxes = totalIvaDebit - totalIvaCredit;
   
-      // Reduce the DAS by the proportion of PIS/COFINS/ISS that is now paid via IVA
+      // Reduce the DAS by the proportion of PIS/COFINS/ISS that is now paid via IVA for domestic B2B revenue
       const dasReduction = domesticActivities.reduce((sum, activity) => {
           const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
           const cnaeInfo = getCnaeData(activity.code);
@@ -205,9 +216,9 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
 
     const notes = [];
     if (isHybrid) {
-      notes.push(`Cenário competitivo para B2B: ${formatPercent(b2bRevenuePercentage/100)} do faturamento paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido, contemplando apenas IRPJ, CSLL e CPP.`);
+      notes.push(`Cenário competitivo para B2B: ${formatPercent(b2bRevenuePercentage/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
     } else {
-      notes.push("Regime padrão do Simples. A competitividade em B2B pode ser menor, pois o crédito de IVA gerado para o cliente é limitado à alíquota do DAS.");
+      notes.push("Regime padrão do Simples. O crédito de IVA para clientes B2B é limitado. Receitas de exportação têm PIS/COFINS/ISS zerados dentro do DAS.");
     }
     if (cppFromAnnexIV > 0) {
       notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2026.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);

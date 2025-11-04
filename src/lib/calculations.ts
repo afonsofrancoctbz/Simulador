@@ -91,13 +91,13 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
     
-    // Impostos sobre Faturamento
+    // Impostos sobre Faturamento (Apenas receita doméstica)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
     const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
     const iss = domesticRevenue * issValue;
 
-    // Presunção sobre a receita total
+    // Presunção sobre a receita total (IRPJ e CSLL incidem sobre exportação)
     const presumedProfitBase = totalRevenue * 0.32;
     const irpjAdicional = Math.max(0, (presumedProfitBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
     const irpj = presumedProfitBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
