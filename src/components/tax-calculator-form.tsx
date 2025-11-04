@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
@@ -15,7 +15,6 @@ import { CnaeSelector } from './cnae-selector';
 import { getCnaeData } from "@/lib/cnae-helpers";
 import type { Annex } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
 
@@ -35,6 +34,7 @@ export const CalculatorFormSchema = z.object({
   proLabores: z.array(ProLaboreFormSchema).min(1),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
+  creditGeneratingExpenses: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
@@ -53,9 +53,19 @@ interface TaxCalculatorFormProps {
     isLoading: boolean;
 }
 
+
+const STEPS = [
+    { id: 'company', label: 'Empresa', component: (props: any) => <FormSectionCompany {...props} /> },
+    { id: 'payroll', label: 'Folha e Sócios', component: (props: any) => <FormSectionPayroll {...props} /> },
+    { id: 'annual-revenue', label: 'Receita Anual', component: (props: any) => <FormSectionAnnualRevenue {...props} /> },
+    { id: 'monthly-revenue', label: 'Receita Mensal', component: (props: any) => <FormSectionRevenue {...props} /> },
+    { id: 'plan', label: 'Plano', component: (props: any) => <FormSectionPlan {...props} /> },
+];
+
 export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalculatorFormProps) {
     const form = useFormContext<CalculatorFormValues>();
     const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
+    const [currentStep, setCurrentStep] = useState(0);
 
     const selectedCnaes = form.watch("selectedCnaes");
     
@@ -74,41 +84,58 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         form.setValue('revenues', newRevenues);
     };
 
+    const CurrentStepComponent = STEPS[currentStep].component;
+
+    const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
+    const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
+
     return (
         <>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
-                <Tabs defaultValue="company" className="w-full">
-                    <div className="flex justify-center">
-                        <TabsList className="flex w-full mb-8">
-                            <TabsTrigger value="company" className="flex-1">1. Empresa</TabsTrigger>
-                            <TabsTrigger value="payroll" className="flex-1">2. Folha e Sócios</TabsTrigger>
-                            <TabsTrigger value="annual-revenue" className="flex-1">3. Receita Anual</TabsTrigger>
-                            <TabsTrigger value="monthly-revenue" className="flex-1">4. Atividades e Faturamento Mensal</TabsTrigger>
-                            <TabsTrigger value="plan" className="flex-1">5. Plano</TabsTrigger>
-                        </TabsList>
+                <div className="mb-8 px-4 print-hidden">
+                    <div className="flex items-center justify-center">
+                        {STEPS.map((step, index) => (
+                            <React.Fragment key={step.id}>
+                                <div className="flex flex-col items-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => setCurrentStep(index)}
+                                        className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                                            currentStep === index
+                                                ? 'bg-primary border-primary text-primary-foreground'
+                                                : currentStep > index 
+                                                ? 'bg-green-500 border-green-500 text-white'
+                                                : 'bg-muted border-border text-muted-foreground'
+                                        }`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                    <p className={`mt-2 text-xs text-center font-semibold ${currentStep === index ? 'text-primary' : 'text-muted-foreground'}`}>{step.label}</p>
+                                </div>
+                                {index < STEPS.length - 1 && (
+                                    <div className={`flex-1 h-0.5 mt-5 ${currentStep > index ? 'bg-primary' : 'bg-border'}`} />
+                                )}
+                            </React.Fragment>
+                        ))}
                     </div>
-                    <TabsContent value="company">
-                         <FormSectionCompany />
-                    </TabsContent>
-                     <TabsContent value="payroll">
-                         <FormSectionPayroll year={year} />
-                    </TabsContent>
-                    <TabsContent value="annual-revenue">
-                        <FormSectionAnnualRevenue />
-                    </TabsContent>
-                    <TabsContent value="monthly-revenue">
-                        <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
-                    </TabsContent>
-                    <TabsContent value="plan">
-                        <FormSectionPlan />
-                    </TabsContent>
-                </Tabs>
+                </div>
 
-                <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
-                    <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
-                        {isLoading ? <Loader2 className="animate-spin" /> : null}
-                        {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                <CurrentStepComponent year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
+
+                <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10 flex justify-between items-center">
+                    <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 0 || isLoading}>
+                        Anterior
                     </Button>
+                    {currentStep < STEPS.length - 1 ? (
+                        <Button type="button" onClick={nextStep}>
+                            Próximo
+                        </Button>
+                    ) : (
+                        <Button type="submit" disabled={isLoading} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                            {isLoading ? <Loader2 className="animate-spin" /> : null}
+                            {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                        </Button>
+                    )}
                 </div>
             </form>
             <CnaeSelector
@@ -120,5 +147,3 @@ export default function TaxCalculatorForm({ year, onSubmit, isLoading }: TaxCalc
         </>
     );
 }
-
-    

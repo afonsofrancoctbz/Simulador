@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from "react-hook-form";
-import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote, Pencil, Info } from 'lucide-react';
+import { BarChartBig, Rocket, Briefcase, PlusCircle, XCircle, Percent, AlertTriangle, FileText, Banknote, Pencil, Info, Receipt } from 'lucide-react';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { Annex } from '@/lib/types';
 import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
@@ -122,32 +122,70 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                 </div>
                 
                 {year === 2026 && (
-                  <FormField
-                    control={form.control}
-                    name="b2bRevenuePercentage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className='flex items-center gap-2'><Percent className='h-4 w-4 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
-                        <div className='flex items-center gap-4'>
-                          <FormControl>
-                            <Slider
-                              min={0}
-                              max={100}
-                              step={1}
-                              onValueChange={(value) => field.onChange(value[0])}
-                              defaultValue={[field.value ?? 50]}
-                              className='flex-1'
-                            />
-                          </FormControl>
-                          <span className='font-bold text-primary w-16 text-center'>{field.value ?? 50}%</span>
-                        </div>
-                        <FormDescription>
-                          Informe a porcentagem do seu faturamento que vem de vendas para outras empresas (PJ).
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="space-y-8">
+                    <FormField
+                        control={form.control}
+                        name="b2bRevenuePercentage"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className='flex items-center gap-2'><Percent className='h-4 w-4 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
+                            <div className='flex items-center gap-4'>
+                            <FormControl>
+                                <Slider
+                                min={0}
+                                max={100}
+                                step={1}
+                                onValueChange={(value) => field.onChange(value[0])}
+                                defaultValue={[field.value ?? 50]}
+                                className='flex-1'
+                                />
+                            </FormControl>
+                            <span className='font-bold text-primary w-16 text-center'>{field.value ?? 50}%</span>
+                            </div>
+                            <FormDescription>
+                            Informe a porcentagem do seu faturamento que vem de vendas para outras empresas (PJ).
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="creditGeneratingExpenses"
+                        render={({ field }) => {
+                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                            const { value } = e.target;
+                            const digitsOnly = value.replace(/\D/g, '');
+                            field.onChange(Number(digitsOnly) / 100);
+                        };
+                        return (
+                            <FormItem>
+                                <FormLabel className='flex items-center gap-2'><Receipt className='h-4 w-4 text-primary' />Custos Mensais Geradores de Crédito (Insumos)</FormLabel>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            inputMode="decimal"
+                                            placeholder="0,00"
+                                            onChange={handleChange}
+                                            onBlur={field.onBlur}
+                                            value={field.value ? formatBRL(field.value) : ''}
+                                            name={field.name}
+                                            ref={field.ref}
+                                            className="pl-9"
+                                        />
+                                    </FormControl>
+                                </div>
+                                <FormDescription>
+                                    Informe custos como aluguel, software, marketing, etc., para calcular créditos de IBS/CBS.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        );
+                        }}
+                    />
+                </div>
                 )}
                 
                 {revenueGroups.length > 0 && <Separator />}

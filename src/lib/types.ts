@@ -41,6 +41,7 @@ export const TaxFormValuesSchema = z.object({
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
+  creditGeneratingExpenses: z.coerce.number().min(0, "O valor deve ser positivo.").optional(),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
@@ -90,6 +91,7 @@ export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 export const TaxDetails2026Schema = TaxDetailsSchema.extend({
   regime: z.enum([
     'Lucro Presumido',
+    'Lucro Presumido (Regras Atuais)',
     'Simples Nacional Tradicional',
     'Simples Nacional Híbrido',
   ]),
@@ -107,6 +109,7 @@ export const CalculationResults2026Schema = z.object({
   simplesNacionalTradicional: TaxDetails2026Schema,
   simplesNacionalHibrido: TaxDetails2026Schema,
   lucroPresumido: TaxDetails2026Schema,
+  lucroPresumidoAtual: TaxDetailsSchema,
 });
 export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
 
@@ -134,5 +137,3 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
-
-    
