@@ -59,6 +59,18 @@ export default function Home() {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12">
                     <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
                 </div>
+                <div className='print-hidden'>
+                  <section className="py-16 lg:py-24 bg-slate-50/70">
+                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                      <PfPjTaxReformSection />
+                    </div>
+                  </section>
+                  <section className="py-16 lg:py-24 bg-background">
+                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                      <SinTaxInfoSection />
+                    </div>
+                  </section>
+                </div>
             </TabsContent>
         </Tabs>
         
@@ -73,18 +85,6 @@ export default function Home() {
         )}
 
         <div className='print-hidden'>
-
-            <section className="py-16 lg:py-24 bg-slate-50/70">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <PfPjTaxReformSection />
-              </div>
-            </section>
-
-            <section className="py-16 lg:py-24 bg-background">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <SinTaxInfoSection />
-              </div>
-            </section>
 
             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
