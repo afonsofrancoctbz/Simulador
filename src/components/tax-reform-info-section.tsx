@@ -64,9 +64,9 @@ export default function TaxReformInfoSection() {
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
                  <p>O "Imposto do Pecado" incidirá sobre a produção, importação ou comercialização de bens e serviços prejudiciais à saúde ou ao meio ambiente.</p>
                  <ul className="list-disc pl-6 space-y-2">
-                    <li><strong>Lista de Incidência:</strong> A lei definirá a lista exata de produtos e serviços.</li>
-                    <li><strong>Alíquota Calibrada:</strong> A alíquota não será única, mas calibrada pelo impacto do produto (teor alcoólico, açúcar, emissões de CO2, etc.).</li>
-                    <li><strong>Base de Cálculo:</strong> Será o valor da operação, mas a metodologia específica ainda será detalhada em lei.</li>
+                    <li>**Lista de Incidência:** A lei definirá a lista exata de produtos e serviços.</li>
+                    <li>**Alíquota Calibrada:** A alíquota não será única, mas calibrada pelo impacto do produto (teor alcoólico, açúcar, emissões de CO2, etc.).</li>
+                    <li>**Base de Cálculo:** Será o valor da operação, mas a metodologia específica ainda será detalhada em lei.</li>
                  </ul>
               </AccordionContent>
             </AccordionItem>
@@ -85,8 +85,8 @@ export default function TaxReformInfoSection() {
                     <h4 className="font-bold text-foreground">B. Simples Nacional (SN)</h4>
                     <p className="mt-1">O Simples Nacional foi mantido, mas com alterações importantes. O conceito de Receita Bruta foi ampliado, e surge a opção do **Regime Híbrido** a partir de 2027:</p>
                     <ul className="list-disc pl-6 space-y-2 mt-2">
-                        <li><strong>Regime Tradicional:</strong> Continua pagando tudo no DAS. O crédito gerado para o cliente é limitado à alíquota paga dentro do Simples.</li>
-                        <li><strong>Regime Híbrido (Opcional):</strong> A empresa pode optar por pagar o IBS/CBS "por fora" do DAS. Isso permite gerar crédito integral para o cliente (mantendo a competitividade no B2B), mas a carga tributária total da empresa do Simples tende a aumentar.</li>
+                        <li>**Regime Tradicional:** Continua pagando tudo no DAS. O crédito gerado para o cliente é limitado à alíquota paga dentro do Simples.</li>
+                        <li>**Regime Híbrido (Opcional):** A empresa pode optar por pagar o IBS/CBS "por fora" do DAS. Isso permite gerar crédito integral para o cliente (mantendo a competitividade no B2B), mas a carga tributária total da empresa do Simples tende a aumentar.</li>
                     </ul>
                   </div>
                   <Table>
@@ -108,7 +108,7 @@ export default function TaxReformInfoSection() {
               <AccordionContent className="pt-2 text-base text-muted-foreground">
                  <div className="p-4 border-l-4 border-primary bg-primary/10 text-primary-foreground rounded-r-lg">
                     <p className="italic text-primary/90">
-                        "O processo de cálculo sob a nova Reforma Tributária não é mais como tentar somar peças de diferentes quebra-cabeças (os cinco tributos antigos). Agora, funciona como uma linha de montagem, onde você só paga o imposto pela nova peça que adicionou (o valor agregado). Para ter certeza de que pagou corretamente, você precisa do registro detalhado de todas as peças compradas (os créditos) e de quanto seu produto final impacta o ambiente ou a saúde (Imposto Seletivo)."
+                        "O processo de cálculo sob a nova Reforma Tributária não é mais como tentar somar peças de diferentes quebra-cabeças (os cinco tributos antigos). Agora, funciona como uma linha de montagem, onde você só paga o imposto pela nova peça que adicionou (o valor agregado). Para ter certeza de que pagou corretamente, você precisa do registro detalhado de todas as peças compradas (os créditos) e de quanto o seu produto final impacta o ambiente ou a saúde (Imposto Seletivo)."
                     </p>
                  </div>
               </AccordionContent>
