@@ -39,16 +39,16 @@ export default function TaxReformInfoSection() {
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-lg font-semibold">
                 <Calculator className="mr-3 text-primary h-5 w-5" />
-                I. Cálculo do IBS e CBS (IVA Dual)
+                I. Cálculo do IBS e da CBS (IVA Dual)
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-2 text-base text-muted-foreground">
-                <p>O IBS e a CBS seguem a mecânica de um Imposto sobre Valor Agregado (IVA). Para empresas do Lucro Presumido e do Simples Nacional (no regime opcional), os cálculos se baseiam em débitos e créditos.</p>
+                <p>O IBS e a CBS seguem a mecânica de um Imposto sobre Valor Agregado (IVA). Para empresas do Lucro Presumido e as do Simples Nacional que optarem pelo Regime Regular, os cálculos se baseiam em débitos e créditos.</p>
                 
                 <h4 className="font-semibold text-foreground pt-2">A. Base de Cálculo (Débito)</h4>
                 <p>A base de cálculo é o valor da operação, incluindo acréscimos e encargos. Para o cálculo "por fora", é preciso excluir o próprio IVA e outros tributos como o IPI e o Imposto Seletivo.</p>
                 
                 <h4 className="font-semibold text-foreground pt-2">B. Alíquotas</h4>
-                <p>A alíquota-padrão combinada é estimada em **26,5%**, mas o valor final será definido anualmente. Setores específicos (saúde, educação, etc.) terão alíquotas reduzidas (30% ou 60% de desconto) ou isenção.</p>
+                <p>A alíquota-padrão combinada é estimada em **26,5%**, mas o valor final será definido anualmente. Setores específicos (saúde, educação, etc.) terão alíquotas reduzidas ou isenção.</p>
 
                 <h4 className="font-semibold text-foreground pt-2">C. Não Cumulatividade (Crédito)</h4>
                 <p>O imposto devido é a diferença entre os débitos (saídas) e os créditos (entradas). O crédito pode ser apropriado sobre o valor do IBS/CBS pago na aquisição de praticamente todos os bens e serviços usados na operação, comprovado por documento fiscal eletrônico.</p>
