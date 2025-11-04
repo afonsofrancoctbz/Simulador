@@ -91,30 +91,29 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
     return null;
   }
   
-  let orderedScenarios: (TaxDetails | null)[] = [];
+  let scenariosToShow: (TaxDetails | null)[] = [];
 
   if ('simplesNacionalBase' in results) {
-     orderedScenarios = [
+     scenariosToShow = [
       results.simplesNacionalOtimizado,
       results.simplesNacionalBase,
       results.lucroPresumido,
-    ].sort((a, b) => (a?.order ?? 99) - (b?.order ?? 99));
+    ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
 
   } else if ('simplesNacionalTradicional' in results) {
-     orderedScenarios = [
+     scenariosToShow = [
       results.lucroPresumido,
       results.simplesNacionalHibrido,
       results.simplesNacionalTradicional,
       results.lucroPresumidoAtual,
-    ].sort((a,b) => (a?.order ?? 99) - (b?.order ?? 99));
+    ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
   }
 
-  const validScenarios = orderedScenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
-  if (validScenarios.length === 0) return null;
+  scenariosToShow.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+
+  if (scenariosToShow.length === 0) return null;
     
   const cheapestScenario = selectedDetails;
-  
-  const scenariosToShow = validScenarios;
   
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
@@ -184,7 +183,6 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
             let title = scenario.regime;
-            if (title === "Simples Nacional (Otimizado)") title = "Simples Nacional";
             
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva|ibs|cbs/));
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);

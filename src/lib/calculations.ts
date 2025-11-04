@@ -240,6 +240,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     };
     
     if (proLaboreOverride) {
+        finalResult.regime = "Simples Nacional (Fator R)";
         finalResult.optimizationNote = `Pró-labore ajustado para R$ ${totalProLaboreBruto.toFixed(2)} para atingir o Fator R e tributar pelo Anexo III.`;
     }
 
@@ -285,9 +286,14 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
                 }];
           
           simplesNacionalOtimizado = _calculateSimplesNacional(values, config, optimizedProLabores);
-          simplesNacionalOtimizado.regime = "Simples Nacional (Otimizado)";
       }
   }
+
+  // Não sobrescrever o cenário otimizado se ele for mais caro que o base.
+  if (simplesNacionalOtimizado && simplesNacionalBase.totalMonthlyCost < simplesNacionalOtimizado.totalMonthlyCost) {
+      simplesNacionalOtimizado = null;
+  }
+
 
   return {
     simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
