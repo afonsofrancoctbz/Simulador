@@ -859,7 +859,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.3,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
   },
   {
@@ -1222,7 +1222,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0,
-    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...CRT - Conselho Técnicos Industriais'
+    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...'
   },
   {
     code: '7410-2/02',

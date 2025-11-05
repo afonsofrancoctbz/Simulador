@@ -52,11 +52,12 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const config2026 = fiscalConfig as FiscalConfig2026;
+        const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
         
         const getEffectiveIvaRate = (code: string) => {
           const cnaeInfo = getCnaeData(code);
           const reduction = cnaeInfo?.ivaReduction ?? 0;
-          return config2026.reforma_tributaria.iva_rate * (1 - reduction);
+          return ivaStandardRate * (1 - reduction);
         }
         
         const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
@@ -64,15 +65,12 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
             return sum + (activity.revenue * effectiveIvaRate);
         }, 0);
         
-        const weightedAvgIvaRateForCredit = domesticActivities.length > 0 && domesticRevenue > 0
-            ? domesticActivities.reduce((sum, act) => sum + getEffectiveIvaRate(act.code) * act.revenue, 0) / domesticRevenue
-            : getEffectiveIvaRate(values.selectedCnaes[0] || '');
-
-        const totalIvaCredit = creditGeneratingExpenses * weightedAvgIvaRateForCredit;
+        const totalIvaCredit = creditGeneratingExpenses * ivaStandardRate; // Credit is based on the standard rate
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
 
-        const cbsRateInIva = (config2026.reforma_tributaria.cbs_rate_test || 0.088) / config2026.reforma_tributaria.iva_rate;
-        const ibsRateInIva = (config2026.reforma_tributaria.ibs_rate_test || 0.177) / config2026.reforma_tributaria.iva_rate;
+        const cbsRateInIva = (config2026.reforma_tributaria.cbs_rate_test || 0.088) / ivaStandardRate;
+        const ibsRateInIva = (config2026.reforma_tributaria.ibs_rate_test || 0.177) / ivaStandardRate;
+        
         const cbs = totalIvaDue > 0 ? totalIvaDue * cbsRateInIva : 0;
         const ibs = totalIvaDue > 0 ? totalIvaDue * ibsRateInIva : 0;
 
@@ -189,10 +187,12 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
     if (isHybrid) {
       const config2026 = getFiscalParameters(2026) as FiscalConfig2026;
+      const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
+
       const getEffectiveIvaRate = (code: string) => {
           const cnaeInfo = getCnaeData(code);
           const reduction = cnaeInfo?.ivaReduction ?? 0;
-          return config2026.reforma_tributaria.iva_rate * (1 - reduction);
+          return ivaStandardRate * (1 - reduction);
       }
       
       const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
@@ -201,11 +201,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
           return sum + (activityB2bRevenue * effectiveIvaRate);
       }, 0);
 
-      const weightedAvgIvaRateForCredit = domesticActivities.length > 0 && domesticRevenue > 0
-          ? domesticActivities.reduce((sum, act) => sum + getEffectiveIvaRate(act.code) * act.revenue, 0) / domesticRevenue
-          : getEffectiveIvaRate(values.selectedCnaes[0] || '');
-
-      const totalIvaCredit = creditGeneratingExpenses * weightedAvgIvaRateForCredit;
+      const totalIvaCredit = creditGeneratingExpenses * ivaStandardRate; // Credit is based on the standard rate
       ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
     }
     
@@ -231,13 +227,13 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     }
 
     let regimeName: TaxDetails2026['regime'];
-    const regimeType = isHybrid ? 'Híbrido' : 'Tradicional';
-
+    
     if (proLaboreOverride) {
         regimeName = `Simples Nacional (Fator R Otimizado)${isHybrid ? ' Híbrido' : ''}`;
     } else {
-        const regimeAnexo = finalAnnex === 'III' ? '(Anexo III)' : '(Anexo V)';
-        regimeName = `Simples Nacional ${regimeType} ${regimeAnexo}`;
+        const regimeAnexo = finalAnnex === 'III' ? 'Anexo III' : 'Anexo V';
+        const regimeType = isHybrid ? 'Híbrido' : 'Tradicional';
+        regimeName = `Simples Nacional ${regimeType} (${regimeAnexo})`;
     }
     
     const result: TaxDetails2026 = {
