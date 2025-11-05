@@ -1,6 +1,5 @@
 
 
-
 import { getFiscalParameters, type FiscalConfig, type FiscalConfig2026, type FiscalConfig2027 } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -53,23 +52,37 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const config2026 = fiscalConfig as FiscalConfig2026;
+        
+        const getEffectiveIvaRate = (code: string) => {
+          const cnaeInfo = getCnaeData(code);
+          const reduction = cnaeInfo?.ivaReduction ?? 0;
+          return config2026.reforma_tributaria.iva_rate * (1 - reduction);
+        }
+        
         // NEW: IBS/CBS Calculation (Replaces PIS/COFINS/ISS)
         const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
-            const cnaeInfo = getCnaeData(activity.code);
-            const reduction = cnaeInfo?.ivaReduction ?? 0;
-            const effectiveIvaRate = config2026.reforma_tributaria.iva_rate * (1 - reduction);
+            const effectiveIvaRate = getEffectiveIvaRate(activity.code);
             return sum + (activity.revenue * effectiveIvaRate);
         }, 0);
 
-        const totalIvaCredit = creditGeneratingExpenses * config2026.reforma_tributaria.iva_rate;
+        // Correctly calculate credit based on all activities in creditGeneratingExpenses
+        const weightedAvgIvaRateForCredit = domesticActivities.length > 0
+            ? domesticActivities.reduce((sum, act) => sum + getEffectiveIvaRate(act.code) * act.revenue, 0) / domesticRevenue
+            : getEffectiveIvaRate(values.selectedCnaes[0] || ''); // fallback to first CNAE if no domestic revenue
+
+        const totalIvaCredit = creditGeneratingExpenses * weightedAvgIvaRateForCredit;
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
 
-        const cbs = totalIvaDue > 0 ? totalIvaDue * ((config2026.reforma_tributaria.cbs_rate_test || 0.088) / config2026.reforma_tributaria.iva_rate) : 0;
-        const ibs = totalIvaDue > 0 ? totalIvaDue * ((config2026.reforma_tributaria.ibs_rate_test || 0.177) / config2026.reforma_tributaria.iva_rate) : 0;
+        // Split IVA into CBS and IBS for breakdown display
+        const cbsRateInIva = (config2026.reforma_tributaria.cbs_rate_test || 0.088) / config2026.reforma_tributaria.iva_rate;
+        const ibsRateInIva = (config2026.reforma_tributaria.ibs_rate_test || 0.177) / config2026.reforma_tributaria.iva_rate;
+        const cbs = totalIvaDue > 0 ? totalIvaDue * cbsRateInIva : 0;
+        const ibs = totalIvaDue > 0 ? totalIvaDue * ibsRateInIva : 0;
 
         consumptionTaxes = totalIvaDue;
         breakdown.push({ name: `CBS (8,8%)`, value: cbs });
         breakdown.push({ name: `IBS (17,7%)`, value: ibs });
+
     } else {
         // Old PIS/COFINS/ISS
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
@@ -137,6 +150,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
     let cppFromAnnexIV = 0;
     let ivaTaxes = 0;
     let hasAnnexIVActivity = false;
+    let finalAnnexes: Annex[] = [];
 
     const allActivities = [...domesticActivities.map(a=>({...a, isExport: false})), ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, isExport: true }))];
 
@@ -148,13 +162,15 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
         if(revenueForActivity === 0) return;
 
         let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
+        finalAnnexes.push(effectiveAnnex);
         const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const { rate, deduction, distribution } = bracket;
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
 
         const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0, CBS = 0, IBS = 0 } = distribution;
-        const consumptionTaxProportionInDas = CBS + IBS + (ISS || 0) + (ICMS || 0);
+        // Use CBS/IBS/ICMS/ISS for consumption tax proportion, as PIS/COFINS are replaced
+        const consumptionTaxProportionInDas = CBS + IBS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
 
         let rateForDas = effectiveRate;
         
@@ -164,12 +180,11 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
 
         if (isHybrid && !activity.isExport) {
              const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-             const effectiveConsumptionTaxRate = effectiveRate * consumptionTaxProportionInDas;
-             const weightedReduction = effectiveConsumptionTaxRate * b2bRevenuePortion;
-             rateForDas -= weightedReduction;
+             const dasRevenue = activity.revenue * (1 - b2bRevenuePortion);
+             totalDas += dasRevenue * effectiveRate;
+        } else {
+            totalDas += revenueForActivity * rateForDas;
         }
-
-        totalDas += revenueForActivity * rateForDas;
         
         if (effectiveAnnex === 'IV') hasAnnexIVActivity = true;
     });
@@ -179,18 +194,24 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
     }
 
     if (isHybrid) {
-      const insumosGeradoresDeCredito = creditGeneratingExpenses ?? 0;
       const config2026 = getFiscalParameters(2026) as FiscalConfig2026;
+      const getEffectiveIvaRate = (code: string) => {
+          const cnaeInfo = getCnaeData(code);
+          const reduction = cnaeInfo?.ivaReduction ?? 0;
+          return config2026.reforma_tributaria.iva_rate * (1 - reduction);
+      }
       
       const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
           const activityB2bRevenue = activity.revenue * ((b2bRevenuePercentage ?? 100) / 100);
-          const cnaeInfo = getCnaeData(activity.code);
-          const reduction = cnaeInfo?.ivaReduction ?? 0;
-          const effectiveIvaRate = config2026.reforma_tributaria.iva_rate * (1 - reduction);
+          const effectiveIvaRate = getEffectiveIvaRate(activity.code);
           return sum + (activityB2bRevenue * effectiveIvaRate);
       }, 0);
 
-      const totalIvaCredit = insumosGeradoresDeCredito * config2026.reforma_tributaria.iva_rate;
+      const weightedAvgIvaRateForCredit = domesticActivities.length > 0 && domesticRevenue > 0
+          ? domesticActivities.reduce((sum, act) => sum + getEffectiveIvaRate(act.code) * act.revenue, 0) / domesticRevenue
+          : getEffectiveIvaRate(values.selectedCnaes[0] || '');
+
+      const totalIvaCredit = creditGeneratingExpenses * weightedAvgIvaRateForCredit;
       ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
     }
     
@@ -224,6 +245,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
     
     const result: TaxDetails2026 = {
         regime: regimeName,
+        annex: [...new Set(finalAnnexes)].join(', '),
         totalTax, totalMonthlyCost, totalRevenue,
         proLabore: totalProLaboreBruto,
         fatorR,
@@ -291,3 +313,5 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 0 } : null,
   };
 }
+
+    
