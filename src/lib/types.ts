@@ -89,6 +89,15 @@ export const TaxDetailsSchema = z.object({
 });
 export type TaxDetails = z.infer<typeof TaxDetailsSchema>;
 
+export const CalculationResultsSchema = z.object({
+  simplesNacionalOtimizado: TaxDetailsSchema.nullable(),
+  simplesNacionalBase: TaxDetailsSchema,
+  lucroPresumido: TaxDetailsSchema,
+});
+export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
+
+
+// Schemas for 2026 and beyond
 export const TaxDetails2026Schema = TaxDetailsSchema.extend({
   regime: z.enum([
     'Lucro Presumido',
@@ -97,24 +106,19 @@ export const TaxDetails2026Schema = TaxDetailsSchema.extend({
     'Simples Nacional Híbrido (Anexo V)',
     'Simples Nacional Tradicional (Anexo III)',
     'Simples Nacional Híbrido (Anexo III)',
+    'Simples Nacional (Fator R Otimizado)',
+    'Simples Nacional (Fator R Otimizado) Híbrido'
   ]),
 });
 export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;
 
-export const CalculationResultsSchema = z.object({
-  simplesNacionalOtimizado: TaxDetailsSchema.nullable(),
-  simplesNacionalBase: TaxDetailsSchema,
-  lucroPresumido: TaxDetailsSchema,
-});
-export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
-
 export const CalculationResults2026Schema = z.object({
-  lucroPresumido: TaxDetails2026.nullable(),
+  lucroPresumido: TaxDetails2026Schema.nullable(),
   lucroPresumidoAtual: TaxDetails.nullable(),
-  simplesNacionalTradicional: TaxDetails2026.nullable(),
-  simplesNacionalHibrido: TaxDetails2026.nullable(),
-  simplesNacionalOtimizado: TaxDetails2026.nullable(),
-  simplesNacionalOtimizadoHibrido: TaxDetails2026.nullable(),
+  simplesNacionalTradicional: TaxDetails2026Schema.nullable(),
+  simplesNacionalHibrido: TaxDetails2026Schema.nullable(),
+  simplesNacionalOtimizado: TaxDetails2026Schema.nullable(),
+  simplesNacionalOtimizadoHibrido: TaxDetails2026Schema.nullable(),
 });
 export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
 
