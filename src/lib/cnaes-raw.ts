@@ -838,17 +838,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
-    code: '9001-9/99',
-    description: 'Artes cênicas, espetáculos e atividades complementares não especificadas anteriormente',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
     code: '5911-1/02',
     description: 'Produção de filmes para publicidade',
     category: 'Publicidade e Marketing',
@@ -858,17 +847,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6,
-  },
-  {
-    code: '5911-1/99',
-    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
   },
   
   // --- PROFISSÕES REGULAMENTADAS (REDUÇÃO 30%) ---
@@ -1250,8 +1228,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     code: '7410-2/02',
     description: 'Design de interiores',
     category: 'Engenharia, Arquitetura e Design',
-    annex: 'IV',
-    requiresFatorR: false,
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
@@ -1428,6 +1406,43 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.',
     ivaReduction: 0,
   },
+  {
+    code: '9002-7/01',
+    description: 'Atividades de artistas plásticos, jornalistas independentes e escritores',
+    category: 'Comunicação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.0
+  },
+  {
+    code: '5911-1/99',
+    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.0
+  },
+  
+  // --- INCONSISTÊNCIAS E REGIMES ESPECÍFICOS ---
+  {
+    code: '6821-8/01',
+    description: 'Corretagem na compra e venda e avaliação de imóveis',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'V', // CORRIGIDO DE III PARA V
+    requiresFatorR: true, // CORRIGIDO
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.5, // Mantendo a aproximação
+    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
+  },
+
 
   // RESTANTES...
   
@@ -1611,11 +1626,12 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     code: '9101-5/00',
     description: 'Atividades de bibliotecas e arquivos',
     category: 'Cultura e Lazer',
-    annex: 'III',
-    requiresFatorR: false,
+    annex: 'V', // CORRIGIDO
+    requiresFatorR: true, // CORRIGIDO
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.3 // CORRIGIDO
   },
   {
     code: '9102-3/01',
@@ -1812,15 +1828,15 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
-    code: '9002-7/01',
-    description: 'Atividades de artistas plásticos, jornalistas independentes e escritores',
-    category: 'Comunicação',
-    annex: 'V',
-    requiresFatorR: true,
+    code: '9001-9/99',
+    description: 'Artes cênicas, espetáculos e atividades complementares não especificadas anteriormente',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
-    ivaReduction: 0.6
+    ivaReduction: 0.0
   },
   {
     code: '9002-7/02',
@@ -2120,22 +2136,11 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: false
   },
   {
-    code: '6821-8/01',
-    description: 'Corretagem na compra e venda e avaliação de imóveis',
-    category: 'Serviços Financeiros e Imobiliários',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
-  },
-  {
     code: '6821-8/02',
     description: 'Corretagem no aluguel de imóveis',
     category: 'Serviços Financeiros e Imobiliários',
-    annex: 'III',
-    requiresFatorR: false,
+    annex: 'V', // CORRIGIDO
+    requiresFatorR: true, // CORRIGIDO
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
@@ -4213,3 +4218,5 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Regulamentado pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   }
 ];
+
+    
