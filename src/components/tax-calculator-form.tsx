@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
@@ -9,14 +9,9 @@ import { Button } from "@/components/ui/button";
 import { FormSectionCompany } from "./form-section-company";
 import { FormSectionRevenue } from "./form-section-revenue";
 import { FormSectionPlan } from "./form-section-plan";
-import { CnaeSelector } from './cnae-selector';
-import { getCnaeData } from "@/lib/cnae-helpers";
-import type { Annex } from "@/lib/types";
-import { Loader2, ArrowLeft, ArrowRight } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
-import { cn } from "@/lib/utils";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 
 export const CalculatorFormSchema = z.object({
@@ -54,59 +49,22 @@ interface TaxCalculatorFormProps {
     onSubmit: (e: React.BaseSyntheticEvent) => Promise<void>;
 }
 
-const steps = [
-    { id: 1, name: 'Empresa' },
-    { id: 2, name: 'Folha e Sócios' },
-    { id: 3, name: 'Receita Anual' },
-    { id: 4, name: 'Atividades e Faturamento Mensal' },
-    { id: 5, name: 'Plano' }
-];
-
 export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmit }: TaxCalculatorFormProps) {
-    const [currentStep, setCurrentStep] = useState(1);
-    
     const form = useFormContext();
-
-    const nextStep = () => setCurrentStep(prev => Math.min(steps.length, prev + 1));
-    const prevStep = () => setCurrentStep(prev => Math.max(1, prev - 1));
 
     return (
         <form onSubmit={onSubmit} className="space-y-8 text-left max-w-4xl mx-auto">
-            <div className="mb-8">
-                 <Tabs value={String(currentStep)} className="w-full">
-                    <TabsList>
-                        {steps.map(step => (
-                            <TabsTrigger key={step.id} value={String(step.id)} onClick={() => setCurrentStep(step.id)}>
-                               {step.id}. {step.name}
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
-                </Tabs>
-            </div>
-
-            {currentStep === 1 && <FormSectionCompany />}
-            {currentStep === 2 && <FormSectionPayroll year={year} />}
-            {currentStep === 3 && <FormSectionAnnualRevenue />}
-            {currentStep === 4 && <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />}
-            {currentStep === 5 && <FormSectionPlan />}
+            <FormSectionCompany />
+            <FormSectionPayroll year={year} />
+            <FormSectionAnnualRevenue />
+            <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />
+            <FormSectionPlan />
 
             <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
-                <div className="flex justify-between items-center">
-                    <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1 || isLoading} className="text-base py-6 px-6">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Anterior
-                    </Button>
-                    
-                    {currentStep < steps.length ? (
-                        <Button type="button" variant="default" onClick={nextStep} disabled={isLoading} className="text-base py-6 px-6">
-                            Próximo <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    ) : (
-                        <Button type="submit" size="lg" disabled={isLoading} className="text-lg bg-accent text-accent-foreground hover:bg-accent/90 py-7 px-8">
-                            {isLoading ? <Loader2 className="animate-spin" /> : null}
-                            {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
-                        </Button>
-                    )}
-                </div>
+                <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg bg-accent text-accent-foreground hover:bg-accent/90 py-7 px-8">
+                    {isLoading ? <Loader2 className="animate-spin" /> : null}
+                    {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                </Button>
             </div>
         </form>
     );
