@@ -125,7 +125,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
     const totalRevenue = domesticRevenue + exportRevenue;
     
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    const effectiveFp12 = fp12 > 0 ? totalPayroll * 12 : totalPayroll * 12;
+    const effectiveFp12 = fp12 > 0 ? fp12 : totalPayroll * 12;
 
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
@@ -153,21 +153,21 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
         const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
 
         let rateForDas = effectiveRate;
-
+        
+        // CORREÇÃO: Usar a repartição para subtrair impostos do consumo
+        const consumptionTaxProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
+        
         // Apply export exemption by reducing the rate
         if (activity.isExport) {
-            const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-            rateForDas *= (1 - exportExemptionRatio);
+            rateForDas = effectiveRate * (1 - consumptionTaxProportionInDas);
         }
 
         // For hybrid, further reduce the rate for the portion of domestic B2B revenue
         if (isHybrid && !activity.isExport) {
             const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-            const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
-            
             // The rate is reduced proportionally to the B2B part of the revenue
-            const weightedReduction = ivaProportionInDas * b2bRevenuePortion;
-            rateForDas *= (1 - weightedReduction);
+            const weightedReduction = consumptionTaxProportionInDas * b2bRevenuePortion;
+            rateForDas = effectiveRate * (1 - weightedReduction);
         }
 
         totalDas += revenueForActivity * rateForDas;
@@ -218,7 +218,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
 
     let regimeName: TaxDetails2026['regime'] = 'Simples Nacional Tradicional';
     if(proLaboreOverride) {
-      regimeName = 'Simples Nacional (Fator R)' as any; // Cast for now, will be handled in display
+      regimeName = 'Simples Nacional (Fator R)' as any;
     } else if (isHybrid) {
       regimeName = 'Simples Nacional Híbrido';
     }
@@ -253,20 +253,20 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
   const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
   const rbt12 = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
-  const fp12 = values.fp12 > 0 ? values.fp12 : (values.totalSalaryExpense + values.proLabores.reduce((a,p)=>a+p.value,0)) * 12;
+  const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
+  const currentTotalPayroll = values.totalSalaryExpense + currentTotalProLabore;
+  const fp12 = values.fp12 > 0 ? values.fp12 : currentTotalPayroll * 12;
   const currentFatorR = rbt12 > 0 ? fp12 / rbt12 : 0;
   
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   
   if (hasAnnexVActivity && currentFatorR < fiscalConfig2026.simples_nacional.limite_fator_r && totalRevenue > 0) {
-      const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
-      const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
-      const requiredPayroll = totalRevenue * fiscalConfig2026.simples_nacional.limite_fator_r;
-      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
+      const requiredPayroll = rbt12 * fiscalConfig2026.simples_nacional.limite_fator_r;
+      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - fp12);
       
       if (additionalProLaboreNeeded > 0) {
-          const newTotalProLabore = currentTotalProLabore + additionalProLaboreNeeded;
+          const newTotalProLabore = currentTotalProLabore + (additionalProLaboreNeeded / 12);
           
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
               ? values.proLabores.map(p => ({ 
@@ -279,18 +279,14 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
                   otherContributionSalary: 0 
                 }];
           
-          // We need to decide if this optimized scenario replaces the 'tradicional' or 'hibrido', or is a new one.
-          // Let's make it a new one for clarity.
-          simplesNacionalOtimizado = _calculateSimples2026(values, false, optimizedProLabores); // Base it on the traditional calculation
+          simplesNacionalOtimizado = _calculateSimples2026(values, false, optimizedProLabores); // Base on traditional
           
-          // If the optimized scenario is worse than the original, don't show it.
           if (simplesNacionalOtimizado && simplesNacionalTradicional.totalMonthlyCost < simplesNacionalOtimizado.totalMonthlyCost) {
             simplesNacionalOtimizado = null;
           }
       }
   }
 
-  // Se o otimizado existir, ele se torna a opção principal do Simples
   if(simplesNacionalOtimizado) {
     simplesNacionalTradicional = simplesNacionalOtimizado;
   }

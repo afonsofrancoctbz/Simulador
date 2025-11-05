@@ -70,6 +70,7 @@ export const TaxDetailsSchema = z.object({
       "Simples Nacional", 
       "Lucro Presumido",
       "Simples Nacional (Otimizado)",
+      "Simples Nacional (Fator R)",
     ]),
     totalTax: z.number(),
     totalMonthlyCost: z.number(),
@@ -94,6 +95,7 @@ export const TaxDetails2026Schema = TaxDetailsSchema.extend({
     'Lucro Presumido (Regras Atuais)',
     'Simples Nacional Tradicional',
     'Simples Nacional Híbrido',
+    'Simples Nacional (Fator R)',
   ]),
 });
 export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;

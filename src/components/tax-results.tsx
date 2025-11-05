@@ -183,10 +183,9 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
             let title = scenario.regime;
-            if (title === 'Simples Nacional (Otimizado)') title = 'Simples Nacional (Fator R)';
-            if (year === 2026 && scenario.regime === 'Simples Nacional (Fator R)') title = 'Simples Nacional (Fator R)';
-            if (year === 2026 && scenario.regime === 'Simples Nacional' && scenario.optimizationNote) title = 'Simples Nacional (Fator R)';
-
+            if (title === 'Simples Nacional (Otimizado)') title = 'Simples Nacional';
+            if (year === 2026 && scenario.regime === 'Simples Nacional Tradicional' && scenario.optimizationNote) title = 'Simples Nacional';
+            
 
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva|ibs|cbs/));
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
@@ -227,8 +226,8 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                       <h3 className="text-xl font-bold text-foreground mt-2">{title}</h3>
                        {isCurrentLpFor2026 && <p className='text-xs font-bold text-muted-foreground'>(Comparativo Regras Atuais)</p>}
                       {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
-                      {scenario.optimizationNote && !title.includes('Fator R') && <p className="text-sm text-primary/90 mt-1">Com Fator R</p>}
-                      {!scenario.optimizationNote && scenario.regime.includes("Simples") && !title.includes('Fator R') && <p className="text-sm text-muted-foreground mt-1">Sem Fator R</p>}
+                      {scenario.optimizationNote && !title.includes('Fator R') && <p className="text-sm text-primary/90 mt-1">Com Fator R Otimizado</p>}
+                      {!scenario.optimizationNote && scenario.regime.includes("Simples") && !title.includes('Fator R') && <p className="text-sm text-muted-foreground mt-1">Sem Otimização de Fator R</p>}
                   </div>
 
                   <div className="px-4 pb-4 pt-2 flex-grow space-y-1">
