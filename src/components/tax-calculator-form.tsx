@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
@@ -49,89 +49,23 @@ interface TaxCalculatorFormProps {
     onSubmit: (e: React.BaseSyntheticEvent) => Promise<void>;
 }
 
-const steps = [
-    { id: 1, name: 'Empresa', component: FormSectionCompany },
-    { id: 2, name: 'Folha e Sócios', component: FormSectionPayroll },
-    { id: 3, name: 'Receita Anual', component: FormSectionAnnualRevenue },
-    { id: 4, name: 'Receita Mensal', component: FormSectionRevenue },
-    { id: 5, name: 'Plano', component: FormSectionPlan },
-];
-
-const validationSteps = [
-    ['city'],
-    ['totalSalaryExpense', 'proLabores', 'numberOfPartners'],
-    ['rbt12', 'fp12'],
-    ['selectedCnaes', 'revenues', 'exportCurrency', 'exchangeRate', 'issRate', 'b2bRevenuePercentage', 'creditGeneratingExpenses'],
-    ['selectedPlan']
-];
-
 export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmit }: TaxCalculatorFormProps) {
-    const [currentStep, setCurrentStep] = useState(0);
     const form = useFormContext<CalculatorFormValues>();
-
-    const handleNext = async () => {
-        const fieldsToValidate = validationSteps[currentStep];
-        const isValid = await form.trigger(fieldsToValidate as any);
-        if (isValid) {
-            setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
-        }
-    };
-
-    const handleBack = () => {
-        setCurrentStep((prev) => Math.max(prev - 1, 0));
-    };
-
-    const CurrentComponent = steps[currentStep].component;
 
     return (
         <form onSubmit={onSubmit} className="space-y-8 text-left max-w-4xl mx-auto">
-            {/* Stepper */}
-            <div className="flex items-center justify-center space-x-2 md:space-x-4 mb-12">
-                {steps.map((step, index) => (
-                    <React.Fragment key={step.id}>
-                        <div className="flex flex-col items-center">
-                            <div
-                                className={cn(
-                                    "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all",
-                                    currentStep === index
-                                        ? "bg-primary border-primary text-primary-foreground"
-                                        : currentStep > index ? "bg-primary/20 border-primary/30 text-primary" : "bg-muted border-border text-muted-foreground"
-                                )}
-                            >
-                                {step.id}
-                            </div>
-                            <p className={cn("text-xs md:text-sm mt-2 text-center", currentStep === index ? "font-bold text-primary" : "text-muted-foreground")}>
-                                {step.name}
-                            </p>
-                        </div>
-                        {index < steps.length - 1 && (
-                            <div className={cn("flex-1 h-0.5 mt-[-1rem]", currentStep > index ? "bg-primary/30" : "bg-border")}></div>
-                        )}
-                    </React.Fragment>
-                ))}
-            </div>
+            
+            <FormSectionCompany />
+            <FormSectionPayroll year={year} />
+            <FormSectionAnnualRevenue />
+            <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />
+            <FormSectionPlan />
 
-            <div className="min-h-[450px]">
-                <CurrentComponent year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />
-            </div>
-
-            <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10 flex justify-between items-center">
-                {currentStep > 0 ? (
-                    <Button type="button" variant="outline" onClick={handleBack} disabled={isLoading}>
-                        Anterior
-                    </Button>
-                ) : <div />}
-
-                {currentStep < steps.length - 1 ? (
-                    <Button type="button" onClick={handleNext} disabled={isLoading}>
-                        Próximo
-                    </Button>
-                ) : (
-                    <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
-                        {isLoading ? <Loader2 className="animate-spin" /> : null}
-                        {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
-                    </Button>
-                )}
+            <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
+                <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
+                    {isLoading ? <Loader2 className="animate-spin" /> : null}
+                    {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                </Button>
             </div>
         </form>
     );
