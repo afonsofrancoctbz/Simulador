@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, { useState } from "react";
@@ -14,7 +12,7 @@ import { FormSectionPlan } from "./form-section-plan";
 import { CnaeSelector } from './cnae-selector';
 import { getCnaeData } from "@/lib/cnae-helpers";
 import type { Annex } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft, ArrowRight } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
 
@@ -46,3 +44,70 @@ export const CalculatorFormSchema = z.object({
 });
 
 export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
+
+interface TaxCalculatorFormProps {
+    year: 2025 | 2026;
+    onCnaeSelectorOpen: () => void;
+    isLoading: boolean;
+    onSubmit: (e: React.BaseSyntheticEvent) => Promise<void>;
+}
+
+const steps = [
+    { id: 1, name: 'Empresa' },
+    { id: 2, name: 'Folha e Sócios' },
+    { id: 3, name: 'Receita Anual' },
+    { id: 4, name: 'Faturamento Mensal' },
+    { id: 5, name: 'Plano' }
+];
+
+export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmit }: TaxCalculatorFormProps) {
+    const [currentStep, setCurrentStep] = useState(1);
+    
+    const form = useFormContext();
+
+    const nextStep = () => setCurrentStep(prev => Math.min(steps.length, prev + 1));
+    const prevStep = () => setCurrentStep(prev => Math.max(1, prev - 1));
+
+    return (
+        <form onSubmit={onSubmit} className="space-y-8 text-left max-w-7xl mx-auto">
+            <div className="mb-8 px-4">
+                <ol className="flex items-center w-full">
+                    {steps.map((step, index) => (
+                        <li key={step.id} className={`flex w-full items-center ${index < steps.length - 1 ? "after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block " : ""} ${currentStep > step.id ? "after:border-primary" : "after:border-muted"}`}>
+                            <span className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${currentStep >= step.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                                {step.id}
+                            </span>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            {currentStep === 1 && <FormSectionCompany />}
+            {currentStep === 2 && <FormSectionPayroll year={year} />}
+            {currentStep === 3 && <FormSectionAnnualRevenue />}
+            {currentStep === 4 && <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />}
+            {currentStep === 5 && <FormSectionPlan />}
+
+            <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
+                <div className="flex justify-between items-center">
+                    <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1 || isLoading}>
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Anterior
+                    </Button>
+                    
+                    {currentStep < steps.length && (
+                        <Button type="button" variant="default" onClick={nextStep} disabled={isLoading}>
+                            Próximo <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    )}
+
+                    {currentStep === steps.length && (
+                        <Button type="submit" size="lg" disabled={isLoading} className="text-lg bg-accent text-accent-foreground hover:bg-accent/90">
+                            {isLoading ? <Loader2 className="animate-spin" /> : null}
+                            {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
+                        </Button>
+                    )}
+                </div>
+            </div>
+        </form>
+    );
+}

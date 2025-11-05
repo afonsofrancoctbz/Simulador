@@ -1,29 +1,16 @@
-
-
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
 import { FormProvider } from "react-hook-form";
 import { getCnaeData } from '@/lib/cnae-helpers';
 import { useTaxCalculator } from '@/hooks/use-tax-calculator';
-import { z } from "zod";
-import { CIDADES_ATENDIDAS } from '@/lib/cities';
-import { PlanEnumSchema, ProLaboreFormSchema } from '@/lib/types';
-import { Button } from "@/components/ui/button";
-import { FormSectionCompany } from "./form-section-company";
-import { FormSectionRevenue } from "./form-section-revenue";
-import { FormSectionPlan } from "./form-section-plan";
-import { CnaeSelector } from './cnae-selector';
 import type { Annex } from "@/lib/types";
-import { Loader2 } from "lucide-react";
-import { FormSectionPayroll } from "./form-section-payroll";
-import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
+import { CnaeSelector } from './cnae-selector';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
 import TaxResults from './tax-results';
-import type { CalculatorFormValues } from './tax-calculator-form';
-
+import { TaxCalculatorForm } from './tax-calculator-form';
 
 export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange }: { year: 2025 | 2026, onExportRevenueChange: (show: boolean) => void, onResultsChange: (show: boolean) => void }) {
   const {
@@ -81,28 +68,19 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
     <div className='printable-section'>
         <div className="print-hidden">
              <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 text-left max-w-7xl mx-auto">
-                    
-                    <FormSectionCompany />
-                    <FormSectionPayroll year={year} />
-                    <FormSectionAnnualRevenue />
-                    <FormSectionRevenue year={year} onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)} />
-                    <FormSectionPlan />
-
-                    <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
-                        <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
-                            {isLoading ? <Loader2 className="animate-spin" /> : null}
-                            {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
-                        </Button>
-                    </div>
-                </form>
-                 <CnaeSelector
-                    open={isCnaeSelectorOpen}
-                    onOpenChange={setCnaeSelectorOpen}
-                    onConfirm={handleCnaeConfirm}
-                    initialSelectedCodes={selectedCnaes}
+                <TaxCalculatorForm
+                    year={year}
+                    onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)}
+                    isLoading={isLoading}
+                    onSubmit={form.handleSubmit(onSubmit)}
                 />
             </FormProvider>
+             <CnaeSelector
+                open={isCnaeSelectorOpen}
+                onOpenChange={setCnaeSelectorOpen}
+                onConfirm={handleCnaeConfirm}
+                initialSelectedCodes={selectedCnaes}
+            />
 
             <div className="mt-12">
                 <CityInfoRenderer city={selectedCity} />
