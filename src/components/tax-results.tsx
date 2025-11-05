@@ -183,7 +183,11 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
             let title = scenario.regime;
-            
+            if (title === 'Simples Nacional (Otimizado)') title = 'Simples Nacional (Fator R)';
+            if (year === 2026 && scenario.regime === 'Simples Nacional (Fator R)') title = 'Simples Nacional (Fator R)';
+            if (year === 2026 && scenario.regime === 'Simples Nacional' && scenario.optimizationNote) title = 'Simples Nacional (Fator R)';
+
+
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva|ibs|cbs/));
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
             const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
@@ -223,8 +227,8 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                       <h3 className="text-xl font-bold text-foreground mt-2">{title}</h3>
                        {isCurrentLpFor2026 && <p className='text-xs font-bold text-muted-foreground'>(Comparativo Regras Atuais)</p>}
                       {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
-                      {scenario.optimizationNote && <p className="text-sm text-primary/90 mt-1">Com Fator R</p>}
-                      {!scenario.optimizationNote && scenario.regime.includes("Simples") && <p className="text-sm text-muted-foreground mt-1">Sem Fator R</p>}
+                      {scenario.optimizationNote && !title.includes('Fator R') && <p className="text-sm text-primary/90 mt-1">Com Fator R</p>}
+                      {!scenario.optimizationNote && scenario.regime.includes("Simples") && !title.includes('Fator R') && <p className="text-sm text-muted-foreground mt-1">Sem Fator R</p>}
                   </div>
 
                   <div className="px-4 pb-4 pt-2 flex-grow space-y-1">
@@ -320,7 +324,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
                                 <span>
-                                    {scenario.optimizationNote && `Pró-labore ajustado para ${formatCurrencyBRL(scenario.proLabore)} para atingir o Fator R e tributar pelo Anexo III.`}
+                                    {scenario.optimizationNote && `${scenario.optimizationNote}`}
                                     {exportRevenue > 0 && scenario.regime.includes('Simples') && " No Simples Nacional, PIS, COFINS e ISS não incidem sobre a receita de exportação, o que reduz a alíquota efetiva do DAS."}
                                     {exportRevenue > 0 && scenario.regime === 'Lucro Presumido' && " PIS, COFINS e ISS não incidem sobre a receita de exportação."}
                                 </span>

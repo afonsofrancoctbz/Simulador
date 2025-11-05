@@ -12,6 +12,7 @@ import {
   type Annex,
   type FeeBracket,
   type TaxDetails,
+  type ProLaboreForm,
 } from './types';
 import { formatPercent, findBracket, findFeeBracket } from './utils';
 import { getCnaeData } from './cnae-helpers';
@@ -110,93 +111,80 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 }
 
 
-function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDetails2026 {
+function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0 } = values;
-    const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
+    
+    const proLaboresToUse = proLaboreOverride || proLabores;
+    const totalProLaboreBruto = proLaboresToUse.reduce((a, p) => a + p.value, 0);
     const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
 
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig2026);
+    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig2026);
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenue = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenue;
     
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    const effectiveFp12 = fp12 > 0 ? fp12 : totalPayroll * 12;
+    const effectiveFp12 = fp12 > 0 ? totalPayroll * 12 : totalPayroll * 12;
 
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     
-    if (totalRevenue === 0 && effectiveRbt12 === 0) {
-      return {
-        regime: isHybrid ? 'Simples Nacional Híbrido' : 'Simples Nacional Tradicional',
-        totalTax: totalINSSRetido + totalIRRFRetido,
-        totalMonthlyCost: totalINSSRetido + totalIRRFRetido + fee,
-        totalRevenue: 0,
-        proLabore: totalProLaboreBruto,
-        effectiveRate: 0,
-        contabilizeiFee: fee,
-        breakdown: [
-          { name: "INSS s/ Pró-labore", value: totalINSSRetido },
-          { name: "IRRF s/ Pró-labore", value: totalIRRFRetido }
-        ].filter(i => i.value > 0.001),
-        notes: [],
-        partnerTaxes
-      };
-    }
-
-    const allActivities = [...domesticActivities.map(a=>({...a, isExport: false})), ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, isExport: true }))];
-    const fatorR = totalRevenue > 0 ? totalPayroll / totalRevenue : (effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0);
+    const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
     
     let totalDas = 0;
     let cppFromAnnexIV = 0;
     let ivaTaxes = 0;
     let hasAnnexIVActivity = false;
 
-    // This block calculates the total DAS as if no IVA was paid "por fora"
-    const revenueByAnnex: Record<string, { revenue: number, isExport: boolean }[]> = {};
+    const allActivities = [...domesticActivities.map(a=>({...a, isExport: false})), ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, isExport: true }))];
 
     allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
+        
+        const revenueForActivity = activity.revenue;
+        if(revenueForActivity === 0) return;
+
         let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
-        if (!revenueByAnnex[effectiveAnnex]) revenueByAnnex[effectiveAnnex] = [];
-        revenueByAnnex[effectiveAnnex].push({ revenue: activity.revenue, isExport: activity.isExport });
-    });
-
-
-    for (const annexStr in revenueByAnnex) {
-        const annex = annexStr as Annex;
-        const activitiesInAnnex = revenueByAnnex[annex];
-        const annexTable = fiscalConfig2026.simples_nacional[annex];
+        const annexTable = fiscalConfig2026.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
         const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-        const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
 
-        activitiesInAnnex.forEach(activity => {
-            let activityDas = activity.revenue * effectiveRate;
-            if (activity.isExport) {
-                activityDas *= (1 - exportExemptionRatio);
-            }
-            totalDas += activityDas;
-        });
+        let rateForDas = effectiveRate;
 
-        if (annex === 'IV') hasAnnexIVActivity = true;
-    }
-    
+        // Apply export exemption by reducing the rate
+        if (activity.isExport) {
+            const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
+            rateForDas *= (1 - exportExemptionRatio);
+        }
+
+        // For hybrid, further reduce the rate for the portion of domestic B2B revenue
+        if (isHybrid && !activity.isExport) {
+            const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
+            const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
+            
+            // The rate is reduced proportionally to the B2B part of the revenue
+            const weightedReduction = ivaProportionInDas * b2bRevenuePortion;
+            rateForDas *= (1 - weightedReduction);
+        }
+
+        totalDas += revenueForActivity * rateForDas;
+        
+        if (effectiveAnnex === 'IV') hasAnnexIVActivity = true;
+    });
+
     if (hasAnnexIVActivity) {
         cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig2026);
     }
 
-    // If hybrid, adjust DAS and calculate IVA separately
     if (isHybrid) {
-      // IVA is only on domestic B2B revenue. Export is immune.
-      const insumosGeradoresDeCredito = creditGeneratingExpenses;
+      const insumosGeradoresDeCredito = creditGeneratingExpenses ?? 0;
+      const b2bDomesticRevenue = domesticRevenue * ((b2bRevenuePercentage ?? 100) / 100);
 
-      // Calculate the IVA debit on B2B domestic revenue
       const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
-          const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
+          const activityB2bRevenue = activity.revenue * ((b2bRevenuePercentage ?? 100) / 100);
           const cnaeInfo = getCnaeData(activity.code);
           const reduction = cnaeInfo?.ivaReduction ?? 0;
           const effectiveIvaRate = fiscalConfig2026.reforma_tributaria.iva_rate * (1 - reduction);
@@ -205,25 +193,6 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
 
       const totalIvaCredit = insumosGeradoresDeCredito * fiscalConfig2026.reforma_tributaria.iva_rate;
       ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
-  
-      // Reduce the DAS by the proportion of PIS/COFINS/ISS that is now paid via IVA for domestic B2B revenue
-      const dasReduction = domesticActivities.reduce((sum, activity) => {
-          const activityB2bRevenue = activity.revenue * (b2bRevenuePercentage / 100);
-          const cnaeInfo = getCnaeData(activity.code);
-          if (!cnaeInfo) return sum;
-  
-          let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
-          const annexTable = fiscalConfig2026.simples_nacional[effectiveAnnex];
-          const bracket = findBracket(annexTable, effectiveRbt12);
-          const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
-          
-          const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-          const ivaProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
-          
-          return sum + (activityB2bRevenue * effectiveRate * ivaProportionInDas);
-      }, 0);
-      
-      totalDas -= dasReduction;
     }
     
     const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
@@ -239,7 +208,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
 
     const notes = [];
     if (isHybrid) {
-      notes.push(`Cenário competitivo para B2B: ${formatPercent(b2bRevenuePercentage/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
+      notes.push(`Cenário competitivo para B2B: ${formatPercent((b2bRevenuePercentage ?? 100)/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
     } else {
       notes.push("Regime padrão do Simples. O crédito de IVA para clientes B2B é limitado. Receitas de exportação têm PIS/COFINS/ISS zerados dentro do DAS.");
     }
@@ -247,8 +216,15 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
       notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig2026.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
     }
 
-    return {
-        regime: isHybrid ? 'Simples Nacional Híbrido' : 'Simples Nacional Tradicional',
+    let regimeName: TaxDetails2026['regime'] = 'Simples Nacional Tradicional';
+    if(proLaboreOverride) {
+      regimeName = 'Simples Nacional (Fator R)' as any; // Cast for now, will be handled in display
+    } else if (isHybrid) {
+      regimeName = 'Simples Nacional Híbrido';
+    }
+    
+    const result: TaxDetails2026 = {
+        regime: regimeName,
         totalTax, totalMonthlyCost, totalRevenue,
         proLabore: totalProLaboreBruto,
         fatorR,
@@ -258,15 +234,67 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean): TaxDet
         notes,
         partnerTaxes
     };
+
+     if (proLaboreOverride) {
+        result.optimizationNote = `Pró-labore ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} para atingir o Fator R e tributar pelo Anexo III.`;
+    }
+    return result;
 }
 
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
   const lucroPresumido = calculateLucroPresumido(values, true) as TaxDetails2026;
   const lucroPresumidoAtual = calculateLucroPresumido(values, false) as TaxDetails;
-  const simplesNacionalTradicional = _calculateSimples2026(values, false);
-  const simplesNacionalHibrido = _calculateSimples2026(values, true);
   
+  let simplesNacionalTradicional = _calculateSimples2026(values, false);
+  let simplesNacionalHibrido = _calculateSimples2026(values, true);
+  
+  // Condição para otimização do Fator R
+  const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
+  const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
+  const rbt12 = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
+  const fp12 = values.fp12 > 0 ? values.fp12 : (values.totalSalaryExpense + values.proLabores.reduce((a,p)=>a+p.value,0)) * 12;
+  const currentFatorR = rbt12 > 0 ? fp12 / rbt12 : 0;
+  
+  let simplesNacionalOtimizado: TaxDetails2026 | null = null;
+  
+  if (hasAnnexVActivity && currentFatorR < fiscalConfig2026.simples_nacional.limite_fator_r && totalRevenue > 0) {
+      const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
+      const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
+      
+      const requiredPayroll = totalRevenue * fiscalConfig2026.simples_nacional.limite_fator_r;
+      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
+      
+      if (additionalProLaboreNeeded > 0) {
+          const newTotalProLabore = currentTotalProLabore + additionalProLaboreNeeded;
+          
+          const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
+              ? values.proLabores.map(p => ({ 
+                  ...p, 
+                  value: newTotalProLabore / values.proLabores.length,
+                }))
+              : [{ 
+                  value: newTotalProLabore, 
+                  hasOtherInssContribution: false, 
+                  otherContributionSalary: 0 
+                }];
+          
+          // We need to decide if this optimized scenario replaces the 'tradicional' or 'hibrido', or is a new one.
+          // Let's make it a new one for clarity.
+          simplesNacionalOtimizado = _calculateSimples2026(values, false, optimizedProLabores); // Base it on the traditional calculation
+          
+          // If the optimized scenario is worse than the original, don't show it.
+          if (simplesNacionalOtimizado && simplesNacionalTradicional.totalMonthlyCost < simplesNacionalOtimizado.totalMonthlyCost) {
+            simplesNacionalOtimizado = null;
+          }
+      }
+  }
+
+  // Se o otimizado existir, ele se torna a opção principal do Simples
+  if(simplesNacionalOtimizado) {
+    simplesNacionalTradicional = simplesNacionalOtimizado;
+  }
+
   return {
     simplesNacionalTradicional: { ...simplesNacionalTradicional, order: 2 },
     simplesNacionalHibrido: { ...simplesNacionalHibrido, order: 3 },
@@ -274,5 +302,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     lucroPresumidoAtual: { ...lucroPresumidoAtual, regime: 'Lucro Presumido', order: 4 }, // Override regime for display
   };
 }
-
-    
