@@ -663,7 +663,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6,
   },
   {
     code: '6399-2/00',
@@ -782,6 +783,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
+    ivaReduction: 0,
     notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...'
   },
   {
@@ -792,7 +794,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0,
   },
   {
     code: '7410-2/99',
@@ -802,7 +805,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0,
   },
   
   // --- CONSULTORIA E GESTÃO ---
@@ -944,7 +948,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6,
   },
 
   // --- EDUCAÇÃO E TREINAMENTO ---
@@ -1293,6 +1298,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.4,
     notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
@@ -1304,6 +1310,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.4,
     notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
@@ -1315,6 +1322,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.4,
     notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
@@ -1921,7 +1929,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6,
   },
   {
     code: '9313-1/00',
@@ -1932,6 +1941,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREF ou CREFITO. Não é obrigatório.'
   },
   {
@@ -3948,7 +3958,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5510-8/02',
@@ -3958,7 +3969,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5510-8/03',
@@ -3968,7 +3980,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5590-6/01',
@@ -3978,7 +3991,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5590-6/02',
@@ -3988,7 +4002,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5590-6/03',
@@ -3998,7 +4013,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5590-6/99',
@@ -4008,7 +4024,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5611-2/01',
@@ -4018,7 +4035,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5611-2/03',
@@ -4028,7 +4046,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5611-2/04',
@@ -4038,7 +4057,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5620-1/01',
@@ -4049,6 +4069,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: true,
+    ivaReduction: 0.4,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
   },
   {
@@ -4059,7 +4080,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5620-1/03',
@@ -4069,7 +4091,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '5620-1/04',
@@ -4079,7 +4102,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.4,
   },
   {
     code: '4721-1/02',
