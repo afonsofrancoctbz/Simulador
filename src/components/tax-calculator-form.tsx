@@ -16,6 +16,7 @@ import { Loader2, ArrowLeft, ArrowRight } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 
 export const CalculatorFormSchema = z.object({
@@ -57,7 +58,7 @@ const steps = [
     { id: 1, name: 'Empresa' },
     { id: 2, name: 'Folha e Sócios' },
     { id: 3, name: 'Receita Anual' },
-    { id: 4, name: 'Faturamento Mensal' },
+    { id: 4, name: 'Atividades e Faturamento Mensal' },
     { id: 5, name: 'Plano' }
 ];
 
@@ -71,27 +72,16 @@ export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmi
 
     return (
         <form onSubmit={onSubmit} className="space-y-8 text-left max-w-4xl mx-auto">
-            <div className="mb-8 px-4">
-                <ol className="flex items-center w-full">
-                    {steps.map((step, index) => (
-                        <React.Fragment key={step.id}>
-                            <li className="flex items-center">
-                                <span className={cn(
-                                    "flex items-center justify-center w-10 h-10 rounded-full shrink-0",
-                                    currentStep >= step.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                                )}>
-                                    {step.id}
-                                </span>
-                            </li>
-                            {index < steps.length - 1 && (
-                                <li className={cn(
-                                    "flex-1 h-1",
-                                    currentStep > step.id ? "bg-primary" : "bg-border"
-                                )}></li>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </ol>
+            <div className="mb-8">
+                 <Tabs value={String(currentStep)} className="w-full">
+                    <TabsList>
+                        {steps.map(step => (
+                            <TabsTrigger key={step.id} value={String(step.id)} onClick={() => setCurrentStep(step.id)}>
+                               {step.id}. {step.name}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
             </div>
 
             {currentStep === 1 && <FormSectionCompany />}
@@ -102,18 +92,16 @@ export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmi
 
             <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
                 <div className="flex justify-between items-center">
-                    <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1 || isLoading}>
+                    <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1 || isLoading} className="text-base py-6 px-6">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Anterior
                     </Button>
                     
-                    {currentStep < steps.length && (
-                        <Button type="button" variant="default" onClick={nextStep} disabled={isLoading}>
+                    {currentStep < steps.length ? (
+                        <Button type="button" variant="default" onClick={nextStep} disabled={isLoading} className="text-base py-6 px-6">
                             Próximo <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
-                    )}
-
-                    {currentStep === steps.length && (
-                        <Button type="submit" size="lg" disabled={isLoading} className="text-lg bg-accent text-accent-foreground hover:bg-accent/90">
+                    ) : (
+                        <Button type="submit" size="lg" disabled={isLoading} className="text-lg bg-accent text-accent-foreground hover:bg-accent/90 py-7 px-8">
                             {isLoading ? <Loader2 className="animate-spin" /> : null}
                             {isLoading ? "Analisando..." : "Analisar e Otimizar Impostos"}
                         </Button>

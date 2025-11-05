@@ -97,9 +97,9 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
             </CardHeader>
              <CardContent className='p-6 md:p-8 space-y-8'>
                  <div>
-                    <FormLabel>1. Selecione suas Atividades (CNAEs)</FormLabel>
-                    <FormDescription className="text-xs mb-2">A escolha do CNAE define os anexos e as alíquotas de imposto aplicáveis.</FormDescription>
-                    <div className="flex flex-col gap-2 mt-2 p-3 border rounded-md min-h-[44px] bg-background">
+                    <h3 className='font-semibold text-lg mb-2'>1. Selecione suas Atividades (CNAEs)</h3>
+                    <FormDescription className="text-sm mb-3">A escolha do CNAE define os anexos e as alíquotas de imposto aplicáveis.</FormDescription>
+                    <div className="flex flex-col gap-2 mt-2 p-3 border rounded-md min-h-[52px] bg-background">
                         {selectedCnaes.length > 0 ? selectedCnaes.map(code => {
                             const cnae = getCnaeData(code);
                             return (
@@ -128,7 +128,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         name="b2bRevenuePercentage"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='flex items-center gap-2'><Percent className='h-4 w-4 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
+                            <FormLabel className='flex items-center gap-2 text-lg'><Percent className='h-5 w-5 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
                             <div className='flex items-center gap-4'>
                             <FormControl>
                                 <Slider
@@ -160,7 +160,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         };
                         return (
                             <FormItem>
-                                <FormLabel className='flex items-center gap-2'><Receipt className='h-4 w-4 text-primary' />Custos Mensais Geradores de Crédito (Insumos)</FormLabel>
+                                <FormLabel className='flex items-center gap-2 text-lg'><Receipt className='h-5 w-5 text-primary' />Custos Mensais Geradores de Crédito (Insumos)</FormLabel>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                     <FormControl>
@@ -192,10 +192,10 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
 
                 {revenueGroups.length > 0 && (
                      <div className="space-y-6">
-                        <h4 className="font-semibold text-lg text-foreground flex items-center gap-3">
+                        <h3 className="font-semibold text-lg flex items-center gap-3">
                             <Banknote className="h-5 w-5 text-primary"/>
                             2. Informe o Faturamento Mensal Estimado
-                        </h4>
+                        </h3>
                         <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8'>
                             <div className='space-y-6'>
                                 <h4 className="font-medium text-md text-foreground flex items-center gap-2"><BarChartBig className="h-5 w-5 text-primary/80" />Receita Nacional (em R$)</h4>
