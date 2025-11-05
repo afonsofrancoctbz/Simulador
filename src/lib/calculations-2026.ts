@@ -64,8 +64,10 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
             const effectiveIvaRate = getEffectiveIvaRate(activity.code);
             return sum + (activity.revenue * effectiveIvaRate);
         }, 0);
+
+        const creditRate = getEffectiveIvaRate(domesticActivities[0]?.code || exportActivities[0]?.code || '');
+        const totalIvaCredit = creditGeneratingExpenses * creditRate;
         
-        const totalIvaCredit = creditGeneratingExpenses * ivaStandardRate; // Credit is based on the standard rate
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
 
         const cbsRateInIva = (config2026.reforma_tributaria.cbs_rate_test || 0.088) / ivaStandardRate;
@@ -201,7 +203,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
           return sum + (activityB2bRevenue * effectiveIvaRate);
       }, 0);
 
-      const totalIvaCredit = creditGeneratingExpenses * ivaStandardRate; // Credit is based on the standard rate
+      const creditRate = getEffectiveIvaRate(domesticActivities[0]?.code || exportActivities[0]?.code || '');
+      const totalIvaCredit = creditGeneratingExpenses * creditRate;
       ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
     }
     
