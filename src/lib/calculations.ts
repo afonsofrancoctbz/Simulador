@@ -98,7 +98,14 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const iss = domesticRevenue * issValue;
 
     // Presunção sobre a receita total (IRPJ e CSLL incidem sobre exportação)
-    const presumedProfitBase = totalRevenue * 0.32;
+    let presumedProfitBase = 0;
+    const allActivities = [...values.domesticActivities, ...values.exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
+    allActivities.forEach(activity => {
+      const cnaeInfo = getCnaeData(activity.code);
+      const presuncao = cnaeInfo?.presumedProfitRateIRPJ ?? 0.32;
+      presumedProfitBase += activity.revenue * presuncao;
+    });
+
     const irpjAdicional = Math.max(0, (presumedProfitBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
     const irpj = presumedProfitBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
     const csll = presumedProfitBase * config.lucro_presumido_rates.CSLL;
@@ -164,13 +171,13 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     let hasAnnexIVActivity = false;
     const finalAnnexes = new Set<Annex>();
 
-    const allActivities = [...values.domesticActivities.map(a => ({...a, isExport: false})), ...values.exportActivities.map(a => ({...a, isExport: true}))];
+    const allActivities = [...values.domesticActivities.map(a => ({...a, isExport: false})), ...values.exportActivities.map(a => ({...a, isExport: true, revenue: a.revenue * exchangeRate}))];
 
     allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
 
-        const revenueForActivity = activity.isExport ? activity.revenue * exchangeRate : activity.revenue;
+        const revenueForActivity = activity.revenue;
 
         if (revenueForActivity === 0) return;
 
@@ -240,7 +247,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     };
     
     if (proLaboreOverride) {
-        finalResult.regime = "Simples Nacional (Fator R)";
+        finalResult.regime = "Simples Nacional (Otimizado)";
         finalResult.optimizationNote = `Pró-labore ajustado para R$ ${totalProLaboreBruto.toFixed(2)} para atingir o Fator R e tributar pelo Anexo III.`;
     }
 
@@ -297,7 +304,7 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
 
   return {
     simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
-    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, regime: 'Simples Nacional (Otimizado)', order: 1 } : null,
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
