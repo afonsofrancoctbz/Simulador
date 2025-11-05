@@ -65,7 +65,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
             return sum + (activity.revenue * effectiveIvaRate);
         }, 0);
 
-        const creditRate = getEffectiveIvaRate(domesticActivities[0]?.code || exportActivities[0]?.code || '');
+        const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
+        const creditRate = getEffectiveIvaRate(primaryActivityCode);
         const totalIvaCredit = creditGeneratingExpenses * creditRate;
         
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
@@ -169,20 +170,18 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0, CBS = 0, IBS = 0 } = distribution;
         const consumptionTaxProportionInDas = CBS + IBS + (ISS || 0) + (ICMS || 0) + (IPI || 0) + (PIS || 0) + (COFINS || 0);
 
+        let dasRevenue = revenueForActivity;
         let dasRateForActivity = effectiveDasRate;
         
-        if (activity.isExport) {
+        if (isHybrid && !activity.isExport) {
+            const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
+            dasRevenue = activity.revenue * (1 - b2bRevenuePortion);
+            dasRateForActivity = effectiveDasRate * (1 - consumptionTaxProportionInDas);
+        } else if (activity.isExport) {
             dasRateForActivity -= effectiveDasRate * consumptionTaxProportionInDas;
         }
-
-        if (isHybrid && !activity.isExport) {
-             const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-             const dasRevenueForActivity = activity.revenue * (1 - b2bRevenuePortion);
-             const dasRateWithoutConsumption = effectiveDasRate * (1 - consumptionTaxProportionInDas);
-             totalDas += dasRevenueForActivity * dasRateWithoutConsumption;
-        } else {
-            totalDas += revenueForActivity * dasRateForActivity;
-        }
+        
+        totalDas += dasRevenue * dasRateForActivity;
         
         if (effectiveAnnex === 'IV') cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig);
     });
@@ -203,7 +202,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
           return sum + (activityB2bRevenue * effectiveIvaRate);
       }, 0);
 
-      const creditRate = getEffectiveIvaRate(domesticActivities[0]?.code || exportActivities[0]?.code || '');
+      const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
+      const creditRate = getEffectiveIvaRate(primaryActivityCode);
       const totalIvaCredit = creditGeneratingExpenses * creditRate;
       ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
     }
@@ -325,3 +325,6 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null,
   };
 }
+
+
+    
