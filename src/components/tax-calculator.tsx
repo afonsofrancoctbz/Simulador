@@ -66,7 +66,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
 
   return (
     <div className='printable-section'>
-        <div className="print-hidden">
+        <div className="print-hidden max-w-5xl mx-auto">
              <FormProvider {...form}>
                 <TaxCalculatorForm
                     year={year}

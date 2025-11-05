@@ -50,7 +50,7 @@ export function FormSectionPlan() {
                         <ListChecks className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl">Plano Contabilizei</CardTitle>
+                        <CardTitle className="text-xl font-bold">Plano Contabilizei</CardTitle>
                         <CardDescription>Escolha o plano que melhor se adapta às suas necessidades.</CardDescription>
                     </div>
                 </div>

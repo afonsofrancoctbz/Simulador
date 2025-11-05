@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useFormContext } from "react-hook-form";
@@ -42,7 +43,7 @@ export function FormSectionAnnualRevenue() {
                         <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl">Receita Bruta (Últimos 12 meses)</CardTitle>
+                        <CardTitle className="text-xl font-bold">Receita Anual</CardTitle>
                         <CardDescription>Esta informação é crucial para determinar a alíquota correta do Simples Nacional.</CardDescription>
                     </div>
                 </div>
@@ -75,7 +76,7 @@ export function FormSectionAnnualRevenue() {
                                     </FormControl>
                                 </div>
                                 <FormDescription>
-                                    Se for o primeiro mês, pode deixar em R$ 0,00.
+                                    Receita Bruta dos últimos 12 meses. Se for o primeiro mês, pode deixar em R$ 0,00.
                                 </FormDescription>
                                 <FormMessage />
                                 {showSimplesLimitWarning && (
@@ -116,7 +117,7 @@ export function FormSectionAnnualRevenue() {
                                     </FormControl>
                                 </div>
                                 <FormDescription>
-                                    Soma de salários e pró-labore do último ano.
+                                    Soma de salários e pró-labore dos últimos 12 meses. Essencial para o Fator R.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>

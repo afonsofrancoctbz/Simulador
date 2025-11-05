@@ -20,7 +20,7 @@ export function FormSectionCompany() {
                         <Building2 className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl">Dados da Empresa</CardTitle>
+                        <CardTitle className="text-xl font-bold">Dados da Empresa</CardTitle>
                         <CardDescription>Comece nos dizendo onde sua empresa será registrada.</CardDescription>
                     </div>
                 </div>

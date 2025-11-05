@@ -90,7 +90,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         <Briefcase className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl">Atividades e Faturamento Mensal</CardTitle>
+                        <CardTitle className="text-xl font-bold">Atividades e Faturamento Mensal</CardTitle>
                         <CardDescription>Selecione suas atividades e informe a estimativa de receita para o mês.</CardDescription>
                     </div>
                 </div>
@@ -128,7 +128,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         name="b2bRevenuePercentage"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='flex items-center gap-2 text-lg'><Percent className='h-5 w-5 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
+                            <FormLabel className='flex items-center gap-2 text-lg font-semibold'><Percent className='h-5 w-5 text-primary' />% do Faturamento para Empresas (B2B)</FormLabel>
                             <div className='flex items-center gap-4'>
                             <FormControl>
                                 <Slider
@@ -160,7 +160,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                         };
                         return (
                             <FormItem>
-                                <FormLabel className='flex items-center gap-2 text-lg'><Receipt className='h-5 w-5 text-primary' />Custos Mensais Geradores de Crédito (Insumos)</FormLabel>
+                                <FormLabel className='flex items-center gap-2 text-lg font-semibold'><Receipt className='h-5 w-5 text-primary' />Custos Mensais Geradores de Crédito (Insumos)</FormLabel>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                     <FormControl>
@@ -178,7 +178,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                     </FormControl>
                                 </div>
                                 <FormDescription>
-                                    Informe custos como aluguel, software, marketing, etc., para calcular créditos de IBS/CBS.
+                                    Informe custos como aluguel de PJ, software, marketing, etc., para calcular créditos de IBS/CBS.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -365,3 +365,4 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
+

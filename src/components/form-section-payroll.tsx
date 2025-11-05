@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect } from 'react';
@@ -47,7 +48,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                         <Wallet className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl">Folha e Quadro Societário</CardTitle>
+                        <CardTitle className="text-xl font-bold">Folha e Sócios</CardTitle>
                         <CardDescription>Informações sobre sua folha de pagamento e sócios.</CardDescription>
                     </div>
                 </div>
