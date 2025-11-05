@@ -53,14 +53,12 @@ export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmi
 
     return (
         <form onSubmit={onSubmit} className="max-w-4xl mx-auto space-y-8">
-            {/* Todas as seções renderizadas verticalmente */}
             <FormSectionCompany />
             <FormSectionPayroll year={year} />
             <FormSectionAnnualRevenue />
             <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />
             <FormSectionPlan />
             
-            {/* Botão de ação único e fixo */}
             <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
                 <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
                     {isLoading ? <Loader2 className="animate-spin" /> : null}
