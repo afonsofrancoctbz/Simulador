@@ -10,7 +10,7 @@ import { Scale, ShieldCheck, Calendar, Clock, BadgePercent, ArrowRight } from 'l
 
 const partnershipInfo = {
     title: "Informações da Parceria",
-    logoUrl: "https://sociilaw.com/static/media/white_logo.dff5457f4d33f209a544a54f5ba90185.svg",
+    logoUrl: "https://sociilaw.com/static/media/named-white.0a44d51b8aae4b9bd4dc74aef4f78564.svg",
     logoAlt: "SociiLaw e Contabilizei Parceria",
     services: {
         trademark: {
@@ -67,13 +67,22 @@ export default function SociiLawSection() {
         <div className="w-full max-w-5xl mx-auto">
             <Card className="shadow-xl border-primary/20 bg-primary/5 overflow-hidden">
                 <CardHeader className="text-center bg-card p-8">
-                     <Image
-                        src={partnershipInfo.logoUrl}
-                        alt={partnershipInfo.logoAlt}
-                        width={300}
-                        height={60}
-                        className="mx-auto mb-4"
-                    />
+                     <div className="flex justify-center items-center gap-4 mb-4">
+                        <Image
+                            src={partnershipInfo.logoUrl}
+                            alt="Logo SociiLaw"
+                            width={150}
+                            height={40}
+                            className="h-10"
+                        />
+                        <span className="text-2xl text-muted-foreground font-light">+</span>
+                         <Image
+                            src="https://www.contabilizei.com.br/_mobile/img/logo-contabilizei.edac969.svg"
+                            alt="Logo Contabilizei"
+                            width={180}
+                            height={30}
+                        />
+                    </div>
                     <CardTitle className="text-3xl font-extrabold text-primary tracking-tight">
                         {partnershipInfo.title}
                     </CardTitle>
