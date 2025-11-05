@@ -574,7 +574,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6201-5/02',
@@ -584,7 +585,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6202-3/00',
@@ -594,7 +596,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6203-1/00',
@@ -604,7 +607,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6204-0/00',
@@ -614,7 +618,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6209-1/00',
@@ -625,6 +630,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0,
     notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -635,7 +641,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6319-4/00',
@@ -645,7 +652,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0
   },
   {
     code: '6391-7/00',
@@ -807,6 +815,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRA. Exige registro da empresa e indicação de Responsável Técnico.'
   },
   {
@@ -850,6 +859,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
 
@@ -1189,6 +1199,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Regulamentado pelo CRA. Não é obrigatório.'
   },
   {
@@ -1315,6 +1326,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
   {
@@ -1325,7 +1337,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '9319-1/01',
@@ -1335,7 +1348,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '5211-7/02',
@@ -2129,7 +2143,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false
+    isRegulated: false,
+    ivaReduction: 0.6
   },
   {
     code: '5912-0/01',
@@ -3056,6 +3071,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO"" na razão social ou fantasia, desde a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
   },
   {
