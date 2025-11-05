@@ -46,7 +46,7 @@ const formSteps = [
     { id: 1, label: 'Empresa', component: FormSectionCompany },
     { id: 2, label: 'Folha e Sócios', component: FormSectionPayroll },
     { id: 3, label: 'Receita Anual', component: FormSectionAnnualRevenue },
-    { id: 4, label: 'Atividades e Faturamento Mensal', component: FormSectionRevenue },
+    { id: 4, label: 'Atividades e Faturamento', component: FormSectionRevenue },
     { id: 5, label: 'Plano', component: FormSectionPlan },
 ];
 

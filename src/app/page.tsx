@@ -54,10 +54,8 @@ export default function Home() {
                 </div>
             </TabsContent>
             <TabsContent value="2026">
-                 <div className="print-hidden">
-                  <TaxReformInfoSection />
-                </div>
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <TaxReformInfoSection />
                     <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
                 </div>
                 <div className='print-hidden'>
