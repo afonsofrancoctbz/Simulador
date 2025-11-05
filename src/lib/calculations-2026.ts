@@ -59,12 +59,11 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
           return config2026.reforma_tributaria.iva_rate * (1 - reduction);
         }
         
-        // NEW: IBS/CBS Calculation (Replaces PIS/COFINS/ISS)
         const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
             const effectiveIvaRate = getEffectiveIvaRate(activity.code);
             return sum + (activity.revenue * effectiveIvaRate);
         }, 0);
-
+        
         const weightedAvgIvaRateForCredit = domesticActivities.length > 0 && domesticRevenue > 0
             ? domesticActivities.reduce((sum, act) => sum + getEffectiveIvaRate(act.code) * act.revenue, 0) / domesticRevenue
             : getEffectiveIvaRate(values.selectedCnaes[0] || '');
@@ -78,8 +77,9 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const ibs = totalIvaDue > 0 ? totalIvaDue * ibsRateInIva : 0;
 
         consumptionTaxes = totalIvaDue;
-        breakdown.push({ name: `CBS (8,8%)`, value: cbs });
-        breakdown.push({ name: `IBS (17,7%)`, value: ibs });
+        breakdown.push({ name: `CBS`, value: cbs });
+        breakdown.push({ name: `IBS`, value: ibs });
+        breakdown.push({ name: `Total IVA (Débito: ${totalIvaDebit.toFixed(2)}, Crédito: ${totalIvaCredit.toFixed(2)})`, value: totalIvaDue });
 
     } else {
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
@@ -142,7 +142,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     let totalDas = 0;
     let cppFromAnnexIV = 0;
     let ivaTaxes = 0;
-    let finalAnnex: Annex = 'III'; // default
+    let finalAnnex: Annex = 'III'; 
 
     const allActivities = [...domesticActivities.map(a=>({...a, isExport: false})), ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, isExport: true }))];
 
@@ -153,7 +153,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         const revenueForActivity = activity.revenue;
         if(revenueForActivity === 0) return;
 
-        let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorREffective < fiscalConfig.simples_nacional.limite_fator_r) ? 'V' : cnaeInfo.annex;
+        let effectiveAnnex: Annex;
         if (cnaeInfo.requiresFatorR) {
              effectiveAnnex = fatorREffective >= fiscalConfig.simples_nacional.limite_fator_r ? 'III' : 'V';
         } else {
@@ -167,7 +167,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
 
         const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0, CBS = 0, IBS = 0 } = distribution;
-        const consumptionTaxProportionInDas = CBS + IBS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
+        const consumptionTaxProportionInDas = CBS + IBS + (ISS || 0) + (ICMS || 0) + (IPI || 0) + (PIS || 0) + (COFINS || 0);
 
         let rateForDas = effectiveRate;
         
@@ -178,7 +178,6 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         if (isHybrid && !activity.isExport) {
              const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
              const dasRevenue = activity.revenue * (1 - b2bRevenuePortion);
-             // On hybrid, DAS is calculated only on the non-B2B portion, but without the consumption taxes
              const dasRateWithoutConsumption = effectiveRate * (1 - consumptionTaxProportionInDas);
              totalDas += dasRevenue * dasRateWithoutConsumption;
         } else {
@@ -231,9 +230,15 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
     }
 
-    const regimeAnexo = finalAnnex === 'III' ? '(Anexo III)' : '(Anexo V)';
+    let regimeName: TaxDetails2026['regime'];
     const regimeType = isHybrid ? 'Híbrido' : 'Tradicional';
-    const regimeName: TaxDetails2026['regime'] = `Simples Nacional ${regimeType} ${regimeAnexo}`;
+
+    if (proLaboreOverride) {
+        regimeName = `Simples Nacional (Fator R Otimizado)${isHybrid ? ' Híbrido' : ''}`;
+    } else {
+        const regimeAnexo = finalAnnex === 'III' ? '(Anexo III)' : '(Anexo V)';
+        regimeName = `Simples Nacional ${regimeType} ${regimeAnexo}`;
+    }
     
     const result: TaxDetails2026 = {
         regime: regimeName,
@@ -266,11 +271,9 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
   const fatorR_naoOtimizado = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
   
-  // Scenarios without Fator R optimization
   const simplesNacionalTradicional = _calculateSimples2026(values, false, fatorR_naoOtimizado);
   const simplesNacionalHibrido = _calculateSimples2026(values, true, fatorR_naoOtimizado);
 
-  // Scenarios with Fator R optimization
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   let simplesNacionalOtimizadoHibrido: TaxDetails2026 | null = null;
 
@@ -295,6 +298,14 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
           simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, fatorR_Otimizado, optimizedProLabores);
           simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, fatorR_Otimizado, optimizedProLabores);
+
+          // Do not show optimized scenarios if they are more expensive
+          if (simplesNacionalOtimizado && simplesNacionalTradicional && simplesNacionalOtimizado.totalMonthlyCost > simplesNacionalTradicional.totalMonthlyCost) {
+            simplesNacionalOtimizado = null;
+          }
+          if (simplesNacionalOtimizadoHibrido && simplesNacionalHibrido && simplesNacionalOtimizadoHibrido.totalMonthlyCost > simplesNacionalHibrido.totalMonthlyCost) {
+            simplesNacionalOtimizadoHibrido = null;
+          }
       }
   }
   
@@ -302,11 +313,11 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const lucroPresumidoAtual = calculateLucroPresumido(values, false) as TaxDetails;
 
   return {
-    simplesNacionalTradicional,
-    simplesNacionalHibrido,
-    lucroPresumido,
-    lucroPresumidoAtual: { ...lucroPresumidoAtual, order: 4 },
-    simplesNacionalOtimizado,
-    simplesNacionalOtimizadoHibrido,
+    simplesNacionalTradicional: {...simplesNacionalTradicional, order: simplesNacionalOtimizado ? 2 : 1},
+    simplesNacionalHibrido: {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2},
+    lucroPresumido: { ...lucroPresumido, order: 4 },
+    lucroPresumidoAtual: { ...lucroPresumidoAtual, order: 5 },
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 0 } : null,
+    simplesNacionalOtimizadoHibrido: simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null,
   };
 }
