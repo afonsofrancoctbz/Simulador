@@ -70,6 +70,7 @@ export const TaxDetailsSchema = z.object({
       "Simples Nacional", 
       "Lucro Presumido",
       "Simples Nacional (Otimizado)",
+      "Lucro Presumido (Regras Atuais)",
     ]),
     totalTax: z.number(),
     totalMonthlyCost: z.number(),
