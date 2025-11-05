@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Schema for an individual CNAE item
@@ -114,7 +115,7 @@ export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;
 
 export const CalculationResults2026Schema = z.object({
   lucroPresumido: TaxDetails2026Schema.nullable(),
-  lucroPresumidoAtual: TaxDetails.nullable(),
+  lucroPresumidoAtual: TaxDetailsSchema.nullable(),
   simplesNacionalTradicional: TaxDetails2026Schema.nullable(),
   simplesNacionalHibrido: TaxDetails2026Schema.nullable(),
   simplesNacionalOtimizado: TaxDetails2026Schema.nullable(),
