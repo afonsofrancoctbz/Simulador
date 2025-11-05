@@ -162,24 +162,24 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const { rate, deduction, distribution } = bracket;
-        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
+        const effectiveDasRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
 
         const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0, CBS = 0, IBS = 0 } = distribution;
         const consumptionTaxProportionInDas = CBS + IBS + (ISS || 0) + (ICMS || 0) + (IPI || 0) + (PIS || 0) + (COFINS || 0);
 
-        let rateForDas = effectiveRate;
+        let dasRateForActivity = effectiveDasRate;
         
         if (activity.isExport) {
-            rateForDas -= effectiveRate * consumptionTaxProportionInDas;
+            dasRateForActivity -= effectiveDasRate * consumptionTaxProportionInDas;
         }
 
         if (isHybrid && !activity.isExport) {
              const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-             const dasRevenue = activity.revenue * (1 - b2bRevenuePortion);
-             const dasRateWithoutConsumption = effectiveRate * (1 - consumptionTaxProportionInDas);
-             totalDas += dasRevenue * dasRateWithoutConsumption;
+             const dasRevenueForActivity = activity.revenue * (1 - b2bRevenuePortion);
+             const dasRateWithoutConsumption = effectiveDasRate * (1 - consumptionTaxProportionInDas);
+             totalDas += dasRevenueForActivity * dasRateWithoutConsumption;
         } else {
-            totalDas += revenueForActivity * rateForDas;
+            totalDas += revenueForActivity * dasRateForActivity;
         }
         
         if (effectiveAnnex === 'IV') cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig);
@@ -276,11 +276,16 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
 
   if (hasAnnexVActivity && totalRevenue > 0) {
-      const requiredPayroll = totalRevenue * 0.28;
-      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - monthlyPayroll);
       
-      if (additionalProLaboreNeeded > 0 || fatorR_naoOtimizado >= 0.28) {
-          const proLaboreValue = (fatorR_naoOtimizado >= 0.28) ? totalProLaboreBruto : (totalProLaboreBruto + additionalProLaboreNeeded);
+      const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
+      const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
+      
+      const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027; // Use future config for Fator R target
+      const requiredPayroll = totalRevenue * fiscalConfig.simples_nacional.limite_fator_r;
+      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
+      
+      if (additionalProLaboreNeeded > 0 || fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) {
+          const proLaboreValue = (fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) ? totalProLaboreBruto : (totalProLaboreBruto + additionalProLaboreNeeded);
 
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
               ? values.proLabores.map(p => ({ 
@@ -290,7 +295,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
               : [{ value: proLaboreValue, hasOtherInssContribution: false, otherContributionSalary: 0 }];
 
           const optimizedValues = { ...values, proLabores: optimizedProLabores };
-          const fatorR_Otimizado = (fatorR_naoOtimizado >= 0.28) ? fatorR_naoOtimizado : 0.28;
+          const fatorR_Otimizado = (fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) ? fatorR_naoOtimizado : fiscalConfig.simples_nacional.limite_fator_r;
 
           simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, fatorR_Otimizado, optimizedProLabores);
           simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, fatorR_Otimizado, optimizedProLabores);

@@ -859,7 +859,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.6,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
   },
   {
@@ -2704,7 +2704,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
   },
   {
     code: '3314-7/06',
-    description: 'Manutenção e reparação de máquinas, aparelhos e equipamentos para instalações térmicas',
+    description: 'Manutenção e reparação de máquinas e aparelhos de refrigeração e ventilação para uso industrial e comercial',
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
