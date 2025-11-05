@@ -2,19 +2,7 @@
 import { type CnaeData } from './types';
 
 export const CNAE_DATA_RAW: CnaeData[] = [
-  // --- SAÚDE E BEM-ESTAR ---
-  {
-    code: '7500-1/00',
-    description: 'Atividades veterinárias',
-    category: 'Veterinária',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
-  },
+  // --- SAÚDE E BEM-ESTAR (REDUÇÃO 60%) ---
   {
     code: '8610-1/01',
     description: 'Atividades de atendimento hospitalar, exceto pronto-socorro e unidades para atendimento a urgências',
@@ -538,8 +526,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CBOO. Não é obrigatório.'
   },
-  
-  // --- ODONTOLOGIA ---
   {
     code: '8630-5/04',
     description: 'Atividade odontológica',
@@ -564,395 +550,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRO. Não é obrigatório.'
   },
-
-  // --- TECNOLOGIA DA INFORMAÇÃO ---
-  {
-    code: '6201-5/01',
-    description: 'Desenvolvimento de programas de computador sob encomenda',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6201-5/02',
-    description: 'Web design',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6202-3/00',
-    description: 'Desenvolvimento e licenciamento de programas de computador customizáveis',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6203-1/00',
-    description: 'Desenvolvimento e licenciamento de programas de computador não-customizáveis',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6204-0/00',
-    description: 'Consultoria em tecnologia da informação',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6209-1/00',
-    description: 'Suporte técnico, manutenção e outros serviços em tecnologia da informação',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0,
-    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '6311-9/00',
-    description: 'Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6319-4/00',
-    description: 'Portais, provedores de conteúdo e outros serviços de informação na internet',
-    category: 'Tecnologia da Informação',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0
-  },
-  {
-    code: '6391-7/00',
-    description: 'Agências de notícias',
-    category: 'Comunicação',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6,
-  },
-  {
-    code: '6399-2/00',
-    description: 'Outras atividades de prestação de serviços de informação não especificadas anteriormente',
-    category: 'Tecnologia da Informação',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-
-  // --- ENGENHARIA, ARQUITETURA E DESIGN ---
-  {
-    code: '7111-1/00',
-    description: 'Serviços de arquitetura',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CAU. É permitido o uso da expressão ARQUITETURA OU URBANISMO na razão social ou fantasia, desde que a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
-  },
-  {
-    code: '7112-0/00',
-    description: 'Serviços de engenharia',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
-  },
-  {
-    code: '7119-7/01',
-    description: 'Serviços de cartografia, topografia e geodésia',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CRT - Conselho Técnicos Industriais'
-  },
-  {
-    code: '7119-7/02',
-    description: 'Atividades de estudos geológicos',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
-  },
-  {
-    code: '7119-7/03',
-    description: 'Serviços de desenho técnico relacionados à arquitetura e engenharia',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.3,
-    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...CRT - Conselho Técnicos Industriais'
-  },
-  {
-    code: '7119-7/04',
-    description: 'Serviços de perícia técnica relacionados à segurança do trabalho',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Regulamentado por CREA/RQE se houver pericia médica. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
-  },
-  {
-    code: '7119-7/99',
-    description: 'Atividades técnicas relacionadas à engenharia e arquitetura não especificadas anteriormente',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
-  },
-  {
-    code: '7120-1/00',
-    description: 'Testes e análises técnicas',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
-  },
-  {
-    code: '7410-2/02',
-    description: 'Design de interiores',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'IV',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0,
-    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...'
-  },
-  {
-    code: '7410-2/03',
-    description: 'Design de produto',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0,
-  },
-  {
-    code: '7410-2/99',
-    description: 'Atividades de design não especificadas anteriormente',
-    category: 'Engenharia, Arquitetura e Design',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0,
-  },
-  
-  // --- CONSULTORIA E GESTÃO ---
-  {
-    code: '7020-4/00',
-    description: 'Atividades de consultoria em gestão empresarial, exceto consultoria técnica específica',
-    category: 'Consultoria e Gestão Empresarial',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CRA. Exige registro da empresa e indicação de Responsável Técnico.'
-  },
-  {
-    code: '7210-0/00',
-    description: 'Pesquisa e desenvolvimento experimental em ciências físicas e naturais',
-    category: 'Consultoria e Gestão Empresarial',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CREA ou CONEP (para pesquisas em humanos).'
-  },
-  {
-    code: '7220-7/00',
-    description: 'Pesquisa e desenvolvimento experimental em ciências sociais e humanas',
-    category: 'Consultoria e Gestão Empresarial',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '7320-3/00',
-    description: 'Pesquisas de mercado e de opinião pública',
-    category: 'Consultoria e Gestão Empresarial',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
-  },
-  {
-    code: '7490-1/03',
-    description: 'Serviços de agronomia e de consultoria às atividades agrícolas e pecuárias',
-    category: 'Consultoria e Gestão Empresarial',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
-  },
-
-  // --- PUBLICIDADE E MARKETING ---
-  {
-    code: '7311-4/00',
-    description: 'Agências de publicidade',
-    category: 'Publicidade e Marketing',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: false
-  },
-  {
-    code: '7312-2/00',
-    description: 'Agenciamento de espaços para publicidade exceto em veículos de comunicação',
-    category: 'Publicidade e Marketing',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '7319-0/01',
-    description: 'Criação de estandes para feiras e exposições',
-    category: 'Publicidade e Marketing',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '7319-0/02',
-    description: 'Promoção de vendas',
-    category: 'Publicidade e Marketing',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
-  },
-  {
-    code: '7319-0/03',
-    description: 'Marketing direto',
-    category: 'Publicidade e Marketing',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
-  },
-  {
-    code: '7319-0/04',
-    description: 'Consultoria em publicidade',
-    category: 'Publicidade e Marketing',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '7319-0/99',
-    description: 'Outras atividades de publicidade não especificadas anteriormente',
-    category: 'Publicidade e Marketing',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '5911-1/02',
-    description: 'Produção de filmes para publicidade',
-    category: 'Publicidade e Marketing',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6,
-  },
-
-  // --- EDUCAÇÃO E TREINAMENTO ---
   {
     code: '8511-2/00',
     description: 'Educação infantil – creche',
@@ -1130,26 +727,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     ivaReduction: 0.6
   },
   {
-    code: '8599-6/01',
-    description: 'Formação de condutores',
-    category: 'Educação e Treinamento',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-  },
-  {
-    code: '8599-6/02',
-    description: 'Cursos de pilotagem',
-    category: 'Educação e Treinamento',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-  },
-  {
     code: '8599-6/03',
     description: 'Treinamento em informática',
     category: 'Educação e Treinamento',
@@ -1193,8 +770,687 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: false,
     ivaReduction: 0.6
   },
+  {
+    code: '9001-9/01',
+    description: 'Produção teatral',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/02',
+    description: 'Produção musical',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/03',
+    description: 'Produção de espetáculos de dança',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/04',
+    description: 'Produção de espetáculos circenses, de marionetes e similares',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/05',
+    description: 'Produção de espetáculos de rodeios, vaquejadas e similares',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '9001-9/06',
+    description: 'Atividades de sonorização e de iluminação',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
+  },
+  {
+    code: '9001-9/99',
+    description: 'Artes cênicas, espetáculos e atividades complementares não especificadas anteriormente',
+    category: 'Atividades artísticas, criativas e de espetáculos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
+  {
+    code: '5911-1/02',
+    description: 'Produção de filmes para publicidade',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6,
+  },
+  {
+    code: '5911-1/99',
+    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
+    category: 'Fotografia e Audiovisual',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.6
+  },
   
-  // --- SERVIÇOS ADMINISTRATIVOS E DE APOIO ---
+  // --- PROFISSÕES REGULAMENTADAS (REDUÇÃO 30%) ---
+  {
+    code: '7500-1/00',
+    description: 'Atividades veterinárias',
+    category: 'Veterinária',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
+  },
+  {
+    code: '7111-1/00',
+    description: 'Serviços de arquitetura',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CAU. É permitido o uso da expressão ARQUITETURA OU URBANISMO na razão social ou fantasia, desde que a empresa seja constituída paritária ou majoritariamente por arquiteto e urbanista e que este tenha poder de gestão.'
+  },
+  {
+    code: '7112-0/00',
+    description: 'Serviços de engenharia',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
+  },
+  {
+    code: '7119-7/01',
+    description: 'Serviços de cartografia, topografia e geodésia',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.CRT - Conselho Técnicos Industriais'
+  },
+  {
+    code: '7119-7/02',
+    description: 'Atividades de estudos geológicos',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
+  },
+  {
+    code: '7119-7/04',
+    description: 'Serviços de perícia técnica relacionados à segurança do trabalho',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Regulamentado por CREA/RQE se houver pericia médica. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
+  },
+  {
+    code: '7119-7/99',
+    description: 'Atividades técnicas relacionadas à engenharia e arquitetura não especificadas anteriormente',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
+  },
+  {
+    code: '7120-1/00',
+    description: 'Testes e análises técnicas',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
+  },
+  {
+    code: '7020-4/00',
+    description: 'Atividades de consultoria em gestão empresarial, exceto consultoria técnica específica',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CRA. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+   {
+    code: '7490-1/03',
+    description: 'Serviços de agronomia e de consultoria às atividades agrícolas e pecuárias',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
+  },
+  {
+    code: '6911-7/01',
+    description: 'Serviços advocatícios',
+    category: 'Atividades Jurídicas e Contábeis',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pela OAB. Obrigatório Utilizar Contrato Padrão da OAB com os Advs responsáveis.'
+  },
+  {
+    code: '6920-6/01',
+    description: 'Atividades de contabilidade',
+    category: 'Atividades Jurídicas e Contábeis',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CRC. Exige registro da empresa e um Responsável Técnico contador.'
+  },
+  {
+    code: '9313-1/00',
+    description: 'Atividades de condicionamento físico',
+    category: 'Esportes e Lazer',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CREF ou CREFITO. Não é obrigatório.'
+  },
+
+  // --- REGIMES ESPECÍFICOS (REDUÇÃO DE 40%) ---
+  {
+    code: '5510-8/01',
+    description: 'Hotéis',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5510-8/02',
+    description: 'Apart-hotéis',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5510-8/03',
+    description: 'Motéis',
+    category: 'Hospedagem e Alimentação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5611-2/01',
+    description: 'Restaurantes e similares',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5611-2/03',
+    description: 'Lanchonetes, casas de chá, de sucos e similares',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5611-2/04',
+    description: 'Bares e outros estabelecimentos especializados em servir bebidas, sem entretenimento',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '7911-2/00',
+    description: 'Agências de viagens',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.4,
+    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
+  },
+  {
+    code: '7912-1/00',
+    description: 'Operadores turísticos',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.4,
+    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
+  },
+  {
+    code: '7990-2/00',
+    description: 'Serviços de reservas e outros serviços de turismo não especificados anteriormente',
+    category: 'Turismo e Eventos',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.4,
+    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
+  },
+
+  // --- ALÍQUOTA PADRÃO (REDUÇÃO 0%) ---
+  {
+    code: '6201-5/01',
+    description: 'Desenvolvimento de programas de computador sob encomenda',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6201-5/02',
+    description: 'Web design',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6202-3/00',
+    description: 'Desenvolvimento e licenciamento de programas de computador customizáveis',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6203-1/00',
+    description: 'Desenvolvimento e licenciamento de programas de computador não-customizáveis',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6204-0/00',
+    description: 'Consultoria em tecnologia da informação',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6209-1/00',
+    description: 'Suporte técnico, manutenção e outros serviços em tecnologia da informação',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0,
+    notes: 'Atividade regulamentada pelo CREA. Exige registro da empresa e indicação de Responsável Técnico.'
+  },
+  {
+    code: '6311-9/00',
+    description: 'Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6319-4/00',
+    description: 'Portais, provedores de conteúdo e outros serviços de informação na internet',
+    category: 'Tecnologia da Informação',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0
+  },
+  {
+    code: '6399-2/00',
+    description: 'Outras atividades de prestação de serviços de informação não especificadas anteriormente',
+    category: 'Tecnologia da Informação',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7119-7/03',
+    description: 'Serviços de desenho técnico relacionados à arquitetura e engenharia',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...CRT - Conselho Técnicos Industriais'
+  },
+  {
+    code: '7410-2/02',
+    description: 'Design de interiores',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'IV',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+    notes: 'Regulamentado por CREA/CAU. CREA - Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...CAU - É permitido o uso da expressão ARQUITETURA OU URBANISMO""...'
+  },
+  {
+    code: '7410-2/03',
+    description: 'Design de produto',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7410-2/99',
+    description: 'Atividades de design não especificadas anteriormente',
+    category: 'Engenharia, Arquitetura e Design',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7210-0/00',
+    description: 'Pesquisa e desenvolvimento experimental em ciências físicas e naturais',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0,
+    notes: 'Regulamentado pelo CREA ou CONEP (para pesquisas em humanos).'
+  },
+  {
+    code: '7220-7/00',
+    description: 'Pesquisa e desenvolvimento experimental em ciências sociais e humanas',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7320-3/00',
+    description: 'Pesquisas de mercado e de opinião pública',
+    category: 'Consultoria e Gestão Empresarial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0,
+    notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
+  },
+  {
+    code: '7311-4/00',
+    description: 'Agências de publicidade',
+    category: 'Publicidade e Marketing',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7312-2/00',
+    description: 'Agenciamento de espaços para publicidade exceto em veículos de comunicação',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7319-0/01',
+    description: 'Criação de estandes para feiras e exposições',
+    category: 'Publicidade e Marketing',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7319-0/02',
+    description: 'Promoção de vendas',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0,
+    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
+  },
+  {
+    code: '7319-0/03',
+    description: 'Marketing direto',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0,
+    notes: 'Regulamentado pelo CRA. Não é obrigatório.'
+  },
+  {
+    code: '7319-0/04',
+    description: 'Consultoria em publicidade',
+    category: 'Publicidade e Marketing',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7319-0/99',
+    description: 'Outras atividades de publicidade não especificadas anteriormente',
+    category: 'Publicidade e Marketing',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7711-0/00',
+    description: 'Locação de automóveis sem condutor',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '7729-2/02',
+    description: 'Aluguel de móveis, utensílios e aparelhos de uso doméstico e pessoal; instrumentos musicais',
+    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+  },
+  {
+    code: '4619-2/00',
+    description: 'Representantes comerciais e agentes do comércio de mercadorias em geral não especializado',
+    category: 'Representação Comercial',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.',
+    ivaReduction: 0,
+  },
+
+  // RESTANTES...
+  
+  {
+    code: '8599-6/01',
+    description: 'Formação de condutores',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+  },
+  {
+    code: '8599-6/02',
+    description: 'Cursos de pilotagem',
+    category: 'Educação e Treinamento',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+  },
   {
     code: '8211-3/00',
     description: 'Serviços combinados de escritório e apoio administrativo',
@@ -1286,44 +1542,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
-  },
-
-  // --- TURISMO E EVENTOS ---
-  {
-    code: '7911-2/00',
-    description: 'Agências de viagens',
-    category: 'Turismo e Eventos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.4,
-    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
-  },
-  {
-    code: '7912-1/00',
-    description: 'Operadores turísticos',
-    category: 'Turismo e Eventos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.4,
-    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
-  },
-  {
-    code: '7990-2/00',
-    description: 'Serviços de reservas e outros serviços de turismo não especificados anteriormente',
-    category: 'Turismo e Eventos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.4,
-    notes: 'Regulamentado pelo CADASTUR. Não é obrigatório.'
   },
   {
     code: '8230-0/01',
@@ -1419,33 +1637,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
-
-
-  // --- ATIVIDADES JURÍDICAS E CONTÁBEIS ---
-  {
-    code: '6911-7/01',
-    description: 'Serviços advocatícios',
-    category: 'Atividades Jurídicas e Contábeis',
-    annex: 'IV',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pela OAB. Obrigatório Utilizar Contrato Padrão da OAB com os Advs responsáveis.'
-  },
-  {
-    code: '6920-6/01',
-    description: 'Atividades de contabilidade',
-    category: 'Atividades Jurídicas e Contábeis',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CRC. Exige registro da empresa e um Responsável Técnico contador.'
-  },
   {
     code: '6911-7/02',
     description: 'Atividades auxiliares da justiça',
@@ -1466,8 +1657,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
-
-  // --- REPRESENTAÇÃO COMERCIAL ---
   {
     code: '4512-9/01',
     description: 'Representantes comerciais e agentes do comércio de veículos automotores',
@@ -1623,97 +1812,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
   },
   {
-    code: '4619-2/00',
-    description: 'Representantes comerciais e agentes do comércio de mercadorias em geral não especializado',
-    category: 'Representação Comercial',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Atividade regulamentada pelo CORE. Não é obrigatório.'
-  },
-
-  // --- ATIVIDADES ARTÍSTICAS, CRIATIVAS E DE ESPETÁCULOS ---
-  {
-    code: '9001-9/01',
-    description: 'Produção teatral',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
-    code: '9001-9/02',
-    description: 'Produção musical',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
-    code: '9001-9/03',
-    description: 'Produção de espetáculos de dança',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
-    code: '9001-9/04',
-    description: 'Produção de espetáculos circenses, de marionetes e similares',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
-    code: '9001-9/05',
-    description: 'Produção de espetáculos de rodeios, vaquejadas e similares',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
-    code: '9001-9/06',
-    description: 'Atividades de sonorização e de iluminação',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
-  },
-  {
-    code: '9001-9/99',
-    description: 'Artes cênicas, espetáculos e atividades complementares não especificadas anteriormente',
-    category: 'Atividades artísticas, criativas e de espetáculos',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
-  },
-  {
     code: '9002-7/01',
     description: 'Atividades de artistas plásticos, jornalistas independentes e escritores',
     category: 'Comunicação',
@@ -1745,18 +1843,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6
-  },
-  
-  // --- ALUGUÉIS E GESTÃO DE ATIVOS ---
-  {
-    code: '7711-0/00',
-    description: 'Locação de automóveis sem condutor',
-    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
   },
   {
     code: '7721-7/00',
@@ -1791,16 +1877,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
   {
     code: '7729-2/01',
     description: 'Aluguel de aparelhos de jogos eletrônicos',
-    category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false
-  },
-  {
-    code: '7729-2/02',
-    description: 'Aluguel de móveis, utensílios e aparelhos de uso doméstico e pessoal; instrumentos musicais',
     category: 'Aluguéis não-imobiliários e gestão de ativos intangíveis',
     annex: 'III',
     requiresFatorR: false,
@@ -1919,8 +1995,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
-
-  // --- ESPORTES E LAZER ---
   {
     code: '9311-5/00',
     description: 'Gestão de instalações de esportes',
@@ -1931,18 +2005,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
     ivaReduction: 0.6,
-  },
-  {
-    code: '9313-1/00',
-    description: 'Atividades de condicionamento físico',
-    category: 'Esportes e Lazer',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.6,
-    notes: 'Atividade regulamentada pelo CREF ou CREFITO. Não é obrigatório.'
   },
   {
     code: '9319-1/99',
@@ -1994,8 +2056,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
-
-  // --- SERVIÇOS FINANCEIROS E IMOBILIÁRIOS ---
   {
     code: '6612-6/05',
     description: 'Agentes de investimentos em aplicações financeiras',
@@ -2092,8 +2152,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: true,
     notes: 'Regulamentado pelo CRECI/CRA. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
-  
-  // --- FOTOGRAFIA E AUDIOVISUAL ---
   {
     code: '7420-0/01',
     description: 'Atividades de produção de fotografias, exceto aérea e submarina',
@@ -2144,17 +2202,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
-  },
-  {
-    code: '5911-1/99',
-    description: 'Atividades de produção cinematográfica, de vídeos e de programas de televisão não especificadas anteriormente',
-    category: 'Fotografia e Audiovisual',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.6
   },
   {
     code: '5912-0/01',
@@ -2276,8 +2323,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
-  
-  // --- SERVIÇOS PROFISSIONAIS E TÉCNICOS ---
   {
     code: '7490-1/01',
     description: 'Serviços de tradução, interpretação e similares',
@@ -2531,8 +2576,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
-  
-  // --- MANUTENÇÃO E REPARO TÉCNICO ---
   {
     code: '3312-1/02',
     description: 'Manutenção e reparação de aparelhos e instrumentos de medida, teste e controle',
@@ -3233,9 +3276,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: true,
     notes: 'Atividade regulamentada pelo CREA. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
   },
-
-  
-  // --- COMÉRCIO VAREJISTA (ANEXO I) ---
   {
     code: '4511-1/01',
     description: 'Comércio a varejo de automóveis, camionetas e utilitários novos',
@@ -3916,8 +3956,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
   },
-  
-  // --- COMÉRCIO ATACADISTA ---
   {
     code: '4530-7/01',
     description: 'Comércio por atacado de peças e acessórios novos para veículos automotores',
@@ -3947,41 +3985,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: false
-  },
-  
-  // --- HOSPEDAGEM E ALIMENTAÇÃO ---
-  {
-    code: '5510-8/01',
-    description: 'Hotéis',
-    category: 'Hospedagem e Alimentação',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5510-8/02',
-    description: 'Apart-hotéis',
-    category: 'Hospedagem e Alimentação',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5510-8/03',
-    description: 'Motéis',
-    category: 'Hospedagem e Alimentação',
-    annex: 'III',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.4,
   },
   {
     code: '5590-6/01',
@@ -4024,39 +4027,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5611-2/01',
-    description: 'Restaurantes e similares',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5611-2/03',
-    description: 'Lanchonetes, casas de chá, de sucos e similares',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5611-2/04',
-    description: 'Bares e outros estabelecimentos especializados em servir bebidas, sem entretenimento',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
     isRegulated: false,
     ivaReduction: 0.4,
   },
@@ -4165,7 +4135,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.12,
     isRegulated: false
   },
-  // NOVOS CNAES
   {
     code: '0161-0/03',
     description: 'Serviço de preparação de terreno, cultivo e colheita',

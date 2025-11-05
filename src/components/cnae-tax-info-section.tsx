@@ -13,17 +13,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { BookCopy, AlertCircle, TrendingUp, ShieldCheck } from "lucide-react";
 
 const professionTaxes = [
-  { profession: "Administração", annex: "Anexo III", ivaReduction: "30%" },
+  { profession: "Saúde e Educação", annex: "Anexo V / III", ivaReduction: "60%" },
+  { profession: "Produção Artística", annex: "Anexo III", ivaReduction: "60%" },
   { profession: "Advogados", annex: "Anexo IV", ivaReduction: "30%" },
+  { profession: "Administração", annex: "Anexo V", ivaReduction: "30%" },
   { profession: "Arquitetura / Engenharia", annex: "Anexo V", ivaReduction: "30%" },
   { profession: "Educação Física", annex: "Anexo V", ivaReduction: "30%" },
   { profession: "Veterinária", annex: "Anexo V", ivaReduction: "30%" },
-  { profession: "Saúde e Educação", annex: "Anexo V / III", ivaReduction: "60%" },
-  { profession: "Produção Artística", annex: "Anexo III", ivaReduction: "60%" },
   { profession: "Bares, Restaurantes, Turismo", annex: "Anexo I / III", ivaReduction: "40%" },
-  { profession: "Comércio", annex: "Anexo I", ivaReduction: "0% (Alíquota Padrão)" },
   { profession: "Tecnologia (Intelectual)", annex: "Anexo V", ivaReduction: "0% (Alíquota Padrão)" },
   { profession: "Locação de Bens Móveis", annex: "Anexo III", ivaReduction: "0% (Alíquota Padrão)" },
+  { profession: "Comércio", annex: "Anexo I", ivaReduction: "0% (Alíquota Padrão)" },
 ];
 
 export default function CnaeTaxInfoSection() {
