@@ -40,21 +40,21 @@ export default function Home() {
             </section>
         </div>
         <Tabs defaultValue="2025" className="w-full">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
-            <div className="w-full flex justify-center">
-                <TabsList className="mb-8 w-full max-w-lg flex">
-                    <TabsTrigger value="2025" className='flex-1'>Cenário Atual (2025)</TabsTrigger>
-                    <TabsTrigger value="2026" className='flex-1'>Reforma Tributária (Simulação 2026)</TabsTrigger>
-                </TabsList>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
+                <div className="w-full flex justify-center">
+                    <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
+                        <TabsTrigger value="2025">Cenário Atual (2025)</TabsTrigger>
+                        <TabsTrigger value="2026">Reforma Tributária (2026)</TabsTrigger>
+                    </TabsList>
+                </div>
             </div>
-          </div>
             <TabsContent value="2025">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <TaxCalculator key="2025" year={2025} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults}/>
                 </div>
             </TabsContent>
             <TabsContent value="2026">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <TaxReformInfoSection />
                     <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
                 </div>

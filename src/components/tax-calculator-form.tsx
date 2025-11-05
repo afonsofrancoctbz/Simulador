@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
 import { PlanEnumSchema, ProLaboreFormSchema } from '@/lib/types';
@@ -12,7 +11,6 @@ import { FormSectionPlan } from "./form-section-plan";
 import { Loader2 } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
-import { cn } from "@/lib/utils";
 
 export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
@@ -50,11 +48,9 @@ interface TaxCalculatorFormProps {
 }
 
 export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmit }: TaxCalculatorFormProps) {
-    const form = useFormContext<CalculatorFormValues>();
 
     return (
-        <form onSubmit={onSubmit} className="space-y-8 text-left max-w-4xl mx-auto">
-            
+        <form onSubmit={onSubmit} className="space-y-8 max-w-4xl mx-auto">
             <FormSectionCompany />
             <FormSectionPayroll year={year} />
             <FormSectionAnnualRevenue />
