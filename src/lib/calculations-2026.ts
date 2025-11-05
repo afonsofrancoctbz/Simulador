@@ -68,8 +68,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const ibs = totalIvaDue > 0 ? totalIvaDue * (fiscalConfig2026.reforma_tributaria.ibs_rate / fiscalConfig2026.reforma_tributaria.iva_rate) : 0;
 
         consumptionTaxes = ibs + cbs;
-        breakdown.push({ name: `CBS`, value: cbs });
-        breakdown.push({ name: `IBS`, value: ibs });
+        breakdown.push({ name: `CBS (8,8%)`, value: cbs });
+        breakdown.push({ name: `IBS (17,7%)`, value: ibs });
     } else {
         // Old PIS/COFINS/ISS
         const pis = domesticRevenue * fiscalConfig2026.lucro_presumido_rates.PIS;
@@ -149,25 +149,25 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
         let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= fiscalConfig2026.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
         const annexTable = fiscalConfig2026.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
-        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * bracket.rate - bracket.deduction) / effectiveRbt12 : bracket.rate;
-        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+        const { rate, deduction, distribution } = bracket;
+        const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
+
+        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
+        const consumptionTaxProportionInDas = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
 
         let rateForDas = effectiveRate;
         
-        // CORREÇÃO: Usar a repartição para subtrair impostos do consumo
-        const consumptionTaxProportionInDas = PIS + COFINS + ISS + ICMS + IPI;
-        
         // Apply export exemption by reducing the rate
         if (activity.isExport) {
-            rateForDas = effectiveRate * (1 - consumptionTaxProportionInDas);
+            rateForDas -= effectiveRate * consumptionTaxProportionInDas;
         }
 
         // For hybrid, further reduce the rate for the portion of domestic B2B revenue
         if (isHybrid && !activity.isExport) {
-            const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-            // The rate is reduced proportionally to the B2B part of the revenue
-            const weightedReduction = consumptionTaxProportionInDas * b2bRevenuePortion;
-            rateForDas = effectiveRate * (1 - weightedReduction);
+             const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
+             const effectiveConsumptionTaxRate = effectiveRate * consumptionTaxProportionInDas;
+             const weightedReduction = effectiveConsumptionTaxRate * b2bRevenuePortion;
+             rateForDas -= weightedReduction;
         }
 
         totalDas += revenueForActivity * rateForDas;
@@ -181,8 +181,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
 
     if (isHybrid) {
       const insumosGeradoresDeCredito = creditGeneratingExpenses ?? 0;
-      const b2bDomesticRevenue = domesticRevenue * ((b2bRevenuePercentage ?? 100) / 100);
-
+      
       const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
           const activityB2bRevenue = activity.revenue * ((b2bRevenuePercentage ?? 100) / 100);
           const cnaeInfo = getCnaeData(activity.code);
@@ -218,7 +217,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
 
     let regimeName: TaxDetails2026['regime'] = 'Simples Nacional Tradicional';
     if(proLaboreOverride) {
-      regimeName = 'Simples Nacional (Fator R)' as any;
+      regimeName = 'Simples Nacional (Fator R)';
     } else if (isHybrid) {
       regimeName = 'Simples Nacional Híbrido';
     }
@@ -249,52 +248,66 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   let simplesNacionalTradicional = _calculateSimples2026(values, false);
   let simplesNacionalHibrido = _calculateSimples2026(values, true);
   
-  // Condição para otimização do Fator R
   const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-  const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
-  const rbt12 = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
-  const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
-  const currentTotalPayroll = values.totalSalaryExpense + currentTotalProLabore;
-  const fp12 = values.fp12 > 0 ? values.fp12 : currentTotalPayroll * 12;
-  const currentFatorR = rbt12 > 0 ? fp12 / rbt12 : 0;
   
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   
-  if (hasAnnexVActivity && currentFatorR < fiscalConfig2026.simples_nacional.limite_fator_r && totalRevenue > 0) {
-      
-      const requiredPayroll = rbt12 * fiscalConfig2026.simples_nacional.limite_fator_r;
-      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - fp12);
+  if (hasAnnexVActivity && (simplesNacionalTradicional.fatorR ?? 0) < fiscalConfig2026.simples_nacional.limite_fator_r) {
+      const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
+      const effectiveRbt12 = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
+      const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
+      const currentTotalPayroll = values.totalSalaryExpense + currentTotalProLabore;
+      const effectiveFp12 = values.fp12 > 0 ? values.fp12 : currentTotalPayroll * 12;
+
+      const requiredPayroll = effectiveRbt12 * fiscalConfig2026.simples_nacional.limite_fator_r;
+      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - effectiveFp12);
       
       if (additionalProLaboreNeeded > 0) {
-          const newTotalProLabore = currentTotalProLabore + (additionalProLaboreNeeded / 12);
+          const newTotalProLabore = currentTotalProLabore + (additionalProLaboreNeeded); // The need is annual, we need to distribute it
+          const proLaborePerPartner = newTotalProLabore / (values.proLabores.length || 1);
           
-          const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
-              ? values.proLabores.map(p => ({ 
-                  ...p, 
-                  value: newTotalProLabore / values.proLabores.length,
-                }))
-              : [{ 
-                  value: newTotalProLabore, 
-                  hasOtherInssContribution: false, 
-                  otherContributionSalary: 0 
-                }];
+          const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => ({ 
+              ...p, 
+              value: proLaborePerPartner,
+          }));
           
-          simplesNacionalOtimizado = _calculateSimples2026(values, false, optimizedProLabores); // Base on traditional
+          if (optimizedProLabores.length === 0) {
+            optimizedProLabores.push({value: proLaborePerPartner, hasOtherInssContribution: false, otherContributionSalary: 0})
+          }
+
+          // We create an optimized version of the "Traditional" scenario
+          const optimizedValues = {
+            ...values,
+            // We adjust the FP12 to reflect the new annual payroll projection
+            fp12: (values.totalSalaryExpense + proLaborePerPartner) * 12
+          };
+
+          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, optimizedProLabores);
           
-          if (simplesNacionalOtimizado && simplesNacionalTradicional.totalMonthlyCost < simplesNacionalOtimizado.totalMonthlyCost) {
-            simplesNacionalOtimizado = null;
+          if (simplesNacionalTradicional.totalMonthlyCost < simplesNacionalOtimizado.totalMonthlyCost) {
+            simplesNacionalOtimizado = null; // Don't show if it's more expensive
           }
       }
   }
 
+  // If optimization is better, it replaces the "Traditional" one for recommendation purposes
+  // but we still need to show the original "Traditional" one.
+  // The logic in tax-results will handle the "Recomendado" badge.
   if(simplesNacionalOtimizado) {
-    simplesNacionalTradicional = simplesNacionalOtimizado;
+    return {
+      simplesNacionalTradicional: { ...simplesNacionalTradicional, regime: 'Simples Nacional Tradicional', order: 2}, // The original one
+      simplesNacionalHibrido: { ...simplesNacionalHibrido, order: 3 },
+      lucroPresumido: { ...lucroPresumido, order: 1 },
+      lucroPresumidoAtual: { ...lucroPresumidoAtual, regime: 'Lucro Presumido (Regras Atuais)', order: 4 },
+      simplesNacionalOtimizado: { ...simplesNacionalOtimizado, order: 0 }
+    }
   }
 
   return {
     simplesNacionalTradicional: { ...simplesNacionalTradicional, order: 2 },
     simplesNacionalHibrido: { ...simplesNacionalHibrido, order: 3 },
     lucroPresumido: { ...lucroPresumido, order: 1 },
-    lucroPresumidoAtual: { ...lucroPresumidoAtual, regime: 'Lucro Presumido', order: 4 }, // Override regime for display
+    lucroPresumidoAtual: { ...lucroPresumidoAtual, regime: 'Lucro Presumido (Regras Atuais)', order: 4 },
+    simplesNacionalOtimizado: null
   };
 }

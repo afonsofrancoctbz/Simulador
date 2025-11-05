@@ -29,13 +29,12 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
         if ('simplesNacionalBase' in results) { // 2025 results
             scenarios = [results.simplesNacionalOtimizado, results.simplesNacionalBase, results.lucroPresumido];
         } else if ('simplesNacionalTradicional' in results) { // 2026 results
-            scenarios = [results.simplesNacionalTradicional, results.simplesNacionalHibrido, results.lucroPresumido, results.lucroPresumidoAtual];
+            scenarios = [results.simplesNacionalOtimizado, results.simplesNacionalTradicional, results.simplesNacionalHibrido, results.lucroPresumido, results.lucroPresumidoAtual];
         }
         
         const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && s.totalMonthlyCost > 0);
         
         if (validScenarios.length > 0) {
-            // For 2026, we don't recommend the "current" LP rules.
             const scenariosForRecommendation = year === 2026 
                 ? validScenarios.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)')
                 : validScenarios;
@@ -44,7 +43,6 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                 const cheapest = [...scenariosForRecommendation].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
                 setSelectedDetails(cheapest);
             } else if (validScenarios.length > 0) {
-                // Fallback if only the 'current' LP is valid in 2026
                 setSelectedDetails(validScenarios[0]);
             }
 
@@ -102,9 +100,10 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
 
   } else if ('simplesNacionalTradicional' in results) {
      scenariosToShow = [
-      results.lucroPresumido,
-      results.simplesNacionalHibrido,
+      results.simplesNacionalOtimizado,
       results.simplesNacionalTradicional,
+      results.simplesNacionalHibrido,
+      results.lucroPresumido,
       results.lucroPresumidoAtual,
     ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
   }
@@ -126,27 +125,12 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
     details.breakdown.forEach(item => {
         const name = item.name.toLowerCase();
         
-        if (details.regime.includes('Simples')) {
-          if (name.includes('das') || name.includes('iva')) {
-              groups['IMPOSTOS S/ FATURAMENTO MENSAL'].push(item);
-          }
-        } else if (details.regime.includes('Lucro Presumido')) {
-            if (name.includes('pis') || name.includes('cofins') || name.includes('iss') || name.includes('ibs') || name.includes('cbs')) {
-                groups['IMPOSTOS S/ FATURAMENTO MENSAL'].push(item);
-            } else if (name.includes('irpj') || name.includes('csll')) {
-                groups['IMPOSTOS S/ FATURAMENTO TRIMESTRAL'].push(item);
-            }
-        }
-
-        if (name.includes('inss') || name.includes('cpp')) {
-            groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
-        }
-
-        if (name.includes('irrf')) {
-          const irrfItem = { name: "IRRF s/ Pró-labore", value: item.value };
-          if (!groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].find(i => i.name === irrfItem.name)) {
-             groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(irrfItem);
-          }
+        if (name.includes('das') || name.includes('pis') || name.includes('cofins') || name.includes('iss') || name.includes('ibs') || name.includes('cbs') || name.includes('iva')) {
+            groups['IMPOSTOS S/ FATURAMENTO MENSAL'].push(item);
+        } else if (name.includes('irpj') || name.includes('csll')) {
+            groups['IMPOSTOS S/ FATURAMENTO TRIMESTRAL'].push(item);
+        } else if (name.includes('inss') || name.includes('cpp') || name.includes('irrf')) {
+             groups['ENCARGOS S/ FOLHA E PRÓ-LABORE'].push(item);
         }
     });
 
@@ -183,8 +167,34 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
             let title = scenario.regime;
-            if (title === 'Simples Nacional (Otimizado)') title = 'Simples Nacional';
-            if (year === 2026 && scenario.regime === 'Simples Nacional Tradicional' && scenario.optimizationNote) title = 'Simples Nacional';
+            let subtitle = scenario.annex ? `(Anexo ${scenario.annex})` : '';
+
+            if (year === 2026) {
+                if (scenario.regime === 'Simples Nacional (Fator R)') {
+                    title = 'Simples Nacional';
+                    subtitle = '(Fator R Otimizado)';
+                } else if (scenario.regime === 'Simples Nacional Tradicional') {
+                    title = 'Simples Nacional';
+                    subtitle = '(Tradicional)';
+                } else if (scenario.regime === 'Simples Nacional Híbrido') {
+                    title = 'Simples Nacional';
+                    subtitle = '(Híbrido)';
+                } else if (scenario.regime === 'Lucro Presumido (Regras Atuais)') {
+                    title = 'Lucro Presumido';
+                    subtitle = '(Regras Atuais)';
+                } else {
+                    subtitle = '';
+                }
+            } else { // year 2025
+                 if (scenario.regime === 'Simples Nacional (Otimizado)') {
+                    title = 'Simples Nacional';
+                    subtitle = 'Com Fator R Otimizado';
+                } else if (scenario.regime === 'Simples Nacional') {
+                     subtitle = 'Sem Otimização de Fator R'
+                } else {
+                    subtitle = '';
+                }
+            }
             
 
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva|ibs|cbs/));
@@ -224,10 +234,8 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                   <div className={cn("p-2 rounded-t-xl text-center overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
 
                       <h3 className="text-xl font-bold text-foreground mt-2">{title}</h3>
-                       {isCurrentLpFor2026 && <p className='text-xs font-bold text-muted-foreground'>(Comparativo Regras Atuais)</p>}
-                      {scenario.annex && scenario.annex !== 'N/A' && <p className="font-semibold text-primary">{scenario.annex}</p>}
-                      {scenario.optimizationNote && !title.includes('Fator R') && <p className="text-sm text-primary/90 mt-1">Com Fator R Otimizado</p>}
-                      {!scenario.optimizationNote && scenario.regime.includes("Simples") && !title.includes('Fator R') && <p className="text-sm text-muted-foreground mt-1">Sem Otimização de Fator R</p>}
+                      <p className={cn("font-semibold", isRecommended ? "text-primary" : "text-muted-foreground")}>{subtitle}</p>
+
                   </div>
 
                   <div className="px-4 pb-4 pt-2 flex-grow space-y-1">
@@ -318,14 +326,13 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                           <span>Fator R: {formatPercent(scenario.fatorR)}</span>
                       </div>
                       )}
-                      {(scenario.optimizationNote || exportRevenue > 0) && (
+                      {(scenario.optimizationNote || scenario.notes.length > 0) && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
                                 <span>
                                     {scenario.optimizationNote && `${scenario.optimizationNote}`}
-                                    {exportRevenue > 0 && scenario.regime.includes('Simples') && " No Simples Nacional, PIS, COFINS e ISS não incidem sobre a receita de exportação, o que reduz a alíquota efetiva do DAS."}
-                                    {exportRevenue > 0 && scenario.regime === 'Lucro Presumido' && " PIS, COFINS e ISS não incidem sobre a receita de exportação."}
+                                    {scenario.notes.join(' ')}
                                 </span>
                             </AlertDescription>
                         </Alert>

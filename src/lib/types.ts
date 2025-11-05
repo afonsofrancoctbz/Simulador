@@ -112,6 +112,7 @@ export const CalculationResults2026Schema = z.object({
   simplesNacionalHibrido: TaxDetails2026Schema,
   lucroPresumido: TaxDetails2026Schema,
   lucroPresumidoAtual: TaxDetailsSchema,
+  simplesNacionalOtimizado: TaxDetails2026Schema.nullable(),
 });
 export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
 
