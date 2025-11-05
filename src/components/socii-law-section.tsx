@@ -10,7 +10,7 @@ import { Scale, ShieldCheck, Calendar, Clock, BadgePercent, ArrowRight } from 'l
 
 const partnershipInfo = {
     title: "Informações da Parceria",
-    logoUrl: "https://www.contabilizei.com.br/wp-content/uploads/2024/04/logo-sociilaw-e-c.png",
+    logoUrl: "https://www.contabilizei.com.br/wp-content/uploads/2021/08/logo-sociilaw-contabilizei-e-sociilaw.png",
     logoAlt: "SociiLaw e Contabilizei Parceria",
     services: {
         trademark: {
