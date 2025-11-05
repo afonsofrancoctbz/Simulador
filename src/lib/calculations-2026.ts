@@ -1,6 +1,7 @@
 
 
-import { getFiscalParameters, type FiscalConfig, type FiscalConfig2026 } from '@/config/fiscal';
+
+import { getFiscalParameters, type FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -18,7 +19,7 @@ import { formatPercent, findBracket, findFeeBracket } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 
-const fiscalConfig2026 = getFiscalParameters(2026) as FiscalConfig2026;
+const fiscalConfig2026 = getFiscalParameters(2026);
 
 function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0 } = values;
@@ -64,8 +65,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const totalIvaCredit = creditGeneratingExpenses * fiscalConfig2026.reforma_tributaria.iva_rate;
         const totalIvaDue = totalIvaDebit - totalIvaCredit;
 
-        const cbs = totalIvaDue > 0 ? totalIvaDue * (fiscalConfig2026.reforma_tributaria.cbs_rate / fiscalConfig2026.reforma_tributaria.iva_rate) : 0;
-        const ibs = totalIvaDue > 0 ? totalIvaDue * (fiscalConfig2026.reforma_tributaria.ibs_rate / fiscalConfig2026.reforma_tributaria.iva_rate) : 0;
+        const cbs = totalIvaDue > 0 ? totalIvaDue * (fiscalConfig2026.reforma_tributaria.cbs_rate_test / (fiscalConfig2026.reforma_tributaria.cbs_rate_test + fiscalConfig2026.reforma_tributaria.ibs_rate_test)) : 0;
+        const ibs = totalIvaDue > 0 ? totalIvaDue * (fiscalConfig2026.reforma_tributaria.ibs_rate_test / (fiscalConfig2026.reforma_tributaria.cbs_rate_test + fiscalConfig2026.reforma_tributaria.ibs_rate_test)) : 0;
 
         consumptionTaxes = ibs + cbs;
         breakdown.push({ name: `CBS (8,8%)`, value: cbs });
@@ -152,8 +153,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, proLabo
         const { rate, deduction, distribution } = bracket;
         const effectiveRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
 
-        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
-        const consumptionTaxProportionInDas = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
+        const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0, CBS = 0, IBS = 0 } = distribution;
+        const consumptionTaxProportionInDas = isHybrid ? (PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0) + (CBS || 0) + (IBS || 0)) : (PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0));
 
         let rateForDas = effectiveRate;
         
