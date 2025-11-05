@@ -28,8 +28,15 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
         let scenarios: (TaxDetails | null)[] = [];
         if ('simplesNacionalBase' in results) { // 2025 results
             scenarios = [results.simplesNacionalOtimizado, results.simplesNacionalBase, results.lucroPresumido];
-        } else if ('simplesNacionalTradicional' in results) { // 2026 results
-            scenarios = [results.simplesNacionalOtimizado, results.simplesNacionalTradicional, results.simplesNacionalHibrido, results.lucroPresumido, results.lucroPresumidoAtual];
+        } else if ('lucroPresumido' in results) { // 2026 results
+            scenarios = [
+                results.simplesNacionalOtimizado, 
+                results.simplesNacionalOtimizadoHibrido,
+                results.simplesNacionalTradicional, 
+                results.simplesNacionalHibrido,
+                results.lucroPresumido, 
+                results.lucroPresumidoAtual
+            ];
         }
         
         const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && s.totalMonthlyCost > 0);
@@ -91,20 +98,21 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
   
   let scenariosToShow: (TaxDetails | null)[] = [];
 
-  if ('simplesNacionalBase' in results) {
+  if ('simplesNacionalBase' in results) { // 2025 results
      scenariosToShow = [
       results.simplesNacionalOtimizado,
       results.simplesNacionalBase,
       results.lucroPresumido,
     ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
 
-  } else if ('simplesNacionalTradicional' in results) {
+  } else if ('lucroPresumido' in results) { // 2026 results
      scenariosToShow = [
-      results.simplesNacionalOtimizado,
-      results.simplesNacionalTradicional,
-      results.simplesNacionalHibrido,
-      results.lucroPresumido,
-      results.lucroPresumidoAtual,
+        results.simplesNacionalOtimizado,
+        results.simplesNacionalOtimizadoHibrido,
+        results.simplesNacionalTradicional,
+        results.simplesNacionalHibrido,
+        results.lucroPresumido,
+        results.lucroPresumidoAtual,
     ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
   }
 
@@ -170,20 +178,15 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             let subtitle = scenario.annex ? `(Anexo ${scenario.annex})` : '';
 
             if (year === 2026) {
-                if (scenario.regime === 'Simples Nacional (Fator R)') {
+                if (scenario.regime.includes('Simples Nacional')) {
                     title = 'Simples Nacional';
-                    subtitle = '(Fator R Otimizado)';
-                } else if (scenario.regime === 'Simples Nacional Tradicional') {
-                    title = 'Simples Nacional';
-                    subtitle = '(Tradicional)';
-                } else if (scenario.regime === 'Simples Nacional Híbrido') {
-                    title = 'Simples Nacional';
-                    subtitle = '(Híbrido)';
+                    subtitle = scenario.regime.replace('Simples Nacional', '').trim();
                 } else if (scenario.regime === 'Lucro Presumido (Regras Atuais)') {
                     title = 'Lucro Presumido';
                     subtitle = '(Regras Atuais)';
                 } else {
-                    subtitle = '';
+                    title = 'Lucro Presumido';
+                    subtitle = '(Pós-Reforma)';
                 }
             } else { // year 2025
                  if (scenario.regime === 'Simples Nacional (Otimizado)') {
@@ -192,6 +195,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                 } else if (scenario.regime === 'Simples Nacional') {
                      subtitle = 'Sem Otimização de Fator R'
                 } else {
+                    title = 'Lucro Presumido';
                     subtitle = '';
                 }
             }

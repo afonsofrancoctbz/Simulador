@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { useEffect, useState } from 'react';
 
 const bankFeatures = [
     {
@@ -64,6 +65,12 @@ const bankFeatures = [
 ];
 
 export default function PjAccountSection() {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
     return (
         <div className="w-full max-w-7xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -75,45 +82,47 @@ export default function PjAccountSection() {
                 </p>
             </div>
             
-            <Carousel
-                opts={{
-                    align: "start",
-                    loop: true,
-                }}
-                className="w-full relative px-10"
-            >
-                <CarouselContent className="-ml-4 items-stretch">
-                    {bankFeatures.map((feature, index) => (
-                        <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                            <div className="p-1 h-full">
-                                <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-card">
-                                    <CardHeader className="pb-4 flex-shrink-0">
-                                        <CardTitle className="text-lg font-semibold min-h-[40px]">{feature.title}</CardTitle>
-                                        <CardDescription className="text-sm !mt-2 min-h-[80px]">{feature.description}</CardDescription>
-                                        {feature.footnote && feature.footnoteLocation === 'header' && (
-                                            <CardDescription className="!mt-2 !text-xs text-muted-foreground">{feature.footnote}</CardDescription>
-                                        )}
-                                    </CardHeader>
-                                    <CardContent className="p-4 mt-auto flex-grow flex flex-col items-center justify-center relative">
-                                        <Image
-                                            src={feature.imageUrl}
-                                            alt={feature.imageAlt}
-                                            width={250}
-                                            height={500}
-                                            className="w-auto h-[300px] object-contain"
-                                        />
-                                        {feature.footnote && feature.footnoteLocation === 'content' && (
-                                            <p className="absolute bottom-4 right-4 text-xs text-muted-foreground">{feature.footnote}</p>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex" />
-                <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex" />
-            </Carousel>
+            {isClient && (
+                 <Carousel
+                    opts={{
+                        align: "start",
+                        loop: true,
+                    }}
+                    className="w-full relative px-10"
+                >
+                    <CarouselContent className="-ml-4 items-stretch">
+                        {bankFeatures.map((feature, index) => (
+                            <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                                <div className="p-1 h-full">
+                                    <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-card">
+                                        <CardHeader className="pb-4 flex-shrink-0">
+                                            <CardTitle className="text-lg font-semibold min-h-[40px]">{feature.title}</CardTitle>
+                                            <CardDescription className="text-sm !mt-2 min-h-[80px]">{feature.description}</CardDescription>
+                                            {feature.footnote && feature.footnoteLocation === 'header' && (
+                                                <CardDescription className="!mt-2 !text-xs text-muted-foreground">{feature.footnote}</CardDescription>
+                                            )}
+                                        </CardHeader>
+                                        <CardContent className="p-4 mt-auto flex-grow flex flex-col items-center justify-center relative">
+                                            <Image
+                                                src={feature.imageUrl}
+                                                alt={feature.imageAlt}
+                                                width={250}
+                                                height={500}
+                                                className="w-auto h-[300px] object-contain"
+                                            />
+                                            {feature.footnote && feature.footnoteLocation === 'content' && (
+                                                <p className="absolute bottom-4 right-4 text-xs text-muted-foreground">{feature.footnote}</p>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex" />
+                    <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex" />
+                </Carousel>
+            )}
         </div>
     );
 }

@@ -176,7 +176,16 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const [isClient, setIsClient] = React.useState(false)
 
+    React.useEffect(() => {
+        setIsClient(true)
+    }, [])
+
+    if (!isClient) {
+      return null;
+    }
+    
     if (collapsible === "none") {
       return (
         <div
@@ -761,3 +770,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
