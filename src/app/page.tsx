@@ -42,7 +42,7 @@ export default function Home() {
         <Tabs defaultValue="2025" className="w-full">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
             <div className="w-full flex justify-center">
-                <TabsList className="mb-8 w-full flex">
+                <TabsList className="mb-8 w-full max-w-md flex">
                     <TabsTrigger value="2025" className='flex-1'>Cenário Atual (2025)</TabsTrigger>
                     <TabsTrigger value="2026" className='flex-1'>Reforma Tributária (Simulação 2026)</TabsTrigger>
                 </TabsList>

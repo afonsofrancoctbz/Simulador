@@ -15,6 +15,7 @@ import type { Annex } from "@/lib/types";
 import { Loader2, ArrowLeft, ArrowRight } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
+import { cn } from "@/lib/utils";
 
 
 export const CalculatorFormSchema = z.object({
@@ -69,15 +70,26 @@ export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmi
     const prevStep = () => setCurrentStep(prev => Math.max(1, prev - 1));
 
     return (
-        <form onSubmit={onSubmit} className="space-y-8 text-left max-w-7xl mx-auto">
+        <form onSubmit={onSubmit} className="space-y-8 text-left max-w-4xl mx-auto">
             <div className="mb-8 px-4">
                 <ol className="flex items-center w-full">
                     {steps.map((step, index) => (
-                        <li key={step.id} className={`flex w-full items-center ${index < steps.length - 1 ? "after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block " : ""} ${currentStep > step.id ? "after:border-primary" : "after:border-muted"}`}>
-                            <span className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${currentStep >= step.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                                {step.id}
-                            </span>
-                        </li>
+                        <React.Fragment key={step.id}>
+                            <li className="flex items-center">
+                                <span className={cn(
+                                    "flex items-center justify-center w-10 h-10 rounded-full shrink-0",
+                                    currentStep >= step.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                )}>
+                                    {step.id}
+                                </span>
+                            </li>
+                            {index < steps.length - 1 && (
+                                <li className={cn(
+                                    "flex-1 h-1",
+                                    currentStep > step.id ? "bg-primary" : "bg-border"
+                                )}></li>
+                            )}
+                        </React.Fragment>
                     ))}
                 </ol>
             </div>
