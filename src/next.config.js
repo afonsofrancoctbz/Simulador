@@ -21,6 +21,18 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'sociilaw.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
   typescript: {
@@ -42,5 +54,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-
-    

@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useState } from 'react';
@@ -21,6 +19,7 @@ import SinTaxInfoSection from '@/components/sin-tax-info-section';
 import PfPjTaxReformSection from '@/components/pf-pj-tax-reform-section';
 import CnaeTaxInfoSection from '@/components/cnae-tax-info-section';
 import OpeningStepsSection from '@/components/opening-steps-section';
+import ContabilizeiMaisSection from '@/components/contabilizei-mais-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -109,7 +108,7 @@ export default function Home() {
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-slate-50/70">
+            <section className="py-16 lgpy-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <PjAccountSection />
               </div>
@@ -132,14 +131,20 @@ export default function Home() {
                 <MultibenefitsSection />
               </div>
             </section>
+
+            <section className="py-16 lg:py-24 bg-slate-50/70">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <ContabilizeiMaisSection />
+              </div>
+            </section>
             
-             <section className="py-16 lg:py-24 bg-slate-50/70">
+             <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <SociiLawSection />
               </div>
             </section>
 
-             <section className="py-16 lg:py-24 bg-background">
+             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <FaqSection />
               </div>
