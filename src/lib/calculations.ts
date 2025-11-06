@@ -296,11 +296,6 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
       }
   }
 
-  // Não sobrescrever o cenário otimizado se ele for mais caro que o base.
-  if (simplesNacionalOtimizado && simplesNacionalBase.totalMonthlyCost < simplesNacionalOtimizado.totalMonthlyCost) {
-      simplesNacionalOtimizado = null;
-  }
-
 
   return {
     simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
