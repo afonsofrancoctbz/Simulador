@@ -2,7 +2,7 @@
 import { type CnaeData } from './types';
 
 export const CNAE_DATA_RAW: CnaeData[] = [
-  // --- SAÚDE E BEM-ESTAR (REDUÇÃO 60%) ---
+  // --- SAÚDE, EDUCAÇÃO, CULTURA (REDUÇÃO 60%) ---
   {
     code: '8610-1/01',
     description: 'Atividades de atendimento hospitalar, exceto pronto-socorro e unidades para atendimento a urgências',
@@ -1230,6 +1230,19 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     ivaReduction: 0.3,
     notes: 'Regulamentado pelo CRA. Não é obrigatório.'
   },
+  {
+    code: '9101-5/00',
+    description: 'Atividades de bibliotecas e arquivos',
+    category: 'Cultura e Lazer',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CRB (Conselho Regional de Biblioteconomia).'
+  },
+
 
   // --- ALÍQUOTA PADRÃO (REDUÇÃO 0%) ---
   {
@@ -1697,17 +1710,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
-  },
-  {
-    code: '9101-5/00',
-    description: 'Atividades de bibliotecas e arquivos',
-    category: 'Cultura e Lazer',
-    annex: 'V', // CORRIGIDO
-    requiresFatorR: true, // CORRIGIDO
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0.3 // CORRIGIDO
   },
   {
     code: '6911-7/02',
