@@ -39,7 +39,7 @@ export default function ContabilizeiMaisSection() {
         <div className="w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center space-y-8 mb-12">
                 <div className="space-y-4">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-primary">
+                    <h2 className="text-4xl sm:text-5xl font-bold text-primary">
                         Apresentamos a Contabilizei Mais.
                     </h2>
                     <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -47,7 +47,7 @@ export default function ContabilizeiMaisSection() {
                     </p>
                 </div>
                 <div className="max-w-2xl mx-auto">
-                    <h3 className="font-semibold text-lg text-foreground mb-3">Confira os conteúdos que você vai encontrar:</h3>
+                    <h3 className="font-semibold text-xl text-foreground mb-3">Confira os conteúdos que você vai encontrar:</h3>
                      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
                        {topics.map((topic, index) => (
                          <div key={index} className="flex items-center gap-2 text-muted-foreground">
@@ -64,9 +64,9 @@ export default function ContabilizeiMaisSection() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {contentPillars.map((pillar, index) => (
-                    <Card key={index} className="group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                    <Card key={index} className="group overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border-0">
                         <CardContent className="p-4 text-center">
-                            <div className="relative h-24 mb-4">
+                            <div className="relative h-28 mb-4">
                                 <Image
                                     src={pillar.imageUrl}
                                     alt={pillar.imageAlt}
@@ -75,7 +75,7 @@ export default function ContabilizeiMaisSection() {
                                     data-ai-hint={pillar.aiHint}
                                 />
                             </div>
-                            <CardTitle className="text-md font-semibold text-foreground">{pillar.title}</CardTitle>
+                            <CardTitle className="text-lg font-semibold text-foreground">{pillar.title}</CardTitle>
                         </CardContent>
                     </Card>
                 ))}
