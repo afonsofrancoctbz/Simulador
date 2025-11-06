@@ -73,7 +73,6 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         consumptionTaxes = totalIvaDue;
         breakdown.push({ name: `CBS`, value: cbs });
         breakdown.push({ name: `IBS`, value: ibs });
-        breakdown.push({ name: `Total IVA (Débito: ${totalIvaDebit.toFixed(2)}, Crédito: ${totalIvaCredit.toFixed(2)})`, value: totalIvaDue });
 
     } else {
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
@@ -168,13 +167,17 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         
         if (isHybrid && !activity.isExport) {
             const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-            dasRevenue = activity.revenue * (1 - b2bRevenuePortion);
-            dasRateForActivity = effectiveDasRate * (1 - consumptionTaxProportionInDas);
+            // The DAS is calculated only on the non-B2B portion for consumption taxes
+            const nonB2bRevenue = activity.revenue * (1 - b2bRevenuePortion);
+            const dasOnB2b = activity.revenue * b2bRevenuePortion * (effectiveDasRate * (1 - consumptionTaxProportionInDas));
+            const dasOnNonB2b = nonB2bRevenue * effectiveDasRate;
+            totalDas += dasOnB2b + dasOnNonB2b;
         } else if (activity.isExport) {
             dasRateForActivity -= effectiveDasRate * consumptionTaxProportionInDas;
+            totalDas += dasRevenue * dasRateForActivity;
+        } else {
+            totalDas += dasRevenue * dasRateForActivity;
         }
-        
-        totalDas += dasRevenue * dasRateForActivity;
         
         if (effectiveAnnex === 'IV') cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig);
     });

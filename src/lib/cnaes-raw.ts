@@ -1,4 +1,5 @@
 
+
 import { type CnaeData } from './types';
 
 export const CNAE_DATA_RAW: CnaeData[] = [
@@ -1514,7 +1515,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
-    ivaReduction: 0,
+    ivaReduction: 0.6,
   },
   {
     code: '7729-2/02',
@@ -1572,7 +1573,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0, 
+    ivaReduction: 0.5, 
     notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
 
@@ -2158,6 +2159,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
   {
@@ -2850,7 +2852,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
   },
   {
     code: '3314-7/18',
-    description: 'Manutenção e reparação de máquinas para a indústria metalúrgica, exceto máquinas-ferramenta',
+    description: 'Manutenção e reparação de máquinas e equipamentos para a indústria metalúrgica, exceto máquinas-ferramenta',
     category: 'Manutenção e Reparo Técnico',
     annex: 'III',
     requiresFatorR: false,
