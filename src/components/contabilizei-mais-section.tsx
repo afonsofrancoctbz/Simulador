@@ -28,7 +28,7 @@ export default function ContabilizeiMaisSection() {
                     </p>
                      <div className='flex flex-col sm:flex-row items-center gap-8 pt-4'>
                         <Image
-                            src="/Imagem/unnamed (4).png"
+                            src="https://www.contabilizei.com.br/wp-content/uploads/2024/05/qr-code-contabilizei-mais.svg"
                             alt="QR Code para Contabilizei Mais"
                             width={120}
                             height={120}
@@ -41,7 +41,7 @@ export default function ContabilizeiMaisSection() {
                 </div>
                  <div className="flex items-center justify-center">
                     <Image
-                        src="https://storage.googleapis.com/stabl-aec9b.appspot.com/project-1721861545638/contabilizei-mais-screens.png"
+                        src="https://www.contabilizei.com.br/wp-content/uploads/2024/05/macbook-vale-a-pena-scaled.webp"
                         alt="Telas da plataforma Contabilizei Mais"
                         width={600}
                         height={400}
