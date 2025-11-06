@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -42,7 +41,7 @@ const contentCards = [
 
 export default function ContabilizeiMaisSection() {
     return (
-        <div className="w-full max-w-7xl mx-auto space-y-16 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto space-y-12 py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center space-y-8 max-w-4xl mx-auto">
                 <div>
                     <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
