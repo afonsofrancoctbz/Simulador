@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -21,7 +20,7 @@ export default function ContabilizeiMaisSection() {
                     <div>
                         <h3 className="text-xl font-semibold text-foreground">O que você vai encontrar:</h3>
                         <p className="text-lg text-muted-foreground">
-                            finanças (em parceria com Me Poupe), carreira, marketing, inteligência artificial, contabilidade.
+                            Cursos, vídeos, planilhas e artigos sobre finanças (em parceria com a Nath Finanças), carreira, marketing, vendas, inteligência artificial e contabilidade.
                         </p>
                     </div>
                     <p className="text-lg text-muted-foreground">
