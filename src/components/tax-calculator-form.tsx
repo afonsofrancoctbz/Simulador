@@ -12,6 +12,7 @@ import { FormSectionPlan } from "./form-section-plan";
 import { Loader2 } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
+import { MultiStepForm, useMultiStepForm } from "./multi-step-form";
 
 export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
@@ -50,15 +51,18 @@ interface TaxCalculatorFormProps {
 
 export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmit }: TaxCalculatorFormProps) {
     const form = useFormContext();
+    const { currentStep, steps, goToStep } = useMultiStepForm();
 
     return (
         <form onSubmit={onSubmit} className="max-w-4xl mx-auto space-y-8">
-            <FormSectionCompany />
-            <FormSectionPayroll year={year} />
-            <FormSectionAnnualRevenue />
-            <FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} />
-            <FormSectionPlan />
-            
+            <MultiStepForm currentStep={currentStep} steps={steps} onStepClick={goToStep} />
+
+            <div className={currentStep === 1 ? 'block' : 'hidden'}><FormSectionCompany /></div>
+            <div className={currentStep === 2 ? 'block' : 'hidden'}><FormSectionPayroll year={year} /></div>
+            <div className={currentStep === 3 ? 'block' : 'hidden'}><FormSectionAnnualRevenue /></div>
+            <div className={currentStep === 4 ? 'block' : 'hidden'}><FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} /></div>
+            <div className={currentStep === 5 ? 'block' : 'hidden'}><FormSectionPlan /></div>
+
             <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">
                 <Button type="submit" size="lg" disabled={isLoading} className="w-full text-lg py-7 bg-accent text-accent-foreground hover:bg-accent/90">
                     {isLoading ? <Loader2 className="animate-spin" /> : null}

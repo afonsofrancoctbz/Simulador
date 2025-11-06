@@ -11,6 +11,7 @@ import HealthInfoSection from './health-info-section';
 import OdontologyInfoSection from './odontology-info-section';
 import TaxResults from './tax-results';
 import { TaxCalculatorForm } from './tax-calculator-form';
+import { MultiStepFormProvider } from './multi-step-form';
 
 export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange }: { year: 2025 | 2026, onExportRevenueChange: (show: boolean) => void, onResultsChange: (show: boolean) => void }) {
   const {
@@ -68,12 +69,14 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
     <div className='printable-section'>
         <div className="print-hidden">
              <FormProvider {...form}>
+              <MultiStepFormProvider>
                 <TaxCalculatorForm
                     year={year}
                     onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)}
                     isLoading={isLoading}
                     onSubmit={form.handleSubmit(onSubmit)}
                 />
+              </MultiStepFormProvider>
             </FormProvider>
              <CnaeSelector
                 open={isCnaeSelectorOpen}
