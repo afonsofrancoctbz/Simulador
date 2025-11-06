@@ -32,7 +32,7 @@ const nextConfig = {
         hostname: 'storage.googleapis.com',
         port: '',
         pathname: '/**',
-      }
+      },
     ],
   },
   typescript: {

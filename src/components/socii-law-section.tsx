@@ -69,7 +69,7 @@ export default function SociiLawSection() {
                 <CardHeader className="text-center bg-card p-8">
                      <div className="flex justify-center items-center gap-4 mb-4">
                         <Image
-                            src="https://sociilaw.com/static/media/named-white.0a44d51b8aae4b9bd4dc74aef4f78564.svg"
+                            src="https://sociilaw.com/static/media/named-orange.64b2bd20da2e71b0d6448f4fecf7e4c1.svg"
                             alt="Logo SociiLaw"
                             width={150}
                             height={40}
