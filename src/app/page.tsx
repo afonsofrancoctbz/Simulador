@@ -20,6 +20,7 @@ import SociiLawSection from '@/components/socii-law-section';
 import SinTaxInfoSection from '@/components/sin-tax-info-section';
 import PfPjTaxReformSection from '@/components/pf-pj-tax-reform-section';
 import CnaeTaxInfoSection from '@/components/cnae-tax-info-section';
+import OpeningStepsSection from '@/components/opening-steps-section';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -89,6 +90,12 @@ export default function Home() {
         )}
 
         <div className='print-hidden'>
+
+            <section className="py-16 lg:py-24 bg-background">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <OpeningStepsSection />
+              </div>
+            </section>
 
             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
