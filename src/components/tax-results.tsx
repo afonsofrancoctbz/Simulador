@@ -175,7 +175,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
             let title = scenario.regime;
-            let subtitle = scenario.annex ? `(Anexo ${scenario.annex})` : '';
+            let subtitle = '';
 
             if (year === 2026) {
                 if (scenario.regime.includes('Simples Nacional')) {
@@ -189,11 +189,12 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                     subtitle = '(Pós-Reforma)';
                 }
             } else { // year 2025
-                 if (scenario.regime === 'Simples Nacional (Otimizado)') {
-                    title = 'Simples Nacional';
+                if (scenario.regime === 'Simples Nacional (Otimizado)') {
+                    title = 'Simples Nacional - Anexo III';
                     subtitle = 'Com Fator R Otimizado';
                 } else if (scenario.regime === 'Simples Nacional') {
-                     subtitle = 'Sem Otimização de Fator R'
+                    title = 'Simples Nacional - Anexo V';
+                    subtitle = 'Sem Otimização de Fator R';
                 } else {
                     title = 'Lucro Presumido';
                     subtitle = '';
