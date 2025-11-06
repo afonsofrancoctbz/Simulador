@@ -94,7 +94,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
     const regimeName = isPostReform ? 'Lucro Presumido' : 'Lucro Presumido (Regras Atuais)';
     const notes = isPostReform 
-        ? ["Cálculo pós-reforma: PIS, COFINS e ISS são substituídos por CBS e IBS. Alíquota do IVA pode ter redução de 30% ou 60% dependendo da atividade. Receitas de exportação são imunes ao IVA. Créditos de insumos foram considerados."]
+        ? ["Cálculo pós-reforma: PIS, COFINS e ISS são substituídos por CBS e IBS. Alíquota do IVA pode ter redução dependendo da atividade. Receitas de exportação são imunes ao IVA. Créditos de insumos foram considerados."]
         : ["Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas de PIS/COFINS/ISS."];
 
     const result: TaxDetails | TaxDetails2026 = {

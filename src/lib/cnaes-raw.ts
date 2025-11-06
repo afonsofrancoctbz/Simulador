@@ -961,7 +961,18 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: false,
     ivaReduction: 0.6
   },
-
+  {
+    code: '6821-8/02',
+    description: 'Corretagem no aluguel de imóveis',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'V', 
+    requiresFatorR: true, 
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.6,
+    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
+  },
   // --- REGIMES ESPECÍFICOS (REDUÇÃO 40%) ---
   {
     code: '5510-8/01',
@@ -1073,7 +1084,51 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: false,
     ivaReduction: 0.4,
   },
-
+  {
+    code: '5620-1/01',
+    description: 'Fornecimento de alimentos preparados preponderantemente para empresas',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: true,
+    ivaReduction: 0.4,
+    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
+  },
+  {
+    code: '5620-1/02',
+    description: 'Serviços de alimentação para eventos e recepções – bufê',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5620-1/03',
+    description: 'Cantinas – serviços de alimentação privativos',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
+  {
+    code: '5620-1/04',
+    description: 'Fornecimento de alimentos preparados preponderantemente para consumo domiciliar',
+    category: 'Hospedagem e Alimentação',
+    annex: 'I',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.08,
+    presumedProfitRateCSLL: 0.12,
+    isRegulated: false,
+    ivaReduction: 0.4,
+  },
   // --- PROFISSÕES REGULAMENTADAS (REDUÇÃO 30%) ---
   {
     code: '7111-1/00',
@@ -1568,8 +1623,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     code: '6821-8/01',
     description: 'Corretagem na compra e venda e avaliação de imóveis',
     category: 'Serviços Financeiros e Imobiliários',
-    annex: 'V', // CORRIGIDO DE III PARA V
-    requiresFatorR: true, // CORRIGIDO
+    annex: 'V', 
+    requiresFatorR: true, 
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
@@ -2149,29 +2204,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false
-  },
-  {
-    code: '6821-8/02',
-    description: 'Corretagem no aluguel de imóveis',
-    category: 'Serviços Financeiros e Imobiliários',
-    annex: 'V', // CORRIGIDO
-    requiresFatorR: true, // CORRIGIDO
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.6,
-    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
-  },
-  {
-    code: '6822-6/00',
-    description: 'Gestão e administração da propriedade imobiliária',
-    category: 'Serviços Financeiros e Imobiliários',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    notes: 'Regulamentado pelo CRECI/CRA. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
   {
     code: '7420-0/01',
@@ -4006,51 +4038,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.08,
     presumedProfitRateCSLL: 0.12,
     isRegulated: false
-  },
-  {
-    code: '5620-1/01',
-    description: 'Fornecimento de alimentos preparados preponderantemente para empresas',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: true,
-    ivaReduction: 0.4,
-    notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. É permitido o uso da expressão ""ENGENHARIA"" desde que o sócio majoritário, tenha no mínimo 51% e seja o administrador da empresa. Conforme a resolução do CONFEA / CREA.'
-  },
-  {
-    code: '5620-1/02',
-    description: 'Serviços de alimentação para eventos e recepções – bufê',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5620-1/03',
-    description: 'Cantinas – serviços de alimentação privativos',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: false,
-    ivaReduction: 0.4,
-  },
-  {
-    code: '5620-1/04',
-    description: 'Fornecimento de alimentos preparados preponderantemente para consumo domiciliar',
-    category: 'Hospedagem e Alimentação',
-    annex: 'I',
-    requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.08,
-    presumedProfitRateCSLL: 0.12,
-    isRegulated: false,
-    ivaReduction: 0.4,
   },
   {
     code: '4721-1/02',
