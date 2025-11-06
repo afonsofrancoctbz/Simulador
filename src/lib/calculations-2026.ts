@@ -53,21 +53,14 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const config2026 = fiscalConfig as FiscalConfig2026;
         const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
-        
-        const getEffectiveIvaRate = (code: string) => {
-          const cnaeInfo = getCnaeData(code);
-          const reduction = cnaeInfo?.ivaReduction ?? 0;
-          return ivaStandardRate * (1 - reduction);
-        }
-        
-        const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
-            const effectiveIvaRate = getEffectiveIvaRate(activity.code);
-            return sum + (activity.revenue * effectiveIvaRate);
-        }, 0);
 
         const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-        const creditRate = getEffectiveIvaRate(primaryActivityCode);
-        const totalIvaCredit = creditGeneratingExpenses * creditRate;
+        const cnaeInfo = getCnaeData(primaryActivityCode);
+        const reduction = cnaeInfo?.ivaReduction ?? 0;
+        const effectiveIvaRate = ivaStandardRate * (1 - reduction);
+        
+        const totalIvaDebit = domesticRevenue * effectiveIvaRate;
+        const totalIvaCredit = creditGeneratingExpenses * effectiveIvaRate;
         
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
 
@@ -190,21 +183,16 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       const config2026 = getFiscalParameters(2026) as FiscalConfig2026;
       const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
 
-      const getEffectiveIvaRate = (code: string) => {
-          const cnaeInfo = getCnaeData(code);
-          const reduction = cnaeInfo?.ivaReduction ?? 0;
-          return ivaStandardRate * (1 - reduction);
-      }
-      
-      const totalIvaDebit = domesticActivities.reduce((sum, activity) => {
-          const activityB2bRevenue = activity.revenue * ((b2bRevenuePercentage ?? 100) / 100);
-          const effectiveIvaRate = getEffectiveIvaRate(activity.code);
-          return sum + (activityB2bRevenue * effectiveIvaRate);
-      }, 0);
-
       const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-      const creditRate = getEffectiveIvaRate(primaryActivityCode);
-      const totalIvaCredit = creditGeneratingExpenses * creditRate;
+      const cnaeInfo = getCnaeData(primaryActivityCode);
+      const reduction = cnaeInfo?.ivaReduction ?? 0;
+      const effectiveIvaRate = ivaStandardRate * (1 - reduction);
+
+      const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
+      const b2bRevenue = domesticRevenue * b2bRevenuePortion;
+      
+      const totalIvaDebit = b2bRevenue * effectiveIvaRate;
+      const totalIvaCredit = creditGeneratingExpenses * effectiveIvaRate;
       ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
     }
     
