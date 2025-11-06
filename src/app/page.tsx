@@ -20,6 +20,7 @@ import SociiLawSection from '@/components/socii-law-section';
 import TaxCalculator from '@/components/tax-calculator';
 import TaxReformInfoSection from '@/components/tax-reform-info-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import FloatingNav from '@/components/floating-nav';
 
 
 export default function Home() {
@@ -29,9 +30,10 @@ export default function Home() {
   return (
     <>
       <AppHeader />
-      <main>
+      <main className="relative">
+        <FloatingNav />
         <div className='print-hidden'>
-            <section className="bg-slate-50/70 border-b">
+            <section id="tax-calculator" className="bg-slate-50/70 border-b">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center">
                   <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
                   <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto pb-12">
@@ -91,61 +93,61 @@ export default function Home() {
 
         <div className='print-hidden'>
 
-            <section className="py-16 lg:py-24 bg-background">
+            <section id="opening-steps" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <OpeningStepsSection />
               </div>
             </section>
             
-            <section className="py-16 lg:py-24 bg-slate-50/70">
+            <section id="digital-certificate" className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <DigitalCertificateSection />
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-background">
+            <section id="roc" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <RocSection />
               </div>
             </section>
 
-            <section className="py-16 lgpy-24 bg-slate-50/70">
+            <section id="pj-account" className="py-16 lgpy-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <PjAccountSection />
               </div>
             </section>
             
-            <section className="py-16 lg:py-24 bg-background">
+            <section id="capital-social" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <CapitalSocialSection />
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-slate-50/70">
+            <section id="health-benefits" className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <BenefitsSection />
               </div>
             </section>
 
-            <section className="py-16 lg:py-24 bg-background">
+            <section id="multibenefits-section" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <MultibenefitsSection />
               </div>
             </section>
             
-            <section className="py-16 lg:py-24 bg-slate-50/70">
+            <section id="contabilizei-mais" className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <ContabilizeiMaisSection />
               </div>
             </section>
 
-             <section className="py-16 lg:py-24 bg-background">
+             <section id="socii-law" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <SociiLawSection />
               </div>
             </section>
 
-             <section className="py-16 lg:py-24 bg-slate-50/70">
+             <section id="faq" className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <FaqSection />
               </div>
