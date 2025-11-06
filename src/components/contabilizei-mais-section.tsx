@@ -1,54 +1,64 @@
 "use client";
 
 import Image from 'next/image';
-import { Button } from './ui/button';
+import { Card, CardContent, CardTitle } from './ui/card';
+
+const contentPillars = [
+    {
+        title: "Eu, chefe de mim",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/eu-chefe-de-mim.194fca5.webp",
+        imageAlt: "Logo do curso Eu, Chefe de Mim da Me Poupe!",
+        aiHint: "logo purple"
+    },
+    {
+        title: "Procurando ganhos",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/procurando-ganhos.75e2604.webp",
+        imageAlt: "Logo do curso Procurando Ganhos da Me Poupe!",
+        aiHint: "logo yellow"
+    },
+    {
+        title: "Capacitação em IA",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/capacitacao-ia.eb0e8a8.webp",
+        imageAlt: "Ilustração de um robô segurando um chip de IA",
+        aiHint: "robot hand AI"
+    },
+    {
+        title: "Finanças em dia",
+        imageUrl: "https://www.contabilizei.com.br/_mobile/img/financas-em-dia.188375d.webp",
+        imageAlt: "Moeda de um real em destaque",
+        aiHint: "coin money"
+    }
+];
 
 export default function ContabilizeiMaisSection() {
     return (
         <div className="w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="space-y-6">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-primary">
-                        Apresentamos a Contabilizei Mais.
-                    </h2>
-                    <p className="text-lg text-muted-foreground">
-                        A plataforma de educação da Contabilizei, criada para apoiar o crescimento profissional dos nossos clientes.
-                    </p>
-                    <p className="text-lg text-muted-foreground">
-                        Com conteúdos que ajudam a desenvolver o negócio, organizar a gestão e impulsionar a carreira, os materiais respondem suas dúvidas e respeitam o seu tempo.
-                    </p>
-                    <div>
-                        <h3 className="text-xl font-semibold text-foreground">O que você vai encontrar:</h3>
-                        <p className="text-lg text-muted-foreground">
-                            Cursos, vídeos, planilhas e artigos sobre finanças (em parceria com a Nath Finanças), carreira, marketing, vendas, inteligência artificial e contabilidade.
-                        </p>
-                    </div>
-                    <p className="text-lg text-muted-foreground">
-                        Apoio contínuo na jornada empreendedora: um canal permanente de desenvolvimento, independente do segmento ou estágio do negócio.
-                    </p>
-                     <div className='flex flex-col sm:flex-row items-center gap-8 pt-4'>
-                        <Image
-                            src="https://www.contabilizei.com.br/wp-content/uploads/2024/05/qr-code-contabilizei-mais.svg"
-                            alt="QR Code para Contabilizei Mais"
-                            width={120}
-                            height={120}
-                            data-ai-hint="qr code"
-                        />
-                         <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg py-7 px-10">
-                            A Contabilizei Mais é gratuita para clientes
-                        </Button>
-                    </div>
-                </div>
-                 <div className="flex items-center justify-center">
-                    <Image
-                        src="https://www.contabilizei.com.br/wp-content/uploads/2024/05/macbook-vale-a-pena-scaled.webp"
-                        alt="Telas da plataforma Contabilizei Mais"
-                        width={600}
-                        height={400}
-                        className="rounded-lg shadow-2xl"
-                        data-ai-hint="laptop mobile app"
-                    />
-                </div>
+            <div className="text-center space-y-4 mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-primary">
+                    Confira os conteúdos que você vai encontrar na Contabilizei Mais.
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Entenda como se posicionar, ganhar credibilidade, cuidar do seu dinheiro e construir uma carreira sólida.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {contentPillars.map((pillar, index) => (
+                    <Card key={index} className="group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                        <CardContent className="p-6 text-center">
+                            <CardTitle className="text-lg font-semibold text-foreground mb-4">{pillar.title}</CardTitle>
+                            <div className="relative aspect-square">
+                                <Image
+                                    src={pillar.imageUrl}
+                                    alt={pillar.imageAlt}
+                                    fill
+                                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                                    data-ai-hint={pillar.aiHint}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </div>
     );
