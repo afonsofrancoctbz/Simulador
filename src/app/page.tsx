@@ -1,25 +1,26 @@
 "use client";
 
 import { useState } from 'react';
-import BenefitsSection from '@/components/benefits-section';
-import FaqSection from '@/components/faq-section';
-import TaxCalculator from '@/components/tax-calculator';
 import AppFooter from '@/components/app-footer';
 import AppHeader from '@/components/app-header';
-import DigitalCertificateSection from '@/components/digital-certificate-section';
-import PjAccountSection from '@/components/pj-account-section';
-import MultibenefitsSection from '@/components/multibenefits-section';
-import TaxReformInfoSection from '@/components/tax-reform-info-section';
-import RocSection from '@/components/roc-section';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ExportTaxInfoSection from '@/components/export-tax-info-section';
+import BenefitsSection from '@/components/benefits-section';
 import CapitalSocialSection from '@/components/capital-social-section';
-import SociiLawSection from '@/components/socii-law-section';
-import SinTaxInfoSection from '@/components/sin-tax-info-section';
-import PfPjTaxReformSection from '@/components/pf-pj-tax-reform-section';
 import CnaeTaxInfoSection from '@/components/cnae-tax-info-section';
-import OpeningStepsSection from '@/components/opening-steps-section';
 import ContabilizeiMaisSection from '@/components/contabilizei-mais-section';
+import DigitalCertificateSection from '@/components/digital-certificate-section';
+import ExportTaxInfoSection from '@/components/export-tax-info-section';
+import FaqSection from '@/components/faq-section';
+import MultibenefitsSection from '@/components/multibenefits-section';
+import OpeningStepsSection from '@/components/opening-steps-section';
+import PfPjTaxReformSection from '@/components/pf-pj-tax-reform-section';
+import PjAccountSection from '@/components/pj-account-section';
+import RocSection from '@/components/roc-section';
+import SinTaxInfoSection from '@/components/sin-tax-info-section';
+import SociiLawSection from '@/components/socii-law-section';
+import TaxCalculator from '@/components/tax-calculator';
+import TaxReformInfoSection from '@/components/tax-reform-info-section';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -95,7 +96,7 @@ export default function Home() {
                 <OpeningStepsSection />
               </div>
             </section>
-
+            
             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <DigitalCertificateSection />
@@ -131,13 +132,13 @@ export default function Home() {
                 <MultibenefitsSection />
               </div>
             </section>
-
+            
             <section className="py-16 lg:py-24 bg-slate-50/70">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <ContabilizeiMaisSection />
               </div>
             </section>
-            
+
              <section className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <SociiLawSection />
