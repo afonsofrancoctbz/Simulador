@@ -28,7 +28,7 @@ export default function ContabilizeiMaisSection() {
                     </p>
                      <div className='flex flex-col sm:flex-row items-center gap-8 pt-4'>
                         <Image
-                            src="https://storage.googleapis.com/stabl-aec9b.appspot.com/project-1721861545638/contabilizei-mais-qrcode.png"
+                            src="/Imagem/unnamed (4).png"
                             alt="QR Code para Contabilizei Mais"
                             width={120}
                             height={120}
