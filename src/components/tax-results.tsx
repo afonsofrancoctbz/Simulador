@@ -193,8 +193,13 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                     title = 'Simples Nacional - Anexo III';
                     subtitle = 'Com Fator R Otimizado';
                 } else if (scenario.regime === 'Simples Nacional') {
-                    title = 'Simples Nacional - Anexo V';
-                    subtitle = 'Sem Otimização de Fator R';
+                    if (scenario.annex === 'Anexo V') {
+                      title = 'Simples Nacional - Anexo V';
+                      subtitle = 'Sem Otimização de Fator R';
+                    } else {
+                      title = `Simples Nacional - ${scenario.annex || 'Padrão'}`;
+                      subtitle = '';
+                    }
                 } else {
                     title = 'Lucro Presumido';
                     subtitle = '';
