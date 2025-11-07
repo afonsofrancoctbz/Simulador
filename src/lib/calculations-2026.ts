@@ -136,7 +136,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
-    const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027;
+    const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027; // Use 2027+ config as base for hybrid
     const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0 } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
@@ -188,18 +188,11 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         let dasRateForActivity = effectiveDasRate;
         
         if (isHybrid && !activity.isExport) {
-            const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-            // The DAS is calculated only on the non-B2B portion for consumption taxes
-            const nonB2bRevenue = activity.revenue * (1 - b2bRevenuePortion);
-            const dasOnB2b = activity.revenue * b2bRevenuePortion * (effectiveDasRate * (1 - consumptionTaxProportionInDas));
-            const dasOnNonB2b = nonB2bRevenue * effectiveDasRate;
-            totalDas += dasOnB2b + dasOnNonB2b;
+            dasRateForActivity = effectiveDasRate * (1 - consumptionTaxProportionInDas);
         } else if (activity.isExport) {
             dasRateForActivity -= effectiveDasRate * consumptionTaxProportionInDas;
-            totalDas += dasRevenue * dasRateForActivity;
-        } else {
-            totalDas += dasRevenue * dasRateForActivity;
-        }
+        } 
+        totalDas += dasRevenue * dasRateForActivity;
         
         if (effectiveAnnex === 'IV') cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig);
     });
@@ -367,6 +360,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null,
   };
 }
-
-
-    

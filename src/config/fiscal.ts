@@ -112,46 +112,11 @@ export const FISCAL_CONFIG_2027_2028 = {
     // No Simples, PIS/COFINS são substituídos pela CBS
     simples_nacional: {
         ...FISCAL_CONFIG_2025.simples_nacional,
-        I: [
-            { min: 0, max: 180000, rate: 0.04, deduction: 0, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.155, CPP: 0.415, IBS: 0.0017, ICMS: 0.3383 } },
-            { min: 180000.01, max: 360000, rate: 0.073, deduction: 5940, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.155, CPP: 0.415, IBS: 0.0017, ICMS: 0.3383 } },
-            { min: 360000.01, max: 720000, rate: 0.095, deduction: 13860, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.155, CPP: 0.42, IBS: 0.0017, ICMS: 0.3333 } },
-            { min: 720000.01, max: 1800000, rate: 0.107, deduction: 22500, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.155, CPP: 0.42, IBS: 0.0017, ICMS: 0.3333 } },
-            { min: 1800000.01, max: 3600000, rate: 0.143, deduction: 87300, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.155, CPP: 0.42, IBS: 0.0017, ICMS: 0.3333 } },
-            { min: 3600000.01, max: 4800000, rate: 0.189, deduction: 378000, distribution: { IRPJ: 0.1358, CSLL: 0.1006, CBS: 0.3402, CPP: 0.4234, IBS: 0, ICMS: 0 } },
-        ],
-        II: [
-            { min: 0, max: 180000, rate: 0.045, deduction: 0, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.1385, CPP: 0.375, IBS: 0.0015, ICMS: 0.32, IPI: 0.075 } },
-            { min: 180000.01, max: 360000, rate: 0.078, deduction: 5940, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.1385, CPP: 0.375, IBS: 0.0015, ICMS: 0.32, IPI: 0.075 } },
-            { min: 360000.01, max: 720000, rate: 0.10, deduction: 13860, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.1385, CPP: 0.375, IBS: 0.0015, ICMS: 0.32, IPI: 0.075 } },
-            { min: 720000.01, max: 1800000, rate: 0.112, deduction: 22500, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.1385, CPP: 0.375, IBS: 0.0015, ICMS: 0.32, IPI: 0.075 } },
-            { min: 1800000.01, max: 3600000, rate: 0.147, deduction: 85500, distribution: { IRPJ: 0.055, CSLL: 0.035, CBS: 0.1385, CPP: 0.375, IBS: 0.0015, ICMS: 0.32, IPI: 0.075 } },
-            { min: 3600000.01, max: 4800000, rate: 0.299, deduction: 720000, distribution: { IRPJ: 0.0853, CSLL: 0.0753, CBS: 0.2522, CPP: 0.2359, IBS: 0, ICMS: 0, IPI: 0.3513 } },
-        ],
-        III: [
-            { min: 0, max: 180000, rate: 0.06, deduction: 0, distribution: { IRPJ: 0.04, CSLL: 0.035, CBS: 0.1543, CPP: 0.434, IBS: 0.0017, ISS: 0.335 } },
-            { min: 180000.01, max: 360000, rate: 0.112, deduction: 9360, distribution: { IRPJ: 0.04, CSLL: 0.035, CBS: 0.1691, CPP: 0.434, IBS: 0.0019, ISS: 0.32 } },
-            { min: 360000.01, max: 720000, rate: 0.135, deduction: 17640, distribution: { IRPJ: 0.04, CSLL: 0.035, CBS: 0.1642, CPP: 0.434, IBS: 0.0019, ISS: 0.325 } },
-            { min: 720000.01, max: 1800000, rate: 0.16, deduction: 35640, distribution: { IRPJ: 0.04, CSLL: 0.04, CBS: 0.1642, CPP: 0.434, IBS: 0.0019, ISS: 0.32 } },
-            { min: 1800000.01, max: 3600000, rate: 0.21, deduction: 125640, distribution: { IRPJ: 0.04, CSLL: 0.04, CBS: 0.1543, CPP: 0.434, IBS: 0.0017, ISS: 0.33 } },
-            { min: 3600000.01, max: 4800000, rate: 0.329, deduction: 648000, distribution: { IRPJ: 0.3509, CSLL: 0.1504, CBS: 0.1929, CPP: 0.3058, IBS: 0, ISS: 0 } },
-        ],
-        IV: [
-            { min: 0, max: 180000, rate: 0.045, deduction: 0, distribution: { IRPJ: 0.188, CSLL: 0.152, CBS: 0.2126, CPP: 0, IBS: 0.0024, ISS: 0.445 } },
-            { min: 180000.01, max: 360000, rate: 0.09, deduction: 8100, distribution: { IRPJ: 0.198, CSLL: 0.152, CBS: 0.2473, CPP: 0, IBS: 0.0027, ISS: 0.40 } },
-            { min: 360000.01, max: 720000, rate: 0.102, deduction: 12420, distribution: { IRPJ: 0.208, CSLL: 0.152, CBS: 0.2374, CPP: 0, IBS: 0.0026, ISS: 0.40 } },
-            { min: 720000.01, max: 1800000, rate: 0.14, deduction: 39780, distribution: { IRPJ: 0.178, CSLL: 0.192, CBS: 0.2275, CPP: 0, IBS: 0.0025, ISS: 0.40 } },
-            { min: 1800000.01, max: 3600000, rate: 0.22, deduction: 183780, distribution: { IRPJ: 0.188, CSLL: 0.192, CBS: 0.2176, CPP: 0, IBS: 0.0024, ISS: 0.40 } },
-            { min: 3600000.01, max: 4800000, rate: 0.329, deduction: 828000, distribution: { IRPJ: 0.5371, CSLL: 0.2159, CBS: 0.247, CPP: 0, IBS: 0, ISS: 0 } },
-        ],
-        V: [
-            { min: 0, max: 180000, rate: 0.155, deduction: 0, distribution: { IRPJ: 0.25, CSLL: 0.15, CBS: 0.1696, CPP: 0.2885, IBS: 0.0019, ISS: 0.14 } },
-            { min: 180000.01, max: 360000, rate: 0.18, deduction: 4500, distribution: { IRPJ: 0.23, CSLL: 0.15, CBS: 0.1696, CPP: 0.2785, IBS: 0.0019, ISS: 0.17 } },
-            { min: 360000.01, max: 720000, rate: 0.195, deduction: 9900, distribution: { IRPJ: 0.24, CSLL: 0.15, CBS: 0.1795, CPP: 0.2385, IBS: 0.0020, ISS: 0.19 } },
-            { min: 720000.01, max: 1800000, rate: 0.205, deduction: 17100, distribution: { IRPJ: 0.21, CSLL: 0.15, CBS: 0.1894, CPP: 0.2385, IBS: 0.0021, ISS: 0.21 } },
-            { min: 1800000.01, max: 3600000, rate: 0.23, deduction: 62100, distribution: { IRPJ: 0.23, CSLL: 0.125, CBS: 0.1696, CPP: 0.2385, IBS: 0.0019, ISS: 0.235 } },
-            { min: 3600000.01, max: 4800000, rate: 0.305, deduction: 540000, distribution: { IRPJ: 0.3510, CSLL: 0.1554, CBS: 0.1978, CPP: 0.2958, IBS: 0, ISS: 0 } },
-        ],
+        I: FISCAL_CONFIG_2025.simples_nacional.I.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
+        II: FISCAL_CONFIG_2025.simples_nacional.II.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
+        III: FISCAL_CONFIG_2025.simples_nacional.III.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
+        IV: FISCAL_CONFIG_2025.simples_nacional.IV.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
+        V: FISCAL_CONFIG_2025.simples_nacional.V.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
     }
 };
 
@@ -171,11 +136,11 @@ export const FISCAL_CONFIG_2029_2032 = {
         ...FISCAL_CONFIG_2027_2028.simples_nacional,
         // A distribuição dentro do DAS mudaria ano a ano.
         // Para 2029: 9/10 de ICMS/ISS + 1/10 de IBS
+        I: FISCAL_CONFIG_2027_2028.simples_nacional.I.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ICMS || 0) * 0.1, ICMS: (b.distribution.ICMS || 0) * 0.9 }})),
+        II: FISCAL_CONFIG_2027_2028.simples_nacional.II.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ICMS || 0) * 0.1, ICMS: (b.distribution.ICMS || 0) * 0.9 }})),
         III: FISCAL_CONFIG_2027_2028.simples_nacional.III.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ISS || 0) * 0.1, ISS: (b.distribution.ISS || 0) * 0.9 }})),
         IV: FISCAL_CONFIG_2027_2028.simples_nacional.IV.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ISS || 0) * 0.1, ISS: (b.distribution.ISS || 0) * 0.9 }})),
         V: FISCAL_CONFIG_2027_2028.simples_nacional.V.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ISS || 0) * 0.1, ISS: (b.distribution.ISS || 0) * 0.9 }})),
-        I: FISCAL_CONFIG_2027_2028.simples_nacional.I.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ICMS || 0) * 0.1, ICMS: (b.distribution.ICMS || 0) * 0.9 }})),
-        II: FISCAL_CONFIG_2027_2028.simples_nacional.II.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ICMS || 0) * 0.1, ICMS: (b.distribution.ICMS || 0) * 0.9 }})),
     }
 };
 
@@ -191,11 +156,11 @@ export const FISCAL_CONFIG_2033_PLUS = {
     // No Simples, PIS/COFINS/ISS/ICMS são substituídos por CBS/IBS
     simples_nacional: {
         ...FISCAL_CONFIG_2025.simples_nacional,
+        I: FISCAL_CONFIG_2025.simples_nacional.I.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ICMS || 0), PIS: 0, COFINS: 0, ICMS: 0 } })),
+        II: FISCAL_CONFIG_2025.simples_nacional.II.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ICMS || 0), PIS: 0, COFINS: 0, ICMS: 0 } })),
         III: FISCAL_CONFIG_2025.simples_nacional.III.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ISS || 0), PIS: 0, COFINS: 0, ISS: 0 } })),
         IV: FISCAL_CONFIG_2025.simples_nacional.IV.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ISS || 0), PIS: 0, COFINS: 0, ISS: 0 } })),
         V: FISCAL_CONFIG_2025.simples_nacional.V.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ISS || 0), PIS: 0, COFINS: 0, ISS: 0 } })),
-        I: FISCAL_CONFIG_2025.simples_nacional.I.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ICMS || 0), PIS: 0, COFINS: 0, ICMS: 0 } })),
-        II: FISCAL_CONFIG_2025.simples_nacional.II.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ICMS || 0), PIS: 0, COFINS: 0, ICMS: 0 } })),
     }
 };
 
