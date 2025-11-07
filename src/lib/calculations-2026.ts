@@ -17,6 +17,7 @@ import {
 import { formatPercent, findBracket, findFeeBracket } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
+import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
     const fiscalConfig = getFiscalParameters(isPostReform ? 2026 : 2025);
@@ -53,22 +54,43 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const config2026 = fiscalConfig as FiscalConfig2026;
         const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
+        const baseCbsRate = config2026.reforma_tributaria.cbs_rate_test || 0.088;
+        const baseIbsRate = config2026.reforma_tributaria.ibs_rate_test || 0.177;
 
+        let totalIbsDebit = 0;
+        let totalCbsDebit = 0;
+
+        domesticActivities.forEach(activity => {
+            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code);
+            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === relationship?.cClassTrib);
+
+            const ibsReduction = (cClass?.ibsReduction ?? 0) / 100;
+            const cbsReduction = (cClass?.cbsReduction ?? 0) / 100;
+
+            totalIbsDebit += activity.revenue * (baseIbsRate * (1 - ibsReduction));
+            totalCbsDebit += activity.revenue * (baseCbsRate * (1 - cbsReduction));
+        });
+
+        const totalIvaDebit = totalIbsDebit + totalCbsDebit;
+
+        // Simplified credit calculation based on a single IVA rate for now
         const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
         const cnaeInfo = getCnaeData(primaryActivityCode);
-        const reduction = cnaeInfo?.ivaReduction ?? 0;
-        const effectiveIvaRate = ivaStandardRate * (1 - reduction);
+        const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode);
+        const cClassInfo = CNAE_CLASSES_2026.find(c => c.cClass === cnaeRel?.cClassTrib);
         
-        const totalIvaDebit = domesticRevenue * effectiveIvaRate;
-        const totalIvaCredit = creditGeneratingExpenses * effectiveIvaRate;
+        const avgIbsReduction = (cClassInfo?.ibsReduction ?? 0) / 100;
+        const avgCbsReduction = (cClassInfo?.cbsReduction ?? 0) / 100;
+        const avgEffectiveIbsRate = baseIbsRate * (1-avgIbsReduction);
+        const avgEffectiveCbsRate = baseCbsRate * (1-avgCbsReduction);
+        const effectiveIvaRateForCredit = avgEffectiveIbsRate + avgEffectiveCbsRate;
+        
+        const totalIvaCredit = creditGeneratingExpenses * effectiveIvaRateForCredit;
         
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
 
-        const cbsRateInIva = (config2026.reforma_tributaria.cbs_rate_test || 0.088) / ivaStandardRate;
-        const ibsRateInIva = (config2026.reforma_tributaria.ibs_rate_test || 0.177) / ivaStandardRate;
-        
-        const cbs = totalIvaDue > 0 ? totalIvaDue * cbsRateInIva : 0;
-        const ibs = totalIvaDue > 0 ? totalIvaDue * ibsRateInIva : 0;
+        const cbs = totalIvaDue > 0 ? totalIvaDue * (avgEffectiveCbsRate / effectiveIvaRateForCredit) : 0;
+        const ibs = totalIvaDue > 0 ? totalIvaDue * (avgEffectiveIbsRate / effectiveIvaRateForCredit) : 0;
 
         consumptionTaxes = totalIvaDue;
         breakdown.push({ name: `CBS`, value: cbs });
@@ -184,19 +206,48 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
     if (isHybrid) {
       const config2026 = getFiscalParameters(2026) as FiscalConfig2026;
-      const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
+      const baseCbsRate = config2026.reforma_tributaria.cbs_rate_test || 0.088;
+      const baseIbsRate = config2026.reforma_tributaria.ibs_rate_test || 0.177;
 
-      const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-      const cnaeInfo = getCnaeData(primaryActivityCode);
-      const reduction = cnaeInfo?.ivaReduction ?? 0;
-      const effectiveIvaRate = ivaStandardRate * (1 - reduction);
+      let totalIbsDebit = 0;
+      let totalCbsDebit = 0;
+      let totalCreditIbs = 0;
+      let totalCreditCbs = 0;
 
       const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
       const b2bRevenue = domesticRevenue * b2bRevenuePortion;
+
+      domesticActivities.forEach(activity => {
+          if(activity.revenue > 0) {
+            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code);
+            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === relationship?.cClassTrib);
+
+            const ibsReduction = (cClass?.ibsReduction ?? 0) / 100;
+            const cbsReduction = (cClass?.cbsReduction ?? 0) / 100;
+
+            const activityB2bRevenue = activity.revenue * b2bRevenuePortion;
+
+            totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - ibsReduction));
+            totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - cbsReduction));
+          }
+      });
       
-      const totalIvaDebit = b2bRevenue * effectiveIvaRate;
-      const totalIvaCredit = creditGeneratingExpenses * effectiveIvaRate;
-      ivaTaxes = Math.max(0, totalIvaDebit - totalIvaCredit);
+      const totalIvaDebit = totalIbsDebit + totalCbsDebit;
+
+      const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
+      const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode);
+      const cClassInfo = CNAE_CLASSES_2026.find(c => c.cClass === cnaeRel?.cClassTrib);
+      
+      const creditIbsReduction = (cClassInfo?.ibsReduction ?? 0) / 100;
+      const creditCbsReduction = (cClassInfo?.cbsReduction ?? 0) / 100;
+
+      totalCreditIbs = creditGeneratingExpenses * (baseIbsRate * (1-creditIbsReduction));
+      totalCreditCbs = creditGeneratingExpenses * (baseCbsRate * (1-creditCbsReduction));
+
+      const finalIbs = Math.max(0, totalIbsDebit - totalCreditIbs);
+      const finalCbs = Math.max(0, totalCbsDebit - totalCreditCbs);
+      
+      ivaTaxes = finalIbs + finalCbs;
     }
     
     const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
