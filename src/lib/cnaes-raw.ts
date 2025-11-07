@@ -965,8 +965,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     code: '6821-8/02',
     description: 'Corretagem no aluguel de imóveis',
     category: 'Serviços Financeiros e Imobiliários',
-    annex: 'V', 
-    requiresFatorR: true, 
+    annex: 'III',
+    requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
@@ -1623,12 +1623,12 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     code: '6821-8/01',
     description: 'Corretagem na compra e venda e avaliação de imóveis',
     category: 'Serviços Financeiros e Imobiliários',
-    annex: 'V', 
-    requiresFatorR: true, 
+    annex: 'III',
+    requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.5, 
+    ivaReduction: 0.5,
     notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
 
@@ -1665,7 +1665,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
+    isRegulated: false
   },
   {
     code: '8219-9/99',
