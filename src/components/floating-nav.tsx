@@ -28,6 +28,7 @@ const navItems = [
 
 export default function FloatingNav() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,6 +53,10 @@ export default function FloatingNav() {
     };
   }, []);
 
+  const handleLinkClick = () => {
+    setIsSheetOpen(false);
+  };
+
   const renderNavLinks = () => (
     <nav className="flex flex-col gap-1">
       {navItems.map(item => (
@@ -63,6 +68,7 @@ export default function FloatingNav() {
             'w-full justify-start text-base',
             activeSection === item.id ? 'bg-accent text-accent-foreground' : ''
           )}
+          onClick={handleLinkClick}
         >
           <Link href={`#${item.id}`} className="flex items-center gap-3">
              <item.icon className="h-5 w-5" />
@@ -74,32 +80,22 @@ export default function FloatingNav() {
   );
 
   return (
-    <>
-      {/* Mobile Navigation */}
-      <div className="md:hidden fixed bottom-4 right-4 z-50 print-hidden">
-         <Sheet>
-          <SheetTrigger asChild>
-            <Button size="icon" className="rounded-full shadow-lg h-14 w-14">
-              <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <SheetHeader>
-              <SheetTitle>Navegação Rápida</SheetTitle>
-            </SheetHeader>
-            <div className="py-4">
-              {renderNavLinks()}
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
-
-      {/* Desktop Navigation */}
-      <aside className="hidden md:block fixed left-4 top-1/2 -translate-y-1/2 z-50 print-hidden">
-        <div className="bg-card/80 backdrop-blur-sm p-2 rounded-lg border shadow-lg max-h-[80vh] overflow-auto">
+    <div className="fixed bottom-4 right-4 z-50 print-hidden">
+       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetTrigger asChild>
+          <Button size="icon" className="rounded-full shadow-lg h-14 w-14">
+            <Menu className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right">
+          <SheetHeader>
+            <SheetTitle>Navegação Rápida</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
             {renderNavLinks()}
-        </div>
-      </aside>
-    </>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
   );
 }
