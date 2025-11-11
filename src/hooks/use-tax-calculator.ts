@@ -45,13 +45,13 @@ export function useTaxCalculator(year: 2025 | 2026) {
 
         // 1. Group selected CNAEs by their effective annex
         const cnaesByAnnex: Record<string, string[]> = {};
-        values.selectedCnaes.forEach(code => {
-            const cnae = getCnaeData(code);
+        values.selectedCnaes.forEach(item => {
+            const cnae = getCnaeData(item.code);
             if (cnae) {
                 // For this transformation, we use the base annex. Fator R logic will be applied in the backend.
                 const annex = cnae.annex;
                 if (!cnaesByAnnex[annex]) cnaesByAnnex[annex] = [];
-                cnaesByAnnex[annex].push(code);
+                cnaesByAnnex[annex].push(item.code);
             }
         });
 
@@ -157,5 +157,3 @@ export function useTaxCalculator(year: 2025 | 2026) {
         selectedCity
     };
 }
-
-    

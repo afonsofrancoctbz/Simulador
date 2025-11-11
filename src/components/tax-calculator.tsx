@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FormProvider } from "react-hook-form";
 import { getCnaeData } from '@/lib/cnae-helpers';
 import { useTaxCalculator } from '@/hooks/use-tax-calculator';
-import type { Annex } from "@/lib/types";
+import type { Annex, CnaeSelection } from "@/lib/types";
 import { CnaeSelector } from './cnae-selector';
 import CityInfoRenderer from './city-info-renderer';
 import HealthInfoSection from './health-info-section';
@@ -27,10 +27,10 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   const selectedCnaes = form.watch("selectedCnaes");
   const revenues = form.watch("revenues");
 
-  const handleCnaeConfirm = (codes: string[]) => {
-      form.setValue('selectedCnaes', codes, { shouldValidate: true });
+  const handleCnaeConfirm = (cnaes: CnaeSelection[]) => {
+      form.setValue('selectedCnaes', cnaes, { shouldValidate: true });
       const newRevenues: Record<string, number | undefined> = {};
-      const newAnnexes = new Set(codes.map(code => getCnaeData(code)?.annex).filter(Boolean));
+      const newAnnexes = new Set(cnaes.map(item => getCnaeData(item.code)?.annex).filter(Boolean));
       const currentRevenues = form.getValues('revenues');
 
       for (const key in currentRevenues) {
@@ -43,15 +43,15 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   };
 
   const hasHealthOrVetCnae = useMemo(() => {
-    return selectedCnaes.some(code => {
-      const cnae = getCnaeData(code);
+    return selectedCnaes.some(item => {
+      const cnae = getCnaeData(item.code);
       return cnae?.category === 'Saúde e Bem-estar' || cnae?.category === 'Veterinária';
     });
   }, [selectedCnaes]);
 
   const hasOdontologyCnae = useMemo(() => {
-    return selectedCnaes.some(code => {
-      const cnae = getCnaeData(code);
+    return selectedCnaes.some(item => {
+      const cnae = getCnaeData(item.code);
       return cnae?.category === 'Odontologia';
     });
   }, [selectedCnaes]);
@@ -82,7 +82,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
                 open={isCnaeSelectorOpen}
                 onOpenChange={setCnaeSelectorOpen}
                 onConfirm={handleCnaeConfirm}
-                initialSelectedCodes={selectedCnaes}
+                initialSelectedCnaes={selectedCnaes}
             />
 
             <div className="mt-12">

@@ -22,6 +22,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Switch } from './ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { CNAE_LC116_RELATIONSHIP, CNAE_CLASSES_2026 } from '@/lib/cnae-data-2026';
 
 interface FormSectionRevenueProps {
     year: 2025 | 2026;
@@ -38,10 +39,24 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     const selectedCnaes = form.watch("selectedCnaes");
 
     const revenueGroups = useMemo(() => {
-        const cnaesInfo = selectedCnaes.map(code => getCnaeData(code)).filter((c): c is any => !!c);
+        const cnaesInfo = selectedCnaes.map(item => getCnaeData(item.code)).filter((c): c is any => !!c);
         const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
         return annexes.sort();
     }, [selectedCnaes]);
+
+    const getCnaeOptions = (cnaeCode: string) => {
+        const options = CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === cnaeCode.replace(/\D/g, ''));
+        const uniqueOptions = Array.from(new Set(options.map(opt => opt.cClassTrib)))
+            .map(cClass => {
+                const classInfo = CNAE_CLASSES_2026.find(c => c.cClass === cClass);
+                return {
+                    cClass: cClass,
+                    description: classInfo?.description ?? `Classe ${cClass}`,
+                };
+            });
+        return uniqueOptions;
+    };
+
 
     const fetchRates = async () => {
         setIsFetchingRate(true);
@@ -76,7 +91,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     }, []);
 
     const handleCnaeBadgeRemove = (codeToRemove: string) => {
-        const newCnaes = selectedCnaes.filter(c => c !== codeToRemove);
+        const newCnaes = selectedCnaes.filter(c => c.code !== codeToRemove);
         form.setValue('selectedCnaes', newCnaes, { shouldValidate: true });
     };
 
@@ -99,16 +114,47 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                  <div>
                     <h3 className='font-semibold text-lg mb-2'>1. Selecione suas Atividades (CNAEs)</h3>
                     <FormDescription className="text-sm mb-3">A escolha do CNAE define os anexos e as alíquotas de imposto aplicáveis.</FormDescription>
-                    <div className="flex flex-col gap-2 mt-2 p-3 border rounded-md min-h-[52px] bg-background">
-                        {selectedCnaes.length > 0 ? selectedCnaes.map(code => {
-                            const cnae = getCnaeData(code);
+                    <div className="flex flex-col gap-4 mt-2 p-3 border rounded-md min-h-[52px] bg-background">
+                        {selectedCnaes.length > 0 ? selectedCnaes.map((cnaeItem, index) => {
+                            const cnae = getCnaeData(cnaeItem.code);
+                            const cnaeOptions = year === 2026 ? getCnaeOptions(cnaeItem.code) : [];
                             return (
-                                <Badge key={code} variant="secondary" className="text-sm justify-between w-full py-1.5 px-3">
-                                    <span className='font-normal'><b className='font-semibold'>{code}</b> - {cnae?.description}</span>
-                                    <button type="button" className="ml-2 rounded-full p-0.5 hover:bg-destructive/20" onClick={() => handleCnaeBadgeRemove(code)}>
-                                        <XCircle className="h-4 w-4 text-destructive/80" />
-                                    </button>
-                                </Badge>
+                                <div key={cnaeItem.code}>
+                                    <Badge variant="secondary" className="text-sm justify-between w-full py-1.5 px-3">
+                                        <span className='font-normal'><b className='font-semibold'>{cnaeItem.code}</b> - {cnae?.description}</span>
+                                        <button type="button" className="ml-2 rounded-full p-0.5 hover:bg-destructive/20" onClick={() => handleCnaeBadgeRemove(cnaeItem.code)}>
+                                            <XCircle className="h-4 w-4 text-destructive/80" />
+                                        </button>
+                                    </Badge>
+                                    {cnaeOptions.length > 1 && (
+                                        <div className='mt-2 pl-4'>
+                                            <FormField
+                                                control={form.control}
+                                                name={`selectedCnaes.${index}.cClass`}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className='text-xs text-muted-foreground'>Selecione a classificação tributária para este CNAE:</FormLabel>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <FormControl>
+                                                            <SelectTrigger className='h-9 text-xs'>
+                                                                <SelectValue placeholder="Escolha uma opção tributária..." />
+                                                            </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                            {cnaeOptions.map((opt) => (
+                                                                <SelectItem key={opt.cClass} value={opt.cClass} className='text-xs'>
+                                                                {opt.description}
+                                                                </SelectItem>
+                                                            ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             )
                         }) : <p className="text-sm text-muted-foreground px-1">Nenhuma atividade selecionada.</p>}
                     </div>
@@ -365,4 +411,5 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
+
 

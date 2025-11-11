@@ -22,7 +22,7 @@ import { Textarea } from "./ui/textarea"
 import { Label } from "./ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Separator } from "./ui/separator"
-import type { CnaeData } from "@/lib/types"
+import type { CnaeData, CnaeSelection } from "@/lib/types"
 
 const categories = [
   { name: "Busca", icon: Search, cnaeCodes: [] },
@@ -53,27 +53,27 @@ function CnaeSelectorComponent({
   open,
   onOpenChange,
   onConfirm,
-  initialSelectedCodes = [],
+  initialSelectedCnaes = [],
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConfirm: (codes: string[]) => void
-  initialSelectedCodes?: string[]
+  onConfirm: (cnaes: CnaeSelection[]) => void
+  initialSelectedCnaes?: CnaeSelection[]
 }) {
   const [search, setSearch] = React.useState("")
   const [activeView, setActiveView] = React.useState("Busca")
-  const [selectedCodes, setSelectedCodes] = React.useState<string[]>(initialSelectedCodes)
+  const [selectedCnaes, setSelectedCnaes] = React.useState<CnaeSelection[]>(initialSelectedCnaes)
   const [codesToPaste, setCodesToPaste] = React.useState("");
   const [hoveredCnae, setHoveredCnae] = React.useState<CnaeData | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
     if (open) {
-      setSelectedCodes(initialSelectedCodes);
+      setSelectedCnaes(initialSelectedCnaes);
       setActiveView("Busca");
       setSearch("");
     }
-  }, [open, initialSelectedCodes])
+  }, [open, initialSelectedCnaes])
 
   const filteredCnaes = React.useMemo(() => {
     if (activeView === "Busca") {
@@ -92,12 +92,13 @@ function CnaeSelectorComponent({
   }, [search, activeView]);
 
   const handleToggleCnae = (code: string) => {
-    setSelectedCodes((current) => {
-      if (current.includes(code)) {
-        return current.filter((c) => c !== code)
+    setSelectedCnaes((current) => {
+      const isSelected = current.some(c => c.code === code);
+      if (isSelected) {
+        return current.filter((c) => c.code !== code)
       }
       if (current.length < MAX_SELECTION) {
-        return [...current, code]
+        return [...current, { code }]
       }
       toast({
         title: "Limite Atingido",
@@ -109,7 +110,7 @@ function CnaeSelectorComponent({
   }
 
   const handleConfirmClick = () => {
-    onConfirm(selectedCodes)
+    onConfirm(selectedCnaes)
     onOpenChange(false)
   }
   
@@ -121,53 +122,70 @@ function CnaeSelectorComponent({
       return;
     }
     
-    const allCnaeCodes = CNAE_DATA.map(c => c.code);
+    const allCnaeCodes = new Set(CNAE_DATA.map(c => c.code));
+    const currentSelectedCodes = new Set(selectedCnaes.map(c => c.code));
     let addedCount = 0, invalidCount = 0, duplicateCount = 0, limitReached = false;
-    const newSelected = new Set(selectedCodes);
+    const newSelected = [...selectedCnaes];
 
     rawCodes.forEach(rawCode => {
-      if (newSelected.size >= MAX_SELECTION) { limitReached = true; return; }
+      if (newSelected.length >= MAX_SELECTION) { limitReached = true; return; }
       
       const normalizedCode = rawCode.replace(/[^\d]/g, '');
       const formattedCode = `${normalizedCode.slice(0, 4)}-${normalizedCode.slice(4, 5)}/${normalizedCode.slice(5, 7)}`;
       
-      if (allCnaeCodes.includes(formattedCode)) {
-        if (newSelected.has(formattedCode)) duplicateCount++;
-        else { newSelected.add(formattedCode); addedCount++; }
-      } else invalidCount++;
+      if (allCnaeCodes.has(formattedCode)) {
+        if (currentSelectedCodes.has(formattedCode)) {
+          duplicateCount++;
+        } else {
+          newSelected.push({ code: formattedCode });
+          currentSelectedCodes.add(formattedCode);
+          addedCount++;
+        }
+      } else {
+        invalidCount++;
+      }
     });
 
-    setSelectedCodes(Array.from(newSelected));
+    setSelectedCnaes(newSelected);
     toast({ title: "Processamento Concluído", description: `${addedCount} CNAEs adicionados, ${invalidCount} inválidos e ${duplicateCount} já selecionados.` });
     if (limitReached) toast({ title: "Limite Atingido", description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado.`, variant: "destructive" });
     setCodesToPaste("");
   };
 
+
   const handleSelectAll = () => {
-    const newSelected = new Set(selectedCodes);
+    const currentSelectedCodes = new Set(selectedCnaes.map(c => c.code));
+    const newSelected = [...selectedCnaes];
     let limitReached = false;
+    
     for (const cnae of filteredCnaes) {
-      if (newSelected.size >= MAX_SELECTION) {
-        limitReached = true;
-        break;
-      }
-      newSelected.add(cnae.code);
+        if (newSelected.length >= MAX_SELECTION) {
+            limitReached = true;
+            break;
+        }
+        if (!currentSelectedCodes.has(cnae.code)) {
+            newSelected.push({ code: cnae.code });
+            currentSelectedCodes.add(cnae.code);
+        }
     }
-    setSelectedCodes(Array.from(newSelected));
+    setSelectedCnaes(newSelected);
     if (limitReached) {
-      toast({
-        title: "Limite Atingido",
-        description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado. Nem todos os itens puderam ser adicionados.`,
-        variant: "destructive",
-      });
+        toast({
+            title: "Limite Atingido",
+            description: `O limite de ${MAX_SELECTION} CNAEs foi alcançado. Nem todos os itens puderam ser adicionados.`,
+            variant: "destructive",
+        });
     }
-  };
+};
+
 
   const handleClearCategorySelection = () => {
     const categoryCnaeCodes = new Set(filteredCnaes.map(c => c.code));
-    const newSelectedCodes = selectedCodes.filter(code => !categoryCnaeCodes.has(code));
-    setSelectedCodes(newSelectedCodes);
+    const newSelectedCnaes = selectedCnaes.filter(cnae => !categoryCnaeCodes.has(cnae.code));
+    setSelectedCnaes(newSelectedCnaes);
   };
+
+  const isCnaeSelected = (code: string) => selectedCnaes.some(c => c.code === code);
 
 
   return (
@@ -256,7 +274,7 @@ function CnaeSelectorComponent({
                                         onMouseEnter={() => setHoveredCnae(cnae)}
                                         onMouseLeave={() => setHoveredCnae(null)}
                                         onClick={() => handleToggleCnae(cnae.code)}
-                                        className={cn("p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between hover:bg-muted/50", selectedCodes.includes(cnae.code) && "border-primary ring-1 ring-primary/80")}
+                                        className={cn("p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between hover:bg-muted/50", isCnaeSelected(cnae.code) && "border-primary ring-1 ring-primary/80")}
                                     >
                                         <div className="flex-grow">
                                             <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
@@ -269,7 +287,7 @@ function CnaeSelectorComponent({
                                             </div>
                                         </div>
                                          <Button size="sm" variant="ghost" className="ml-4 shrink-0">
-                                            {selectedCodes.includes(cnae.code) ? <Check className="h-5 w-5 text-primary"/> : <PlusCircle className="h-5 w-5 text-muted-foreground"/>}
+                                            {isCnaeSelected(cnae.code) ? <Check className="h-5 w-5 text-primary"/> : <PlusCircle className="h-5 w-5 text-muted-foreground"/>}
                                         </Button>
                                     </div>
                                 )) : (
@@ -306,15 +324,15 @@ function CnaeSelectorComponent({
                 </div>
                 
                 <div className="p-6 border-t shrink-0 h-1/2 flex flex-col min-h-0">
-                    <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCodes.length}/${MAX_SELECTION})</h4>
+                    <h4 className="font-semibold text-foreground mb-4 shrink-0">Atividades Selecionadas ({selectedCnaes.length}/${MAX_SELECTION})</h4>
                     <ScrollArea className="flex-grow bg-background border rounded-lg">
                         <div className="space-y-2 p-3">
-                           {selectedCodes.length > 0 ? selectedCodes.map(code => {
-                               const cnae = CNAE_DATA.find(c=>c.code===code);
+                           {selectedCnaes.length > 0 ? selectedCnaes.map(cnaeItem => {
+                               const cnae = CNAE_DATA.find(c=>c.code===cnaeItem.code);
                                return (
-                                <div key={code} className="flex items-center justify-between bg-muted/40 p-2 rounded-md border">
-                                    <span className="text-sm font-medium flex-grow pr-2">{cnae ? `${code} - ${cnae.description}` : code}</span>
-                                    <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(code)}>
+                                <div key={cnaeItem.code} className="flex items-center justify-between bg-muted/40 p-2 rounded-md border">
+                                    <span className="text-sm font-medium flex-grow pr-2">{cnae ? `${cnae.code} - ${cnae.description}` : cnaeItem.code}</span>
+                                    <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(cnaeItem.code)}>
                                         <X className="h-4 w-4 text-destructive"/>
                                     </Button>
                                 </div>
@@ -333,8 +351,8 @@ function CnaeSelectorComponent({
         <DialogFooter className="p-4 border-t bg-background items-center justify-end flex-row shrink-0">
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                <Button onClick={handleConfirmClick} disabled={selectedCodes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Confirmar {selectedCodes.length > 0 ? `(${selectedCodes.length})` : ''}
+                <Button onClick={handleConfirmClick} disabled={selectedCnaes.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    Confirmar {selectedCnaes.length > 0 ? `(${selectedCnaes.length})` : ''}
                 </Button>
             </div>
         </DialogFooter>

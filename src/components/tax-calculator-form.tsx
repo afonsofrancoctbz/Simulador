@@ -4,7 +4,7 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { CIDADES_ATENDIDAS } from '@/lib/cities';
-import { PlanEnumSchema, ProLaboreFormSchema } from '@/lib/types';
+import { PlanEnumSchema, ProLaboreFormSchema, CnaeSelectionSchema } from '@/lib/types';
 import { Button } from "@/components/ui/button";
 import { FormSectionCompany } from "./form-section-company";
 import { FormSectionRevenue } from "./form-section-revenue";
@@ -18,7 +18,7 @@ export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
     message: "Por favor, selecione uma cidade válida da lista."
   }),
-  selectedCnaes: z.array(z.string()).min(1, "Selecione ao menos uma atividade (CNAE)."),
+  selectedCnaes: z.array(CnaeSelectionSchema).min(1, "Selecione ao menos uma atividade (CNAE)."),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),

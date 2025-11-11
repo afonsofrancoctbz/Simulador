@@ -1,7 +1,14 @@
 
 import { z } from "zod";
 
-// Schema for an individual CNAE item
+// Schema for a selected CNAE, which might include a user's choice of cClass
+export const CnaeSelectionSchema = z.object({
+  code: z.string(),
+  cClass: z.string().optional(),
+});
+export type CnaeSelection = z.infer<typeof CnaeSelectionSchema>;
+
+// Schema for an individual CNAE item with revenue
 export const CnaeItemSchema = z.object({
   code: z.string(),
   revenue: z.coerce.number().positive({ message: "O faturamento deve ser maior que zero." }).or(z.literal(0)),
@@ -30,7 +37,7 @@ export type Plan = z.infer<typeof PlanEnumSchema>;
 
 // Schema for the main form input passed from the frontend to the Genkit flow
 export const TaxFormValuesSchema = z.object({
-  selectedCnaes: z.array(z.string()),
+  selectedCnaes: z.array(CnaeSelectionSchema),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo."),
   domesticActivities: z.array(CnaeItemSchema),
