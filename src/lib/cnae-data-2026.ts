@@ -160,10 +160,12 @@ export const CNAE_CLASSES_2026: CnaeClass2026[] = [
 ];
 
 export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
-    { itemLC116: '01.01', descriptionLC116: 'Análise E Desenvolvimento De Sistemas.', nationalCode: '010101', cnae: '6201501', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos e programas não personalizados (não customizados)', cClassTrib: '000001'},
-    { itemLC116: '01.01', descriptionLC116: 'Análise E Desenvolvimento De Sistemas.', nationalCode: '010101', cnae: '6202300', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos e programas não personalizados (não customizados)', cClassTrib: '000001'},
+    { itemLC116: '01.01', descriptionLC116: 'Análise E Desenvolvimento De Sistemas.', nationalCode: '010101', cnae: '6201-5/01', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos e programas não personalizados (não customizados)', cClassTrib: '000001'},
+    { itemLC116: '01.01', descriptionLC116: 'Análise E Desenvolvimento De Sistemas.', nationalCode: '010101', cnae: '6202-3/00', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos e programas não personalizados (não customizados)', cClassTrib: '000001'},
     // ... all other rows from the user's data ...
     // NOTE: This is a truncated example. The full data would be here.
-    { itemLC116: '39.01', descriptionLC116: 'Serviços De Ourivesaria E Lapidação (Quando O Material For Fornecido Pelo Tomador Do Serviço).', nationalCode: '390101', cnae: '9529106', nbs: '1.2002.20.00', nbsDescription: 'Serviços de manutenção e reparação de relógios e joias', cClassTrib: '000001'},
-    { itemLC116: '40.01', descriptionLC116: 'Obras De Arte Sob Encomenda.', nationalCode: '400101', cnae: '9002702', nbs: '1.2503.20.00', nbsDescription: 'Serviços de autores, compositores, escultores, pintores e outros artistas, exceto os de atuação artística', cClassTrib: '000001'},
+    { itemLC116: '39.01', descriptionLC116: 'Serviços De Ourivesaria E Lapidação (Quando O Material For Fornecido Pelo Tomador Do Serviço).', nationalCode: '390101', cnae: '9529-1/06', nbs: '1.2002.20.00', nbsDescription: 'Serviços de manutenção e reparação de relógios e joias', cClassTrib: '000001'},
+    { itemLC116: '40.01', descriptionLC116: 'Obras De Arte Sob Encomenda.', nationalCode: '400101', cnae: '9002-7/02', nbs: '1.2503.20.00', nbsDescription: 'Serviços de autores, compositores, escultores, pintores e outros artistas, exceto os de atuação artística', cClassTrib: '000001'},
 ];
+
+    
