@@ -39,12 +39,14 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
     const selectedCnaes = form.watch("selectedCnaes");
 
     const revenueGroups = useMemo(() => {
+        if (!selectedCnaes) return [];
         const cnaesInfo = selectedCnaes.map(item => getCnaeData(item.code)).filter((c): c is any => !!c);
         const annexes = [...new Set(cnaesInfo.map(c => c.annex))];
         return annexes.sort();
     }, [selectedCnaes]);
 
     const getCnaeOptions = (cnaeCode: string) => {
+        if (!cnaeCode) return [];
         const options = CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === cnaeCode.replace(/\D/g, ''));
         const uniqueOptions = Array.from(new Set(options.map(opt => opt.cClassTrib)))
             .map(cClass => {
@@ -117,7 +119,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                     <h3 className='font-semibold text-lg mb-2'>1. Selecione suas Atividades (CNAEs)</h3>
                     <FormDescription className="text-sm mb-3">A escolha do CNAE define os anexos e as alíquotas de imposto aplicáveis.</FormDescription>
                     <div className="flex flex-col gap-4 mt-2 p-3 border rounded-md min-h-[52px] bg-background">
-                        {selectedCnaes.length > 0 ? selectedCnaes.map((cnaeItem, index) => {
+                        {selectedCnaes && selectedCnaes.length > 0 ? selectedCnaes.map((cnaeItem, index) => {
                             const cnae = getCnaeData(cnaeItem.code);
                             const cnaeOptions = year === 2026 ? getCnaeOptions(cnaeItem.code) : [];
                             return (
@@ -164,7 +166,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                     <Button type="button" variant="default" size="sm" className="mt-3" onClick={onCnaeSelectorOpen}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Adicionar / Editar Atividades
                     </Button>
-                     {selectedCnaes.length === 0 && (
+                     {(!selectedCnaes || selectedCnaes.length === 0) && (
                          <p className='text-sm text-muted-foreground mt-4'>Selecione uma ou mais atividades para informar o faturamento.</p>
                     )}
                 </div>
@@ -413,7 +415,3 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
-
-
-
-

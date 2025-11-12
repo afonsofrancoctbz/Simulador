@@ -43,6 +43,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   };
 
   const hasHealthOrVetCnae = useMemo(() => {
+    if (!selectedCnaes) return false;
     return selectedCnaes.some(item => {
       const cnae = getCnaeData(item.code);
       return cnae?.category === 'Saúde e Bem-estar' || cnae?.category === 'Veterinária';
@@ -50,6 +51,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   }, [selectedCnaes]);
 
   const hasOdontologyCnae = useMemo(() => {
+    if (!selectedCnaes) return false;
     return selectedCnaes.some(item => {
       const cnae = getCnaeData(item.code);
       return cnae?.category === 'Odontologia';
