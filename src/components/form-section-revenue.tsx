@@ -49,9 +49,11 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         const uniqueOptions = Array.from(new Set(options.map(opt => opt.cClassTrib)))
             .map(cClass => {
                 const classInfo = CNAE_CLASSES_2026.find(c => c.cClass === cClass);
+                const nbsInfo = options.find(o => o.cClassTrib === cClass);
                 return {
                     cClass: cClass,
                     description: classInfo?.description ?? `Classe ${cClass}`,
+                    nbsDescription: nbsInfo?.nbsDescription ?? 'Opção de Tributação'
                 };
             });
         return uniqueOptions;
@@ -411,5 +413,6 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
+
 
 

@@ -53,42 +53,43 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const config2026 = fiscalConfig as FiscalConfig2026;
-        const ivaStandardRate = config2026.reforma_tributaria.iva_rate;
         const baseCbsRate = config2026.reforma_tributaria.cbs_rate_test || 0.088;
         const baseIbsRate = config2026.reforma_tributaria.ibs_rate_test || 0.177;
 
         let totalIbsDebit = 0;
         let totalCbsDebit = 0;
+        let totalCreditIbs = 0;
+        let totalCreditCbs = 0;
+        let weightedIbsReduction = 0;
+        let weightedCbsReduction = 0;
 
         domesticActivities.forEach(activity => {
             const selectedCnae = selectedCnaes.find(sc => sc.code === activity.code);
             const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code.replace(/\D/g, '') && (!selectedCnae?.cClass || r.cClassTrib === selectedCnae.cClass));
-            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === relationship?.cClassTrib);
-
+            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === (relationship?.cClassTrib || '000001'));
+            
             const ibsReduction = (cClass?.ibsReduction ?? 0) / 100;
             const cbsReduction = (cClass?.cbsReduction ?? 0) / 100;
-
+            
             totalIbsDebit += activity.revenue * (baseIbsRate * (1 - ibsReduction));
             totalCbsDebit += activity.revenue * (baseCbsRate * (1 - cbsReduction));
+            
+            if (totalRevenue > 0) {
+              weightedIbsReduction += (activity.revenue / totalRevenue) * ibsReduction;
+              weightedCbsReduction += (activity.revenue / totalRevenue) * cbsReduction;
+            }
         });
-
+        
         const totalIvaDebit = totalIbsDebit + totalCbsDebit;
-        const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-        const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode.replace(/\D/g, ''));
-        const cClassInfo = CNAE_CLASSES_2026.find(c => c.cClass === cnaeRel?.cClassTrib);
+
+        totalCreditIbs = creditGeneratingExpenses * (baseIbsRate * (1 - weightedIbsReduction));
+        totalCreditCbs = creditGeneratingExpenses * (baseCbsRate * (1 - weightedCbsReduction));
         
-        const avgIbsReduction = (cClassInfo?.ibsReduction ?? 0) / 100;
-        const avgCbsReduction = (cClassInfo?.cbsReduction ?? 0) / 100;
-        const avgEffectiveIbsRate = baseIbsRate * (1-avgIbsReduction);
-        const avgEffectiveCbsRate = baseCbsRate * (1-avgCbsReduction);
-        const effectiveIvaRateForCredit = avgEffectiveIbsRate + avgEffectiveCbsRate;
-        
-        const totalIvaCredit = creditGeneratingExpenses * effectiveIvaRateForCredit;
-        
+        const totalIvaCredit = totalCreditIbs + totalCreditCbs;
         const totalIvaDue = Math.max(0, totalIvaDebit - totalIvaCredit);
 
-        const cbs = totalIvaDue > 0 ? totalIvaDue * (avgEffectiveCbsRate / effectiveIvaRateForCredit) : 0;
-        const ibs = totalIvaDue > 0 ? totalIvaDue * (avgEffectiveIbsRate / effectiveIvaRateForCredit) : 0;
+        const cbs = Math.max(0, totalCbsDebit - totalCreditCbs);
+        const ibs = Math.max(0, totalIbsDebit - totalCreditIbs);
 
         consumptionTaxes = totalIvaDue;
         breakdown.push({ name: `CBS`, value: cbs });
@@ -204,15 +205,16 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       let totalCbsDebit = 0;
       let totalCreditIbs = 0;
       let totalCreditCbs = 0;
+      let weightedIbsReduction = 0;
+      let weightedCbsReduction = 0;
 
       const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
-      const b2bRevenue = domesticRevenue * b2bRevenuePortion;
-
+      
       domesticActivities.forEach(activity => {
           if(activity.revenue > 0) {
             const selectedCnae = selectedCnaes.find(sc => sc.code === activity.code);
             const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code.replace(/\D/g, '') && (!selectedCnae?.cClass || r.cClassTrib === selectedCnae.cClass));
-            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === relationship?.cClassTrib);
+            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === (relationship?.cClassTrib || '000001'));
 
             const ibsReduction = (cClass?.ibsReduction ?? 0) / 100;
             const cbsReduction = (cClass?.cbsReduction ?? 0) / 100;
@@ -221,20 +223,16 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
             totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - ibsReduction));
             totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - cbsReduction));
+            
+            if (totalRevenue > 0) {
+              weightedIbsReduction += (activity.revenue / totalRevenue) * ibsReduction;
+              weightedCbsReduction += (activity.revenue / totalRevenue) * cbsReduction;
+            }
           }
       });
       
-      const totalIvaDebit = totalIbsDebit + totalCbsDebit;
-
-      const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-      const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode.replace(/\D/g, ''));
-      const cClassInfo = CNAE_CLASSES_2026.find(c => c.cClass === cnaeRel?.cClassTrib);
-      
-      const creditIbsReduction = (cClassInfo?.ibsReduction ?? 0) / 100;
-      const creditCbsReduction = (cClassInfo?.cbsReduction ?? 0) / 100;
-
-      totalCreditIbs = creditGeneratingExpenses * (baseIbsRate * (1-creditIbsReduction));
-      totalCreditCbs = creditGeneratingExpenses * (baseCbsRate * (1-creditCbsReduction));
+      totalCreditIbs = creditGeneratingExpenses * (baseIbsRate * (1-weightedIbsReduction));
+      totalCreditCbs = creditGeneratingExpenses * (baseCbsRate * (1-weightedCbsReduction));
 
       const finalIbs = Math.max(0, totalIbsDebit - totalCreditIbs);
       const finalCbs = Math.max(0, totalCbsDebit - totalCreditCbs);
@@ -338,19 +336,19 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
           
           const optimizedValues = { ...values, proLabores: optimizedProLabores };
           
-          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, optimizedProLabores);
-          simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, optimizedProLabores);
-          
-          if (simplesNacionalOtimizado && simplesNacionalTradicional && simplesNacionalOtimizado.totalMonthlyCost >= simplesNacionalTradicional.totalMonthlyCost) {
-            simplesNacionalOtimizado = null;
+          const tempSimplesOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, optimizedProLabores);
+          const tempSimplesOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, optimizedProLabores);
+
+          if (tempSimplesOtimizado.totalMonthlyCost < simplesNacionalTradicional.totalMonthlyCost) {
+            simplesNacionalOtimizado = tempSimplesOtimizado;
           }
-          if (simplesNacionalOtimizadoHibrido && simplesNacionalHibrido && simplesNacionalOtimizadoHibrido.totalMonthlyCost >= simplesNacionalHibrido.totalMonthlyCost) {
-            simplesNacionalOtimizadoHibrido = null;
+          if (tempSimplesOtimizadoHibrido.totalMonthlyCost < simplesNacionalHibrido.totalMonthlyCost) {
+            simplesNacionalOtimizadoHibrido = tempSimplesOtimizadoHibrido;
           }
+
       } else if (fatorR_naoOtimizado >= limiteFatorR) {
-        // If Fator R is already met, the "optimized" scenario IS the base scenario, but we label it as such
-        simplesNacionalOtimizado = { ..._calculateSimples2026(values, false, fatorR_naoOtimizado), regime: 'Simples Nacional (Fator R Otimizado)' };
-        simplesNacionalOtimizadoHibrido = { ..._calculateSimples2026(values, true, fatorR_naoOtimizado), regime: 'Simples Nacional (Fator R Otimizado) Híbrido' };
+        simplesNacionalOtimizado = { ...simplesNacionalTradicional, regime: 'Simples Nacional (Fator R Otimizado)' };
+        simplesNacionalOtimizadoHibrido = { ...simplesNacionalHibrido, regime: 'Simples Nacional (Fator R Otimizado) Híbrido' };
       }
   }
   
