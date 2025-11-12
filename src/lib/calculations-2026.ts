@@ -21,7 +21,7 @@ import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
     const fiscalConfig = getFiscalParameters(isPostReform ? 2026 : 2025);
-    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0 } = values;
+    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -61,7 +61,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         let totalCbsDebit = 0;
 
         domesticActivities.forEach(activity => {
-            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code);
+            const selectedCnae = selectedCnaes.find(sc => sc.code === activity.code);
+            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code.replace(/\D/g, '') && (!selectedCnae?.cClass || r.cClassTrib === selectedCnae.cClass));
             const cClass = CNAE_CLASSES_2026.find(c => c.cClass === relationship?.cClassTrib);
 
             const ibsReduction = (cClass?.ibsReduction ?? 0) / 100;
@@ -72,11 +73,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         });
 
         const totalIvaDebit = totalIbsDebit + totalCbsDebit;
-
-        // Simplified credit calculation based on a single IVA rate for now
         const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-        const cnaeInfo = getCnaeData(primaryActivityCode);
-        const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode);
+        const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode.replace(/\D/g, ''));
         const cClassInfo = CNAE_CLASSES_2026.find(c => c.cClass === cnaeRel?.cClassTrib);
         
         const avgIbsReduction = (cClassInfo?.ibsReduction ?? 0) / 100;
@@ -137,7 +135,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
     const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027; // Use 2027+ config as base for hybrid
-    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0 } = values;
+    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
     const totalProLaboreBruto = proLaboresToUse.reduce((a, p) => a + p.value, 0);
@@ -212,7 +210,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
       domesticActivities.forEach(activity => {
           if(activity.revenue > 0) {
-            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code);
+            const selectedCnae = selectedCnaes.find(sc => sc.code === activity.code);
+            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code.replace(/\D/g, '') && (!selectedCnae?.cClass || r.cClassTrib === selectedCnae.cClass));
             const cClass = CNAE_CLASSES_2026.find(c => c.cClass === relationship?.cClassTrib);
 
             const ibsReduction = (cClass?.ibsReduction ?? 0) / 100;
@@ -228,7 +227,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       const totalIvaDebit = totalIbsDebit + totalCbsDebit;
 
       const primaryActivityCode = domesticActivities[0]?.code || exportActivities[0]?.code || '';
-      const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode);
+      const cnaeRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === primaryActivityCode.replace(/\D/g, ''));
       const cClassInfo = CNAE_CLASSES_2026.find(c => c.cClass === cnaeRel?.cClassTrib);
       
       const creditIbsReduction = (cClassInfo?.ibsReduction ?? 0) / 100;
@@ -311,40 +310,47 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   let simplesNacionalOtimizadoHibrido: TaxDetails2026 | null = null;
 
-  const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
-
+  const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
+  
   if (hasAnnexVActivity && totalRevenue > 0) {
+      const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027;
+      const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
       
       const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
-      const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027; // Use future config for Fator R target
-      const requiredPayroll = totalRevenue * fiscalConfig.simples_nacional.limite_fator_r;
-      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
-      
-      if (additionalProLaboreNeeded > 0 || fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) {
-          const proLaboreValue = (fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) ? totalProLaboreBruto : (totalProLaboreBruto + additionalProLaboreNeeded);
+      const requiredPayroll = totalRevenue * limiteFatorR;
+      const additionalProLaboreNeeded = requiredPayroll - currentPayroll;
 
+      if (fatorR_naoOtimizado < limiteFatorR && additionalProLaboreNeeded > 0) {
+          const newTotalProLabore = currentTotalProLabore + additionalProLaboreNeeded;
+          
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
               ? values.proLabores.map(p => ({ 
                   ...p, 
-                  value: proLaboreValue / values.proLabores.length,
+                  value: newTotalProLabore / values.proLabores.length,
                 }))
-              : [{ value: proLaboreValue, hasOtherInssContribution: false, otherContributionSalary: 0 }];
-
+              : [{ 
+                  value: newTotalProLabore, 
+                  hasOtherInssContribution: false, 
+                  otherContributionSalary: 0 
+                }];
+          
           const optimizedValues = { ...values, proLabores: optimizedProLabores };
-          const fatorR_Otimizado = (fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) ? fatorR_naoOtimizado : fiscalConfig.simples_nacional.limite_fator_r;
-
-          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, fatorR_Otimizado, optimizedProLabores);
-          simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, fatorR_Otimizado, optimizedProLabores);
-
-          // Do not show optimized scenarios if they are more expensive
-          if (simplesNacionalOtimizado && simplesNacionalTradicional && simplesNacionalOtimizado.totalMonthlyCost > simplesNacionalTradicional.totalMonthlyCost) {
+          
+          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, optimizedProLabores);
+          simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, optimizedProLabores);
+          
+          if (simplesNacionalOtimizado && simplesNacionalTradicional && simplesNacionalOtimizado.totalMonthlyCost >= simplesNacionalTradicional.totalMonthlyCost) {
             simplesNacionalOtimizado = null;
           }
-          if (simplesNacionalOtimizadoHibrido && simplesNacionalHibrido && simplesNacionalOtimizadoHibrido.totalMonthlyCost > simplesNacionalHibrido.totalMonthlyCost) {
+          if (simplesNacionalOtimizadoHibrido && simplesNacionalHibrido && simplesNacionalOtimizadoHibrido.totalMonthlyCost >= simplesNacionalHibrido.totalMonthlyCost) {
             simplesNacionalOtimizadoHibrido = null;
           }
+      } else if (fatorR_naoOtimizado >= limiteFatorR) {
+        // If Fator R is already met, the "optimized" scenario IS the base scenario, but we label it as such
+        simplesNacionalOtimizado = { ..._calculateSimples2026(values, false, fatorR_naoOtimizado), regime: 'Simples Nacional (Fator R Otimizado)' };
+        simplesNacionalOtimizadoHibrido = { ..._calculateSimples2026(values, true, fatorR_naoOtimizado), regime: 'Simples Nacional (Fator R Otimizado) Híbrido' };
       }
   }
   
