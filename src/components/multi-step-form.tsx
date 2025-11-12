@@ -6,7 +6,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 const STEPS = [
   { id: 1, title: "1. Empresa" },
   { id: 2, title: "2. Folha e Sócios" },
-  { id: 3, title: "3. Receita Anual" },
+  { id: 3, title: "3. Faturamento Anual" },
   { id: 4, title: "4. Atividades e Faturamento Mensal" },
   { id: 5, title: "5. Plano" },
 ];
