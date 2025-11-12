@@ -14,7 +14,7 @@ import {
     type PartnerTaxDetails,
     type TaxFormValues
 } from './types';
-import { findBracket, findFeeBracket } from './utils';
+import { findBracket, findFeeBracket, formatPercent } from './utils';
 
 // =================================================================================
 // 2. CORE CALCULATION LOGIC (HELPER FUNCTIONS)
@@ -91,13 +91,13 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
     
-    // Impostos sobre Faturamento (Apenas receita doméstica)
+    // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
     const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
     const iss = domesticRevenue * issValue;
 
-    // Presunção sobre a receita total (IRPJ e CSLL incidem sobre exportação)
+    // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
     let presumedProfitBase = 0;
     const allActivities = [...values.domesticActivities, ...values.exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
     allActivities.forEach(activity => {
@@ -110,7 +110,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const irpj = presumedProfitBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
     const csll = presumedProfitBase * config.lucro_presumido_rates.CSLL;
 
-    // Encargos sobre Folha
+    // Grupo 3: Encargos sobre a Folha
     const cpp = _calculateCpp(monthlyPayroll, config);
 
     // Custo Total
@@ -224,7 +224,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
     
     const breakdown = [
-        { name: `DAS (${(totalRevenue > 0 ? totalDas / totalRevenue : 0) * 100}%)`, value: totalDas },
+        { name: `DAS (${formatPercent(totalRevenue > 0 ? totalDas / totalRevenue : 0)})`, value: totalDas },
         { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
         { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0 },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
@@ -248,7 +248,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     
     if (proLaboreOverride) {
         finalResult.regime = "Simples Nacional (Otimizado)";
-        finalResult.optimizationNote = `Pró-labore ajustado para R$ ${totalProLaboreBruto.toFixed(2)} para atingir o Fator R e tributar pelo Anexo III.`;
+        finalResult.optimizationNote = `Pró-labore ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} para atingir o Fator R e tributar pelo Anexo III.`;
     }
 
     return finalResult;
@@ -275,11 +275,12 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
       const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
-      const requiredPayroll = totalRevenue * config.simples_nacional.limite_fator_r;
-      const additionalProLaboreNeeded = Math.max(0, requiredPayroll - currentPayroll);
+      const requiredAnnualPayroll = (values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12) * config.simples_nacional.limite_fator_r;
+      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (currentPayroll * 12);
+      const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
       
-      if (additionalProLaboreNeeded > 0) {
-          const newTotalProLabore = currentTotalProLabore + additionalProLaboreNeeded;
+      if (additionalMonthlyProLaboreNeeded > 0) {
+          const newTotalProLabore = currentTotalProLabore + additionalMonthlyProLaboreNeeded;
           
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
               ? values.proLabores.map(p => ({ 
@@ -292,10 +293,10 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
                   otherContributionSalary: 0 
                 }];
           
-          simplesNacionalOtimizado = _calculateSimplesNacional({...values}, config, optimizedProLabores);
+          simplesNacionalOtimizado = _calculateSimplesNacional({...values, proLabores: optimizedProLabores}, config, optimizedProLabores);
       }
   } else if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR >= config.simples_nacional.limite_fator_r) {
-    simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)"};
+    simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)", optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(simplesNacionalBase.fatorR)} e se beneficia do Anexo III.`};
   }
 
 

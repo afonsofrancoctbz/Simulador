@@ -94,6 +94,8 @@ export const FISCAL_CONFIG_2026 = {
         ibs_rate_test: 0.001,
         // Alíquota cheia para cenários hipotéticos pós-reforma
         iva_rate: 0.265, // 26.5%
+        cbs_rate: 0.088,
+        ibs_rate: 0.177,
     }
 };
 
