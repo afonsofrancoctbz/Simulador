@@ -108,6 +108,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
             proLabores: submissionProLabores,
             numberOfPartners: values.numberOfPartners,
             b2bRevenuePercentage: values.b2bRevenuePercentage,
+            creditGeneratingExpenses: values.creditGeneratingExpenses,
         };
     };
 

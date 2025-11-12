@@ -267,7 +267,7 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
   const simplesNacionalBase = _calculateSimplesNacional(values, config);
   let simplesNacionalOtimizado: TaxDetails | null = null;
   
-  const hasAnnexVActivity = values.selectedCnaes.some(code => getCnaeData(code)?.requiresFatorR);
+  const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
   // Condição para otimização do Fator R
   if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < config.simples_nacional.limite_fator_r && totalRevenue > 0) {
@@ -292,13 +292,15 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
                   otherContributionSalary: 0 
                 }];
           
-          simplesNacionalOtimizado = _calculateSimplesNacional(values, config, optimizedProLabores);
+          simplesNacionalOtimizado = _calculateSimplesNacional({...values}, config, optimizedProLabores);
       }
+  } else if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR >= config.simples_nacional.limite_fator_r) {
+    simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)"};
   }
 
 
   return {
-    simplesNacionalBase: { ...simplesNacionalBase, order: 2 },
+    simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2: 1 },
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, regime: 'Simples Nacional (Otimizado)', order: 1 } : null,
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };

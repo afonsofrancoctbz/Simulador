@@ -57,7 +57,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   }, [selectedCnaes]);
   
   useEffect(() => {
-    const hasExportRevenue = Object.keys(revenues).some(key => key.startsWith('export_') && (revenues[key] ?? 0) > 0);
+    const hasExportRevenue = Object.keys(revenues || {}).some(key => key.startsWith('export_') && (revenues[key] ?? 0) > 0);
     onExportRevenueChange(hasExportRevenue);
   }, [revenues, onExportRevenueChange]);
 

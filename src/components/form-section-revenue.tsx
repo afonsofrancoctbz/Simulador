@@ -145,7 +145,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
                                                             <SelectContent>
                                                             {cnaeOptions.map((opt) => (
                                                                 <SelectItem key={opt.cClass} value={opt.cClass} className='text-xs'>
-                                                                {opt.description}
+                                                                {opt.nbsDescription}
                                                                 </SelectItem>
                                                             ))}
                                                             </SelectContent>
@@ -413,6 +413,7 @@ export function FormSectionRevenue({ year, onCnaeSelectorOpen }: FormSectionReve
         </Card>
     );
 }
+
 
 
 
