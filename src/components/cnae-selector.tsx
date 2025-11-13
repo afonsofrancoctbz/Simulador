@@ -2,10 +2,10 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle, Stethoscope, DraftingCompass, Building, Handshake, Clapperboard, ShoppingCart, Utensils, VenetianMask } from "lucide-react"
+import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle, Stethoscope, DraftingCompass, Building, Handshake, Clapperboard, ShoppingCart, Utensils, VenetianMask, AlertTriangle, Badge } from "lucide-react"
 
 import { CNAE_DATA_RAW as CNAE_DATA } from "@/lib/cnaes-raw"
-import { Badge } from "@/components/ui/badge"
+import { Badge as BadgeUI } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -279,11 +279,11 @@ function CnaeSelectorComponent({
                                         <div className="flex-grow">
                                             <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
                                             <div className="flex flex-wrap gap-1.5 mt-2">
-                                                <Badge variant="secondary" className="text-xs">{cnae.category}</Badge>
-                                                <Badge variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                                                <BadgeUI variant="secondary" className="text-xs">{cnae.category}</BadgeUI>
+                                                <BadgeUI variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
                                                     Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
-                                                </Badge>
-                                                {cnae.isRegulated && <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">Regulamentado</Badge>}
+                                                </BadgeUI>
+                                                {cnae.isRegulated && <BadgeUI variant="outline" className="text-xs border-amber-500 text-amber-600">Regulamentado</BadgeUI>}
                                             </div>
                                         </div>
                                          <Button size="sm" variant="ghost" className="ml-4 shrink-0">
@@ -309,7 +309,7 @@ function CnaeSelectorComponent({
                         <div className="p-4 border rounded-lg bg-background space-y-3 text-sm">
                            <h5 className="font-bold">{hoveredCnae.code} - {hoveredCnae.description}</h5>
                             <div className="space-y-1">
-                                <Badge>Anexo Simples Nacional: {hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</Badge>
+                                <BadgeUI>Anexo Simples Nacional: {hoveredCnae.annex} {hoveredCnae.requiresFatorR && '(Depende do Fator R)'}</BadgeUI>
                             </div>
                            {hoveredCnae.notes && <p className="text-xs text-muted-foreground italic flex gap-2 pt-2"><Info className="h-4 w-4 shrink-0 mt-0.5"/>{hoveredCnae.notes}</p>}
                         </div>
@@ -329,12 +329,24 @@ function CnaeSelectorComponent({
                         <div className="space-y-2 p-3">
                            {selectedCnaes.length > 0 ? selectedCnaes.map(cnaeItem => {
                                const cnae = CNAE_DATA.find(c=>c.code===cnaeItem.code);
+                               if (!cnae) return null;
                                return (
-                                <div key={cnaeItem.code} className="flex items-center justify-between bg-muted/40 p-2 rounded-md border">
-                                    <span className="text-sm font-medium flex-grow pr-2">{cnae ? `${cnae.code} - ${cnae.description}` : cnaeItem.code}</span>
-                                    <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => handleToggleCnae(cnaeItem.code)}>
+                                <div key={cnaeItem.code} className="bg-muted/40 p-3 rounded-lg border text-sm relative">
+                                    <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0 absolute top-1 right-1" onClick={() => handleToggleCnae(cnaeItem.code)}>
                                         <X className="h-4 w-4 text-destructive"/>
                                     </Button>
+                                    <p className="font-semibold text-foreground pr-6">{cnae.code} - {cnae.description}</p>
+                                    <div className="flex flex-wrap gap-2 mt-2 items-center">
+                                         <BadgeUI variant={cnae.annex === 'V' ? 'destructive' : 'default'} className="text-xs">
+                                            Anexo {cnae.annex}{cnae.requiresFatorR ? ' (Fator R)' : ''}
+                                        </BadgeUI>
+                                        {cnae.isRegulated && (
+                                            <div className="flex items-center gap-1 text-amber-600 font-semibold text-xs">
+                                                <AlertTriangle className="h-3.5 w-3.5" />
+                                                <span>Atividade Regulamentada</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                )
                             }) : (
@@ -362,3 +374,5 @@ function CnaeSelectorComponent({
 }
 
 export const CnaeSelector = React.memo(CnaeSelectorComponent);
+
+    
