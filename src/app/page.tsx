@@ -60,26 +60,7 @@ export default function Home() {
             </TabsContent>
             <TabsContent value="2026">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <TaxReformInfoSection />
-                    <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} />
                     <TaxCalculator key={selectedYear} year={selectedYear} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
-                </div>
-                <div className='print-hidden'>
-                  <section className="py-16 lg:py-24 bg-slate-50/70">
-                      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <CnaeTaxInfoSection />
-                      </div>
-                  </section>
-                  <section className="py-16 lg:py-24 bg-background">
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                      <PfPjTaxReformSection />
-                    </div>
-                  </section>
-                  <section className="py-16 lg:py-24 bg-slate-50/70">
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                      <SinTaxInfoSection />
-                    </div>
-                  </section>
                 </div>
             </TabsContent>
         </Tabs>
