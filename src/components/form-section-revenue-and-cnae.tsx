@@ -181,7 +181,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                      <div className="relative">
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                                         <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} onBlur={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value) || ''} className="pl-9" />
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} onBlur={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
                                                         </FormControl>
                                                     </div>
                                                 </FormItem>
@@ -214,7 +214,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                      <div className="relative">
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{form.watch('exportCurrency') === 'USD' ? '$' : form.watch('exportCurrency') === 'EUR' ? '€' : 'R$'}</span>
                                                         <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} onBlur={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value) || ''} className="pl-9" />
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} onBlur={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
                                                         </FormControl>
                                                     </div>
                                                 </FormItem>
@@ -253,7 +253,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             <FormLabel>Receita de Clientes PJ (B2B)</FormLabel>
                                             <div className="relative">
                                                 <FormControl>
-                                                    <Input type="number" {...field} className="pr-8" />
+                                                    <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="pr-8" />
                                                 </FormControl>
                                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
                                             </div>
@@ -269,8 +269,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     name="creditGeneratingExpenses"
                                     render={({ field }) => {
                                         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                            const { value } = e.target;
-                                            const digitsOnly = value.replace(/\D/g, '');
+                                            const digitsOnly = e.target.value.replace(/\D/g, '');
                                             field.onChange(Number(digitsOnly) / 100);
                                         };
                                         return (
@@ -279,7 +278,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                  <div className="relative">
                                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                                     <FormControl>
-                                                        <Input type="text" inputMode="decimal" placeholder="0,00" onChange={handleChange} onBlur={field.onBlur} value={field.value ? formatBRL(field.value) : ''} name={field.name} ref={field.ref} className="pl-9" />
+                                                        <Input type="text" inputMode="decimal" placeholder="0,00" onChange={handleChange} onBlur={field.onBlur} value={formatBRL(field.value)} name={field.name} ref={field.ref} className="pl-9" />
                                                     </FormControl>
                                                 </div>
                                                 <FormDescription>

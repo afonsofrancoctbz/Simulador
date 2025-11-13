@@ -19,16 +19,12 @@ export const formatBRL = (value: number | null | undefined) => {
 };
 
 export const parseBRL = (value: string): number => {
-    if (typeof value !== 'string') return 0;
-    const cleanedValue = value.replace(/[^\d,]/g, '').replace(',', '.');
-    const parsed = parseFloat(cleanedValue);
-    return isNaN(parsed) ? 0 : parsed;
+    if (typeof value !== 'string' || !value) return 0;
+    const digitsOnly = value.replace(/\D/g, '');
+    if (!digitsOnly) return 0;
+    const numberValue = parseFloat(digitsOnly) / 100;
+    return isNaN(numberValue) ? 0 : numberValue;
 };
-
-export const formatBRLFromCents = (value: number | undefined | null): string => {
-    if (value === null || value === undefined || isNaN(value)) return '';
-    return formatBRL(value / 100);
-}
 
 
 export const formatPercent = (value: number) => {
