@@ -5,20 +5,16 @@ import AppFooter from '@/components/app-footer';
 import AppHeader from '@/components/app-header';
 import BenefitsSection from '@/components/benefits-section';
 import CapitalSocialSection from '@/components/capital-social-section';
-import CnaeTaxInfoSection from '@/components/cnae-tax-info-section';
 import ContabilizeiMaisSection from '@/components/contabilizei-mais-section';
 import DigitalCertificateSection from '@/components/digital-certificate-section';
 import ExportTaxInfoSection from '@/components/export-tax-info-section';
 import FaqSection from '@/components/faq-section';
 import MultibenefitsSection from '@/components/multibenefits-section';
 import OpeningStepsSection from '@/components/opening-steps-section';
-import PfPjTaxReformSection from '@/components/pf-pj-tax-reform-section';
 import PjAccountSection from '@/components/pj-account-section';
 import RocSection from '@/components/roc-section';
-import SinTaxInfoSection from '@/components/sin-tax-info-section';
 import SociiLawSection from '@/components/socii-law-section';
 import TaxCalculator from '@/components/tax-calculator';
-import TaxReformInfoSection from '@/components/tax-reform-info-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FloatingNav from '@/components/floating-nav';
 import { YearSelector } from '@/components/year-selector';
@@ -59,7 +55,8 @@ export default function Home() {
                 </div>
             </TabsContent>
             <TabsContent value="2026">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} />
                     <TaxCalculator key={selectedYear} year={selectedYear} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
                 </div>
             </TabsContent>

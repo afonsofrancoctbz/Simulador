@@ -85,15 +85,15 @@ export const FISCAL_CONFIG_2025 = {
   }
 };
 
-const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins: number; iss_icms: number } } = {
-    2026: { cbs: 0.009, ibs: 0.001, pis_cofins: 1, iss_icms: 1 },
-    2027: { cbs: 0.088, ibs: 0.001, pis_cofins: 0, iss_icms: 1 },
-    2028: { cbs: 0.088, ibs: 0.001, pis_cofins: 0, iss_icms: 1 },
-    2029: { cbs: 0.088, ibs: 0.177 * (1/10), pis_cofins: 0, iss_icms: 9/10 },
-    2030: { cbs: 0.088, ibs: 0.177 * (2/10), pis_cofins: 0, iss_icms: 8/10 },
-    2031: { cbs: 0.088, ibs: 0.177 * (3/10), pis_cofins: 0, iss_icms: 7/10 },
-    2032: { cbs: 0.088, ibs: 0.177 * (4/10), pis_cofins: 0, iss_icms: 6/10 }, // Note: Simplified, real transition is more complex
-    2033: { cbs: 0.088, ibs: 0.177, pis_cofins: 0, iss_icms: 0 },
+const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_multiplier: number; iss_icms_multiplier: number } } = {
+    2026: { cbs: 0.009, ibs: 0.001, pis_cofins_multiplier: 1, iss_icms_multiplier: 1 },
+    2027: { cbs: 0.088 - 0.001, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS alíquota plena - 0.10 p.p.
+    2028: { cbs: 0.088 - 0.001, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS alíquota plena - 0.10 p.p.
+    2029: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 9/10 },
+    2030: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 8/10 },
+    2031: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 7/10 },
+    2032: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 6/10 }, // Simplificado, na realidade 1/10 a 6/10
+    2033: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
 };
 
 const getTransitionConfig = (year: number) => {
@@ -102,11 +102,10 @@ const getTransitionConfig = (year: number) => {
     const transition = TRANSITION_TABLE[year] || TRANSITION_TABLE[2033];
 
     baseConfig.reforma_tributaria = {
-        iva_rate: transition.cbs + transition.ibs,
-        cbs_rate: transition.cbs,
-        ibs_rate: transition.ibs,
-        pis_cofins_multiplier: transition.pis_cofins,
-        iss_icms_multiplier: transition.iss_icms,
+        cbs_aliquota_padrao: transition.cbs,
+        ibs_aliquota_padrao: transition.ibs,
+        pis_cofins_multiplier: transition.pis_cofins_multiplier,
+        iss_icms_multiplier: transition.iss_icms_multiplier,
     };
     
     // Adjust Simples Nacional distribution tables for the transition year
@@ -117,16 +116,16 @@ const getTransitionConfig = (year: number) => {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
             const newDist = { ...bracket.distribution };
 
-            // Transition PIS/COFINS to CBS
-            newDist.PIS = PIS * transition.pis_cofins;
-            newDist.COFINS = COFINS * transition.pis_cofins;
-            newDist.CBS = (PIS + COFINS) * (1 - transition.pis_cofins);
+            // PIS/COFINS transition to CBS
+            newDist.PIS = PIS * transition.pis_cofins_multiplier;
+            newDist.COFINS = COFINS * transition.pis_cofins_multiplier;
+            newDist.CBS = (newDist.CBS || 0) + (PIS + COFINS) * (1 - transition.pis_cofins_multiplier);
 
-            // Transition ISS/ICMS/IPI to IBS
-            newDist.ISS = (ISS || 0) * transition.iss_icms;
-            newDist.ICMS = (ICMS || 0) * transition.iss_icms;
-            newDist.IPI = (IPI || 0) * transition.iss_icms; // Assuming IPI transitions with ICMS/ISS
-            newDist.IBS = ((ISS || 0) + (ICMS || 0) + (IPI || 0)) * (1 - transition.iss_icms);
+            // ISS/ICMS/IPI transition to IBS
+            newDist.ISS = (ISS || 0) * transition.iss_icms_multiplier;
+            newDist.ICMS = (ICMS || 0) * transition.iss_icms_multiplier;
+            newDist.IPI = (IPI || 0) * transition.iss_icms_multiplier; // Assuming IPI transitions with ICMS/ISS
+            newDist.IBS = (newDist.IBS || 0) + ((ISS || 0) + (ICMS || 0) + (IPI || 0)) * (1 - transition.iss_icms_multiplier);
 
             return { ...bracket, distribution: newDist };
         });
