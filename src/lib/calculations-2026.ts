@@ -1,6 +1,6 @@
 
 
-import { getFiscalParameters, type FiscalConfig, type FiscalConfig2026, type FiscalConfig2027 } from '@/config/fiscal';
+import { getFiscalParameters, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -21,7 +21,7 @@ import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
     const fiscalConfig = getFiscalParameters(isPostReform ? 2026 : 2025);
-    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
+    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -54,7 +54,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     ];
 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
-        const config2026 = fiscalConfig as FiscalConfig2026;
+        const config2026 = fiscalConfig as FiscalConfigPostReform;
         const baseCbsRate = config2026.reforma_tributaria.cbs_rate;
         const baseIbsRate = config2026.reforma_tributaria.ibs_rate;
 
@@ -118,6 +118,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         totalTax,
         totalMonthlyCost,
         totalRevenue,
+        domesticRevenue,
+        exportRevenue: exportRevenueBRL,
         proLabore: totalProLaboreBruto,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
         contabilizeiFee: fee,
@@ -130,8 +132,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
-    const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027; // Use 2027+ config as base for hybrid
-    const { domesticActivities, exportActivities, exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
+    const fiscalConfig = getFiscalParameters(2027) as FiscalConfigPostReform; // Use 2027+ config as base for hybrid
+    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
     const totalProLaboreBruto = proLaboresToUse.reduce((a, p) => a + p.value, 0);
@@ -191,7 +193,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     });
 
     if (isHybrid) {
-      const config2026 = getFiscalParameters(2026) as FiscalConfig2026;
+      const config2026 = getFiscalParameters(2026) as FiscalConfigPostReform;
       const baseCbsRate = config2026.reforma_tributaria.cbs_rate;
       const baseIbsRate = config2026.reforma_tributaria.ibs_rate;
 
@@ -267,6 +269,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         regime: regimeName,
         annex: finalAnnex,
         totalTax, totalMonthlyCost, totalRevenue,
+        domesticRevenue,
+        exportRevenue,
         proLabore: totalProLaboreBruto,
         fatorR: fatorREffective,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
@@ -284,7 +288,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
-  const { rbt12, totalSalaryExpense, proLabores, fp12, domesticActivities, exportActivities, exchangeRate } = values;
+  const { rbt12, totalSalaryExpense, proLabores, fp12, domesticActivities = [], exportActivities = [], exchangeRate } = values;
 
   const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => acc + (act.revenue * (exchangeRate || 1)), 0);
   const totalProLaboreBruto = proLabores.reduce((acc, p) => acc + p.value, 0);
@@ -303,19 +307,15 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
   if (hasAnnexVActivity && totalRevenue > 0) {
-      const fiscalConfig = getFiscalParameters(2027) as FiscalConfig2027;
+      const fiscalConfig = getFiscalParameters(2027) as FiscalConfigPostReform;
       const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
       
       const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
-      const requiredPayrollForRbt12 = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
-      const requiredPayrollForFp12 = (fp12 > 0 ? fp12 : (values.totalSalaryExpense + currentTotalProLabore) * 12);
-      
-      const requiredAnnualPayroll = Math.max(requiredPayrollForRbt12, requiredPayrollForFp12);
-      
-      const additionalAnnualPayrollNeeded = Math.max(0, requiredAnnualPayroll - (currentPayroll * 12));
-      const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
+      const requiredAnnualPayroll = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
+      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (currentPayroll * 12);
+      const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
 
       if (fatorR_naoOtimizado < limiteFatorR && additionalMonthlyProLaboreNeeded > 0) {
           const newTotalProLabore = currentTotalProLabore + additionalMonthlyProLaboreNeeded;

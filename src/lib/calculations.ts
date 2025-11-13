@@ -80,10 +80,10 @@ export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): num
  * Follows the rules specified in the requirements document.
  */
 function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): TaxDetails {
-    const { totalSalaryExpense, selectedPlan, exchangeRate, proLabores } = values;
+    const { totalSalaryExpense, selectedPlan, exchangeRate, proLabores, domesticActivities = [], exportActivities = [] } = values;
 
-    const domesticRevenue = values.domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenueBRL = values.exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
+    const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
+    const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenueBRL;
 
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
@@ -99,7 +99,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
     let presumedProfitBase = 0;
-    const allActivities = [...values.domesticActivities, ...values.exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
+    const allActivities = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
     allActivities.forEach(activity => {
       const cnaeInfo = getCnaeData(activity.code);
       const presuncao = cnaeInfo?.presumedProfitRateIRPJ ?? 0.32;
@@ -124,6 +124,8 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         totalTax,
         totalMonthlyCost,
         totalRevenue,
+        domesticRevenue,
+        exportRevenue: exportRevenueBRL,
         proLabore: totalProLaboreBruto,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
         contabilizeiFee,
@@ -148,12 +150,12 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
  * Follows the rules specified in the requirements document.
  */
 function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, proLaboreOverride?: ProLaboreForm[]): TaxDetails {
-    const { selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate } = values;
+    const { selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate, domesticActivities = [], exportActivities = [] } = values;
     
     const proLaboresToUse = proLaboreOverride || values.proLabores;
 
-    const domesticRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
-    const exportRevenueValue = values.exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
+    const domesticRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
+    const exportRevenueValue = exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenueValue;
     
     const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
@@ -171,7 +173,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     let hasAnnexIVActivity = false;
     const finalAnnexes = new Set<Annex>();
 
-    const allActivities = [...values.domesticActivities.map(a => ({...a, isExport: false})), ...values.exportActivities.map(a => ({...a, isExport: true, revenue: a.revenue * exchangeRate}))];
+    const allActivities = [...domesticActivities.map(a => ({...a, isExport: false})), ...exportActivities.map(a => ({...a, isExport: true, revenue: a.revenue * exchangeRate}))];
 
     allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
@@ -236,6 +238,8 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         totalTax,
         totalMonthlyCost,
         totalRevenue,
+        domesticRevenue,
+        exportRevenue: exportRevenueValue,
         proLabore: totalProLaboreBruto,
         fatorR: [...finalAnnexes].includes('III') || [...finalAnnexes].includes('V') ? fatorR : undefined,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
@@ -261,7 +265,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
 export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): CalculationResults {
   
-  const totalRevenue = values.domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + values.exportActivities.reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
+  const totalRevenue = (values.domesticActivities || []).reduce((acc, act) => acc + act.revenue, 0) + (values.exportActivities || []).reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
   
   const lucroPresumido = calculateLucroPresumido(values, config);
   const simplesNacionalBase = _calculateSimplesNacional(values, config);

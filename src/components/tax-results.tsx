@@ -14,7 +14,7 @@ import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
 
 interface TaxResultsProps {
-  year: 2025 | 2026;
+  year: number;
   isLoading: boolean;
   results: CalculationResults | CalculationResults2026 | null;
   error: string | null;
@@ -177,7 +177,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             let title = scenario.regime;
             let subtitle = '';
 
-            if (year === 2026) {
+            if (year >= 2026) {
                 if (scenario.regime.includes('Simples Nacional')) {
                     title = 'Simples Nacional';
                     subtitle = scenario.regime.replace('Simples Nacional', '').trim();
@@ -211,20 +211,8 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
             const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
 
-            const domesticRevenue = scenario.breakdown
-                .filter(i => i.name.toLowerCase().includes('pis') || i.name.toLowerCase().includes('cofins') || i.name.toLowerCase().includes('iss') || (i.name.toLowerCase().startsWith('das')))
-                .reduce((sum, item) => {
-                    const rateMatch = item.name.match(/\(([^)]+)\)/);
-                    if (!rateMatch) return sum;
-                    const rateString = rateMatch[1].replace('%', '').replace(',', '.').trim();
-                    const rate = parseFloat(rateString) / 100;
-                    if (item.name.toLowerCase().startsWith('das') && scenario.effectiveDasRate) {
-                        return sum + (item.value / scenario.effectiveDasRate);
-                    }
-                    return rate > 0 ? sum + (item.value / rate) : sum;
-            }, 0);
-
-            const exportRevenue = scenario.totalRevenue > 0 ? Math.max(0, scenario.totalRevenue - domesticRevenue) : 0;
+            const domesticRevenue = scenario.domesticRevenue ?? 0;
+            const exportRevenue = scenario.exportRevenue ?? 0;
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
