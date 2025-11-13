@@ -28,7 +28,7 @@ export const CalculatorFormSchema = z.object({
   totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
   proLabores: z.array(ProLaboreFormSchema).min(1),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
-  b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
+  b2bRevenuePercentage: z.coerce.number().min(0, "O percentual deve ser no mínimo 0.").max(100, "O percentual não pode ser maior que 100.").optional().default(50),
   creditGeneratingExpenses: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
   year: z.number().optional(), // Added to pass the selected year to the calculation
@@ -59,7 +59,7 @@ export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmi
             <MultiStepForm currentStep={currentStep} steps={steps} onStepClick={goToStep} />
 
             <div className={currentStep === 1 ? 'block' : 'hidden'}><FormSectionCompany /></div>
-            <div className={currentStep === 2 ? 'block' : 'hidden'}><FormSectionPayroll year={year} /></div>
+            <div className={currentStep === 2 ? 'block' : 'hidden'}><FormSectionPayroll year={year as 2025 | 2026} /></div>
             <div className={currentStep === 3 ? 'block' : 'hidden'}><FormSectionAnnualRevenue /></div>
             <div className={currentStep === 4 ? 'block' : 'hidden'}><FormSectionRevenueAndCnae year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} /></div>
             <div className={currentStep === 5 ? 'block' : 'hidden'}><FormSectionPlan /></div>
