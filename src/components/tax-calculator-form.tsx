@@ -7,12 +7,12 @@ import { CIDADES_ATENDIDAS } from '@/lib/cities';
 import { PlanEnumSchema, ProLaboreFormSchema, CnaeSelectionSchema } from '@/lib/types';
 import { Button } from "@/components/ui/button";
 import { FormSectionCompany } from "./form-section-company";
-import { FormSectionRevenue } from "./form-section-revenue";
 import { FormSectionPlan } from "./form-section-plan";
 import { Loader2 } from "lucide-react";
 import { FormSectionPayroll } from "./form-section-payroll";
 import { FormSectionAnnualRevenue } from "./form-section-annual-revenue";
 import { MultiStepForm, useMultiStepForm } from "./multi-step-form";
+import { FormSectionRevenueAndCnae } from "./form-section-revenue-and-cnae";
 
 export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
@@ -31,6 +31,7 @@ export const CalculatorFormSchema = z.object({
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
   creditGeneratingExpenses: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
+  year: z.number().optional(), // Added to pass the selected year to the calculation
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
@@ -43,7 +44,7 @@ export const CalculatorFormSchema = z.object({
 export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
 
 interface TaxCalculatorFormProps {
-    year: 2025 | 2026;
+    year: number;
     onCnaeSelectorOpen: () => void;
     isLoading: boolean;
     onSubmit: (e: React.BaseSyntheticEvent) => Promise<void>;
@@ -60,7 +61,7 @@ export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmi
             <div className={currentStep === 1 ? 'block' : 'hidden'}><FormSectionCompany /></div>
             <div className={currentStep === 2 ? 'block' : 'hidden'}><FormSectionPayroll year={year} /></div>
             <div className={currentStep === 3 ? 'block' : 'hidden'}><FormSectionAnnualRevenue /></div>
-            <div className={currentStep === 4 ? 'block' : 'hidden'}><FormSectionRevenue year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} /></div>
+            <div className={currentStep === 4 ? 'block' : 'hidden'}><FormSectionRevenueAndCnae year={year} onCnaeSelectorOpen={onCnaeSelectorOpen} /></div>
             <div className={currentStep === 5 ? 'block' : 'hidden'}><FormSectionPlan /></div>
 
             <div className="bg-card rounded-lg border shadow-lg p-4 sticky bottom-4 z-10">

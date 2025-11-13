@@ -13,7 +13,7 @@ import TaxResults from './tax-results';
 import { TaxCalculatorForm } from './tax-calculator-form';
 import { MultiStepFormProvider } from './multi-step-form';
 
-export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange }: { year: 2025 | 2026, onExportRevenueChange: (show: boolean) => void, onResultsChange: (show: boolean) => void }) {
+export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange }: { year: number, onExportRevenueChange: (show: boolean) => void, onResultsChange: (show: boolean) => void }) {
   const {
     form,
     onSubmit,
@@ -26,6 +26,10 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
   const selectedCnaes = form.watch("selectedCnaes");
   const revenues = form.watch("revenues");
+
+  useEffect(() => {
+    form.setValue('year', year);
+  }, [year, form]);
 
   const handleCnaeConfirm = (cnaes: CnaeSelection[]) => {
       form.setValue('selectedCnaes', cnaes, { shouldValidate: true });

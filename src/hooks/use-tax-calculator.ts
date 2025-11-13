@@ -12,7 +12,7 @@ import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
 
-export function useTaxCalculator(year: 2025 | 2026) {
+export function useTaxCalculator(year: number) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
@@ -36,6 +36,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
             numberOfPartners: 1,
             b2bRevenuePercentage: 50,
             selectedPlan: 'expertsEssencial',
+            year,
         },
     });
 
@@ -44,14 +45,14 @@ export function useTaxCalculator(year: 2025 | 2026) {
         const exportActivities: CnaeItem[] = [];
 
         // 1. Group selected CNAEs by their effective annex
-        const cnaesByAnnex: Record<string, string[]> = {};
+        const cnaesByAnnex: Record<string, { code: string, cClass?: string }[]> = {};
         values.selectedCnaes.forEach(item => {
             const cnae = getCnaeData(item.code);
             if (cnae) {
                 // For this transformation, we use the base annex. Fator R logic will be applied in the backend.
                 const annex = cnae.annex;
                 if (!cnaesByAnnex[annex]) cnaesByAnnex[annex] = [];
-                cnaesByAnnex[annex].push(item.code);
+                cnaesByAnnex[annex].push({ code: item.code, cClass: item.cClass });
             }
         });
 
@@ -64,8 +65,8 @@ export function useTaxCalculator(year: 2025 | 2026) {
 
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
                     const revenuePerCnae = revenue / cnaesInAnnex.length;
-                    cnaesInAnnex.forEach(code => {
-                        domesticActivities.push({ code, revenue: revenuePerCnae });
+                    cnaesInAnnex.forEach(cnaeItem => {
+                        domesticActivities.push({ code: cnaeItem.code, revenue: revenuePerCnae, cClass: cnaeItem.cClass });
                     });
                 }
             }
@@ -80,8 +81,8 @@ export function useTaxCalculator(year: 2025 | 2026) {
 
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
                     const revenuePerCnae = revenue / cnaesInAnnex.length;
-                    cnaesInAnnex.forEach(code => {
-                        exportActivities.push({ code, revenue: revenuePerCnae });
+                    cnaesInAnnex.forEach(cnaeItem => {
+                        exportActivities.push({ code: cnaeItem.code, revenue: revenuePerCnae, cClass: cnaeItem.cClass });
                     });
                 }
             }
@@ -95,6 +96,7 @@ export function useTaxCalculator(year: 2025 | 2026) {
         }));
 
         return {
+            year,
             selectedCnaes: values.selectedCnaes,
             selectedPlan: values.selectedPlan,
             rbt12: values.rbt12 ?? 0,
@@ -125,12 +127,12 @@ export function useTaxCalculator(year: 2025 | 2026) {
         const submissionValues = transformFormToSubmission(values);
 
         try {
-            if (year === 2025) {
+            if (year <= 2025) {
                 const calculatedResults = await calculateTaxesOnServer(submissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo não retornou resultados.");
                 setResults(calculatedResults);
 
-            } else { // Year is 2026
+            } else { // Year is 2026 or later
                 const calculatedResults = await calculateTaxes2026OnServer(submissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo para 2026 não retornou resultados.");
                 setResults(calculatedResults);

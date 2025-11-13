@@ -12,6 +12,7 @@ export type CnaeSelection = z.infer<typeof CnaeSelectionSchema>;
 export const CnaeItemSchema = z.object({
   code: z.string(),
   revenue: z.coerce.number().positive({ message: "O faturamento deve ser maior que zero." }).or(z.literal(0)),
+  cClass: z.string().optional(),
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
@@ -37,6 +38,7 @@ export type Plan = z.infer<typeof PlanEnumSchema>;
 
 // Schema for the main form input passed from the frontend to the Genkit flow
 export const TaxFormValuesSchema = z.object({
+  year: z.number().optional(),
   selectedCnaes: z.array(CnaeSelectionSchema),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo."),

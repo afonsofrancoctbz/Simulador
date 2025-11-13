@@ -21,11 +21,13 @@ import TaxCalculator from '@/components/tax-calculator';
 import TaxReformInfoSection from '@/components/tax-reform-info-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FloatingNav from '@/components/floating-nav';
+import { YearSelector } from '@/components/year-selector';
 
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<number>(2026);
 
   return (
     <>
@@ -47,7 +49,7 @@ export default function Home() {
                 <div className="w-full flex justify-center">
                     <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
                         <TabsTrigger value="2025">Cenário Atual (2025)</TabsTrigger>
-                        <TabsTrigger value="2026">Reforma Tributária (2026)</TabsTrigger>
+                        <TabsTrigger value="2026">Pós-Reforma (2026-2033)</TabsTrigger>
                     </TabsList>
                 </div>
             </div>
@@ -59,7 +61,8 @@ export default function Home() {
             <TabsContent value="2026">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <TaxReformInfoSection />
-                    <TaxCalculator key="2026" year={2026} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
+                    <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} />
+                    <TaxCalculator key={selectedYear} year={selectedYear} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
                 </div>
                 <div className='print-hidden'>
                   <section className="py-16 lg:py-24 bg-slate-50/70">

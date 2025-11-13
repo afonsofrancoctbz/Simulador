@@ -1,5 +1,6 @@
 
 
+
 // Baseado na sua solicitação para um arquivo de configuração centralizado.
 // Todos os parâmetros fiscais que podem mudar ano a ano são armazenados aqui.
 
@@ -84,94 +85,60 @@ export const FISCAL_CONFIG_2025 = {
   }
 };
 
-// Configuração para o ANO-TESTE da Reforma
-export const FISCAL_CONFIG_2026 = {
-    ...FISCAL_CONFIG_2025,
-    ano_vigencia: 2026,
-    reforma_tributaria: {
-        // Alíquotas de teste para LP/LR.
-        cbs_rate_test: 0.009, 
-        ibs_rate_test: 0.001,
-        // Alíquota cheia para cenários hipotéticos pós-reforma
-        iva_rate: 0.265, // 26.5%
-        cbs_rate: 0.088,
-        ibs_rate: 0.177,
-    }
+const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins: number; iss_icms: number } } = {
+    2026: { cbs: 0.009, ibs: 0.001, pis_cofins: 1, iss_icms: 1 },
+    2027: { cbs: 0.088, ibs: 0.001, pis_cofins: 0, iss_icms: 1 },
+    2028: { cbs: 0.088, ibs: 0.001, pis_cofins: 0, iss_icms: 1 },
+    2029: { cbs: 0.088, ibs: 0.177 * (1/10), pis_cofins: 0, iss_icms: 9/10 },
+    2030: { cbs: 0.088, ibs: 0.177 * (2/10), pis_cofins: 0, iss_icms: 8/10 },
+    2031: { cbs: 0.088, ibs: 0.177 * (3/10), pis_cofins: 0, iss_icms: 7/10 },
+    2032: { cbs: 0.088, ibs: 0.177 * (4/10), pis_cofins: 0, iss_icms: 6/10 }, // Note: Simplified, real transition is more complex
+    2033: { cbs: 0.088, ibs: 0.177, pis_cofins: 0, iss_icms: 0 },
 };
 
-// Configuração para o INÍCIO DA TRANSIÇÃO (CBS Plena)
-export const FISCAL_CONFIG_2027_2028 = {
-    ...FISCAL_CONFIG_2025, // Herda regras que não mudam (IRRF, INSS, etc)
-    ano_vigencia: 2027, // Representa o período 2027-2028
-    reforma_tributaria: {
-        ...FISCAL_CONFIG_2026.reforma_tributaria,
-        // PIS/COFINS são extintos. CBS entra com alíquota plena (estimada) - 0.1pp
-        cbs_rate: 0.087, 
-        // IBS continua em teste
-        ibs_rate: 0.001, 
-        get iva_rate() { return this.cbs_rate + this.ibs_rate; }
-    },
-    // No Simples, PIS/COFINS são substituídos pela CBS
-    simples_nacional: {
-        ...FISCAL_CONFIG_2025.simples_nacional,
-        I: FISCAL_CONFIG_2025.simples_nacional.I.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
-        II: FISCAL_CONFIG_2025.simples_nacional.II.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
-        III: FISCAL_CONFIG_2025.simples_nacional.III.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
-        IV: FISCAL_CONFIG_2025.simples_nacional.IV.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
-        V: FISCAL_CONFIG_2025.simples_nacional.V.map(b => ({...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), PIS: 0, COFINS: 0 }})),
-    }
-};
+const getTransitionConfig = (year: number) => {
+    const baseConfig = JSON.parse(JSON.stringify(FISCAL_CONFIG_2025)); // Deep copy
+    baseConfig.ano_vigencia = year;
+    const transition = TRANSITION_TABLE[year] || TRANSITION_TABLE[2033];
 
-// Configuração para a TRANSIÇÃO DO IBS (Parcial)
-export const FISCAL_CONFIG_2029_2032 = {
-    ...FISCAL_CONFIG_2027_2028,
-    ano_vigencia: 2029, // Representa o período 2029-2032
-    reforma_tributaria: {
-        ...FISCAL_CONFIG_2027_2028.reforma_tributaria,
-        // Aqui a lógica seria mais complexa, dependendo do ano exato.
-        // O IBS aumenta e o ICMS/ISS diminui.
-        // Para simplificação, vamos usar a regra de 2029.
-        ibs_rate: 0.0265, // 10% da alíquota cheia de 26.5%
-        get iva_rate() { return this.cbs_rate + this.ibs_rate; }
-    },
-    simples_nacional: {
-        ...FISCAL_CONFIG_2027_2028.simples_nacional,
-        // A distribuição dentro do DAS mudaria ano a ano.
-        // Para 2029: 9/10 de ICMS/ISS + 1/10 de IBS
-        I: FISCAL_CONFIG_2027_2028.simples_nacional.I.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ICMS || 0) * 0.1, ICMS: (b.distribution.ICMS || 0) * 0.9 }})),
-        II: FISCAL_CONFIG_2027_2028.simples_nacional.II.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ICMS || 0) * 0.1, ICMS: (b.distribution.ICMS || 0) * 0.9 }})),
-        III: FISCAL_CONFIG_2027_2028.simples_nacional.III.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ISS || 0) * 0.1, ISS: (b.distribution.ISS || 0) * 0.9 }})),
-        IV: FISCAL_CONFIG_2027_2028.simples_nacional.IV.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ISS || 0) * 0.1, ISS: (b.distribution.ISS || 0) * 0.9 }})),
-        V: FISCAL_CONFIG_2027_2028.simples_nacional.V.map(b => ({...b, distribution: {...b.distribution, IBS: (b.distribution.ISS || 0) * 0.1, ISS: (b.distribution.ISS || 0) * 0.9 }})),
-    }
-};
+    baseConfig.reforma_tributaria = {
+        iva_rate: transition.cbs + transition.ibs,
+        cbs_rate: transition.cbs,
+        ibs_rate: transition.ibs,
+        pis_cofins_multiplier: transition.pis_cofins,
+        iss_icms_multiplier: transition.iss_icms,
+    };
+    
+    // Adjust Simples Nacional distribution tables for the transition year
+    Object.keys(baseConfig.simples_nacional).forEach(key => {
+        if (key === 'limite_fator_r') return;
+        const annexKey = key as keyof typeof baseConfig.simples_nacional;
+        baseConfig.simples_nacional[annexKey] = baseConfig.simples_nacional[annexKey].map((bracket: any) => {
+            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+            const newDist = { ...bracket.distribution };
 
-// Configuração para a VIGÊNCIA PLENA
-export const FISCAL_CONFIG_2033_PLUS = {
-    ...FISCAL_CONFIG_2025,
-    ano_vigencia: 2033,
-    reforma_tributaria: {
-        iva_rate: 0.265, // Alíquota padrão de referência
-        cbs_rate: 0.088, // Estimativa
-        ibs_rate: 0.177, // Estimativa
-    },
-    // No Simples, PIS/COFINS/ISS/ICMS são substituídos por CBS/IBS
-    simples_nacional: {
-        ...FISCAL_CONFIG_2025.simples_nacional,
-        I: FISCAL_CONFIG_2025.simples_nacional.I.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ICMS || 0), PIS: 0, COFINS: 0, ICMS: 0 } })),
-        II: FISCAL_CONFIG_2025.simples_nacional.II.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ICMS || 0), PIS: 0, COFINS: 0, ICMS: 0 } })),
-        III: FISCAL_CONFIG_2025.simples_nacional.III.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ISS || 0), PIS: 0, COFINS: 0, ISS: 0 } })),
-        IV: FISCAL_CONFIG_2025.simples_nacional.IV.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ISS || 0), PIS: 0, COFINS: 0, ISS: 0 } })),
-        V: FISCAL_CONFIG_2025.simples_nacional.V.map(b => ({ ...b, distribution: {...b.distribution, CBS: (b.distribution.PIS + b.distribution.COFINS), IBS: (b.distribution.ISS || 0), PIS: 0, COFINS: 0, ISS: 0 } })),
-    }
-};
+            // Transition PIS/COFINS to CBS
+            newDist.PIS = PIS * transition.pis_cofins;
+            newDist.COFINS = COFINS * transition.pis_cofins;
+            newDist.CBS = (PIS + COFINS) * (1 - transition.pis_cofins);
+
+            // Transition ISS/ICMS/IPI to IBS
+            newDist.ISS = (ISS || 0) * transition.iss_icms;
+            newDist.ICMS = (ICMS || 0) * transition.iss_icms;
+            newDist.IPI = (IPI || 0) * transition.iss_icms; // Assuming IPI transitions with ICMS/ISS
+            newDist.IBS = ((ISS || 0) + (ICMS || 0) + (IPI || 0)) * (1 - transition.iss_icms);
+
+            return { ...bracket, distribution: newDist };
+        });
+    });
+
+
+    return baseConfig;
+}
 
 
 export type FiscalConfig = typeof FISCAL_CONFIG_2025;
-export type FiscalConfig2026 = typeof FISCAL_CONFIG_2026;
-export type FiscalConfig2027 = typeof FISCAL_CONFIG_2027_2028;
-export type FiscalConfig2029 = typeof FISCAL_CONFIG_2029_2032;
-export type FiscalConfig2033 = typeof FISCAL_CONFIG_2033_PLUS;
+export type FiscalConfigPostReform = ReturnType<typeof getTransitionConfig>;
 
 /**
  * Retrieves the fiscal configuration for a given year.
@@ -179,21 +146,9 @@ export type FiscalConfig2033 = typeof FISCAL_CONFIG_2033_PLUS;
  * @param year The fiscal year for which to retrieve parameters.
  * @returns The fiscal configuration object for the specified year.
  */
-export const getFiscalParameters = (year: number): FiscalConfig | FiscalConfig2026 | FiscalConfig2027 | FiscalConfig2029 | FiscalConfig2033 => {
+export const getFiscalParameters = (year: number): FiscalConfig | FiscalConfigPostReform => {
     if (year <= 2025) {
         return FISCAL_CONFIG_2025;
     }
-    if (year === 2026) {
-        return FISCAL_CONFIG_2026;
-    }
-    if (year >= 2027 && year <= 2028) {
-        return FISCAL_CONFIG_2027_2028;
-    }
-    if (year >= 2029 && year <= 2032) {
-        // Here you could add more complex logic to adjust proportions year by year
-        // For now, it returns the 2029 setup as a representative for the period
-        return FISCAL_CONFIG_2029_2032;
-    }
-     // For 2033 and beyond
-    return FISCAL_CONFIG_2033_PLUS;
+    return getTransitionConfig(year);
 }
