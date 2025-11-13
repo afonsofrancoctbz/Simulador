@@ -2,7 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle } from 'lucide-react';
-import { cn, formatBRL } from "@/lib/utils";
+import { cn, formatBRL, parseBRL, formatBRLFromCents } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { CNAE_LC116_RELATIONSHIP } from "@/lib/cnae-data-2026";
@@ -22,7 +22,7 @@ import type { Annex, CnaeSelection } from "@/lib/types";
 // It includes CNAE selection and monthly revenue input
 
 interface FormSectionRevenueAndCnaeProps {
-    year: 2025 | 2026;
+    year: number;
     onCnaeSelectorOpen: () => void;
 }
 
@@ -108,13 +108,13 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     const cnae = getCnaeData(cnaeItem.code);
                                     if (!cnae) return null;
 
-                                    const cnaeOptions = year === 2026 ? getCnaeOptions(cnae.code) : [];
+                                    const cnaeOptions = year >= 2026 ? getCnaeOptions(cnae.code) : [];
 
                                     return (
                                         <div key={index} className="p-4 border rounded-lg bg-background/50">
                                             <p className="font-bold text-primary">{cnae.code}</p>
                                             <p className="text-sm text-muted-foreground">{cnae.description}</p>
-                                            {year === 2026 && cnaeOptions.length > 1 && (
+                                            {year >= 2026 && cnaeOptions.length > 1 && (
                                                  <FormField
                                                     control={form.control}
                                                     name={`selectedCnaes.${index}.cClass`}
@@ -181,7 +181,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                      <div className="relative">
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                                         <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(e.target.value.replace(/\D/g, ''))} value={formatBRL(field.value / 100) || ''} className="pl-9" />
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRLFromCents(field.value) || ''} className="pl-9" />
                                                         </FormControl>
                                                     </div>
                                                 </FormItem>
@@ -214,7 +214,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                      <div className="relative">
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{form.watch('exportCurrency') === 'USD' ? '$' : form.watch('exportCurrency') === 'EUR' ? '€' : 'R$'}</span>
                                                         <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(e.target.value.replace(/\D/g, ''))} value={formatBRL(field.value / 100) || ''} className="pl-9" />
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRLFromCents(field.value) || ''} className="pl-9" />
                                                         </FormControl>
                                                     </div>
                                                 </FormItem>
@@ -231,7 +231,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                         </CardContent>
                     </Card>
                     
-                    {year === 2026 && (
+                    {year >= 2026 && (
                         <Card className='shadow-lg overflow-hidden border bg-card'>
                             <CardHeader className='border-b bg-muted/30'>
                                 <div className="flex items-center gap-4">

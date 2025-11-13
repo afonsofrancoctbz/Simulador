@@ -18,6 +18,21 @@ export const formatBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 };
 
+export const parseBRL = (value: string): number => {
+    if (typeof value !== 'string') return 0;
+    // Remove R$, spaces, and thousand separators, then replace comma with dot
+    const cleanedValue = value.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+    const parsed = parseFloat(cleanedValue);
+    if (isNaN(parsed)) return 0;
+    return Math.round(parsed * 100); // return as cents
+};
+
+export const formatBRLFromCents = (value: number | undefined | null): string => {
+    if (value === null || value === undefined || isNaN(value)) return '';
+    return formatBRL(value / 100);
+}
+
+
 export const formatPercent = (value: number) => {
     if (typeof value !== 'number' || isNaN(value)) return 'N/A';
     return `${(value * 100).toFixed(2)}%`.replace('.', ',');

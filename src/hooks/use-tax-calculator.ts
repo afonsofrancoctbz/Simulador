@@ -60,7 +60,8 @@ export function useTaxCalculator(year: number) {
         for (const key in values.revenues) {
             if (key.startsWith('domestic_')) {
                 const annex = key.split('_')[1] as Annex;
-                const revenue = values.revenues[key] || 0;
+                const revenueInCents = values.revenues[key] || 0;
+                const revenue = revenueInCents / 100;
                 const cnaesInAnnex = cnaesByAnnex[annex];
 
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
@@ -76,7 +77,8 @@ export function useTaxCalculator(year: number) {
         for (const key in values.revenues) {
              if (key.startsWith('export_')) {
                 const annex = key.split('_')[1] as Annex;
-                const revenue = values.revenues[key] || 0;
+                const revenueInCents = values.revenues[key] || 0;
+                const revenue = revenueInCents / 100;
                 const cnaesInAnnex = cnaesByAnnex[annex];
 
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
