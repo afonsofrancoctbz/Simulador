@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle } from 'lucide-react';
+import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
 import { cn, formatBRL, parseBRL } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
@@ -79,6 +79,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         return CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === numericCode);
     };
 
+    const removeCnae = (codeToRemove: string) => {
+        const updatedCnaes = selectedCnaes.filter((cnae: CnaeSelection) => cnae.code !== codeToRemove);
+        form.setValue('selectedCnaes', updatedCnaes, { shouldValidate: true, shouldDirty: true });
+    };
+
     return (
         <div className="space-y-8">
             <Card className='shadow-lg overflow-hidden border bg-card'>
@@ -95,14 +100,14 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                 </CardHeader>
                 <CardContent className='p-6 md:p-8 space-y-6'>
                     <div className="flex items-center justify-center">
-                        <Button type="button" variant="outline" size="lg" onClick={onCnaeSelectorOpen}>
+                        <Button type="button" variant="default" size="lg" onClick={onCnaeSelectorOpen} className="w-full max-w-sm">
                             <Search className="mr-2 h-4 w-4" />
                             Selecionar ou Alterar CNAEs
                         </Button>
                     </div>
                     {selectedCnaes && selectedCnaes.length > 0 && (
                         <div className="space-y-4 pt-4">
-                            <h4 className="font-semibold text-center">Atividades Selecionadas:</h4>
+                            <h4 className="font-semibold text-center text-muted-foreground">Atividades Selecionadas ({selectedCnaes.length}/20):</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {selectedCnaes.map((cnaeItem: CnaeSelection, index: number) => {
                                     const cnae = getCnaeData(cnaeItem.code);
@@ -111,8 +116,17 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     const cnaeOptions = year >= 2026 ? getCnaeOptions(cnae.code) : [];
 
                                     return (
-                                        <div key={index} className="p-4 border rounded-lg bg-background/50">
-                                            <p className="font-bold text-primary">{cnae.code}</p>
+                                        <div key={index} className="p-4 border rounded-lg bg-background/50 relative">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                                onClick={() => removeCnae(cnaeItem.code)}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                            <p className="font-bold text-primary pr-8">{cnae.code}</p>
                                             <p className="text-sm text-muted-foreground">{cnae.description}</p>
                                             {year >= 2026 && cnaeOptions.length > 1 && (
                                                  <FormField
@@ -147,7 +161,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                         </div>
                     )}
                     <FormField control={form.control} name="selectedCnaes" render={({ fieldState }) => (
-                        fieldState.error ? <p className="text-sm font-medium text-destructive">{fieldState.error.message}</p> : null
+                        fieldState.error ? <p className="text-sm font-medium text-destructive text-center">{fieldState.error.message}</p> : null
                     )} />
                 </CardContent>
             </Card>
