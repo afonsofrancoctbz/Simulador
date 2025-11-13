@@ -1,5 +1,3 @@
-
-
 import { getFiscalParameters, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -352,11 +350,10 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   return {
     simplesNacionalTradicional: {...simplesNacionalTradicional, order: simplesNacionalOtimizado ? 2 : 1},
-    simplesNacionalHibrido: simplesNacionalHibrido ? {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2} : null,
+    simplesNacionalHibrido: year === 2026 ? null : (simplesNacionalHibrido ? {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2} : null),
     lucroPresumido: { ...lucroPresumido, order: 4 },
     lucroPresumidoAtual: lucroPresumidoAtual ? { ...lucroPresumidoAtual, order: 5 } : null,
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 0 } : null,
-    simplesNacionalOtimizadoHibrido: simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null,
+    simplesNacionalOtimizadoHibrido: year === 2026 ? null : (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null),
   };
 }
-
