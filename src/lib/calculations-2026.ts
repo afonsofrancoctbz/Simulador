@@ -32,7 +32,6 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
     const inssPatronal = _calculateCpp(monthlyPayroll, fiscalConfig);
 
-    // Grupo 2: Impostos sobre Lucro Presumido
     let presumedProfitBase = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))].reduce((sum, activity) => {
         const cnaeInfo = getCnaeData(activity.code);
         return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateIRPJ ?? 0.32));
@@ -42,12 +41,10 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     const irpjAdicional = Math.max(0, (presumedProfitBase - (fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL * 1))) * fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
     const csll = presumedProfitBase * fiscalConfig.lucro_presumido_rates.CSLL;
     
-    // Grupo 1: Impostos sobre Faturamento
     let consumptionTaxes = 0;
     const breakdown = [
         { name: `IRPJ`, value: irpj + irpjAdicional },
         { name: `CSLL`, value: csll }, 
-        // Grupo 3: Encargos sobre a Folha
         { name: `CPP (INSS Patronal)`, value: inssPatronal },
         { name: "INSS s/ Pró-labore", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
@@ -87,18 +84,21 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const ibs = Math.max(0, totalIbsDebit - totalCreditIbs);
 
         consumptionTaxes = (ibs || 0) + (cbs || 0);
-        breakdown.push({ name: `CBS`, value: cbs });
-        breakdown.push({ name: `IBS`, value: ibs });
+        if (cbs > 0) breakdown.push({ name: `CBS`, value: cbs });
+        if (ibs > 0) breakdown.push({ name: `IBS`, value: ibs });
 
     } else {
-        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
-        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS;
+        const pisMultiplier = ('reforma_tributaria' in fiscalConfig) ? fiscalConfig.reforma_tributaria.pis_cofins_multiplier : 1;
+        const issMultiplier = ('reforma_tributaria' in fiscalConfig) ? fiscalConfig.reforma_tributaria.iss_icms_multiplier : 1;
+
+        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS * pisMultiplier;
+        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS * pisMultiplier;
         const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
-        const iss = domesticRevenue * issValue;
+        const iss = domesticRevenue * issValue * issMultiplier;
         consumptionTaxes = pis + cofins + iss;
-        breakdown.push({ name: `PIS`, value: pis });
-        breakdown.push({ name: `COFINS`, value: cofins });
-        breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
+        if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
+        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
+        if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
     }
 
     const companyRevenueTaxes = irpj + irpjAdicional + csll + consumptionTaxes;
@@ -132,7 +132,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
-    const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform; // Use 2027+ config as base for hybrid
+    const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
     const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
@@ -185,7 +185,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         if (isHybrid && !activity.isExport) {
             dasRateForActivity *= (1 - consumptionTaxProportionInDas);
         } else if (activity.isExport) {
-            dasRateForActivity -= effectiveDasRate * (PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0));
+            dasRateForActivity -= effectiveDasRate * (PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0) + CBS + IBS);
         } 
         totalDas += revenueForActivity * dasRateForActivity;
         
@@ -300,7 +300,6 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   
   const simplesNacionalTradicional = _calculateSimples2026(values, false, fatorR_naoOtimizado);
   
-  // Conditionally calculate hybrid scenarios only from 2027 onwards
   const simplesNacionalHibrido = year >= 2027 ? _calculateSimples2026(values, true, fatorR_naoOtimizado) : null;
 
 
@@ -349,14 +348,15 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   }
   
   const lucroPresumido = calculateLucroPresumido(values, true) as TaxDetails2026;
-  const lucroPresumidoAtual = calculateLucroPresumido(values, false) as TaxDetails;
+  const lucroPresumidoAtual = year < 2027 ? calculateLucroPresumido(values, false) as TaxDetails : null;
 
   return {
     simplesNacionalTradicional: {...simplesNacionalTradicional, order: simplesNacionalOtimizado ? 2 : 1},
     simplesNacionalHibrido: simplesNacionalHibrido ? {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2} : null,
     lucroPresumido: { ...lucroPresumido, order: 4 },
-    lucroPresumidoAtual: { ...lucroPresumidoAtual, order: 5 },
+    lucroPresumidoAtual: lucroPresumidoAtual ? { ...lucroPresumidoAtual, order: 5 } : null,
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 0 } : null,
     simplesNacionalOtimizadoHibrido: simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null,
   };
 }
+
