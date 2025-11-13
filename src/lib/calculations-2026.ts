@@ -288,7 +288,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
-  const { rbt12, totalSalaryExpense, proLabores, fp12, domesticActivities = [], exportActivities = [], exchangeRate } = values;
+  const { rbt12, totalSalaryExpense, proLabores, fp12, domesticActivities = [], exportActivities = [], exchangeRate, year = 2026 } = values;
 
   const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => acc + (act.revenue * (exchangeRate || 1)), 0);
   const totalProLaboreBruto = proLabores.reduce((acc, p) => acc + p.value, 0);
@@ -299,7 +299,10 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const fatorR_naoOtimizado = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
   
   const simplesNacionalTradicional = _calculateSimples2026(values, false, fatorR_naoOtimizado);
-  const simplesNacionalHibrido = _calculateSimples2026(values, true, fatorR_naoOtimizado);
+  
+  // Conditionally calculate hybrid scenarios only from 2027 onwards
+  const simplesNacionalHibrido = year >= 2027 ? _calculateSimples2026(values, true, fatorR_naoOtimizado) : null;
+
 
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   let simplesNacionalOtimizadoHibrido: TaxDetails2026 | null = null;
@@ -334,10 +337,14 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
           const optimizedValues = { ...values, proLabores: optimizedProLabores };
           
           simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, optimizedProLabores);
-          simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, optimizedProLabores);
+          if (year >= 2027) {
+            simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, optimizedProLabores);
+          }
       } else if (fatorR_naoOtimizado >= limiteFatorR) {
         simplesNacionalOtimizado = { ...simplesNacionalTradicional, regime: 'Simples Nacional (Fator R Otimizado)', optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(fatorR_naoOtimizado)} e se beneficia do Anexo III.` };
-        simplesNacionalOtimizadoHibrido = { ...simplesNacionalHibrido, regime: 'Simples Nacional (Fator R Otimizado) Híbrido', optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(fatorR_naoOtimizado)} e se beneficia do Anexo III.` };
+        if (year >= 2027 && simplesNacionalHibrido) {
+            simplesNacionalOtimizadoHibrido = { ...simplesNacionalHibrido, regime: 'Simples Nacional (Fator R Otimizado) Híbrido', optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(fatorR_naoOtimizado)} e se beneficia do Anexo III.` };
+        }
       }
   }
   
@@ -346,7 +353,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   return {
     simplesNacionalTradicional: {...simplesNacionalTradicional, order: simplesNacionalOtimizado ? 2 : 1},
-    simplesNacionalHibrido: {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2},
+    simplesNacionalHibrido: simplesNacionalHibrido ? {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2} : null,
     lucroPresumido: { ...lucroPresumido, order: 4 },
     lucroPresumidoAtual: { ...lucroPresumidoAtual, order: 5 },
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 0 } : null,
