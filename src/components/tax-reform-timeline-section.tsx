@@ -24,13 +24,33 @@ export default function TaxReformTimelineSection() {
                 <p>O atual sistema tributário brasileiro foi promulgado em 1988. Desde então, diferentes governos ofereceram propostas para sua simplificação. Essas tentativas têm como principal motivação simplificar a existência de diversos impostos, taxas e contribuições, além de diferentes regimes tributários e suas respectivas obrigações fiscais acessórias, presentes no sistema atual.</p>
                 <p>Além de pagar os tributos, pessoas físicas e, em especial, as pessoas jurídicas, têm que prestar uma série de informações ao Fisco, periodicamente, tornando o acompanhamento das obrigações fiscais e tributárias um processo muito complexo. Como exemplo desta complexidade destaca-se o fato do Brasil possuir 26 estados, mais o Distrito Federal e mais de 5 mil municípios, sendo, cada um deles, responsável pela criação e alteração de regras fiscais dos tributos arrecadados, bem como, suas respectivas obrigações fiscais acessórias.</p>
             </div>
+            
+            <div className="space-y-4 text-base text-foreground/90 text-justify">
+                <h3 className="font-bold text-xl text-foreground text-left">Quais tributos deixarão de existir?</h3>
+                <p>Dessa forma, a proposta traz em seu texto 3 novos tributos:</p>
+                <ul className="list-disc pl-5 space-y-2 mt-4">
+                    <li><strong>IBS (Imposto sobre Bens e Serviços)</strong> - estadual e municipal, substituindo o ICMS e o ISS;</li>
+                    <li><strong>CBS (Contribuição sobre Bens e Serviços)</strong> - federal, substituindo o PIS, a COFINS e o IPI;</li>
+                    <li><strong>IS (Imposto Seletivo)</strong> - federal, criado para desestimular o consumo de produtos e serviços considerados prejudiciais à saúde ou ao meio ambiente, como por exemplo, tabaco e bebidas alcoólicas.</li>
+                </ul>
+                <div className="relative w-full mt-6 flex justify-center">
+                     <Image
+                        src="https://www.contabilizei.com.br/wp-content/uploads/2024/04/fluxograma-reforma-tributaria-1.png"
+                        alt="Fluxograma da Reforma Tributária"
+                        width={800}
+                        height={433}
+                        className="rounded-lg shadow-md border"
+                        data-ai-hint="tax reform flowchart"
+                    />
+                </div>
+                 <p className="mt-4">Em suma, o que se busca com a Reforma é a simplificação do sistema tributário nacional, em termos de cumprimento das obrigações principais e das acessórias, reduzindo a complexidade da tributação, assegurando transparência e provendo maior cidadania fiscal. Tornando nosso sistema tributário mais justo, reduzindo as desigualdades sociais e regionais e fazendo a economia brasileira crescer de forma sustentável, gerando emprego e renda.</p>
+            </div>
 
             <div className="space-y-4 text-base text-foreground/90 text-justify">
                 <h3 className="font-bold text-xl text-foreground text-left">Quando a Reforma Tributária começará a valer?</h3>
                 <p>Os anos de 2024 e 2025 devem ser anos de regulamentação da Reforma Tributária, ou seja, de edição, discussões e publicações de leis complementares e ordinárias, ao passo que os efeitos práticos começarão a ser vistos a partir de 2026.</p>
                 <p>Vale destacar que o processo de adoção do novo modelo de tributação de consumo será longo e gradativo, e a transição final para o novo sistema de impostos acontecerá em 2033. Em termos práticos, significa dizer que ao longo de 7 anos, de 2026 a 2032, coexistirão dois sistemas tributários distintos, o atual e o novo. Isso significa que, durante este período, a contabilidade precisará atuar com base em duas regras tributárias, cálculos e declarações de impostos.</p>
                  <Alert variant="default" className="mt-4 bg-sky-50/80 border-sky-200 text-sky-900 text-left">
-                    <AlertCircle className="h-5 w-5 text-sky-600" />
                     <AlertTitle className="font-bold text-sky-800">Neutralidade Tributária</AlertTitle>
                     <AlertDescription className="text-sky-900/90">
                         A princípio, a Reforma busca garantir a neutralidade tributária, ou seja, o contribuinte não será afetado com aumento da carga tributária, mas precisará recolher os mesmos tributos em guias de pagamento diferentes para o mesmo período.
