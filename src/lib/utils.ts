@@ -13,18 +13,16 @@ export const formatCurrencyBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
-export const formatBRL = (value: number) => {
-  if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-  return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+export const formatBRL = (value: number | null | undefined) => {
+    if (typeof value !== 'number' || isNaN(value)) return '';
+    return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 };
 
 export const parseBRL = (value: string): number => {
     if (typeof value !== 'string') return 0;
-    // Remove R$, spaces, and thousand separators, then replace comma with dot
-    const cleanedValue = value.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+    const cleanedValue = value.replace(/[^\d,]/g, '').replace(',', '.');
     const parsed = parseFloat(cleanedValue);
-    if (isNaN(parsed)) return 0;
-    return Math.round(parsed * 100); // return as cents
+    return isNaN(parsed) ? 0 : parsed;
 };
 
 export const formatBRLFromCents = (value: number | undefined | null): string => {
@@ -61,5 +59,3 @@ export function findBracket<T extends { max: number }>(table: T[], value: number
 export function findFeeBracket(table: FeeBracket[], revenue: number): FeeBracket | undefined {
     return table.find(bracket => revenue >= bracket.min && revenue <= bracket.max);
 }
-
-    

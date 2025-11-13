@@ -2,7 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle } from 'lucide-react';
-import { cn, formatBRL, parseBRL, formatBRLFromCents } from "@/lib/utils";
+import { cn, formatBRL, parseBRL } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { CNAE_LC116_RELATIONSHIP } from "@/lib/cnae-data-2026";
@@ -181,7 +181,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                      <div className="relative">
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                                         <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRLFromCents(field.value) || ''} className="pl-9" />
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} onBlur={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value) || ''} className="pl-9" />
                                                         </FormControl>
                                                     </div>
                                                 </FormItem>
@@ -214,7 +214,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                      <div className="relative">
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{form.watch('exportCurrency') === 'USD' ? '$' : form.watch('exportCurrency') === 'EUR' ? '€' : 'R$'}</span>
                                                         <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRLFromCents(field.value) || ''} className="pl-9" />
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" {...field} onChange={e => field.onChange(parseBRL(e.target.value))} onBlur={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value) || ''} className="pl-9" />
                                                         </FormControl>
                                                     </div>
                                                 </FormItem>

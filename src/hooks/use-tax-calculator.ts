@@ -35,6 +35,7 @@ export function useTaxCalculator(year: number) {
             proLabores: [{ value: fiscalConfig.salario_minimo, hasOtherInssContribution: false, otherContributionSalary: 0 }],
             numberOfPartners: 1,
             b2bRevenuePercentage: 50,
+            creditGeneratingExpenses: 0,
             selectedPlan: 'expertsEssencial',
             year,
         },
@@ -60,8 +61,7 @@ export function useTaxCalculator(year: number) {
         for (const key in values.revenues) {
             if (key.startsWith('domestic_')) {
                 const annex = key.split('_')[1] as Annex;
-                const revenueInCents = values.revenues[key] || 0;
-                const revenue = revenueInCents / 100;
+                const revenue = values.revenues[key] || 0;
                 const cnaesInAnnex = cnaesByAnnex[annex];
 
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
@@ -77,8 +77,7 @@ export function useTaxCalculator(year: number) {
         for (const key in values.revenues) {
              if (key.startsWith('export_')) {
                 const annex = key.split('_')[1] as Annex;
-                const revenueInCents = values.revenues[key] || 0;
-                const revenue = revenueInCents / 100;
+                const revenue = values.revenues[key] || 0;
                 const cnaesInAnnex = cnaesByAnnex[annex];
 
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {

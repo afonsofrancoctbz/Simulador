@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 // Schema for a selected CNAE, which might include a user's choice of cClass
@@ -42,8 +41,7 @@ export const TaxFormValuesSchema = z.object({
   selectedCnaes: z.array(CnaeSelectionSchema),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo."),
-  domesticActivities: z.array(CnaeItemSchema),
-  exportActivities: z.array(CnaeItemSchema),
+  revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
   issRate: z.coerce.number().min(0).max(5).optional(),
