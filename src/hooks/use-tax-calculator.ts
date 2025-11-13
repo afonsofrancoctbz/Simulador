@@ -103,6 +103,7 @@ export function useTaxCalculator(year: number) {
             rbt12: values.rbt12 ?? 0,
             fp12: values.fp12 ?? 0,
             issRate: (values.issRate ?? 5) / 100, // Convert percentage to decimal
+            revenues: values.revenues, // Correctly include the revenues object
             domesticActivities,
             exportActivities,
             exportCurrency: values.exportCurrency,
