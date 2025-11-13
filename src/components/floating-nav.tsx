@@ -15,7 +15,6 @@ import { Menu, Calculator, Milestone, Award, Wallet, Building, ShieldCheck, Spar
 
 const navItems = [
     { id: 'tax-calculator', title: 'Simulador', icon: Calculator },
-    { id: 'tax-reform-timeline', title: 'Reforma Tributária', icon: Info },
     { id: 'opening-steps', title: 'Etapas da Abertura', icon: Milestone },
     { id: 'digital-certificate', title: 'Certificado Digital', icon: Award },
     { id: 'roc', title: 'Registro de Classe', icon: Award },
