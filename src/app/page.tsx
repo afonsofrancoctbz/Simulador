@@ -18,6 +18,7 @@ import TaxCalculator from '@/components/tax-calculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FloatingNav from '@/components/floating-nav';
 import { YearSelector } from '@/components/year-selector';
+import TaxReformTimelineSection from '@/components/tax-reform-timeline-section';
 
 
 export default function Home() {
@@ -73,6 +74,11 @@ export default function Home() {
         )}
 
         <div className='print-hidden'>
+            <section id="tax-reform-timeline" className="py-16 lg:py-24 bg-slate-50/70">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <TaxReformTimelineSection />
+                </div>
+            </section>
 
             <section id="opening-steps" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">

@@ -11,10 +11,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Calculator, Milestone, Award, Wallet, Building, ShieldCheck, Sparkles, Handshake, HelpCircle } from 'lucide-react';
+import { Menu, Calculator, Milestone, Award, Wallet, Building, ShieldCheck, Sparkles, Handshake, HelpCircle, Info } from 'lucide-react';
 
 const navItems = [
     { id: 'tax-calculator', title: 'Simulador', icon: Calculator },
+    { id: 'tax-reform-timeline', title: 'Reforma Tributária', icon: Info },
     { id: 'opening-steps', title: 'Etapas da Abertura', icon: Milestone },
     { id: 'digital-certificate', title: 'Certificado Digital', icon: Award },
     { id: 'roc', title: 'Registro de Classe', icon: Award },
