@@ -20,7 +20,7 @@ import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
-    const fiscalConfig = getFiscalParameters(isPostReform ? 2026 : 2025);
+    const fiscalConfig = getFiscalParameters(isPostReform ? values.year || 2026 : 2025);
     const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     
@@ -55,8 +55,8 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const config2026 = fiscalConfig as FiscalConfigPostReform;
-        const baseCbsRate = config2026.reforma_tributaria.cbs_rate;
-        const baseIbsRate = config2026.reforma_tributaria.ibs_rate;
+        const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
+        const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
 
         let totalIbsDebit = 0;
         let totalCbsDebit = 0;
@@ -86,7 +86,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const cbs = Math.max(0, totalCbsDebit - totalCreditCbs);
         const ibs = Math.max(0, totalIbsDebit - totalCreditIbs);
 
-        consumptionTaxes = ibs + cbs;
+        consumptionTaxes = (ibs || 0) + (cbs || 0);
         breakdown.push({ name: `CBS`, value: cbs });
         breakdown.push({ name: `IBS`, value: ibs });
 
@@ -132,7 +132,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
-    const fiscalConfig = getFiscalParameters(2027) as FiscalConfigPostReform; // Use 2027+ config as base for hybrid
+    const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform; // Use 2027+ config as base for hybrid
     const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
@@ -193,9 +193,9 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     });
 
     if (isHybrid) {
-      const config2026 = getFiscalParameters(2026) as FiscalConfigPostReform;
-      const baseCbsRate = config2026.reforma_tributaria.cbs_rate;
-      const baseIbsRate = config2026.reforma_tributaria.ibs_rate;
+      const config2026 = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
+      const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
+      const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
 
       let totalIbsDebit = 0;
       let totalCbsDebit = 0;
@@ -231,7 +231,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       const finalIbs = Math.max(0, totalIbsDebit - totalCreditIbs);
       const finalCbs = Math.max(0, totalCbsDebit - totalCreditCbs);
       
-      ivaTaxes = finalIbs + finalCbs;
+      ivaTaxes = (finalIbs || 0) + (finalCbs || 0);
     }
     
     const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
@@ -307,7 +307,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
   if (hasAnnexVActivity && totalRevenue > 0) {
-      const fiscalConfig = getFiscalParameters(2027) as FiscalConfigPostReform;
+      const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
       const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
       
       const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
