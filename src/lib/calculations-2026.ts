@@ -123,7 +123,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         contabilizeiFee: fee,
         breakdown: breakdown.filter(i => i.value > 0.001),
         notes,
-        partnerTaxes
+        partnerTaxes,
     };
     return result;
 }
@@ -241,7 +241,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         { name: `CPP (INSS Patronal - p/ Anexo IV)`, value: cppFromAnnexIV },
         { name: "INSS s/ Pró-labore", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido }
-    ];
+    ].filter(item => item.value > 0.001);
 
     const notes = [];
     if (isHybrid) {
@@ -273,7 +273,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         fatorR: fatorREffective,
         effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
         contabilizeiFee: fee,
-        breakdown: breakdown.filter(item => item.value > 0.001),
+        breakdown,
         notes,
         partnerTaxes
     };
@@ -314,22 +314,19 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
       const requiredAnnualPayroll = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
-      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (currentPayroll * 12);
+      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (fp12 > 0 ? fp12 : currentPayroll * 12);
       const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
 
       if (fatorR_naoOtimizado < limiteFatorR && additionalMonthlyProLaboreNeeded > 0) {
-          const newTotalProLabore = currentTotalProLabore + additionalMonthlyProLaboreNeeded;
+          const totalOriginalProLabore = values.proLabores.reduce((sum, p) => sum + p.value, 0);
           
-          const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
-              ? values.proLabores.map(p => ({ 
-                  ...p, 
-                  value: newTotalProLabore / values.proLabores.length,
-                }))
-              : [{ 
-                  value: newTotalProLabore, 
-                  hasOtherInssContribution: false, 
-                  otherContributionSalary: 0 
-                }];
+          const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => {
+              const proportion = totalOriginalProLabore > 0 ? p.value / totalOriginalProLabore : 1 / values.proLabores.length;
+              return {
+                  ...p,
+                  value: p.value + (additionalMonthlyProLaboreNeeded * proportion),
+              };
+          });
           
           const optimizedValues = { ...values, proLabores: optimizedProLabores };
           

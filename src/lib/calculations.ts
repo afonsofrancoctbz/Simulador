@@ -280,22 +280,19 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
       const requiredAnnualPayroll = (values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12) * config.simples_nacional.limite_fator_r;
-      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (currentPayroll * 12);
+      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (values.fp12 > 0 ? values.fp12 : currentPayroll * 12);
       const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
       
       if (additionalMonthlyProLaboreNeeded > 0) {
-          const newTotalProLabore = currentTotalProLabore + additionalMonthlyProLaboreNeeded;
-          
-          const optimizedProLabores: ProLaboreForm[] = values.proLabores.length > 0
-              ? values.proLabores.map(p => ({ 
-                  ...p, 
-                  value: newTotalProLabore / values.proLabores.length,
-                }))
-              : [{ 
-                  value: newTotalProLabore, 
-                  hasOtherInssContribution: false, 
-                  otherContributionSalary: 0 
-                }];
+          const totalOriginalProLabore = values.proLabores.reduce((sum, p) => sum + p.value, 0);
+
+          const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => {
+              const proportion = totalOriginalProLabore > 0 ? p.value / totalOriginalProLabore : 1 / values.proLabores.length;
+              return {
+                  ...p,
+                  value: p.value + (additionalMonthlyProLaboreNeeded * proportion),
+              };
+          });
           
           simplesNacionalOtimizado = _calculateSimplesNacional({...values, proLabores: optimizedProLabores}, config, optimizedProLabores);
       }
