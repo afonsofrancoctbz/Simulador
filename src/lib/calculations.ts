@@ -284,18 +284,24 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
       const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
       
       if (additionalMonthlyProLaboreNeeded > 0) {
-          const totalOriginalProLabore = values.proLabores.reduce((sum, p) => sum + p.value, 0);
-
-          const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => {
-              // If total is 0, distribute equally, otherwise, distribute proportionally
-              const proportion = totalOriginalProLabore > 0 ? p.value / totalOriginalProLabore : 1 / values.proLabores.length;
-              return {
-                  ...p,
-                  value: p.value + (additionalMonthlyProLaboreNeeded * proportion),
-              };
+          const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
+          
+          // Find the partner(s) with the lowest pro-labore to add the difference
+          let minProLabore = Infinity;
+          proLaboresCopy.forEach(p => {
+              if (p.value < minProLabore) {
+                  minProLabore = p.value;
+              }
           });
           
-          simplesNacionalOtimizado = _calculateSimplesNacional({...values, proLabores: optimizedProLabores}, config, optimizedProLabores);
+          const partnersToAdjust = proLaboresCopy.filter(p => p.value === minProLabore);
+          const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / partnersToAdjust.length;
+
+          partnersToAdjust.forEach(p => {
+              p.value += valueToAddPerPartner;
+          });
+          
+          simplesNacionalOtimizado = _calculateSimplesNacional({...values, proLabores: proLaboresCopy}, config, proLaboresCopy);
       }
   } else if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR >= config.simples_nacional.limite_fator_r) {
     simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)", optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(simplesNacionalBase.fatorR)} e se beneficia do Anexo III.`};

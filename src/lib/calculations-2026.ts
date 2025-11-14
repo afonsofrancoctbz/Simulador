@@ -256,7 +256,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     let regimeName: TaxDetails2026['regime'];
     
     if (proLaboreOverride) {
-        regimeName = `Simples Nacional (Fator R Otimizado)${isHybrid ? ' Híbrido' : ''}`;
+        regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
     } else {
         const regimeAnexo = finalAnnex === 'III' ? 'Anexo III' : 'Anexo V';
         const regimeType = isHybrid ? 'Híbrido' : 'Tradicional';
@@ -298,6 +298,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   
   const simplesNacionalTradicional = _calculateSimples2026(values, false, fatorR_naoOtimizado);
   
+  // Scenarios are only applicable from 2027 onwards
   const simplesNacionalHibrido = year >= 2027 ? _calculateSimples2026(values, true, fatorR_naoOtimizado) : null;
 
 
@@ -318,21 +319,27 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
 
       if (fatorR_naoOtimizado < limiteFatorR && additionalMonthlyProLaboreNeeded > 0) {
-          const totalOriginalProLabore = values.proLabores.reduce((sum, p) => sum + p.value, 0);
+          const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
           
-          const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => {
-              const proportion = totalOriginalProLabore > 0 ? p.value / totalOriginalProLabore : 1 / values.proLabores.length;
-              return {
-                  ...p,
-                  value: p.value + (additionalMonthlyProLaboreNeeded * proportion),
-              };
+          let minProLabore = Infinity;
+          proLaboresCopy.forEach(p => {
+              if (p.value < minProLabore) {
+                  minProLabore = p.value;
+              }
           });
           
-          const optimizedValues = { ...values, proLabores: optimizedProLabores };
+          const partnersToAdjust = proLaboresCopy.filter(p => p.value === minProLabore);
+          const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / partnersToAdjust.length;
+
+          partnersToAdjust.forEach(p => {
+              p.value += valueToAddPerPartner;
+          });
+
+          const optimizedValues = { ...values, proLabores: proLaboresCopy };
           
-          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, optimizedProLabores);
+          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);
           if (year >= 2027) {
-            simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, optimizedProLabores);
+            simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, proLaboresCopy);
           }
       } else if (fatorR_naoOtimizado >= limiteFatorR) {
         simplesNacionalOtimizado = { ...simplesNacionalTradicional, regime: 'Simples Nacional (Fator R Otimizado)', optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(fatorR_naoOtimizado)} e se beneficia do Anexo III.` };
@@ -354,3 +361,4 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: year >= 2027 ? (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null) : null,
   };
 }
+
