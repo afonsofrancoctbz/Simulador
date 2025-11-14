@@ -347,10 +347,10 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   return {
     simplesNacionalTradicional: {...simplesNacionalTradicional, order: simplesNacionalOtimizado ? 2 : 1},
-    simplesNacionalHibrido: year === 2026 ? null : (simplesNacionalHibrido ? {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2} : null),
+    simplesNacionalHibrido: year >= 2027 ? (simplesNacionalHibrido ? {...simplesNacionalHibrido, order: simplesNacionalOtimizadoHibrido ? 3 : 2} : null) : null,
     lucroPresumido: { ...lucroPresumido, order: 4 },
     lucroPresumidoAtual: lucroPresumidoAtual ? { ...lucroPresumidoAtual, order: 5 } : null,
     simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 0 } : null,
-    simplesNacionalOtimizadoHibrido: year === 2026 ? null : (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null),
+    simplesNacionalOtimizadoHibrido: year >= 2027 ? (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null) : null,
   };
 }

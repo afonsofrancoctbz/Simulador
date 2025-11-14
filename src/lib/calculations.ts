@@ -287,6 +287,7 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
           const totalOriginalProLabore = values.proLabores.reduce((sum, p) => sum + p.value, 0);
 
           const optimizedProLabores: ProLaboreForm[] = values.proLabores.map(p => {
+              // If total is 0, distribute equally, otherwise, distribute proportionally
               const proportion = totalOriginalProLabore > 0 ? p.value / totalOriginalProLabore : 1 / values.proLabores.length;
               return {
                   ...p,
