@@ -82,7 +82,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
                     year={year}
                     onCnaeSelectorOpen={() => setCnaeSelectorOpen(true)}
                     isLoading={isLoading}
-                    onSubmit={onSubmit}
+                    onSubmit={form.handleSubmit(onSubmit)}
                 />
               </MultiStepFormProvider>
             </FormProvider>

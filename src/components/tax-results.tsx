@@ -166,6 +166,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && (scenario.optimizationNote ?? null) === (selectedDetails.optimizationNote ?? null);
 
             const isOtimizado = scenario.regime.includes('Otimizado');
+            
             const projectionNote = isOtimizado && fatorRProjection ? fatorRProjection.textoMensagem : null;
             const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
 
@@ -337,6 +338,18 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                             </AlertDescription>
                         </Alert>
                       )}
+
+                      {scenario.optimizationNote && !projectionNote && (
+                         <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
+                            <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
+                                <Info className="h-4 w-4 mt-0.5 shrink-0"/>
+                                <span>
+                                    {scenario.optimizationNote}
+                                </span>
+                            </AlertDescription>
+                        </Alert>
+                      )}
+
 
                       {scenario.notes.length > 0 && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
