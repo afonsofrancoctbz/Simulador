@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AlertTriangle, CheckCircle, Info, BadgeInfo } from 'lucide-react';
 import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
@@ -21,44 +21,65 @@ interface TaxResultsProps {
   fatorRProjection: FatorRResponse | null;
 }
 
+type SelectedScenario = {
+  regime: TaxDetails['regime'] | TaxDetails2026['regime'];
+  optimizationNote?: string | null;
+} | null;
+
 export default function TaxResults({ year, isLoading, results, error, fatorRProjection }: TaxResultsProps) {
-  const [selectedDetails, setSelectedDetails] = useState<TaxDetails | null>(null);
+  const [selectedScenarioId, setSelectedScenarioId] = useState<SelectedScenario>(null);
 
-  useEffect(() => {
-    if (results) {
-        let scenarios: (TaxDetails | null)[] = [];
-        if ('simplesNacionalBase' in results) { // 2025 results
-            scenarios = [results.simplesNacionalOtimizado, results.simplesNacionalBase, results.lucroPresumido];
-        } else if ('lucroPresumido' in results) { // 2026 results
-            scenarios = [
-                results.simplesNacionalOtimizado, 
-                results.simplesNacionalOtimizadoHibrido,
-                results.simplesNacionalTradicional, 
-                results.simplesNacionalHibrido,
-                results.lucroPresumido, 
-                results.lucroPresumidoAtual
-            ];
-        }
-        
-        const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && s.totalMonthlyCost > 0);
-        
-        if (validScenarios.length > 0) {
-            const scenariosForRecommendation = validScenarios.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)');
-            
-            if(scenariosForRecommendation.length > 0) {
-                const cheapest = [...scenariosForRecommendation].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
-                setSelectedDetails(cheapest);
-            } else if (validScenarios.length > 0) {
-                setSelectedDetails(validScenarios[0]);
-            }
-
-        } else {
-            setSelectedDetails(null);
-        }
-    } else {
-        setSelectedDetails(null);
+  const scenariosToShow = useMemo(() => {
+    if (!results) return [];
+    
+    let scenarios: (TaxDetails | null)[] = [];
+    if ('simplesNacionalBase' in results) { // 2025 results
+       scenarios = [
+        results.simplesNacionalOtimizado,
+        results.simplesNacionalBase,
+        results.lucroPresumido,
+      ];
+    } else if ('lucroPresumido' in results) { // 2026 results
+       scenarios = [
+          results.simplesNacionalOtimizado,
+          results.simplesNacionalOtimizadoHibrido,
+          results.simplesNacionalTradicional,
+          results.simplesNacionalHibrido,
+          results.lucroPresumido,
+          results.lucroPresumidoAtual,
+      ];
     }
-}, [results, year]);
+
+    const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
+    validScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+    return validScenarios;
+  }, [results]);
+
+
+  const cheapestScenario = useMemo(() => {
+    if (scenariosToShow.length === 0) return null;
+    const scenariosForRecommendation = scenariosToShow.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)');
+    if (scenariosForRecommendation.length > 0) {
+      return [...scenariosForRecommendation].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
+    }
+    return scenariosToShow[0];
+  }, [scenariosToShow]);
+  
+  useEffect(() => {
+    if (cheapestScenario) {
+      setSelectedScenarioId({
+        regime: cheapestScenario.regime,
+        optimizationNote: cheapestScenario.optimizationNote ?? null,
+      });
+    } else {
+      setSelectedScenarioId(null);
+    }
+  }, [cheapestScenario]);
+
+  const selectedDetails = useMemo(() => {
+    if (!selectedScenarioId) return null;
+    return scenariosToShow.find(s => s.regime === selectedScenarioId.regime && (s.optimizationNote ?? null) === selectedScenarioId.optimizationNote) ?? null;
+  }, [selectedScenarioId, scenariosToShow]);
 
 
   if (isLoading) {
@@ -91,36 +112,10 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     );
   }
 
-  if (!results) {
+  if (!results || scenariosToShow.length === 0) {
     return null;
   }
-  
-  let scenariosToShow: (TaxDetails | null)[] = [];
-
-  if ('simplesNacionalBase' in results) { // 2025 results
-     scenariosToShow = [
-      results.simplesNacionalOtimizado,
-      results.simplesNacionalBase,
-      results.lucroPresumido,
-    ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
-
-  } else if ('lucroPresumido' in results) { // 2026 results
-     scenariosToShow = [
-        results.simplesNacionalOtimizado,
-        results.simplesNacionalOtimizadoHibrido,
-        results.simplesNacionalTradicional,
-        results.simplesNacionalHibrido,
-        results.lucroPresumido,
-        results.lucroPresumidoAtual,
-    ].filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
-  }
-
-  scenariosToShow.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
-
-  if (scenariosToShow.length === 0) return null;
     
-  const cheapestScenario = selectedDetails;
-  
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number }[] } = {
         'IMPOSTOS S/ FATURAMENTO MENSAL': [],
@@ -165,10 +160,10 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8 results-grid">
           {scenariosToShow.map((scenario) => {
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
-
+            
             const isCurrentLpFor2026 = year >= 2026 && scenario.regime === 'Lucro Presumido (Regras Atuais)';
-            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0 && !isCurrentLpFor2026;
-            const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && scenario.optimizationNote === selectedDetails.optimizationNote;
+            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && (scenario.optimizationNote ?? null) === (cheapestScenario.optimizationNote ?? null) && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0 && !isCurrentLpFor2026;
+            const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && (scenario.optimizationNote ?? null) === (selectedDetails.optimizationNote ?? null);
 
             const isOtimizado = scenario.regime.includes('Otimizado');
             const projectionNote = isOtimizado && fatorRProjection ? fatorRProjection.textoMensagem : null;
@@ -213,7 +208,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
-                onClick={() => setSelectedDetails(scenario)}
+                onClick={() => setSelectedScenarioId({regime: scenario.regime, optimizationNote: scenario.optimizationNote ?? null})}
                 className={cn(
                   "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer printable-card",
                   isRecommended ? "border-primary shadow-lg" : "border-border bg-card",
