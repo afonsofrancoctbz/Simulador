@@ -101,23 +101,21 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         
         const cbsFinal = Math.max(0, totalCbsDebit - totalCreditCbs);
         const ibsFinal = Math.max(0, totalIbsDebit - totalCreditIbs);
-
-        let realConsumptionTaxes = cbsFinal + ibsFinal + consumptionTaxes;
         
         if (year === 2026) {
-          // Em 2026, CBS/IBS são compensáveis com PIS/COFINS, então o custo real não os inclui.
-          realConsumptionTaxes = consumptionTaxes;
-          notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) destacado em nota é compensável com o PIS/COFINS devido, não representando custo adicional.`);
-          if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste - 0,9%)`, value: cbsFinal });
-          if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste - 0,1%)`, value: ibsFinal });
+          notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) é apenas informativo e pode ser compensado com PIS/COFINS, não representando custo adicional neste ano.`);
+          if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste - ${formatPercent(baseCbsRate)})`, value: cbsFinal });
+          if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste - ${formatPercent(baseIbsRate)})`, value: ibsFinal });
         } else {
             consumptionTaxes += cbsFinal + ibsFinal;
             if (cbsFinal > 0) breakdown.push({ name: `CBS`, value: cbsFinal });
             if (ibsFinal > 0) breakdown.push({ name: `IBS`, value: ibsFinal });
-            notes.push(`Cálculo em transição: PIS/COFINS são substituídos por CBS. ISS é gradualmente substituído por IBS. Alíquota do IVA pode ter redução dependendo da atividade. Créditos de insumos foram considerados.`);
+            if (year > 2026 && year < 2033) {
+              notes.push(`Cálculo em transição: PIS/COFINS são substituídos por CBS. ISS é gradualmente substituído por IBS. Alíquota do IVA pode ter redução dependendo da atividade. Créditos de insumos foram considerados.`);
+            } else if (year >= 2033) {
+              notes.push(`Cálculo com IVA Pleno: PIS, COFINS e ISS foram extintos. A tributação de consumo é feita via CBS e IBS, com crédito amplo sobre as aquisições.`);
+            }
         }
-        consumptionTaxes = realConsumptionTaxes;
-
 
     } else { // Pré-reforma Pura (Cenário "Regras Atuais")
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
@@ -279,8 +277,8 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
     const notes = [];
     if (isHybrid) {
-      if (year === 2026) {
-        notes.push(`SN Híbrido não aplicável em 2026. O regime opcional de apuração do IVA por fora do Simples Nacional inicia em 2027.`);
+      if (year < 2027) {
+        notes.push(`SN Híbrido não aplicável em ${year}. O regime opcional de apuração do IVA por fora do Simples Nacional inicia em 2027.`);
       } else {
         notes.push(`Cenário competitivo para B2B: ${formatPercent((b2bRevenuePercentage ?? 100)/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
       }

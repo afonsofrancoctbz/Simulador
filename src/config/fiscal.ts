@@ -94,8 +94,6 @@ const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_
     2030: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
     2031: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
     2032: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.4, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.6 },
-    // A tabela original tinha o multiplicador de 60%, mas para chegar a 100% em 2033, o restante deve ser 100-40=60. 
-    // Para simplificar e garantir a extinção, 2032 assume o restante.
     2033: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs, pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
 };
 
