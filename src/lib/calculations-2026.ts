@@ -18,8 +18,8 @@ import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
-function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
-    const year = values.year || (isPostReform ? 2026 : 2025);
+function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean): TaxDetails | TaxDetails2026 {
+    const year = values.year || 2026;
     const fiscalConfig = getFiscalParameters(year) as FiscalConfigPostReform;
 
     const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
@@ -52,12 +52,23 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     ];
     
     const notes = [];
+    const configTransition = 'reforma_tributaria' in fiscalConfig ? fiscalConfig.reforma_tributaria : null;
 
-    // Lógica de transição para impostos de consumo
-    if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
-        const configTransition = fiscalConfig.reforma_tributaria;
-
-        // PIS/COFINS (pré-reforma) - continuam existindo de 2026-2028
+    if (isCurrentRules || !configTransition) {
+        // Lógica Pré-Reforma Pura
+        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
+        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS;
+        const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
+        const iss = domesticRevenue * issValue;
+        consumptionTaxes = pis + cofins + iss;
+        if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
+        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
+        if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
+        notes.push("Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas.");
+    } else {
+        // Lógica Pós-Reforma com transição
+        
+        // PIS/COFINS (pré-reforma) - ainda podem existir na transição
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS * configTransition.pis_cofins_multiplier;
         const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS * configTransition.pis_cofins_multiplier;
         if (pis > 0) breakdown.push({ name: `PIS (0,65%)`, value: pis });
@@ -69,7 +80,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
 
         consumptionTaxes += pis + cofins + iss;
-
+        
         // CBS/IBS (pós-reforma)
         const baseCbsRate = configTransition.cbs_aliquota_padrao;
         const baseIbsRate = configTransition.ibs_aliquota_padrao;
@@ -101,32 +112,22 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         
         const cbsFinal = Math.max(0, totalCbsDebit - totalCreditCbs);
         const ibsFinal = Math.max(0, totalIbsDebit - totalCreditIbs);
-        
+
         if (year === 2026) {
-          notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) é apenas informativo e pode ser compensado com PIS/COFINS, não representando custo adicional neste ano.`);
-          if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste - ${formatPercent(baseCbsRate)})`, value: cbsFinal });
-          if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste - ${formatPercent(baseIbsRate)})`, value: ibsFinal });
+            notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) é informativo e compensável com PIS/COFINS, não representando custo adicional de caixa.`);
+            if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste - ${formatPercent(baseCbsRate)})`, value: cbsFinal });
+            if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste - ${formatPercent(baseIbsRate)})`, value: ibsFinal });
+            // Em 2026, o custo efetivo não inclui CBS/IBS, pois são compensados.
         } else {
             consumptionTaxes += cbsFinal + ibsFinal;
             if (cbsFinal > 0) breakdown.push({ name: `CBS`, value: cbsFinal });
             if (ibsFinal > 0) breakdown.push({ name: `IBS`, value: ibsFinal });
             if (year > 2026 && year < 2033) {
-              notes.push(`Cálculo em transição: PIS/COFINS são substituídos por CBS. ISS é gradualmente substituído por IBS. Alíquota do IVA pode ter redução dependendo da atividade. Créditos de insumos foram considerados.`);
+              notes.push(`Cálculo em transição: PIS/COFINS são substituídos por CBS. ISS é gradualmente substituído por IBS. Créditos de insumos foram considerados.`);
             } else if (year >= 2033) {
-              notes.push(`Cálculo com IVA Pleno: PIS, COFINS e ISS foram extintos. A tributação de consumo é feita via CBS e IBS, com crédito amplo sobre as aquisições.`);
+              notes.push(`Cálculo com IVA Pleno: PIS, COFINS e ISS foram extintos. A tributação é via CBS e IBS, com crédito amplo sobre as aquisições.`);
             }
         }
-
-    } else { // Pré-reforma Pura (Cenário "Regras Atuais")
-        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
-        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS;
-        const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
-        const iss = domesticRevenue * issValue;
-        consumptionTaxes = pis + cofins + iss;
-        if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
-        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
-        if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
-        notes.push("Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas de PIS/COFINS/ISS.");
     }
 
     const companyRevenueTaxes = irpj + irpjAdicional + csll + consumptionTaxes;
@@ -136,12 +137,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + fee;
 
-    let regimeName: TaxDetails['regime'] | TaxDetails2026['regime'] = 'Lucro Presumido';
-    if(isPostReform) {
-      regimeName = `Lucro Presumido`;
-    } else {
-      regimeName = 'Lucro Presumido (Regras Atuais)';
-    }
+    let regimeName: TaxDetails['regime'] | TaxDetails2026['regime'] = isCurrentRules ? 'Lucro Presumido (Regras Atuais)' : 'Lucro Presumido';
 
     const result: TaxDetails | TaxDetails2026 = {
         regime: regimeName as any,
@@ -391,8 +387,8 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       }
   }
   
-  const lucroPresumido = calculateLucroPresumido(values, true) as TaxDetails2026;
-  const lucroPresumidoAtual = calculateLucroPresumido(values, false) as TaxDetails;
+  const lucroPresumido = calculateLucroPresumido(values, false) as TaxDetails2026;
+  const lucroPresumidoAtual = calculateLucroPresumido(values, true) as TaxDetails;
 
   return {
     simplesNacionalTradicional: {...simplesNacionalTradicional, order: simplesNacionalOtimizado ? 2 : 1},
