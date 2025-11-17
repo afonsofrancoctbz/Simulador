@@ -89,7 +89,7 @@ const IVA_FULL_RATE = { cbs: 0.09, ibs: 0.18 };
 const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_multiplier: number; iss_icms_multiplier: number } } = {
     2026: { cbs: 0.009, ibs: 0.001, pis_cofins_multiplier: 1, iss_icms_multiplier: 1 },
     2027: { cbs: 0.089, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
-    2028: { cbs: 0.09, ibs: 0.002, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
+    2028: { cbs: 0.089, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // Note: User doc had 0.2% IBS, but law points to 0.1% for 2028. Sticking to 0.1% as per user's latest calc.
     2029: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.1, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.9 },
     2030: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
     2031: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
@@ -152,3 +152,4 @@ export const getFiscalParameters = (year: number): FiscalConfig | FiscalConfigPo
     }
     return getTransitionConfig(year);
 }
+

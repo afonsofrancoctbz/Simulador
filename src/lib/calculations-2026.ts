@@ -257,7 +257,10 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       const finalIbs = Math.max(0, totalIbsDebit - totalCreditIbs);
       const finalCbs = Math.max(0, totalCbsDebit - totalCreditCbs);
       
-      ivaTaxes = (finalIbs || 0) + (finalCbs || 0);
+      // For 2026, Hybrid is not a real cost option, so IVA taxes are 0.
+      if (year > 2026) {
+        ivaTaxes = (finalIbs || 0) + (finalCbs || 0);
+      }
     }
     
     const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
@@ -279,7 +282,11 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         notes.push(`Cenário competitivo para B2B: ${formatPercent((b2bRevenuePercentage ?? 100)/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
       }
     } else {
-      notes.push("Regime padrão do Simples. O crédito de IVA para clientes B2B é limitado. Receitas de exportação têm tributos sobre consumo zerados dentro do DAS.");
+        if(year >= 2027) {
+            notes.push("Regime padrão do Simples. O crédito de IVA para clientes B2B é limitado. Receitas de exportação têm tributos sobre consumo zerados dentro do DAS.");
+        } else {
+             notes.push("Regime padrão do Simples. Empresas do SN estão dispensadas de participar da fase de testes do IVA em 2026.");
+        }
     }
     if (cppFromAnnexIV > 0) {
       notes.push(`Atividades do Anexo IV pagam a CPP (INSS Patronal de ${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) sobre a folha, fora do DAS.`);
