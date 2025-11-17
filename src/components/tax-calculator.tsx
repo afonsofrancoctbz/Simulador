@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
@@ -21,6 +22,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
     isLoading,
     error,
     selectedCity,
+    fatorRProjection,
   } = useTaxCalculator(year);
   
   const [isCnaeSelectorOpen, setCnaeSelectorOpen] = useState(false);
@@ -114,6 +116,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
                 isLoading={isLoading}
                 results={results}
                 error={error}
+                fatorRProjection={isLoading ? null : fatorRProjection}
             />
         </div>
     </div>
