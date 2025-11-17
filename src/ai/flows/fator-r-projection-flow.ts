@@ -1,7 +1,7 @@
 
 'use server';
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit/zod';
+import {z} from 'genkit';
 
 // --- Constantes de Configuração (Idealmente via Remote Config) ---
 const META_FATOR_R = 0.28;
