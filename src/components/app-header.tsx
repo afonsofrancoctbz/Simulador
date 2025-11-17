@@ -22,6 +22,9 @@ export default function AppHeader() {
             <Button variant="ghost" asChild>
                 <Link href="/custo-funcionario">Custo do Funcionário</Link>
             </Button>
+            <Button variant="ghost" asChild>
+                <Link href="/playbook">Playbook do Empreendedor</Link>
+            </Button>
         </nav>
       </div>
     </header>
