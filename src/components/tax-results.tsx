@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, BadgeInfo } from 'lucide-react';
 import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,15 +11,17 @@ import { Badge } from './ui/badge';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
+import type { FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
 
 interface TaxResultsProps {
   year: number;
   isLoading: boolean;
   results: CalculationResults | CalculationResults2026 | null;
   error: string | null;
+  fatorRProjection: FatorRResponse | null;
 }
 
-export default function TaxResults({ year, isLoading, results, error }: TaxResultsProps) {
+export default function TaxResults({ year, isLoading, results, error, fatorRProjection }: TaxResultsProps) {
   const [selectedDetails, setSelectedDetails] = useState<TaxDetails | null>(null);
 
   useEffect(() => {
@@ -168,6 +170,11 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
             const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0 && !isCurrentLpFor2026;
             const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && scenario.optimizationNote === selectedDetails.optimizationNote;
 
+            const isOtimizado = scenario.regime.includes('Otimizado');
+            const projectionNote = isOtimizado && fatorRProjection ? fatorRProjection.textoMensagem : null;
+            const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
+
+
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
@@ -197,6 +204,12 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
 
             const domesticRevenue = scenario.domesticRevenue ?? 0;
             const exportRevenue = scenario.exportRevenue ?? 0;
+
+            let projectionIcon = BadgeInfo;
+            if (projectionStatus === 'success') projectionIcon = CheckCircle;
+            if (projectionStatus === 'warning') projectionIcon = AlertTriangle;
+            if (projectionStatus === 'error') projectionIcon = AlertTriangle;
+
 
             return (
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
@@ -299,7 +312,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                   </div>
                 
                   <div className="p-4 mt-auto space-y-2 bg-muted/30 rounded-b-xl">
-                      {scenario.fatorR !== undefined && (
+                      {scenario.fatorR !== undefined && !isOtimizado && (
                       <div className={cn(
                           "text-center rounded-lg p-2 text-sm font-semibold flex items-center justify-center gap-2",
                           scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
@@ -308,17 +321,39 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                           <span>Fator R: {formatPercent(scenario.fatorR)}</span>
                       </div>
                       )}
-                      {(scenario.optimizationNote || scenario.notes.length > 0) && (
+
+                      {projectionNote && (
+                        <Alert variant="default" className={cn("bg-primary/10 border-primary/20 text-primary-foreground p-3", {
+                            'bg-green-100/80 border-green-200/80 text-green-900': projectionStatus === 'success',
+                            'bg-amber-100/80 border-amber-200/80 text-amber-900': projectionStatus === 'warning' || projectionStatus === 'error',
+                        })}>
+                            <AlertDescription className="text-xs font-medium flex items-start gap-2">
+                                <span className={cn({
+                                    'text-green-600': projectionStatus === 'success',
+                                    'text-amber-600': projectionStatus === 'warning' || projectionStatus === 'error',
+                                    'text-primary/90': projectionStatus === 'info'
+                                })}>
+                                    <BadgeInfo className="h-4 w-4 mt-0.5 shrink-0" />
+                                </span>
+                                <span className={cn('text-primary/90', {
+                                     'text-green-900': projectionStatus === 'success',
+                                     'text-amber-900': projectionStatus === 'warning' || projectionStatus === 'error',
+                                })} dangerouslySetInnerHTML={{ __html: projectionNote.replace(/\n/g, '<br/>') }}></span>
+                            </AlertDescription>
+                        </Alert>
+                      )}
+
+                      {scenario.notes.length > 0 && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
                                 <span>
-                                    {scenario.optimizationNote && `${scenario.optimizationNote} `}
                                     {scenario.notes.join(' ')}
                                 </span>
                             </AlertDescription>
                         </Alert>
                       )}
+
                       <div className={cn("p-3 rounded-lg bg-background")}>
                           <div className="w-full space-y-1 text-center">
                               <div className='text-sm font-medium text-foreground'>Custo Total Mensal</div>

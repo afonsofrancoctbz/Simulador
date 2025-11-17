@@ -1,19 +1,22 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
 import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
+import { calculateFatorRProjection, type FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
+import { useDebounce } from 'react-use';
 
 export function useTaxCalculator(year: number) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
+    const [fatorRProjection, setFatorRProjection] = useState<FatorRResponse | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
     const [error, setError] = useState<string | null>(null);
@@ -40,6 +43,40 @@ export function useTaxCalculator(year: number) {
             year,
         },
     });
+
+    const { rbt12, fp12, revenues } = form.watch();
+
+    const [debouncedRbt12, setDebouncedRbt12] = useState(rbt12);
+    const [debouncedFp12, setDebouncedFp12] = useState(fp12);
+    const [debouncedRevenues, setDebouncedRevenues] = useState(revenues);
+
+    useDebounce(() => setDebouncedRbt12(rbt12), 500, [rbt12]);
+    useDebounce(() => setDebouncedFp12(fp12), 500, [fp12]);
+    useDebounce(() => setDebouncedRevenues(revenues), 500, [revenues]);
+
+    useEffect(() => {
+        const fetchFatorRProjection = async () => {
+            const RBT12_atual = debouncedRbt12 ?? 0;
+            const FS12_atual = debouncedFp12 ?? 0;
+            const receitaMensalProjetada = Object.values(debouncedRevenues ?? {}).reduce((sum, rev) => sum + (rev || 0), 0);
+
+            const hasAnnexVActivity = form.getValues('selectedCnaes').some(item => getCnaeData(item.code)?.requiresFatorR);
+
+            if (hasAnnexVActivity && RBT12_atual > 0 && FS12_atual > 0 && receitaMensalProjetada > 0) {
+                try {
+                    const projection = await calculateFatorRProjection({ RBT12_atual, FS12_atual, receitaMensalProjetada });
+                    setFatorRProjection(projection);
+                } catch (e) {
+                    console.error("Erro ao calcular projeção do Fator R:", e);
+                    setFatorRProjection(null);
+                }
+            } else {
+                setFatorRProjection(null);
+            }
+        };
+        fetchFatorRProjection();
+    }, [debouncedRbt12, debouncedFp12, debouncedRevenues, form]);
+
 
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
         const domesticActivities: CnaeItem[] = [];
@@ -157,6 +194,7 @@ export function useTaxCalculator(year: number) {
         form,
         onSubmit,
         results,
+        fatorRProjection,
         isLoading,
         error,
         selectedCity

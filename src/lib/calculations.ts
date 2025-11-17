@@ -286,59 +286,26 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
           const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
           
           let minProLaboreValue = Infinity;
-          proLaboresCopy.forEach(p => {
-              if (p.value < minProLaboreValue) minProLaboreValue = p.value;
-          });
-
-          const partnersToAdjust = proLaboresCopy.filter(p => p.value === minProLaboreValue);
-          const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / partnersToAdjust.length;
+          let minProLaborePartnersCount = 0;
           
-          partnersToAdjust.forEach(p => {
-              p.value += valueToAddPerPartner;
+          proLaboresCopy.forEach(p => {
+            if (p.value < minProLaboreValue) {
+                minProLaboreValue = p.value;
+                minProLaborePartnersCount = 1;
+            } else if (p.value === minProLaboreValue) {
+                minProLaborePartnersCount++;
+            }
+          });
+          
+          const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / minProLaborePartnersCount;
+          
+          proLaboresCopy.forEach(p => {
+              if (p.value === minProLaboreValue) {
+                  p.value += valueToAddPerPartner;
+              }
           });
           
           simplesNacionalOtimizado = _calculateSimplesNacional(values, config, proLaboresCopy);
-
-           // Projection Loop
-            let RBT12_atual = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
-            let FS12_atual = values.fp12 > 0 ? values.fp12 : (values.totalSalaryExpense + totalProLaboreOriginal) * 12;
-            let receita_projetada_mensal = totalRevenue;
-            let fs_projetada_mensal = proLaboresCopy.reduce((sum, p) => sum + p.value, 0) + values.totalSalaryExpense;
-
-            let rbt_media_antiga = RBT12_atual / 12.0;
-            let fs_media_antiga = FS12_atual / 12.0;
-
-            let fatorR_projetado = FS12_atual / RBT12_atual;
-             if(isNaN(fatorR_projetado)) fatorR_projetado = 0;
-            let RBT12_projetada = RBT12_atual;
-            let FS12_projetada = FS12_atual;
-            let meses = 0;
-            const MAX_MESES = 24;
-
-            while (fatorR_projetado < config.simples_nacional.limite_fator_r && meses < MAX_MESES) {
-                meses++;
-
-                RBT12_projetada -= rbt_media_antiga;
-                FS12_projetada -= fs_media_antiga;
-
-                RBT12_projetada += receita_projetada_mensal;
-                FS12_projetada += fs_projetada_mensal;
-
-                if (RBT12_projetada > 0) {
-                    fatorR_projetado = FS12_projetada / RBT12_projetada;
-                } else {
-                    break; 
-                }
-            }
-
-            if (simplesNacionalOtimizado) {
-                 if (fatorR_projetado >= config.simples_nacional.limite_fator_r) {
-                    let plural = (meses === 1) ? "mês" : "meses";
-                    simplesNacionalOtimizado.notes.push(`Mantendo esta nova média, estimamos que seu Fator R acumulado atingirá os 28% em aproximadamente ${meses} ${plural}. (Importante: Esta é uma estimativa simplificada. O tempo exato depende da variação do seu faturamento e pró-labore real de cada um dos últimos 12 meses).`);
-                } else {
-                    simplesNacionalOtimizado.notes.push(`Mesmo com este pró-labore, o Fator R não atingiu 28% na simulação de ${MAX_MESES} meses. (Importante: Esta é uma estimativa simplificada. O tempo exato depende da variação do seu faturamento e pró-labore real de cada um dos últimos 12 meses).`);
-                }
-            }
       }
   } else if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR >= config.simples_nacional.limite_fator_r) {
     simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)", optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(simplesNacionalBase.fatorR)} e se beneficia do Anexo III.`};
