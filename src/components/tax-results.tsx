@@ -182,6 +182,9 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 if(scenario.regime.includes('Lucro Presumido')) {
                   title = 'Lucro Presumido';
                   subtitle = scenario.regime.replace('Lucro Presumido', '').trim();
+                } else if (scenario.regime.includes('Simples Nacional')) {
+                  title = 'Simples Nacional';
+                  subtitle = scenario.regime.replace('Simples Nacional', '').trim();
                 }
             } else { // year 2025
                 if (scenario.regime === 'Simples Nacional (Otimizado)') {
