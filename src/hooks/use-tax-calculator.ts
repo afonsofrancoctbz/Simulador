@@ -12,7 +12,6 @@ import { calculateFatorRProjection, type FatorRResponse } from '@/ai/flows/fator
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
-import { useDebounce } from 'react-use';
 
 export function useTaxCalculator(year: number) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
@@ -45,35 +44,47 @@ export function useTaxCalculator(year: number) {
     });
 
     const { watch, getValues } = form;
-    const watchedRbt12 = watch("rbt12");
-    const watchedFp12 = watch("fp12");
-    const watchedRevenues = watch("revenues");
-    const watchedSelectedCnaes = watch("selectedCnaes");
 
+    useEffect(() => {
+        const subscription = watch((value, { name, type }) => {
+            if (
+                name === 'rbt12' ||
+                name === 'fp12' ||
+                (name && name.startsWith('revenues'))
+            ) {
+                const handler = setTimeout(() => {
+                    const fetchFatorRProjection = async () => {
+                        const { rbt12, fp12, revenues, selectedCnaes } = getValues();
+                        const RBT12_atual = rbt12 ?? 0;
+                        const FS12_atual = fp12 ?? 0;
+                        
+                        const domesticRevenue = Object.keys(revenues || {}).filter(k => k.startsWith('domestic_')).reduce((sum, k) => sum + (revenues![k] || 0), 0);
+                        const exportRevenue = Object.keys(revenues || {}).filter(k => k.startsWith('export_')).reduce((sum, k) => sum + (revenues![k] || 0), 0);
+                        const exchangeRate = getValues('exportCurrency') !== 'BRL' ? (getValues('exchangeRate') || 1) : 1;
+                        const receitaMensalProjetada = domesticRevenue + (exportRevenue * exchangeRate);
 
-    useDebounce(() => {
-        const fetchFatorRProjection = async () => {
-            const { rbt12, fp12, revenues, selectedCnaes } = getValues();
-            const RBT12_atual = rbt12 ?? 0;
-            const FS12_atual = fp12 ?? 0;
-            const receitaMensalProjetada = Object.values(revenues ?? {}).reduce((sum, rev) => sum + (rev || 0), 0);
+                        const hasAnnexVActivity = selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
 
-            const hasAnnexVActivity = selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
+                        if (hasAnnexVActivity && RBT12_atual > 0 && FS12_atual > 0 && receitaMensalProjetada > 0) {
+                            try {
+                                const projection = await calculateFatorRProjection({ RBT12_atual, FS12_atual, receitaMensalProjetada });
+                                setFatorRProjection(projection);
+                            } catch (e) {
+                                console.error("Erro ao calcular projeção do Fator R:", e);
+                                setFatorRProjection(null);
+                            }
+                        } else {
+                            setFatorRProjection(null);
+                        }
+                    };
+                    fetchFatorRProjection();
+                }, 500);
 
-            if (hasAnnexVActivity && RBT12_atual > 0 && FS12_atual > 0 && receitaMensalProjetada > 0) {
-                try {
-                    const projection = await calculateFatorRProjection({ RBT12_atual, FS12_atual, receitaMensalProjetada });
-                    setFatorRProjection(projection);
-                } catch (e) {
-                    console.error("Erro ao calcular projeção do Fator R:", e);
-                    setFatorRProjection(null);
-                }
-            } else {
-                setFatorRProjection(null);
+                return () => clearTimeout(handler);
             }
-        };
-        fetchFatorRProjection();
-    }, 500, [watchedRbt12, watchedFp12, watchedRevenues, watchedSelectedCnaes, getValues]);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, getValues]);
 
 
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
@@ -151,7 +162,11 @@ export function useTaxCalculator(year: number) {
         };
     };
 
-    async function onSubmit(values: CalculatorFormValues) {
+    async function onSubmit(e: React.BaseSyntheticEvent) {
+        e.preventDefault();
+        
+        const values = getValues();
+
         setIsLoading(true);
         setResults(null);
         setError(null);
@@ -190,7 +205,7 @@ export function useTaxCalculator(year: number) {
 
     return {
         form,
-        onSubmit: form.handleSubmit(onSubmit),
+        onSubmit,
         results,
         fatorRProjection,
         isLoading,
