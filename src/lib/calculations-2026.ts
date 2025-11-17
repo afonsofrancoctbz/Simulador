@@ -19,7 +19,7 @@ import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): TaxDetails | TaxDetails2026 {
     const fiscalConfig = getFiscalParameters(isPostReform ? values.year || 2026 : 2025);
-    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
+    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes, year = 2026 } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
     
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -47,8 +47,40 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         { name: "INSS s/ Pró-labore", value: totalINSSRetido },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
     ];
+    
+    const notes = [];
 
-    if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
+    // Lógica específica para o ano de transição 2026
+    if (year === 2026 && 'reforma_tributaria' in fiscalConfig) {
+        // 1. Tributos antigos ainda são devidos
+        const pisMultiplier = fiscalConfig.reforma_tributaria.pis_cofins_multiplier;
+        const issMultiplier = fiscalConfig.reforma_tributaria.iss_icms_multiplier;
+
+        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS * pisMultiplier;
+        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS * pisMultiplier;
+        const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
+        const iss = domesticRevenue * issValue * issMultiplier;
+        
+        consumptionTaxes = pis + cofins + iss;
+        if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
+        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
+        if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
+
+        // 2. Cálculo do IVA de teste (não soma ao custo total)
+        const config2026 = fiscalConfig as FiscalConfigPostReform;
+        const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
+        const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
+
+        const testDebitCbs = domesticRevenue * baseCbsRate;
+        const testDebitIbs = domesticRevenue * baseIbsRate;
+        const testCreditCbs = creditGeneratingExpenses * baseCbsRate;
+        const testCreditIbs = creditGeneratingExpenses * baseIbsRate;
+        const testNetCbs = Math.max(0, testDebitCbs - testCreditCbs);
+        const testNetIbs = Math.max(0, testDebitIbs - testCreditIbs);
+
+        notes.push(`Regime de Transição: PIS, COFINS e ISS são devidos. O IVA (IBS/CBS) é calculado apenas para teste. CBS Simulado (Líquido): ${testNetCbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. IBS Simulado (Líquido): ${testNetIbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. Estes valores de teste são compensáveis e não representam custo adicional.`);
+
+    } else if (isPostReform && 'reforma_tributaria' in fiscalConfig) { // Lógica para 2027+
         const config2026 = fiscalConfig as FiscalConfigPostReform;
         const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
         const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
@@ -84,8 +116,10 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         consumptionTaxes = (ibs || 0) + (cbs || 0);
         if (cbs > 0) breakdown.push({ name: `CBS`, value: cbs });
         if (ibs > 0) breakdown.push({ name: `IBS`, value: ibs });
+        
+        notes.push("Cálculo pós-reforma: PIS, COFINS e ISS são substituídos por CBS e IBS. Alíquota do IVA pode ter redução dependendo da atividade. Receitas de exportação são imunes ao IVA. Créditos de insumos foram considerados.");
 
-    } else {
+    } else { // Pré-reforma (Regras Atuais)
         const pisMultiplier = ('reforma_tributaria' in fiscalConfig) ? fiscalConfig.reforma_tributaria.pis_cofins_multiplier : 1;
         const issMultiplier = ('reforma_tributaria' in fiscalConfig) ? fiscalConfig.reforma_tributaria.iss_icms_multiplier : 1;
 
@@ -97,6 +131,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
         if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
         if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
+        notes.push("Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas de PIS/COFINS/ISS.");
     }
 
     const companyRevenueTaxes = irpj + irpjAdicional + csll + consumptionTaxes;
@@ -106,10 +141,12 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     const fee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + fee;
 
-    const regimeName = isPostReform ? 'Lucro Presumido' : 'Lucro Presumido (Regras Atuais)';
-    const notes = isPostReform 
-        ? ["Cálculo pós-reforma: PIS, COFINS e ISS são substituídos por CBS e IBS. Alíquota do IVA pode ter redução dependendo da atividade. Receitas de exportação são imunes ao IVA. Créditos de insumos foram considerados."]
-        : ["Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas de PIS/COFINS/ISS."];
+    let regimeName: TaxDetails['regime'] | TaxDetails2026['regime'] = 'Lucro Presumido';
+    if(isPostReform) {
+      regimeName = year === 2026 ? 'Lucro Presumido (Regime de Transição 2026)' as any : 'Lucro Presumido';
+    } else {
+      regimeName = 'Lucro Presumido (Regras Atuais)';
+    }
 
     const result: TaxDetails | TaxDetails2026 = {
         regime: regimeName as any,
@@ -131,7 +168,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
     const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
-    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
+    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes, year = 2026 } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
     const totalProLaboreBruto = proLaboresToUse.reduce((a, p) => a + p.value, 0);
@@ -259,8 +296,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
     } else {
         const regimeAnexo = finalAnnex === 'III' ? 'Anexo III' : 'Anexo V';
-        const regimeType = isHybrid ? 'Híbrido' : 'Tradicional';
-        regimeName = `Simples Nacional ${regimeType} (${regimeAnexo})`;
+        regimeName = isHybrid ? `Simples Nacional Híbrido (${regimeAnexo})` : `Simples Nacional Tradicional (${regimeAnexo})`;
     }
     
     const result: TaxDetails2026 = {
@@ -316,16 +352,14 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       
       const requiredAnnualPayroll = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
       const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (fp12 > 0 ? fp12 : currentPayroll * 12);
-      const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
-
-      if (fatorR_naoOtimizado < limiteFatorR && additionalMonthlyProLaboreNeeded > 0) {
+      
+      if (fatorR_naoOtimizado < limiteFatorR && additionalAnnualPayrollNeeded > 0) {
           const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
-          
+          const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
+
           let minProLabore = Infinity;
           proLaboresCopy.forEach(p => {
-              if (p.value < minProLabore) {
-                  minProLabore = p.value;
-              }
+              if (p.value < minProLabore) minProLabore = p.value;
           });
           
           const partnersToAdjust = proLaboresCopy.filter(p => p.value === minProLabore);
@@ -334,7 +368,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
           partnersToAdjust.forEach(p => {
               p.value += valueToAddPerPartner;
           });
-
+          
           const optimizedValues = { ...values, proLabores: proLaboresCopy };
           
           simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);
@@ -361,4 +395,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: year >= 2027 ? (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null) : null,
   };
 }
-

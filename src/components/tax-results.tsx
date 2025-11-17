@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -42,9 +41,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
         const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && s.totalMonthlyCost > 0);
         
         if (validScenarios.length > 0) {
-            const scenariosForRecommendation = year === 2026 
-                ? validScenarios.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)')
-                : validScenarios;
+            const scenariosForRecommendation = validScenarios.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)');
             
             if(scenariosForRecommendation.length > 0) {
                 const cheapest = [...scenariosForRecommendation].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
@@ -167,42 +164,29 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
           {scenariosToShow.map((scenario) => {
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
 
-            const isCurrentLpFor2026 = year === 2026 && scenario.regime === 'Lucro Presumido (Regras Atuais)';
+            const isCurrentLpFor2026 = year >= 2026 && scenario.regime === 'Lucro Presumido (Regras Atuais)';
             const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && scenario.optimizationNote === cheapestScenario.optimizationNote && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0 && !isCurrentLpFor2026;
             const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && scenario.optimizationNote === selectedDetails.optimizationNote;
 
             const groupedTaxes = groupTaxes(scenario);
             const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
-            let title = scenario.regime;
-            let subtitle = '';
+            let title = scenario.regime.replace(/ \(.+\)/, ''); // Remove parênteses como (Anexo V)
+            let subtitle = scenario.regime.match(/\((.+)\)/)?.[1] || '';
+
 
             if (year >= 2026) {
-                if (scenario.regime.includes('Simples Nacional')) {
-                    title = 'Simples Nacional';
-                    subtitle = scenario.regime.replace('Simples Nacional', '').trim();
-                } else if (scenario.regime === 'Lucro Presumido (Regras Atuais)') {
-                    title = 'Lucro Presumido';
-                    subtitle = '(Regras Atuais)';
-                } else {
-                    title = 'Lucro Presumido';
-                    subtitle = '(Pós-Reforma)';
+                if(scenario.regime.includes('Lucro Presumido')) {
+                  title = 'Lucro Presumido';
+                  subtitle = scenario.regime.replace('Lucro Presumido', '').trim();
                 }
             } else { // year 2025
                 if (scenario.regime === 'Simples Nacional (Otimizado)') {
-                    title = 'Simples Nacional - Anexo III';
-                    subtitle = 'Com Fator R Otimizado';
+                    title = 'Simples Nacional';
+                    subtitle = 'Com Fator R Otimizado (Anexo III)';
                 } else if (scenario.regime === 'Simples Nacional') {
-                    if (scenario.annex === 'Anexo V') {
-                      title = 'Simples Nacional - Anexo V';
-                      subtitle = 'Sem Otimização de Fator R';
-                    } else {
-                      title = `Simples Nacional - ${scenario.annex || 'Padrão'}`;
-                      subtitle = '';
-                    }
-                } else {
-                    title = 'Lucro Presumido';
-                    subtitle = '';
+                      title = 'Simples Nacional';
+                      subtitle = `Padrão (${scenario.annex || 'Anexo V'})`;
                 }
             }
             
@@ -279,9 +263,9 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                               } else if (item.name.toLowerCase().includes('iss')) {
                                   const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1] || '0') / 100;
                                   rateInfo = `(${(rateFromName * 100).toFixed(2).replace('.', ',')}%)`;
-                              } else if (item.value > 0 && scenario.regime === 'Lucro Presumido' && (item.name.toLowerCase().includes('irpj') || item.name.toLowerCase().includes('csll'))) {
+                              } else if (item.value > 0 && scenario.regime.includes('Lucro Presumido') && (item.name.toLowerCase().includes('irpj') || item.name.toLowerCase().includes('csll'))) {
                                   rateInfo = `(${(item.value / scenario.totalRevenue * 100).toFixed(2).replace('.', ',')}%)`;
-                              } else if (item.value > 0 && scenario.regime === 'Lucro Presumido' && (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins'))) {
+                              } else if (item.value > 0 && scenario.regime.includes('Lucro Presumido') && (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins'))) {
                                     if (domesticRevenue > 0) rateInfo = `(${(item.value / domesticRevenue * 100).toFixed(2).replace('.',',')}%)`;
                               }
                               
@@ -302,7 +286,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                             )})}
                             </div>
                             
-                            {scenario.regime === 'Lucro Presumido' && groupName.includes('TRIMESTRAL') && (
+                            {scenario.regime.includes('Lucro Presumido') && groupName.includes('TRIMESTRAL') && (
                                 <div className="text-right rounded-lg pt-1 text-xs font-semibold flex items-center justify-end gap-2">
                                   <div className='border-primary/50 text-primary/90 rounded-md px-2 py-0.5 text-sm'>
                                     <span>Alíquota Efetiva s/ Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
@@ -329,7 +313,7 @@ export default function TaxResults({ year, isLoading, results, error }: TaxResul
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
                                 <span>
-                                    {scenario.optimizationNote && `${scenario.optimizationNote}`}
+                                    {scenario.optimizationNote && `${scenario.optimizationNote} `}
                                     {scenario.notes.join(' ')}
                                 </span>
                             </AlertDescription>
