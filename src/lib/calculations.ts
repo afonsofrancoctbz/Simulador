@@ -1,5 +1,4 @@
 
-
 import type { FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -252,7 +251,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     
     if (proLaboreOverride) {
         finalResult.regime = "Simples Nacional (Otimizado)";
-        finalResult.optimizationNote = `Pró-labore ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} para atingir o Fator R e tributar pelo Anexo III.`;
+        finalResult.optimizationNote = `Para buscar o Anexo III, o pró-labore total foi ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}.`;
     }
 
     return finalResult;
@@ -285,7 +284,7 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
 
       if (additionalAnnualPayrollNeeded > 0) {
           const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
-
+          
           let minProLaboreValue = Infinity;
           proLaboresCopy.forEach(p => {
               if (p.value < minProLaboreValue) minProLaboreValue = p.value;
@@ -310,6 +309,7 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
             let fs_media_antiga = FS12_atual / 12.0;
 
             let fatorR_projetado = FS12_atual / RBT12_atual;
+             if(isNaN(fatorR_projetado)) fatorR_projetado = 0;
             let RBT12_projetada = RBT12_atual;
             let FS12_projetada = FS12_atual;
             let meses = 0;
@@ -334,9 +334,9 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
             if (simplesNacionalOtimizado) {
                  if (fatorR_projetado >= config.simples_nacional.limite_fator_r) {
                     let plural = (meses === 1) ? "mês" : "meses";
-                    simplesNacionalOtimizado.notes.push(`Mantendo esta média de faturamento e pró-labore, seu Fator R acumulado atingirá os 28% (Anexo III) em aproximadamente ${meses} ${plural}.`);
+                    simplesNacionalOtimizado.notes.push(`Mantendo esta nova média, estimamos que seu Fator R acumulado atingirá os 28% em aproximadamente ${meses} ${plural}. (Importante: Esta é uma estimativa simplificada. O tempo exato depende da variação do seu faturamento e pró-labore real de cada um dos últimos 12 meses).`);
                 } else {
-                    simplesNacionalOtimizado.notes.push(`Mesmo com este pró-labore, o Fator R não atingiu 28% na simulação de ${MAX_MESES} meses.`);
+                    simplesNacionalOtimizado.notes.push(`Mesmo com este pró-labore, o Fator R não atingiu 28% na simulação de ${MAX_MESES} meses. (Importante: Esta é uma estimativa simplificada. O tempo exato depende da variação do seu faturamento e pró-labore real de cada um dos últimos 12 meses).`);
                 }
             }
       }

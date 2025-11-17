@@ -1,3 +1,4 @@
+
 import { getFiscalParameters, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -52,7 +53,6 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
 
     // Lógica específica para o ano de transição 2026
     if (year === 2026 && 'reforma_tributaria' in fiscalConfig) {
-        // 1. Tributos antigos ainda são devidos
         const pisMultiplier = fiscalConfig.reforma_tributaria.pis_cofins_multiplier;
         const issMultiplier = fiscalConfig.reforma_tributaria.iss_icms_multiplier;
 
@@ -62,11 +62,10 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const iss = domesticRevenue * issValue * issMultiplier;
         
         consumptionTaxes = pis + cofins + iss;
-        if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
-        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
+        if (pis > 0) breakdown.push({ name: `PIS (0,65%)`, value: pis });
+        if (cofins > 0) breakdown.push({ name: `COFINS (3,00%)`, value: cofins });
         if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
 
-        // 2. Cálculo do IVA de teste (não soma ao custo total)
         const config2026 = fiscalConfig as FiscalConfigPostReform;
         const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
         const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
@@ -78,7 +77,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const testNetCbs = Math.max(0, testDebitCbs - testCreditCbs);
         const testNetIbs = Math.max(0, testDebitIbs - testCreditIbs);
 
-        notes.push(`IVA Dual - Simulação de Teste (2026): CBS ${testNetCbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} e IBS ${testNetIbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. Estes valores são compensáveis e não representam custo adicional no caixa.`);
+        notes.push(`IVA Dual - Simulação de Teste (2026): CBS ${testNetCbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} e IBS ${testNetIbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. Estes valores são de teste, compensáveis e não representam custo adicional no caixa.`);
 
     } else if (isPostReform && 'reforma_tributaria' in fiscalConfig) { // Lógica para 2027+
         const config2026 = fiscalConfig as FiscalConfigPostReform;
@@ -315,7 +314,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     };
 
      if (proLaboreOverride) {
-        result.optimizationNote = `Pró-labore ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} para atingir o Fator R e tributar pelo Anexo III.`;
+        result.optimizationNote = `Para buscar o Anexo III, o pró-labore total foi ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}.`;
     }
     return result;
 }
@@ -357,7 +356,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       if (fatorR_naoOtimizado < limiteFatorR && additionalAnnualPayrollNeeded > 0) {
           const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
           const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
-          
+
           let minProLaboreValue = Infinity;
           proLaboresCopy.forEach(p => {
               if (p.value < minProLaboreValue) minProLaboreValue = p.value;
@@ -387,6 +386,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
             let fs_media_antiga = FS12_atual / 12.0;
 
             let fatorR_projetado = FS12_atual / RBT12_atual;
+            if(isNaN(fatorR_projetado)) fatorR_projetado = 0;
             let RBT12_projetada = RBT12_atual;
             let FS12_projetada = FS12_atual;
             let meses = 0;
@@ -410,11 +410,11 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
              if (simplesNacionalOtimizado) {
                  if (fatorR_projetado >= fiscalConfig.simples_nacional.limite_fator_r) {
                     let plural = (meses === 1) ? "mês" : "meses";
-                    const note = `Mantendo esta média de faturamento e pró-labore, seu Fator R acumulado atingirá os 28% (Anexo III) em aproximadamente ${meses} ${plural}.`;
+                    const note = `Mantendo esta nova média, estimamos que seu Fator R acumulado atingirá os 28% em aproximadamente ${meses} ${plural}. (Importante: Esta é uma estimativa simplificada. O tempo exato depende da variação do seu faturamento e pró-labore real de cada um dos últimos 12 meses).`;
                     simplesNacionalOtimizado.notes.push(note);
                     if(simplesNacionalOtimizadoHibrido) simplesNacionalOtimizadoHibrido.notes.push(note);
                 } else {
-                    const note = `Mesmo com este pró-labore, o Fator R não atingiu 28% na simulação de ${MAX_MESES} meses.`;
+                    const note = `Mesmo com este pró-labore, o Fator R não atingiu 28% na simulação de ${MAX_MESES} meses. (Importante: Esta é uma estimativa simplificada. O tempo exato depende da variação do seu faturamento e pró-labore real de cada um dos últimos 12 meses).`;
                     simplesNacionalOtimizado.notes.push(note);
                     if(simplesNacionalOtimizadoHibrido) simplesNacionalOtimizadoHibrido.notes.push(note);
                 }
