@@ -2,6 +2,7 @@
 
 import AppFooter from "@/components/app-footer";
 import AppHeader from "@/components/app-header";
+import CalculatorPlaybookSection from "@/components/calculator-playbook-section";
 import CnaeTaxInfoSection from "@/components/cnae-tax-info-section";
 import PfPjTaxReformSection from "@/components/pf-pj-tax-reform-section";
 import SinTaxInfoSection from "@/components/sin-tax-info-section";
@@ -20,6 +21,7 @@ export default function PlaybookPage() {
                     </div>
                 </section>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12 space-y-24">
+                    <CalculatorPlaybookSection />
                     <PfPjTaxReformSection />
                     <SinTaxInfoSection />
                     <CnaeTaxInfoSection />
