@@ -44,24 +44,21 @@ export function useTaxCalculator(year: number) {
         },
     });
 
-    const { rbt12, fp12, revenues } = form.watch();
-    const { getValues } = form;
+    const { watch, getValues } = form;
+    const watchedRbt12 = watch("rbt12");
+    const watchedFp12 = watch("fp12");
+    const watchedRevenues = watch("revenues");
+    const watchedSelectedCnaes = watch("selectedCnaes");
 
-    const [debouncedRbt12, setDebouncedRbt12] = useState(rbt12);
-    const [debouncedFp12, setDebouncedFp12] = useState(fp12);
-    const [debouncedRevenues, setDebouncedRevenues] = useState(revenues);
 
-    useDebounce(() => setDebouncedRbt12(rbt12), 500, [rbt12]);
-    useDebounce(() => setDebouncedFp12(fp12), 500, [fp12]);
-    useDebounce(() => setDebouncedRevenues(revenues), 500, [revenues]);
-
-    useEffect(() => {
+    useDebounce(() => {
         const fetchFatorRProjection = async () => {
-            const RBT12_atual = debouncedRbt12 ?? 0;
-            const FS12_atual = debouncedFp12 ?? 0;
-            const receitaMensalProjetada = Object.values(debouncedRevenues ?? {}).reduce((sum, rev) => sum + (rev || 0), 0);
+            const { rbt12, fp12, revenues, selectedCnaes } = getValues();
+            const RBT12_atual = rbt12 ?? 0;
+            const FS12_atual = fp12 ?? 0;
+            const receitaMensalProjetada = Object.values(revenues ?? {}).reduce((sum, rev) => sum + (rev || 0), 0);
 
-            const hasAnnexVActivity = getValues('selectedCnaes').some(item => getCnaeData(item.code)?.requiresFatorR);
+            const hasAnnexVActivity = selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
 
             if (hasAnnexVActivity && RBT12_atual > 0 && FS12_atual > 0 && receitaMensalProjetada > 0) {
                 try {
@@ -76,7 +73,7 @@ export function useTaxCalculator(year: number) {
             }
         };
         fetchFatorRProjection();
-    }, [debouncedRbt12, debouncedFp12, debouncedRevenues, getValues]);
+    }, 500, [watchedRbt12, watchedFp12, watchedRevenues, watchedSelectedCnaes, getValues]);
 
 
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
@@ -193,7 +190,7 @@ export function useTaxCalculator(year: number) {
 
     return {
         form,
-        onSubmit,
+        onSubmit: form.handleSubmit(onSubmit),
         results,
         fatorRProjection,
         isLoading,
