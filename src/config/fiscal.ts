@@ -87,12 +87,12 @@ export const FISCAL_CONFIG_2025 = {
 
 const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_multiplier: number; iss_icms_multiplier: number } } = {
     2026: { cbs: 0.009, ibs: 0.001, pis_cofins_multiplier: 1, iss_icms_multiplier: 1 },
-    2027: { cbs: 0.088 - 0.001, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS alíquota plena - 0.10 p.p.
-    2028: { cbs: 0.088 - 0.001, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS alíquota plena - 0.10 p.p.
-    2029: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 9/10 },
-    2030: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 8/10 },
-    2031: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 7/10 },
-    2032: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 6/10 }, // Simplificado, na realidade 1/10 a 6/10
+    2027: { cbs: 0.087, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS Alíquota plena de 8,8% - 0,1p.p; IBS de 0,1%
+    2028: { cbs: 0.088, ibs: 0.002, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS Plena; IBS 0,2%
+    2029: { cbs: 0.088, ibs: 0.177 * 0.1, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.9 },
+    2030: { cbs: 0.088, ibs: 0.177 * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
+    2031: { cbs: 0.088, ibs: 0.177 * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
+    2032: { cbs: 0.088, ibs: 0.177 * 0.4, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.6 },
     2033: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
 };
 
