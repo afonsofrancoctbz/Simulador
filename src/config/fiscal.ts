@@ -1,6 +1,5 @@
 
 
-
 // Baseado na sua solicitação para um arquivo de configuração centralizado.
 // Todos os parâmetros fiscais que podem mudar ano a ano são armazenados aqui.
 
@@ -85,15 +84,19 @@ export const FISCAL_CONFIG_2025 = {
   }
 };
 
+const IVA_FULL_RATE = { cbs: 0.09, ibs: 0.18 };
+
 const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_multiplier: number; iss_icms_multiplier: number } } = {
     2026: { cbs: 0.009, ibs: 0.001, pis_cofins_multiplier: 1, iss_icms_multiplier: 1 },
-    2027: { cbs: 0.087, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS Alíquota plena de 8,8% - 0,1p.p; IBS de 0,1%
-    2028: { cbs: 0.088, ibs: 0.002, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // CBS Plena; IBS 0,2%
-    2029: { cbs: 0.088, ibs: 0.177 * 0.1, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.9 },
-    2030: { cbs: 0.088, ibs: 0.177 * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
-    2031: { cbs: 0.088, ibs: 0.177 * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
-    2032: { cbs: 0.088, ibs: 0.177 * 0.4, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.6 },
-    2033: { cbs: 0.088, ibs: 0.177, pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
+    2027: { cbs: 0.089, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
+    2028: { cbs: 0.09, ibs: 0.002, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
+    2029: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.1, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.9 },
+    2030: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
+    2031: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
+    2032: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.4, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.6 },
+    // A tabela original tinha o multiplicador de 60%, mas para chegar a 100% em 2033, o restante deve ser 100-40=60. 
+    // Para simplificar e garantir a extinção, 2032 assume o restante.
+    2033: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs, pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
 };
 
 const getTransitionConfig = (year: number) => {

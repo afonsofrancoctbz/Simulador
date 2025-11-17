@@ -13,7 +13,7 @@ import {
   type TaxDetails,
   type ProLaboreForm,
 } from './types';
-import { formatPercent, findBracket, findFeeBracket } from './utils';
+import { formatPercent, findBracket, findFeeBracket, formatCurrencyBRL } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
@@ -57,7 +57,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
     if (isPostReform && 'reforma_tributaria' in fiscalConfig) {
         const configTransition = fiscalConfig.reforma_tributaria;
 
-        // PIS/COFINS (pré-reforma)
+        // PIS/COFINS (pré-reforma) - continuam existindo de 2026-2028
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS * configTransition.pis_cofins_multiplier;
         const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS * configTransition.pis_cofins_multiplier;
         if (pis > 0) breakdown.push({ name: `PIS (0,65%)`, value: pis });
@@ -102,15 +102,22 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const cbsFinal = Math.max(0, totalCbsDebit - totalCreditCbs);
         const ibsFinal = Math.max(0, totalIbsDebit - totalCreditIbs);
 
-        consumptionTaxes += cbsFinal + ibsFinal;
-        if (cbsFinal > 0) breakdown.push({ name: `CBS`, value: cbsFinal });
-        if (ibsFinal > 0) breakdown.push({ name: `IBS`, value: ibsFinal });
+        let realConsumptionTaxes = cbsFinal + ibsFinal + consumptionTaxes;
         
         if (year === 2026) {
-          notes.push(`IVA Dual - Simulação de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) destacado em nota é compensável com o PIS/COFINS devido, não representando custo adicional.`);
+          // Em 2026, CBS/IBS são compensáveis com PIS/COFINS, então o custo real não os inclui.
+          realConsumptionTaxes = consumptionTaxes;
+          notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) destacado em nota é compensável com o PIS/COFINS devido, não representando custo adicional.`);
+          if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste - 0,9%)`, value: cbsFinal });
+          if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste - 0,1%)`, value: ibsFinal });
         } else {
-          notes.push(`Cálculo em transição: PIS/COFINS são substituídos por CBS. ISS é gradualmente substituído por IBS. Alíquota do IVA pode ter redução dependendo da atividade. Créditos de insumos foram considerados.`);
+            consumptionTaxes += cbsFinal + ibsFinal;
+            if (cbsFinal > 0) breakdown.push({ name: `CBS`, value: cbsFinal });
+            if (ibsFinal > 0) breakdown.push({ name: `IBS`, value: ibsFinal });
+            notes.push(`Cálculo em transição: PIS/COFINS são substituídos por CBS. ISS é gradualmente substituído por IBS. Alíquota do IVA pode ter redução dependendo da atividade. Créditos de insumos foram considerados.`);
         }
+        consumptionTaxes = realConsumptionTaxes;
+
 
     } else { // Pré-reforma Pura (Cenário "Regras Atuais")
         const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
@@ -272,7 +279,11 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
     const notes = [];
     if (isHybrid) {
-      notes.push(`Cenário competitivo para B2B: ${formatPercent((b2bRevenuePercentage ?? 100)/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
+      if (year === 2026) {
+        notes.push(`SN Híbrido não aplicável em 2026. O regime opcional de apuração do IVA por fora do Simples Nacional inicia em 2027.`);
+      } else {
+        notes.push(`Cenário competitivo para B2B: ${formatPercent((b2bRevenuePercentage ?? 100)/100)} da receita doméstica paga IVA por fora, gerando crédito para o cliente. O DAS é reduzido. Receitas de exportação são imunes ao IVA.`);
+      }
     } else {
       notes.push("Regime padrão do Simples. O crédito de IVA para clientes B2B é limitado. Receitas de exportação têm tributos sobre consumo zerados dentro do DAS.");
     }
@@ -359,9 +370,9 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
                 minProLaborePartnersCount++;
             }
           });
-
+          
           const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / minProLaborePartnersCount;
-
+          
           proLaboresCopy.forEach(p => {
               if (p.value === minProLaboreValue) {
                   p.value += valueToAddPerPartner;
