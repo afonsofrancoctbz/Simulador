@@ -22,7 +22,7 @@ interface TaxResultsProps {
 }
 
 type SelectedScenario = {
-  regime: TaxDetails['regime'] | TaxDetails2026['regime'];
+  regime: TaxDetails['regime'];
   optimizationNote?: string | null;
 } | null;
 
