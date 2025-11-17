@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -47,15 +48,15 @@ interface TaxCalculatorFormProps {
     year: number;
     onCnaeSelectorOpen: () => void;
     isLoading: boolean;
-    onSubmit: (e: React.BaseSyntheticEvent) => Promise<void>;
+    onSubmit: (values: CalculatorFormValues) => void;
 }
 
 export function TaxCalculatorForm({ year, onCnaeSelectorOpen, isLoading, onSubmit }: TaxCalculatorFormProps) {
-    const form = useFormContext();
+    const form = useFormContext<CalculatorFormValues>();
     const { currentStep, steps, goToStep } = useMultiStepForm();
 
     return (
-        <form onSubmit={onSubmit} className="max-w-4xl mx-auto space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-8">
             <MultiStepForm currentStep={currentStep} steps={steps} onStepClick={goToStep} />
 
             <div className={currentStep === 1 ? 'block' : 'hidden'}><FormSectionCompany /></div>

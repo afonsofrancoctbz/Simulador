@@ -64,7 +64,7 @@ export function useTaxCalculator(year: number) {
 
             const hasAnnexVActivity = selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
 
-            if (hasAnnexVActivity && RBT12_atual > 0 && FS12_atual > 0 && receitaMensalProjetada > 0) {
+            if (hasAnnexVActivity && RBT12_atual > 0 && receitaMensalProjetada > 0) {
                 try {
                     const projection = await calculateFatorRProjection({ RBT12_atual, FS12_atual, receitaMensalProjetada });
                     setFatorRProjection(projection);
@@ -77,7 +77,7 @@ export function useTaxCalculator(year: number) {
             }
         };
         fetchFatorRProjection();
-    }, 500, [watchedRbt12, watchedFp12, watchedRevenues, watchedCnaes]);
+    }, 500, [watchedRbt12, watchedFp12, watchedRevenues, watchedCnaes, getValues]);
 
 
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
@@ -155,12 +155,9 @@ export function useTaxCalculator(year: number) {
         };
     };
 
-    async function onSubmit(e: React.BaseSyntheticEvent) {
-        e.preventDefault();
+    async function onSubmit(values: CalculatorFormValues) {
         
         // We use getValues() here to ensure we get the latest form state at the time of submission.
-        const values = getValues();
-        // Trigger validation before submitting
         const isValid = await form.trigger();
         if (!isValid) {
             toast({
