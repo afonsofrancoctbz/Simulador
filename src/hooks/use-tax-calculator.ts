@@ -45,6 +45,7 @@ export function useTaxCalculator(year: number) {
     });
 
     const { rbt12, fp12, revenues } = form.watch();
+    const { getValues } = form;
 
     const [debouncedRbt12, setDebouncedRbt12] = useState(rbt12);
     const [debouncedFp12, setDebouncedFp12] = useState(fp12);
@@ -60,7 +61,7 @@ export function useTaxCalculator(year: number) {
             const FS12_atual = debouncedFp12 ?? 0;
             const receitaMensalProjetada = Object.values(debouncedRevenues ?? {}).reduce((sum, rev) => sum + (rev || 0), 0);
 
-            const hasAnnexVActivity = form.getValues('selectedCnaes').some(item => getCnaeData(item.code)?.requiresFatorR);
+            const hasAnnexVActivity = getValues('selectedCnaes').some(item => getCnaeData(item.code)?.requiresFatorR);
 
             if (hasAnnexVActivity && RBT12_atual > 0 && FS12_atual > 0 && receitaMensalProjetada > 0) {
                 try {
@@ -75,7 +76,7 @@ export function useTaxCalculator(year: number) {
             }
         };
         fetchFatorRProjection();
-    }, [debouncedRbt12, debouncedFp12, debouncedRevenues, form]);
+    }, [debouncedRbt12, debouncedFp12, debouncedRevenues, getValues]);
 
 
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
