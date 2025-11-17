@@ -167,7 +167,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
             const isOtimizado = scenario.regime.includes('Otimizado');
             
-            const projectionNote = isOtimizado && fatorRProjection ? fatorRProjection.textoMensagem : null;
+            const projectionNote = isOtimizado && fatorRProjection && !fatorRProjection.isEnquadradoAgora ? fatorRProjection.textoMensagem : null;
             const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
 
 
