@@ -78,7 +78,7 @@ function calculateLucroPresumido(values: TaxFormValues, isPostReform: boolean): 
         const testNetCbs = Math.max(0, testDebitCbs - testCreditCbs);
         const testNetIbs = Math.max(0, testDebitIbs - testCreditIbs);
 
-        notes.push(`Regime de Transição: PIS, COFINS e ISS são devidos. O IVA (IBS/CBS) é calculado apenas para teste. CBS Simulado (Líquido): ${testNetCbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. IBS Simulado (Líquido): ${testNetIbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. Estes valores de teste são compensáveis e não representam custo adicional.`);
+        notes.push(`IVA Dual - Simulação de Teste (2026): CBS ${testNetCbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} e IBS ${testNetIbs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}. Estes valores são compensáveis e não representam custo adicional no caixa.`);
 
     } else if (isPostReform && 'reforma_tributaria' in fiscalConfig) { // Lógica para 2027+
         const config2026 = fiscalConfig as FiscalConfigPostReform;
@@ -351,18 +351,19 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
       
       const requiredAnnualPayroll = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
-      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - (fp12 > 0 ? fp12 : currentPayroll * 12);
+      const currentAnnualPayroll = (fp12 > 0 ? fp12 : currentPayroll * 12);
+      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - currentAnnualPayroll;
       
       if (fatorR_naoOtimizado < limiteFatorR && additionalAnnualPayrollNeeded > 0) {
           const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
           const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
-
-          let minProLabore = Infinity;
-          proLaboresCopy.forEach(p => {
-              if (p.value < minProLabore) minProLabore = p.value;
-          });
           
-          const partnersToAdjust = proLaboresCopy.filter(p => p.value === minProLabore);
+          let minProLaboreValue = Infinity;
+          proLaboresCopy.forEach(p => {
+              if (p.value < minProLaboreValue) minProLaboreValue = p.value;
+          });
+
+          const partnersToAdjust = proLaboresCopy.filter(p => p.value === minProLaboreValue);
           const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / partnersToAdjust.length;
 
           partnersToAdjust.forEach(p => {
@@ -375,6 +376,51 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
           if (year >= 2027) {
             simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, proLaboresCopy);
           }
+
+           // Projection Loop
+            let RBT12_atual = values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12;
+            let FS12_atual = values.fp12 > 0 ? values.fp12 : (values.totalSalaryExpense + currentTotalProLabore) * 12;
+            let receita_projetada_mensal = totalRevenue;
+            let fs_projetada_mensal = proLaboresCopy.reduce((sum, p) => sum + p.value, 0) + values.totalSalaryExpense;
+
+            let rbt_media_antiga = RBT12_atual / 12.0;
+            let fs_media_antiga = FS12_atual / 12.0;
+
+            let fatorR_projetado = FS12_atual / RBT12_atual;
+            let RBT12_projetada = RBT12_atual;
+            let FS12_projetada = FS12_atual;
+            let meses = 0;
+            const MAX_MESES = 24;
+
+            while (fatorR_projetado < fiscalConfig.simples_nacional.limite_fator_r && meses < MAX_MESES) {
+                meses++;
+
+                RBT12_projetada -= rbt_media_antiga;
+                FS12_projetada -= fs_media_antiga;
+
+                RBT12_projetada += receita_projetada_mensal;
+                FS12_projetada += fs_projetada_mensal;
+
+                if (RBT12_projetada > 0) {
+                    fatorR_projetado = FS12_projetada / RBT12_projetada;
+                } else {
+                    break;
+                }
+            }
+             if (simplesNacionalOtimizado) {
+                 if (fatorR_projetado >= fiscalConfig.simples_nacional.limite_fator_r) {
+                    let plural = (meses === 1) ? "mês" : "meses";
+                    const note = `Mantendo esta média de faturamento e pró-labore, seu Fator R acumulado atingirá os 28% (Anexo III) em aproximadamente ${meses} ${plural}.`;
+                    simplesNacionalOtimizado.notes.push(note);
+                    if(simplesNacionalOtimizadoHibrido) simplesNacionalOtimizadoHibrido.notes.push(note);
+                } else {
+                    const note = `Mesmo com este pró-labore, o Fator R não atingiu 28% na simulação de ${MAX_MESES} meses.`;
+                    simplesNacionalOtimizado.notes.push(note);
+                    if(simplesNacionalOtimizadoHibrido) simplesNacionalOtimizadoHibrido.notes.push(note);
+                }
+            }
+
+
       } else if (fatorR_naoOtimizado >= limiteFatorR) {
         simplesNacionalOtimizado = { ...simplesNacionalTradicional, regime: 'Simples Nacional (Fator R Otimizado)', optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(fatorR_naoOtimizado)} e se beneficia do Anexo III.` };
         if (year >= 2027 && simplesNacionalHibrido) {
