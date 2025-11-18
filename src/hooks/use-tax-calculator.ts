@@ -53,9 +53,12 @@ export function useTaxCalculator(year: number) {
 
     useDebounce(() => {
         const fetchFatorRProjection = async () => {
-            const { rbt12, fp12, revenues, selectedCnaes, exportCurrency, exchangeRate } = getValues();
+            const { rbt12, fp12, revenues, selectedCnaes, exportCurrency, exchangeRate, proLabores, totalSalaryExpense } = getValues();
             const RBT12_atual = rbt12 ?? 0;
-            const FS12_atual = fp12 ?? 0;
+            
+            const totalProLaboreMensal = proLabores.reduce((sum, p) => sum + p.value, 0);
+            const folhaMensal = totalSalaryExpense + totalProLaboreMensal;
+            const FS12_atual = fp12 > 0 ? fp12 : folhaMensal * 12;
             
             const domesticRevenue = Object.keys(revenues || {}).filter(k => k.startsWith('domestic_')).reduce((sum, k) => sum + (revenues![k] || 0), 0);
             const exportRevenueVal = Object.keys(revenues || {}).filter(k => k.startsWith('export_')).reduce((sum, k) => sum + (revenues![k] || 0), 0);
