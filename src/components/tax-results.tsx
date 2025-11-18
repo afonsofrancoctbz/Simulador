@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -374,7 +375,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                               <div className="w-full bg-muted rounded-full h-2 mt-1 overflow-hidden print-hidden">
                                   <div className="bg-gradient-to-r from-green-300 via-primary to-blue-800 h-2.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
                               </div>
-                              <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(costPercentage)} do faturamento</p>
+                              <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(scenario.effectiveRate)} do faturamento</p>
                           </div>
                       </div>
                   </div>

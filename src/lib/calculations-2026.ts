@@ -17,7 +17,6 @@ import {
 import { formatPercent, findBracket, findFeeBracket, formatCurrencyBRL } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
-import { CNAE_CLASSES_2026, CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean): TaxDetails | TaxDetails2026 {
     const year = values.year || 2026;
@@ -78,8 +77,8 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
         const iss = domesticRevenue * issValue * configTransition.iss_icms_multiplier;
         if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
-
-        consumptionTaxes += pis + cofins + iss;
+        
+        const oldTaxesCost = pis + cofins + iss;
         
         // Novos impostos (CBS/IBS)
         const baseCbsRate = configTransition.cbs_aliquota_padrao;
@@ -87,37 +86,36 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
 
         let totalIbsDebit = 0;
         let totalCbsDebit = 0;
-        let weightedIbsReduction = 0;
-        let weightedCbsReduction = 0;
         
-        let cbsReductionFactor = 0;
-        let ibsReductionFactor = 0;
-
+        let totalCbsCredit = 0;
+        let totalIbsCredit = 0;
+        
         domesticActivities.forEach(activity => {
-            const selectedCnae = selectedCnaes.find(sc => sc.code === activity.code);
-            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code.replace(/\D/g, '') && (!selectedCnae?.cClass || r.cClassTrib === selectedCnae.cClass));
-            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === (relationship?.cClassTrib || '000001'));
+            const cnaeInfo = getCnaeData(activity.code);
+            const reduction = cnaeInfo?.ivaReduction ?? 0;
             
-            ibsReductionFactor = (cClass?.ibsReduction ?? 0) / 100;
-            cbsReductionFactor = (cClass?.cbsReduction ?? 0) / 100;
-            
-            totalIbsDebit += activity.revenue * (baseIbsRate * (1 - ibsReductionFactor));
-            totalCbsDebit += activity.revenue * (baseCbsRate * (1 - cbsReductionFactor));
+            totalCbsDebit += activity.revenue * (baseCbsRate * (1 - reduction));
+            totalIbsDebit += activity.revenue * (baseIbsRate * (1 - reduction));
         });
-        
-        const totalCreditIbs = creditGeneratingExpenses * (baseIbsRate * (1 - ibsReductionFactor));
-        const totalCreditCbs = creditGeneratingExpenses * (baseCbsRate * (1 - cbsReductionFactor));
-        
-        const cbsFinal = Math.max(0, totalCbsDebit - totalCreditCbs);
-        const ibsFinal = Math.max(0, totalIbsDebit - totalCreditIbs);
 
-        // Apenas em 2026 o custo do IVA não entra no caixa.
+        // O crédito é calculado sobre as despesas usando a alíquota cheia do setor
+        if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
+             const representativeCnae = getCnaeData(domesticActivities[0].code);
+             const reduction = representativeCnae?.ivaReduction ?? 0;
+             totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reduction));
+             totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reduction));
+        }
+        
+        const cbsFinal = Math.max(0, totalCbsDebit - totalCbsCredit);
+        const ibsFinal = Math.max(0, totalIbsDebit - totalIbsCredit);
+
         if (year === 2026) {
             notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) é informativo e compensável com PIS/COFINS, não representando custo adicional de caixa.`);
             if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste/Compensável - ${formatPercent(baseCbsRate)})`, value: cbsFinal });
             if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste/Compensável - ${formatPercent(baseIbsRate)})`, value: ibsFinal });
+            consumptionTaxes = oldTaxesCost;
         } else {
-            consumptionTaxes += cbsFinal + ibsFinal;
+            consumptionTaxes = oldTaxesCost + cbsFinal + ibsFinal;
             if (cbsFinal > 0) breakdown.push({ name: `CBS (Líquida)`, value: cbsFinal });
             if (ibsFinal > 0) breakdown.push({ name: `IBS (Líquido)`, value: ibsFinal });
             if (year > 2026 && year < 2033) {
@@ -145,7 +143,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         domesticRevenue,
         exportRevenue: exportRevenueBRL,
         proLabore: totalProLaboreBruto,
-        effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
+        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
         contabilizeiFee: fee,
         breakdown: breakdown.filter(i => i.value > 0.001),
         notes,
@@ -223,32 +221,32 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
       let totalIbsDebit = 0;
       let totalCbsDebit = 0;
-      let ibsReductionFactor = 0;
-      let cbsReductionFactor = 0;
       
+      let totalCbsCredit = 0;
+      let totalIbsCredit = 0;
+
       const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
       
       domesticActivities.forEach(activity => {
           if(activity.revenue > 0) {
-            const selectedCnae = selectedCnaes.find(sc => sc.code === activity.code);
-            const relationship = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === activity.code.replace(/\D/g, '') && (!selectedCnae?.cClass || r.cClassTrib === selectedCnae.cClass));
-            const cClass = CNAE_CLASSES_2026.find(c => c.cClass === (relationship?.cClassTrib || '000001'));
-
-            ibsReductionFactor = (cClass?.ibsReduction ?? 0) / 100;
-            cbsReductionFactor = (cClass?.cbsReduction ?? 0) / 100;
-
+            const cnaeInfo = getCnaeData(activity.code);
+            const reduction = cnaeInfo?.ivaReduction ?? 0;
             const activityB2bRevenue = activity.revenue * b2bRevenuePortion;
-
-            totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - ibsReductionFactor));
-            totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - cbsReductionFactor));
+            
+            totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - reduction));
+            totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - reduction));
           }
       });
       
-      const totalCreditIbs = creditGeneratingExpenses * (baseIbsRate * (1 - ibsReductionFactor));
-      const totalCreditCbs = creditGeneratingExpenses * (baseCbsRate * (1 - cbsReductionFactor));
+      if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
+        const representativeCnae = getCnaeData(domesticActivities[0].code);
+        const reduction = representativeCnae?.ivaReduction ?? 0;
+        totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reduction));
+        totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reduction));
+      }
 
-      const finalIbs = Math.max(0, totalIbsDebit - totalCreditIbs);
-      const finalCbs = Math.max(0, totalCbsDebit - totalCreditCbs);
+      const finalIbs = Math.max(0, totalIbsDebit - totalIbsCredit);
+      const finalCbs = Math.max(0, totalCbsDebit - totalCbsCredit);
       
       ivaTaxes = (finalIbs || 0) + (finalCbs || 0);
     }
@@ -299,7 +297,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
         exportRevenue,
         proLabore: totalProLaboreBruto,
         fatorR: fatorREffective,
-        effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
+        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
         contabilizeiFee: fee,
         breakdown,
         notes,

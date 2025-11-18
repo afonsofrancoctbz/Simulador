@@ -536,7 +536,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.6,
+    ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
   },
   {
@@ -1570,7 +1570,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
-    ivaReduction: 0.6,
+    ivaReduction: 0,
   },
   {
     code: '7729-2/02',
@@ -4177,5 +4177,3 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Regulamentado pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   }
 ];
-
-    
