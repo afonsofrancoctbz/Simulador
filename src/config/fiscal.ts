@@ -84,12 +84,12 @@ export const FISCAL_CONFIG_2025 = {
   }
 };
 
-const IVA_FULL_RATE = { cbs: 0.09, ibs: 0.18 };
+const IVA_FULL_RATE = { cbs: 0.09, ibs: 0.18 }; // Alíquotas de referência para 2033
 
 const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_multiplier: number; iss_icms_multiplier: number } } = {
     2026: { cbs: 0.009, ibs: 0.001, pis_cofins_multiplier: 1, iss_icms_multiplier: 1 },
     2027: { cbs: 0.089, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
-    2028: { cbs: 0.089, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, // Note: User doc had 0.2% IBS, but law points to 0.1% for 2028. Sticking to 0.1% as per user's latest calc.
+    2028: { cbs: 0.089, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 }, 
     2029: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.1, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.9 },
     2030: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
     2031: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
@@ -100,6 +100,8 @@ const TRANSITION_TABLE: { [key: number]: { cbs: number; ibs: number; pis_cofins_
 const getTransitionConfig = (year: number) => {
     const baseConfig = JSON.parse(JSON.stringify(FISCAL_CONFIG_2025)); // Deep copy
     baseConfig.ano_vigencia = year;
+    
+    // Default to 2033 rules if year is outside range
     const transition = TRANSITION_TABLE[year] || TRANSITION_TABLE[2033];
 
     baseConfig.reforma_tributaria = {
@@ -118,11 +120,16 @@ const getTransitionConfig = (year: number) => {
             const newDist = { ...bracket.distribution };
 
             // PIS/COFINS transition to CBS
+            newDist.PIS_original = PIS;
+            newDist.COFINS_original = COFINS;
             newDist.PIS = PIS * transition.pis_cofins_multiplier;
             newDist.COFINS = COFINS * transition.pis_cofins_multiplier;
             newDist.CBS = (newDist.CBS || 0) + (PIS + COFINS) * (1 - transition.pis_cofins_multiplier);
 
             // ISS/ICMS/IPI transition to IBS
+            newDist.ISS_original = ISS;
+            newDist.ICMS_original = ICMS;
+            newDist.IPI_original = IPI;
             newDist.ISS = (ISS || 0) * transition.iss_icms_multiplier;
             newDist.ICMS = (ICMS || 0) * transition.iss_icms_multiplier;
             newDist.IPI = (IPI || 0) * transition.iss_icms_multiplier; // Assuming IPI transitions with ICMS/ISS
@@ -147,9 +154,8 @@ export type FiscalConfigPostReform = ReturnType<typeof getTransitionConfig>;
  * @returns The fiscal configuration object for the specified year.
  */
 export const getFiscalParameters = (year: number): FiscalConfig | FiscalConfigPostReform => {
-    if (year <= 2025) {
+    if (year < 2026) {
         return FISCAL_CONFIG_2025;
     }
     return getTransitionConfig(year);
 }
-
