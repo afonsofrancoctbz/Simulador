@@ -936,7 +936,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.6,
+    ivaReduction: 0.7,
     notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
   {
@@ -970,7 +970,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.6,
+    ivaReduction: 0.5,
     notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
   },
   // --- REGIMES ESPECÍFICOS (REDUÇÃO 40%) ---
@@ -1456,7 +1456,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0,
+    ivaReduction: 1,
     notes: 'Regulamentado pelo CREA ou CONEP (para pesquisas em humanos).'
   },
   {
@@ -1479,7 +1479,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0,
+    ivaReduction: 1,
     notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
   {
