@@ -527,18 +527,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Atividade regulamentada pelo CBOO. Não é obrigatório.'
   },
   {
-    code: '7500-1/00',
-    description: 'Atividades veterinárias',
-    category: 'Veterinária',
-    annex: 'V',
-    requiresFatorR: true,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.3,
-    notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
-  },
-  {
     code: '8630-5/04',
     description: 'Atividade odontológica',
     category: 'Odontologia',
@@ -935,7 +923,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
-    ivaReduction: 0.7,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CRA. Não é obrigatório.'
   },
   {
@@ -961,16 +949,15 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     ivaReduction: 0.6
   },
   {
-    code: '6821-8/02',
-    description: 'Corretagem no aluguel de imóveis',
-    category: 'Serviços Financeiros e Imobiliários',
-    annex: 'III',
-    requiresFatorR: false,
+    code: '7319-0/01',
+    description: 'Criação de estandes para feiras e exposições',
+    category: 'Publicidade e Marketing',
+    annex: 'V',
+    requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: true,
-    ivaReduction: 0.5,
-    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
+    isRegulated: false,
+    ivaReduction: 0
   },
   // --- REGIMES ESPECÍFICOS (REDUÇÃO 40%) ---
   {
@@ -1297,8 +1284,18 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     ivaReduction: 0.3,
     notes: 'Atividade regulamentada pelo CRB (Conselho Regional de Biblioteconomia).'
   },
-
-
+  {
+    code: '7500-1/00',
+    description: 'Atividades veterinárias',
+    category: 'Veterinária',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.3,
+    notes: 'Atividade regulamentada pelo CRMV. Não é obrigatório.'
+  },
   // --- ALÍQUOTA PADRÃO (REDUÇÃO 0%) ---
   {
     code: '6201-5/01',
@@ -1467,7 +1464,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
-    ivaReduction: 0,
+    ivaReduction: 1,
   },
   {
     code: '7320-3/00',
@@ -1498,17 +1495,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     category: 'Publicidade e Marketing',
     annex: 'III',
     requiresFatorR: false,
-    presumedProfitRateIRPJ: 0.32,
-    presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
-    ivaReduction: 0,
-  },
-  {
-    code: '7319-0/01',
-    description: 'Criação de estandes para feiras e exposições',
-    category: 'Publicidade e Marketing',
-    annex: 'V',
-    requiresFatorR: true,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
@@ -1629,6 +1615,30 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: true,
     ivaReduction: 0.5,
     notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
+  },
+  {
+    code: '6821-8/02',
+    description: 'Corretagem no aluguel de imóveis',
+    category: 'Serviços Financeiros e Imobiliários',
+    annex: 'III',
+    requiresFatorR: false,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    ivaReduction: 0.5,
+    notes: 'Regulamentado pelo CRECI. É obrigatório indicar RT no Contrato Social e o RT deve ser obrigatoriamente corretor de imóveis com inscrição regular no CRECI. (...)'
+  },
+  {
+    code: '5221-4/00',
+    description: 'Concessionárias de rodovias, pontes, túneis e serviços relacionados',
+    category: 'Logística e Transporte',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: false,
+    ivaReduction: 0,
+    notes: 'Regime específico para exploração de rodovia, pode ter alíquota diferenciada.'
   },
 
 
@@ -2425,6 +2435,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.3,
     notes: 'Regulamentação depende da atividade específica (ex: CONEP para pesquisas com humanos).'
   },
   {
@@ -3033,6 +3044,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
@@ -3044,6 +3056,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.5,
     notes: 'Atividade regulamentada pelo CREA.'
   },
   {
@@ -3055,6 +3068,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREA.'
   },
   {
@@ -3066,6 +3080,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREA.'
   },
   {
@@ -3110,6 +3125,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.5,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
@@ -3143,6 +3159,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
@@ -3188,6 +3205,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. '
   },
   {
@@ -3232,6 +3250,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
     isRegulated: true,
+    ivaReduction: 0.6,
     notes: 'Atividade regulamentada pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   },
   {
@@ -3253,7 +3272,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     requiresFatorR: false,
     presumedProfitRateIRPJ: 0.32,
     presumedProfitRateCSLL: 0.32,
-    isRegulated: false,
+    isRegulated: false
   },
   {
     code: '4520-0/03',
@@ -4176,3 +4195,5 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     notes: 'Regulamentado pelo CREA. Não é obrigatório, porém se o cliente quiser utilizar o termo ""Engenharia"" na razão social é obrigatório. ...'
   }
 ];
+
+    
