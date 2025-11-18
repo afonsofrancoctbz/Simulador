@@ -318,5 +318,3 @@ export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): Cal
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
-
-    
