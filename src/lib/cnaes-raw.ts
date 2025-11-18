@@ -1,5 +1,4 @@
 
-
 import { type CnaeData } from './types';
 
 export const CNAE_DATA_RAW: CnaeData[] = [
