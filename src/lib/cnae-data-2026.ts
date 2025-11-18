@@ -1,4 +1,5 @@
 
+
 // Fonte de dados para as classificações tributárias da Reforma (2026+)
 // Baseado na tabela fornecida.
 
@@ -213,3 +214,4 @@ export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     
 
     
+

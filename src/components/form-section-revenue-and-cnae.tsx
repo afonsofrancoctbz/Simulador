@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useFormContext } from "react-hook-form";
@@ -315,3 +316,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
+
