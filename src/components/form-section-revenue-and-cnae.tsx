@@ -179,7 +179,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                 </div>
                                 <div>
                                     <CardTitle className="text-xl font-bold">Faturamento Mensal</CardTitle>
-                                    <CardDescription>Informe sua receita mensal esperada, separada por tipo de anexo.</CardDescription>
+                                    <CardDescription>Informe sua receita esperada e a alíquota de ISS do seu município.</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
@@ -245,6 +245,30 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     )}
                                 </div>
                             </div>
+                             <FormField
+                                control={form.control}
+                                name="issRate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Alíquota de ISS (%)</FormLabel>
+                                        <FormControl>
+                                            <Input 
+                                                type="number" 
+                                                step="0.01" 
+                                                min="2" 
+                                                max="5"
+                                                placeholder="5"
+                                                {...field} 
+                                                onChange={e => field.onChange(e.target.valueAsNumber)}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, deixe em branco para usar o padrão de 5%.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </CardContent>
                     </Card>
                     

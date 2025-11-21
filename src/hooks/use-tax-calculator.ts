@@ -34,6 +34,7 @@ export function useTaxCalculator(year: number) {
             revenues: {},
             exportCurrency: 'BRL',
             exchangeRate: 1,
+            issRate: 5,
             totalSalaryExpense: 0,
             proLabores: [{ value: fiscalConfig.salario_minimo, hasOtherInssContribution: false, otherContributionSalary: 0 }],
             numberOfPartners: 1,
