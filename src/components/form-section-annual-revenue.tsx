@@ -1,19 +1,80 @@
 
-
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
-import { FileText, AlertTriangle } from 'lucide-react';
+import { FileText, AlertTriangle, UploadCloud, Loader2, CheckCircle } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
+
 import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { extractDataFromPgdas, type PgdasData } from "@/ai/flows/extract-pgdas-flow";
 import type { CalculatorFormValues } from './tax-calculator-form';
-import { useMemo } from "react";
+
 
 export function FormSectionAnnualRevenue() {
     const form = useFormContext<CalculatorFormValues>();
+    const { toast } = useToast();
+    const [isUploading, setIsUploading] = useState(false);
+    const [activeTab, setActiveTab] = useState("manual");
+
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
+        const file = acceptedFiles[0];
+        if (!file) return;
+
+        setIsUploading(true);
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            if (typeof event.target?.result !== 'string') {
+                toast({ title: "Erro de Leitura", description: "Não foi possível ler o arquivo.", variant: "destructive" });
+                setIsUploading(false);
+                return;
+            }
+            
+            try {
+                const pdfDataUri = event.target.result;
+                const extractedData: PgdasData = await extractDataFromPgdas({ pdfDataUri });
+
+                form.setValue("rbt12", extractedData.rbt12, { shouldValidate: true, shouldDirty: true });
+                form.setValue("fp12", extractedData.folha12, { shouldValidate: true, shouldDirty: true });
+                
+                toast({
+                    title: "Extração Concluída!",
+                    description: `Dados do extrato de ${extractedData.periodoApuracao} preenchidos com sucesso.`,
+                    className: 'bg-green-100 border-green-200 text-green-900',
+                });
+                
+                setActiveTab("manual"); // Volta para a aba manual para conferência
+
+            } catch (error) {
+                console.error("Error extracting data from PGDAS PDF:", error);
+                const errorMessage = error instanceof Error ? error.message : "Tente novamente mais tarde.";
+                toast({ title: "Falha na Extração", description: `A IA não conseguiu ler os dados do PDF. ${errorMessage}`, variant: "destructive" });
+            } finally {
+                setIsUploading(false);
+            }
+        };
+        reader.onerror = () => {
+            toast({ title: "Erro de Leitura", description: "Ocorreu um erro ao processar o arquivo.", variant: "destructive" });
+            setIsUploading(false);
+        };
+        reader.readAsDataURL(file);
+
+    }, [form, toast]);
+    
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: { 'application/pdf': ['.pdf'] },
+        maxFiles: 1,
+        disabled: isUploading,
+    });
+
 
     const rbt12Value = form.watch("rbt12");
     const watchedRevenues = form.watch("revenues");
@@ -49,84 +110,114 @@ export function FormSectionAnnualRevenue() {
                 </div>
             </CardHeader>
             <CardContent className='p-6 md:p-8'>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
-                    <FormField control={form.control} name="rbt12" render={({ field }) => {
-                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                            const { value } = e.target;
-                            const digitsOnly = value.replace(/\D/g, '');
-                            field.onChange(Number(digitsOnly) / 100);
-                        };
-                        return (
-                            <FormItem>
-                                <FormLabel>Faturamento Total (RBT12)</FormLabel>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            inputMode="decimal"
-                                            placeholder="Ex: 250.000,00"
-                                            onChange={handleChange}
-                                            onBlur={field.onBlur}
-                                            value={field.value ? formatBRL(field.value) : ''}
-                                            name={field.name}
-                                            ref={field.ref}
-                                            className="pl-9"
-                                        />
-                                    </FormControl>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="manual">Preenchimento Manual</TabsTrigger>
+                        <TabsTrigger value="import">Importar Extrato PGDAS (PDF)</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="manual" className="mt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
+                            <FormField control={form.control} name="rbt12" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
+                                    <FormItem>
+                                        <FormLabel>Faturamento Total (RBT12)</FormLabel>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                            <FormControl>
+                                                <Input
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    placeholder="Ex: 250.000,00"
+                                                    onChange={handleChange}
+                                                    onBlur={field.onBlur}
+                                                    value={field.value ? formatBRL(field.value) : ''}
+                                                    name={field.name}
+                                                    ref={field.ref}
+                                                    className="pl-9"
+                                                />
+                                            </FormControl>
+                                        </div>
+                                        <FormDescription>
+                                            Receita Bruta dos últimos 12 meses.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }} />
+                            <FormField control={form.control} name="fp12" render={({ field }) => {
+                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const { value } = e.target;
+                                    const digitsOnly = value.replace(/\D/g, '');
+                                    field.onChange(Number(digitsOnly) / 100);
+                                };
+                                return (
+                                    <FormItem>
+                                        <FormLabel>Folha de Pagamento (FP12)</FormLabel>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                            <FormControl>
+                                                <Input
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    placeholder="Ex: 70.000,00"
+                                                    onChange={handleChange}
+                                                    onBlur={field.onBlur}
+                                                    value={field.value ? formatBRL(field.value) : ''}
+                                                    name={field.name}
+                                                    ref={field.ref}
+                                                    className="pl-9"
+                                                />
+                                            </FormControl>
+                                        </div>
+                                        <FormDescription>
+                                            Soma da folha dos últimos 12 meses.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }} />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="import" className="mt-6">
+                        <div 
+                            {...getRootProps()} 
+                            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+                            ${isDragActive ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
+                        >
+                            <input {...getInputProps()} />
+                            {isUploading ? (
+                                <div className="flex flex-col items-center gap-4 text-primary">
+                                    <Loader2 className="h-10 w-10 animate-spin" />
+                                    <p className="font-semibold">Analisando o extrato...</p>
+                                    <p className="text-sm text-muted-foreground">Aguarde, a IA está extraindo os dados.</p>
                                 </div>
-                                <FormDescription>
-                                    Receita Bruta dos últimos 12 meses. Se for o primeiro mês, pode deixar em R$ 0,00.
-                                </FormDescription>
-                                <FormMessage />
-                                {showSimplesLimitWarning && (
-                                    <Alert variant="destructive" className="mt-2">
-                                        <AlertTriangle className="h-4 w-4" />
-                                        <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
-                                        <AlertDescription>
-                                            Sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões.
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-                            </FormItem>
-                        );
-                    }} />
-                    <FormField control={form.control} name="fp12" render={({ field }) => {
-                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                            const { value } = e.target;
-                            const digitsOnly = value.replace(/\D/g, '');
-                            field.onChange(Number(digitsOnly) / 100);
-                        };
-                        return (
-                            <FormItem>
-                                <FormLabel>Folha de Pagamento (FP12)</FormLabel>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            inputMode="decimal"
-                                            placeholder="Ex: 70.000,00"
-                                            onChange={handleChange}
-                                            onBlur={field.onBlur}
-                                            value={field.value ? formatBRL(field.value) : ''}
-                                            name={field.name}
-                                            ref={field.ref}
-                                            className="pl-9"
-                                        />
-                                    </FormControl>
+                            ) : (
+                                <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                                    <UploadCloud className="h-10 w-10" />
+                                    <p className="font-semibold text-foreground">Arraste seu extrato do Simples Nacional aqui</p>
+                                    <p className="text-sm">ou clique para selecionar o arquivo PDF.</p>
                                 </div>
-                                <FormDescription>
-                                    Soma de salários e pró-labore dos últimos 12 meses. Essencial para o Fator R.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        );
-                    }} />
-                </div>
+                            )}
+                        </div>
+                    </TabsContent>
+                </Tabs>
+                
+                 {showSimplesLimitWarning && (
+                    <Alert variant="destructive" className="mt-4">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Atenção: Limite do Simples Nacional</AlertTitle>
+                        <AlertDescription>
+                            Sua receita anual projetada ({formatCurrencyBRL(projectedAnnualRevenue)}) ultrapassa o teto de R$ 4,8 milhões.
+                            Se sua empresa for nova (sem RBT12), ela poderá ser desenquadrada do Simples Nacional durante o ano.
+                        </AlertDescription>
+                    </Alert>
+                )}
             </CardContent>
         </Card>
     );
 }
-
-    
