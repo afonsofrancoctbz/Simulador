@@ -22,16 +22,11 @@ import type { CalculatorFormValues } from './tax-calculator-form';
  * Função auxiliar para converter arquivo File em data URI.
  * Executada no frontend antes de chamar a Server Action.
  */
-async function fileToDataUri(file: File): Promise<string> {
+function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
-    if (file.type !== 'application/pdf') {
-      reject(new Error('O arquivo deve ser um PDF.'));
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('Erro ao ler o arquivo PDF.'));
+    reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
 }
@@ -46,6 +41,11 @@ export function FormSectionAnnualRevenue() {
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
         if (!file) return;
+        
+        if (file.type !== 'application/pdf') {
+            toast({ title: "Arquivo Inválido", description: "Por favor, selecione um arquivo PDF.", variant: "destructive" });
+            return;
+        }
 
         setIsUploading(true);
 
