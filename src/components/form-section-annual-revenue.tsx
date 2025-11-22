@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { extractDataFromPgdas, type PgdasData } from "@/ai/flows/extract-pgdas-flow";
+import { extractDataFromPgdas } from "@/ai/flows/extract-pgdas-flow";
+import type { PgdasData } from "@/lib/types";
 import type { CalculatorFormValues } from './tax-calculator-form';
 
 

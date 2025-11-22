@@ -15,6 +15,15 @@ export const CnaeItemSchema = z.object({
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
+// Schema for data extracted from PGDAS PDF
+export const PgdasDataSchema = z.object({
+  rbt12: z.number().describe('A Receita Bruta Total acumulada nos últimos 12 meses (RBT12). Este valor é encontrado no campo "Receita Bruta Acumulada (RBA) nos doze meses anteriores ao PA". Extraia apenas o valor numérico.'),
+  folha12: z.number().describe('A Folha de Salários acumulada nos últimos 12 meses (FS12). Este valor é encontrado no campo "Folha de Salários (FS) dos doze meses anteriores ao PA". Extraia apenas o valor numérico.'),
+  periodoApuracao: z.string().describe('O período de apuração (mês e ano) do documento. Formato: MM/YYYY.'),
+});
+export type PgdasData = z.infer<typeof PgdasDataSchema>;
+
+
 // Schema for an individual pro-labore input from the form
 export const ProLaboreFormSchema = z.object({
   value: z.coerce.number().min(0, "O valor deve ser positivo."),
