@@ -29,6 +29,10 @@ const extractPgdasPrompt = ai.definePrompt({
   name: 'extractPgdasPrompt',
   input: { schema: PgdasInputSchema },
   output: { schema: PgdasDataSchema },
+  model: 'googleai/gemini-2.5-flash',
+  config: {
+    temperature: 0.1,
+  },
   prompt: `Você é um especialista em análise de documentos fiscais brasileiros. Sua tarefa é extrair dados do PGDAS-D (Extrato do Simples Nacional) com PRECISÃO ABSOLUTA.
 
 📄 DOCUMENTO PARA ANÁLISE:
