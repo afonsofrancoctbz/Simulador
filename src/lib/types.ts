@@ -166,12 +166,12 @@ export interface FeeBracket {
 export const PgdasDataSchema = z.object({
   rbt12: z
     .number()
-    .positive('RBT12 deve ser um valor positivo')
+    .min(0.01, 'RBT12 deve ser um valor positivo')
     .describe('Receita Bruta Total acumulada nos últimos 12 meses'),
   
   folha12: z
     .number()
-    .nonnegative('Folha de Salários não pode ser negativa')
+    .min(0, 'Folha de Salários não pode ser negativa')
     .describe('Total da Folha de Salários dos últimos 12 meses'),
   
   periodoApuracao: z
