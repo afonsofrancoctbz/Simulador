@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
-import { FileText, AlertTriangle, UploadCloud, Loader2, CheckCircle } from 'lucide-react';
+import { FileText, AlertTriangle, UploadCloud, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
@@ -18,6 +18,25 @@ import type { PgdasData } from "@/lib/types";
 import type { CalculatorFormValues } from './tax-calculator-form';
 
 
+/**
+ * Função auxiliar para converter arquivo File em data URI.
+ * Executada no frontend antes de chamar a Server Action.
+ */
+async function fileToDataUri(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (file.type !== 'application/pdf') {
+      reject(new Error('O arquivo deve ser um PDF.'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error('Erro ao ler o arquivo PDF.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+
 export function FormSectionAnnualRevenue() {
     const form = useFormContext<CalculatorFormValues>();
     const { toast } = useToast();
@@ -30,42 +49,28 @@ export function FormSectionAnnualRevenue() {
 
         setIsUploading(true);
 
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            if (typeof event.target?.result !== 'string') {
-                toast({ title: "Erro de Leitura", description: "Não foi possível ler o arquivo.", variant: "destructive" });
-                setIsUploading(false);
-                return;
-            }
+        try {
+            const pdfDataUri = await fileToDataUri(file);
+            const extractedData: PgdasData = await extractDataFromPgdas({ pdfDataUri });
+
+            form.setValue("rbt12", extractedData.rbt12, { shouldValidate: true, shouldDirty: true });
+            form.setValue("fp12", extractedData.folha12, { shouldValidate: true, shouldDirty: true });
             
-            try {
-                const pdfDataUri = event.target.result;
-                const extractedData: PgdasData = await extractDataFromPgdas({ pdfDataUri });
+            toast({
+                title: "Extração Concluída!",
+                description: `Dados do extrato de ${extractedData.periodoApuracao} preenchidos com sucesso.`,
+                className: 'bg-green-100 border-green-200 text-green-900',
+            });
+            
+            setActiveTab("manual"); // Volta para a aba manual para conferência
 
-                form.setValue("rbt12", extractedData.rbt12, { shouldValidate: true, shouldDirty: true });
-                form.setValue("fp12", extractedData.folha12, { shouldValidate: true, shouldDirty: true });
-                
-                toast({
-                    title: "Extração Concluída!",
-                    description: `Dados do extrato de ${extractedData.periodoApuracao} preenchidos com sucesso.`,
-                    className: 'bg-green-100 border-green-200 text-green-900',
-                });
-                
-                setActiveTab("manual"); // Volta para a aba manual para conferência
-
-            } catch (error) {
-                console.error("Error extracting data from PGDAS PDF:", error);
-                const errorMessage = error instanceof Error ? error.message : "Tente novamente mais tarde.";
-                toast({ title: "Falha na Extração", description: `A IA não conseguiu ler os dados do PDF. ${errorMessage}`, variant: "destructive" });
-            } finally {
-                setIsUploading(false);
-            }
-        };
-        reader.onerror = () => {
-            toast({ title: "Erro de Leitura", description: "Ocorreu um erro ao processar o arquivo.", variant: "destructive" });
+        } catch (error) {
+            console.error("Error extracting data from PGDAS PDF:", error);
+            const errorMessage = error instanceof Error ? error.message : "Tente novamente mais tarde.";
+            toast({ title: "Falha na Extração", description: `A IA não conseguiu ler os dados do PDF. ${errorMessage}`, variant: "destructive" });
+        } finally {
             setIsUploading(false);
-        };
-        reader.readAsDataURL(file);
+        }
 
     }, [form, toast]);
     

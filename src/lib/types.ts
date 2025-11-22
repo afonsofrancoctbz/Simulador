@@ -20,6 +20,8 @@ export const PgdasDataSchema = z.object({
   rbt12: z.number().describe('A Receita Bruta Total acumulada nos últimos 12 meses (RBT12). Este valor é encontrado no campo "Receita Bruta Acumulada (RBA) nos doze meses anteriores ao PA". Extraia apenas o valor numérico.'),
   folha12: z.number().describe('A Folha de Salários acumulada nos últimos 12 meses (FS12). Este valor é encontrado no campo "Folha de Salários (FS) dos doze meses anteriores ao PA". Extraia apenas o valor numérico.'),
   periodoApuracao: z.string().describe('O período de apuração (mês e ano) do documento. Formato: MM/YYYY.'),
+  fatorR: z.number().optional().describe('O valor do Fator R, se estiver explicitamente no documento.'),
+  anexo: z.enum(['III', 'V']).optional().describe('O Anexo do Simples Nacional aplicado, se estiver explicitamente no documento.')
 });
 export type PgdasData = z.infer<typeof PgdasDataSchema>;
 
