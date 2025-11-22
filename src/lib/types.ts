@@ -15,16 +15,6 @@ export const CnaeItemSchema = z.object({
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
-// Schema for data extracted from PGDAS PDF
-export const PgdasDataSchema = z.object({
-  rbt12: z.number().describe('A Receita Bruta Total acumulada nos últimos 12 meses (RBT12). Este valor é encontrado no campo "Receita Bruta Acumulada (RBA) nos doze meses anteriores ao PA". Extraia apenas o valor numérico.'),
-  folha12: z.number().describe('A Folha de Salários acumulada nos últimos 12 meses (FS12). Este valor é encontrado no campo "Folha de Salários (FS) dos doze meses anteriores ao PA". Extraia apenas o valor numérico.'),
-  periodoApuracao: z.string().describe('O período de apuração (mês e ano) do documento. Formato: MM/YYYY.'),
-  fatorR: z.number().optional().describe('O valor do Fator R, se estiver explicitamente no documento.'),
-  anexo: z.enum(['III', 'V']).optional().describe('O Anexo do Simples Nacional aplicado, se estiver explicitamente no documento.')
-});
-export type PgdasData = z.infer<typeof PgdasDataSchema>;
-
 
 // Schema for an individual pro-labore input from the form
 export const ProLaboreFormSchema = z.object({
@@ -169,3 +159,98 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
+
+/**
+ * Schema Zod para validação dos dados extraídos do PGDAS-D
+ */
+export const PgdasDataSchema = z.object({
+  rbt12: z
+    .number()
+    .positive('RBT12 deve ser um valor positivo')
+    .describe('Receita Bruta Total acumulada nos últimos 12 meses'),
+  
+  folha12: z
+    .number()
+    .nonnegative('Folha de Salários não pode ser negativa')
+    .describe('Total da Folha de Salários dos últimos 12 meses'),
+  
+  periodoApuracao: z
+    .string()
+    .regex(/^\d{2}\/\d{4}$/, 'Período deve estar no formato MM/YYYY')
+    .describe('Período de Apuração (ex: 08/2025)'),
+  
+  fatorR: z
+    .number()
+    .min(0)
+    .max(1)
+    .optional()
+    .describe('Fator R calculado (Folha / Receita)'),
+  
+  anexo: z
+    .enum(['III', 'V'])
+    .optional()
+    .describe('Anexo do Simples Nacional aplicado'),
+});
+export type PgdasData = z.infer<typeof PgdasDataSchema>;
+
+
+/**
+ * Schema para os dados mensais da janela móvel (12 meses)
+ */
+export const MonthlyDataSchema = z.object({
+  mes: z.string().regex(/^\d{2}\/\d{4}$/, 'Mês no formato MM/YYYY'),
+  receita: z.number().nonnegative('Receita não pode ser negativa'),
+  folha: z.number().nonnegative('Folha não pode ser negativa'),
+});
+export type MonthlyData = z.infer<typeof MonthlyDataSchema>;
+
+
+/**
+ * Schema para análise do Fator R com plano de adequação
+ */
+export const FatorRAnalysisSchema = z.object({
+  fatorRAtual: z.number().min(0).max(1),
+  anexoAtual: z.enum(['III', 'V']),
+  rbt12Atual: z.number().positive(),
+  folha12Atual: z.number().nonnegative(),
+  folhaNecessaria: z.number().positive().describe('Folha necessária para atingir 28%'),
+  diferenca: z.number().positive().describe('Diferença para atingir o Fator R de 28%'),
+  mesesParaAdequacao: z.number().int().min(1).max(12),
+  aumentoMensalNecessario: z.number().positive(),
+  folhaBaseAtual: z.number().nonnegative(),
+  folhaTotalMensal: z.number().positive().describe('Folha base + aumento'),
+  economiaMensal: z.number().optional().describe('Economia tributária estimada após adequação'),
+  custoAdequacao: z.number().optional().describe('Custo total dos encargos sobre o aumento'),
+  paybackMeses: z.number().optional().describe('Tempo de retorno do investimento em meses'),
+});
+export type FatorRAnalysis = z.infer<typeof FatorRAnalysisSchema>;
+
+
+/**
+ * Schema para a projeção mês a mês da adequação
+ */
+export const ProjectionMonthSchema = z.object({
+  mesFolha: z.string().regex(/^\d{2}\/\d{4}$/),
+  mesApuracao: z.string().regex(/^\d{2}\/\d{4}$/),
+  folhaBase: z.number(),
+  aumento: z.number(),
+  folhaTotal: z.number(),
+  folhaAcumulada12m: z.number(),
+  fatorRProjetado: z.number(),
+  anexoProjetado: z.enum(['III', 'V']),
+  economiaEstimada: z.number().optional(),
+});
+export type ProjectionMonth = z.infer<typeof ProjectionMonthSchema>;
+
+
+/**
+ * Schema completo do relatório de análise para migração
+ */
+export const MigrationReportSchema = z.object({
+  pgdasData: PgdasDataSchema,
+  analysis: FatorRAnalysisSchema,
+  projection: z.array(ProjectionMonthSchema),
+  recommendations: z.array(z.string()).optional(),
+  createdAt: z.date().default(() => new Date()),
+});
+export type MigrationReport = z.infer<typeof MigrationReportSchema>;
