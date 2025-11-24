@@ -1,14 +1,14 @@
 
+
 import { calculateTaxes } from './calculations';
 import { getFiscalParameters } from '../config/fiscal';
 import type { TaxFormValues } from './types';
-
-const fiscalConfig = getFiscalParameters(2025);
 
 describe('Tax Calculation Engine', () => {
 
   // Teste 1: Cenário de Referência (Otimização Fator R) - O "Teste de Gabarito"
   test('should match reference calculation for Fator R optimization scenario', () => {
+    const fiscalConfig = getFiscalParameters(2025);
     const input: TaxFormValues = {
       selectedCnaes: [{ code: '7020-4/00' }], // Anexo V
       rbt12: 240000,
@@ -73,6 +73,7 @@ describe('Tax Calculation Engine', () => {
 
   // Teste 2: Anexo IV - Teste de Regressão
   test('should calculate CPP correctly for Simples Nacional Anexo IV', () => {
+    const fiscalConfig = getFiscalParameters(2025);
     const input: TaxFormValues = {
       selectedCnaes: [{ code: '6911-7/01' }], // Advocacia, Anexo IV
       rbt12: 200000,
@@ -111,6 +112,7 @@ describe('Tax Calculation Engine', () => {
 
   // Teste 3: Lucro Presumido com CPP - Teste de Regressão
   test('should calculate CPP correctly for Lucro Presumido', () => {
+    const fiscalConfig = getFiscalParameters(2025);
     const input: TaxFormValues = {
       selectedCnaes: [{ code: '7020-4/00' }], // Serviço qualquer
       rbt12: 0,

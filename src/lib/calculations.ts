@@ -1,4 +1,5 @@
 
+
 import type { FiscalConfig } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -14,6 +15,7 @@ import {
     type TaxFormValues
 } from './types';
 import { findBracket, findFeeBracket, formatPercent } from './utils';
+import { getFiscalParameters } from '../config/fiscal';
 
 // =================================================================================
 // 2. CORE CALCULATION LOGIC (HELPER FUNCTIONS)
