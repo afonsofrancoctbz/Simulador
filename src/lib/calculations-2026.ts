@@ -1,8 +1,6 @@
 
 
-
-
-import { getFiscalParametersPostReform, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
+import { getFiscalParametersPostReform } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -397,5 +395,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: year >= 2027 ? (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null) : null,
   };
 }
-
-    

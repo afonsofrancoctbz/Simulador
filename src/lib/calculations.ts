@@ -1,6 +1,6 @@
 
 
-import type { FiscalConfig, FiscalConfigPostReform } from './fiscal';
+import type { FiscalConfig } from '@/config/fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -47,9 +47,9 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         const irrfBracketLegal = findBracket(config.tabela_irrf, baseCalculoIRRF_Legal);
         const irrfLegal = Math.max(0, baseCalculoIRRF_Legal * irrfBracketLegal.rate - irrfBracketLegal.deduction);
 
-        const baseCalculoIRRF_Simplificado = proLaboreBruto - config.deducao_simplificada_irrf;
-        const irrfBracketSimplificado = findBracket(config.tabela_irrf, baseCalculoIRRF_Simplificado);
-        const irrfSimplificado = Math.max(0, baseCalculoIRRF_Simplificado * irrfBracketSimplificado.rate - irrfBracketSimplificado.deduction);
+        const baseCalculoIRRF_Simplificado = proLaboreBruto; // Para o simplificado, a base é a bruta
+        const irrfBracketSimplificado = findBracket(config.tabela_irrf, baseCalculoIRRF_Simplificado - config.deducao_simplificada_irrf);
+        const irrfSimplificado = Math.max(0, (baseCalculoIRRF_Simplificado - config.deducao_simplificada_irrf) * irrfBracketSimplificado.rate - irrfBracketSimplificado.deduction);
           
         const irrf = Math.min(irrfLegal, irrfSimplificado);
         
@@ -331,5 +331,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
-
-    
