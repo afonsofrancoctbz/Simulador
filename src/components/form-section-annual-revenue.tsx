@@ -30,20 +30,31 @@ function fileToDataUri(file: File): Promise<string> {
 }
 
 export function FormSectionAnnualRevenue() {
-    const form = useFormContext<CalculatorFormValues>();
+    const { control, setValue, getValues, watch } = useFormContext<CalculatorFormValues>();
     const { toast } = useToast();
     const [isUploading, setIsUploading] = useState(false);
     const [activeTab, setActiveTab] = useState("manual");
     const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
 
     useEffect(() => {
-        if (monthlyData.length > 0) {
-            const totalRbt12 = monthlyData.reduce((acc, item) => acc + item.receita, 0);
-            const totalFp12 = monthlyData.reduce((acc, item) => acc + item.folha, 0);
-            form.setValue("rbt12", totalRbt12, { shouldValidate: true, shouldDirty: true });
-            form.setValue("fp12", totalFp12, { shouldValidate: true, shouldDirty: true });
+        // 1. Calculate the new totals based on the monthly data grid
+        const newRbt12 = monthlyData.reduce((acc, item) => acc + (item.receita || 0), 0);
+        const newFolha12 = monthlyData.reduce((acc, item) => acc + (item.folha || 0), 0);
+    
+        // 2. Get the current values from the form without triggering a re-render
+        const currentRbt12 = getValues('rbt12');
+        const currentFolha12 = getValues('fp12');
+    
+        // 3. GUARD CLAUSE: Only update if there's a real difference to prevent the loop
+        if (newRbt12 !== currentRbt12) {
+            setValue('rbt12', newRbt12, { shouldValidate: true, shouldDirty: true });
         }
-    }, [monthlyData, form]);
+        
+        if (newFolha12 !== currentFolha12) {
+            setValue('fp12', newFolha12, { shouldValidate: true, shouldDirty: true });
+        }
+    
+    }, [monthlyData, setValue, getValues]);
 
     const handleMonthlyDataChange = (index: number, field: 'receita' | 'folha', value: number) => {
         const updatedData = [...monthlyData];
@@ -74,8 +85,8 @@ export function FormSectionAnnualRevenue() {
                     className: 'bg-green-100 border-green-200 text-green-900',
                 });
             } else {
-                 form.setValue("rbt12", extractedData.totalRBT12, { shouldValidate: true, shouldDirty: true });
-                 form.setValue("fp12", extractedData.totalFolha12, { shouldValidate: true, shouldDirty: true });
+                 setValue("rbt12", extractedData.totalRBT12, { shouldValidate: true, shouldDirty: true });
+                 setValue("fp12", extractedData.totalFolha12, { shouldValidate: true, shouldDirty: true });
                  setMonthlyData([]);
                  toast({
                     title: "Extração Parcial",
@@ -93,7 +104,7 @@ export function FormSectionAnnualRevenue() {
         } finally {
             setIsUploading(false);
         }
-    }, [form, toast]);
+    }, [setValue, toast]);
     
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -103,8 +114,8 @@ export function FormSectionAnnualRevenue() {
     });
 
 
-    const rbt12Value = form.watch("rbt12");
-    const watchedRevenues = form.watch("revenues");
+    const rbt12Value = watch("rbt12");
+    const watchedRevenues = watch("revenues");
 
     const projectedAnnualRevenue = useMemo(() => {
         const domestic = Object.keys(watchedRevenues)
@@ -115,10 +126,10 @@ export function FormSectionAnnualRevenue() {
             .filter(k => k.startsWith('export_'))
             .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
 
-        const exchangeRate = form.getValues('exportCurrency') !== 'BRL' ? (form.getValues('exchangeRate') || 1) : 1;
+        const exchangeRate = getValues('exportCurrency') !== 'BRL' ? (getValues('exchangeRate') || 1) : 1;
         
         return (domestic + (exportVal * exchangeRate)) * 12;
-    }, [watchedRevenues, form]);
+    }, [watchedRevenues, getValues]);
       
     const SIMPLES_NACIONAL_LIMIT = 4800000;
     const showSimplesLimitWarning = (rbt12Value ?? 0) === 0 && projectedAnnualRevenue > SIMPLES_NACIONAL_LIMIT;
@@ -144,7 +155,7 @@ export function FormSectionAnnualRevenue() {
                     </TabsList>
                     <TabsContent value="manual" className="mt-6 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
-                             <FormField control={form.control} name="rbt12" render={({ field }) => (
+                             <FormField control={control} name="rbt12" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Faturamento Total (RBT12)</FormLabel>
                                     <div className="relative">
@@ -165,7 +176,7 @@ export function FormSectionAnnualRevenue() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="fp12" render={({ field }) => (
+                            <FormField control={control} name="fp12" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Folha de Pagamento (FP12)</FormLabel>
                                     <div className="relative">
@@ -270,3 +281,4 @@ export function FormSectionAnnualRevenue() {
         </Card>
     );
 }
+    
