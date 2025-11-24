@@ -1,6 +1,7 @@
 
 
-import { getFiscalParameters, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
+
+import { getFiscalParametersPostReform, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -20,7 +21,7 @@ import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 
 function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean): TaxDetails | TaxDetails2026 {
     const year = values.year || 2026;
-    const fiscalConfig = getFiscalParameters(year) as FiscalConfigPostReform;
+    const fiscalConfig = getFiscalParametersPostReform(year);
 
     const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, selectedPlan, b2bRevenuePercentage = 100, creditGeneratingExpenses = 0, selectedCnaes } = values;
     const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
@@ -154,7 +155,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
-    const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
+    const fiscalConfig = getFiscalParametersPostReform(values.year || 2026);
     const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes, year = 2026 } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
@@ -215,7 +216,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
     });
 
     if (isHybrid && year >= 2027) {
-      const config2026 = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
+      const config2026 = getFiscalParametersPostReform(values.year || 2026);
       const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
       const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
 
@@ -313,7 +314,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
   const { rbt12, totalSalaryExpense, proLabores, fp12, domesticActivities = [], exportActivities = [], exchangeRate, year = 2026 } = values;
-  const fiscalConfig = getFiscalParameters(year);
+  const fiscalConfig = getFiscalParametersPostReform(year);
 
   const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => acc + (act.revenue * (exchangeRate || 1)), 0);
   const totalProLaboreBruto = proLabores.reduce((acc, p) => acc + p.value, 0);
@@ -335,7 +336,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
   if (hasAnnexVActivity && totalRevenue > 0) {
-      const limiteFatorR = (fiscalConfig as FiscalConfigPostReform).simples_nacional.limite_fator_r;
+      const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
       
       const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;
