@@ -6,10 +6,11 @@
 export function getFiscalParameters(year: 2025 | 2026) {
 
   const proLaboreInssRate = 0.11;
-  const inssTeto = year === 2026 ? 8565.28 : 8157.41;
-  const salarioMinimo = year === 2026 ? 1631.00 : 1518.00;
+  
+  const inssTeto = year >= 2026 ? 8565.28 : 8157.41;
+  const salarioMinimo = year >= 2026 ? 1631.00 : 1518.00;
 
-  const inssTable = year === 2026 ? [
+  const inssTable = year >= 2026 ? [
       { min: 0, max: 1631.00, rate: 0.075, deduction: 0 },
       { min: 1631.01, max: 2980.00, rate: 0.09, deduction: 24.46 },
       { min: 2980.01, max: 4450.00, rate: 0.12, deduction: 113.86 },
@@ -33,7 +34,14 @@ export function getFiscalParameters(year: 2025 | 2026) {
 
   const reformaRenda2026 = {
     ISENCAO_LIMITE: 5000.00,
-  }
+    tabela_irrf: [
+      { min: 0, max: 5000.00, rate: 0, deduction: 0 },
+      { min: 5000.01, max: 5500.00, rate: 0.075, deduction: 169.44 }, // Simulação com 75% desconto
+      { min: 5500.01, max: 6000.00, rate: 0.15, deduction: 381.44 }, // Simulação com 50% desconto
+      { min: 6000.01, max: 6500.00, rate: 0.225, deduction: 662.77 }, // Simulação com 25% desconto
+      { min: 6500.01, max: Infinity, rate: 0.275, deduction: 896.00 },
+    ]
+  };
 
   // Configuração para o cenário PRÉ-REFORMA
   const FISCAL_CONFIG = {
@@ -59,7 +67,7 @@ export function getFiscalParameters(year: 2025 | 2026) {
       LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL: 20000,
     },
     tabela_inss_clt_progressiva: inssTable,
-    tabela_irrf: irrfTable,
+    tabela_irrf: year >= 2026 ? reformaRenda2026.tabela_irrf : irrfTable,
     deducao_simplificada_irrf: irrfSimplificadoDeduction,
     reforma_renda_2026: reformaRenda2026,
     simples_nacional: {
@@ -174,3 +182,5 @@ export function getFiscalParametersPostReform(year: number) {
 
 export type FiscalConfig = ReturnType<typeof getFiscalParameters>;
 export type FiscalConfigPostReform = ReturnType<typeof getFiscalParametersPostReform>;
+
+    

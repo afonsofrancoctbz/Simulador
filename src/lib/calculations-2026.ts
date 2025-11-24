@@ -1,6 +1,7 @@
 
 
 
+
 import { getFiscalParametersPostReform, type FiscalConfig, type FiscalConfigPostReform } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -155,8 +156,9 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
 
 
 function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorREffective: number, proLaboreOverride?: ProLaboreForm[]): TaxDetails2026 {
-    const fiscalConfig = getFiscalParametersPostReform(values.year || 2026);
-    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes, year = 2026 } = values;
+    const year = values.year || 2026;
+    const fiscalConfig = getFiscalParametersPostReform(year);
+    const { domesticActivities = [], exportActivities = [], exchangeRate, totalSalaryExpense, proLabores, b2bRevenuePercentage = 100, rbt12, selectedPlan, fp12, creditGeneratingExpenses = 0, selectedCnaes } = values;
     
     const proLaboresToUse = proLaboreOverride || proLabores;
     const totalProLaboreBruto = proLaboresToUse.reduce((a, p) => a + p.value, 0);
@@ -395,3 +397,5 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: year >= 2027 ? (simplesNacionalOtimizadoHibrido ? { ...simplesNacionalOtimizadoHibrido, order: 1 } : null) : null,
   };
 }
+
+    
