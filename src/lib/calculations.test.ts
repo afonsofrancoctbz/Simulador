@@ -22,6 +22,7 @@ describe('Tax Calculation Engine', () => {
       proLabores: [{ value: 1518.00, hasOtherInssContribution: false, otherContributionSalary: 0 }],
       numberOfPartners: 1,
       selectedPlan: 'expertsEssencial',
+      year: 2025
     };
 
     const result = calculateTaxes(input, fiscalConfig);
@@ -33,7 +34,8 @@ describe('Tax Calculation Engine', () => {
     // DAS = 20000 * 0.16125 = 3225
     expect(result.simplesNacionalBase.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(3225, 2);
     // INSS Sócio = 1518 * 0.11 = 166.98
-    // Total Tax = 3225 + 166.98 = 3391.98
+    // IRRF Simplificado: Base = 1518 - 564.80 = 953.20. Isento. IRRF = 0
+    // Total Tax = 3225 + 166.98 + 0 = 3391.98
     expect(result.simplesNacionalBase.totalTax).toBeCloseTo(3391.98, 2);
 
     // Cenário Otimizado (Anexo III)
@@ -64,6 +66,7 @@ describe('Tax Calculation Engine', () => {
     // CSLL = 6400 * 0.09 = 576
     // CPP = 1518 * 0.20 = 303.6
     // INSS Sócio = 1518 * 0.11 = 166.98
+    // IRRF = 0
     // Total Tax = 130 + 600 + 1000 + 960 + 576 + 303.6 + 166.98 = 3736.58
     expect(result.lucroPresumido.totalTax).toBeCloseTo(3736.58, 2);
   });
@@ -83,6 +86,7 @@ describe('Tax Calculation Engine', () => {
       proLabores: [{ value: 2000, hasOtherInssContribution: false, otherContributionSalary: 0 }],
       numberOfPartners: 1,
       selectedPlan: 'padrao',
+      year: 2025
     };
 
     const result = calculateTaxes(input, fiscalConfig);
@@ -120,6 +124,7 @@ describe('Tax Calculation Engine', () => {
       proLabores: [{ value: 5000, hasOtherInssContribution: false, otherContributionSalary: 0 }],
       numberOfPartners: 1,
       selectedPlan: 'padrao',
+      year: 2025
     };
 
     const result = calculateTaxes(input, fiscalConfig);

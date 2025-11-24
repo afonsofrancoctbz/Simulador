@@ -33,12 +33,13 @@ export const FISCAL_CONFIG_2025 = {
     { min: 4190.84, max: 8157.41, rate: 0.14, deduction: 190.40 },
   ],
   tabela_irrf: [
-    { min: 0, max: 2428.80, rate: 0, deduction: 0 },
-    { min: 2428.81, max: 2826.65, rate: 0.075, deduction: 182.16 },
-    { min: 2826.66, max: 3751.05, rate: 0.15, deduction: 394.16 },
+    { min: 0, max: 2259.20, rate: 0, deduction: 0 },
+    { min: 2259.21, max: 2826.65, rate: 0.075, deduction: 169.44 },
+    { min: 2826.66, max: 3751.05, rate: 0.15, deduction: 381.44 },
     { min: 3751.06, max: 4664.68, rate: 0.225, deduction: 662.77 },
-    { min: 4664.69, max: Infinity, rate: 0.275, deduction: 908.73 },
+    { min: 4664.69, max: Infinity, rate: 0.275, deduction: 896.00 },
   ],
+  deducao_simplificada_irrf: 564.80,
   simples_nacional: {
     limite_fator_r: 0.28,
     I: [
@@ -155,6 +156,11 @@ export type FiscalConfigPostReform = ReturnType<typeof getTransitionConfig>;
  */
 export const getFiscalParameters = (year: number): FiscalConfig | FiscalConfigPostReform => {
     if (year < 2026) {
+        if (year === 2025) {
+            return FISCAL_CONFIG_2025;
+        }
+        // For years before 2025, we can return 2025 as a fallback.
+        // A more robust solution might have historical data.
         return FISCAL_CONFIG_2025;
     }
     return getTransitionConfig(year);

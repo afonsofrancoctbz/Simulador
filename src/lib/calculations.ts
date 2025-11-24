@@ -33,15 +33,24 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
             return { proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 };
         }
 
+        // SÓCIOS (PARTNERS) SEMPRE USAM A ALÍQUOTA FIXA DE 11%
         const remainingContributionRoom = Math.max(0, config.teto_inss - (proLabore.hasOtherInssContribution ? proLabore.otherContributionSalary || 0 : 0));
         const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
         const inss = baseCalculoINSS * config.aliquota_inss_prolabore;
         
-        const baseCalculoIRRF = proLaboreBruto - inss;
-        const irrfBracket = findBracket(config.tabela_irrf, baseCalculoIRRF);
-        const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
-
         totalINSSRetido += inss;
+
+        // "Smart Selection" for IRRF
+        const baseCalculoIRRF_Legal = proLaboreBruto - inss;
+        const irrfBracket = findBracket(config.tabela_irrf, baseCalculoIRRF_Legal);
+        const irrfLegal = Math.max(0, baseCalculoIRRF_Legal * irrfBracket.rate - irrfBracket.deduction);
+
+        const baseCalculoIRRF_Simplificado = proLaboreBruto - config.deducao_simplificada_irrf;
+        const irrfBracketSimplificado = findBracket(config.tabela_irrf, baseCalculoIRRF_Simplificado);
+        const irrfSimplificado = Math.max(0, baseCalculoIRRF_Simplificado * irrfBracketSimplificado.rate - irrfBracketSimplificado.deduction);
+
+        const irrf = Math.min(irrfLegal, irrfSimplificado);
+        
         totalIRRFRetido += irrf;
 
         return {
@@ -54,6 +63,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
 
     return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
 }
+
 
 /**
  * Calculates the CPP (INSS Patronal) for Lucro Presumido or Simples Nacional Anexo IV.
