@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Schema for a selected CNAE, which might include a user's choice of cClass
@@ -10,7 +11,7 @@ export type CnaeSelection = z.infer<typeof CnaeSelectionSchema>;
 // Schema for an individual CNAE item with revenue
 export const CnaeItemSchema = z.object({
   code: z.string(),
-  revenue: z.coerce.number().positive({ message: "O faturamento deve ser maior que zero." }).or(z.literal(0)),
+  revenue: z.coerce.number().min(0, "O faturamento deve ser maior que zero.").or(z.literal(0)),
   cClass: z.string().optional(),
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
@@ -161,15 +162,27 @@ export interface FeeBracket {
 }
 
 /**
+ * Schema para os dados mensais da janela móvel (12 meses)
+ */
+export const MonthlyDataSchema = z.object({
+  mes: z.string().describe("Formato MM/AAAA"),
+  receita: z.number().describe("Valor monetário da receita"),
+  folha: z.number().describe("Valor monetário da folha/pró-labore"),
+});
+export type MonthlyData = z.infer<typeof MonthlyDataSchema>;
+
+
+/**
  * Schema Zod para validação dos dados extraídos do PGDAS-D
  */
 export const PgdasDataSchema = z.object({
-  rbt12: z
+  competencias: z.array(MonthlyDataSchema).describe("Lista extraída das tabelas '2.2 Receitas Brutas Anteriores' e '2.3 Folha de Salários'"),
+  totalRBT12: z
     .number()
-    .min(0.01, 'RBT12 deve ser um valor positivo')
+    .min(0, 'RBT12 deve ser um valor positivo')
     .describe('Receita Bruta Total acumulada nos últimos 12 meses'),
   
-  folha12: z
+  totalFolha12: z
     .number()
     .min(0, 'Folha de Salários não pode ser negativa')
     .describe('Total da Folha de Salários dos últimos 12 meses'),
@@ -195,30 +208,22 @@ export type PgdasData = z.infer<typeof PgdasDataSchema>;
 
 
 /**
- * Schema para os dados mensais da janela móvel (12 meses)
- */
-export const MonthlyDataSchema = z.object({
-  mes: z.string().regex(/^\d{2}\/\d{4}$/, 'Mês no formato MM/YYYY'),
-  receita: z.number().nonnegative('Receita não pode ser negativa'),
-  folha: z.number().nonnegative('Folha não pode ser negativa'),
-});
-export type MonthlyData = z.infer<typeof MonthlyDataSchema>;
-
-
-/**
  * Schema para análise do Fator R com plano de adequação
  */
 export const FatorRAnalysisSchema = z.object({
   fatorRAtual: z.number().min(0).max(1),
   anexoAtual: z.enum(['III', 'V']),
-  rbt12Atual: z.number().positive(),
-  folha12Atual: z.number().nonnegative(),
-  folhaNecessaria: z.number().positive().describe('Folha necessária para atingir 28%'),
-  diferenca: z.number().positive().describe('Diferença para atingir o Fator R de 28%'),
+  rbt12Atual: z.number().min(0),
+  folha12Atual: z.number().min(0),
+  
+  folhaNecessaria: z.number().min(0).describe('Folha necessária para atingir 28%'),
+  diferenca: z.number().min(0).describe('Diferença para atingir o Fator R de 28%'),
+  
   mesesParaAdequacao: z.number().int().min(1).max(12),
-  aumentoMensalNecessario: z.number().positive(),
-  folhaBaseAtual: z.number().nonnegative(),
-  folhaTotalMensal: z.number().positive().describe('Folha base + aumento'),
+  aumentoMensalNecessario: z.number().min(0),
+  folhaBaseAtual: z.number().min(0),
+  folhaTotalMensal: z.number().min(0).describe('Folha base + aumento'),
+  
   economiaMensal: z.number().optional().describe('Economia tributária estimada após adequação'),
   custoAdequacao: z.number().optional().describe('Custo total dos encargos sobre o aumento'),
   paybackMeses: z.number().optional().describe('Tempo de retorno do investimento em meses'),

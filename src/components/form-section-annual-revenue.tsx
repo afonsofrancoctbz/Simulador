@@ -1,12 +1,12 @@
 
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { FileText, AlertTriangle, UploadCloud, Loader2 } from 'lucide-react';
+import { FileText, AlertTriangle, UploadCloud, Loader2, List, Edit } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
-import { formatCurrencyBRL, formatBRL } from "@/lib/utils";
+import { formatCurrencyBRL, formatBRL, parseBRL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -14,14 +14,12 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { extractDataFromPgdas } from "@/ai/flows/extract-pgdas-flow";
-import type { PgdasData } from "@/lib/types";
+import type { PgdasData, MonthlyData } from "@/lib/types";
 import type { CalculatorFormValues } from './tax-calculator-form';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "./ui/table";
+import { Button } from "./ui/button";
 
-
-/**
- * Função auxiliar para converter arquivo File em data URI.
- * Executada no frontend antes de chamar a Server Action.
- */
 function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -31,12 +29,27 @@ function fileToDataUri(file: File): Promise<string> {
   });
 }
 
-
 export function FormSectionAnnualRevenue() {
     const form = useFormContext<CalculatorFormValues>();
     const { toast } = useToast();
     const [isUploading, setIsUploading] = useState(false);
     const [activeTab, setActiveTab] = useState("manual");
+    const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+
+    useEffect(() => {
+        if (monthlyData.length > 0) {
+            const totalRbt12 = monthlyData.reduce((acc, item) => acc + item.receita, 0);
+            const totalFp12 = monthlyData.reduce((acc, item) => acc + item.folha, 0);
+            form.setValue("rbt12", totalRbt12, { shouldValidate: true, shouldDirty: true });
+            form.setValue("fp12", totalFp12, { shouldValidate: true, shouldDirty: true });
+        }
+    }, [monthlyData, form]);
+
+    const handleMonthlyDataChange = (index: number, field: 'receita' | 'folha', value: number) => {
+        const updatedData = [...monthlyData];
+        updatedData[index] = { ...updatedData[index], [field]: value };
+        setMonthlyData(updatedData);
+    };
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
@@ -52,17 +65,26 @@ export function FormSectionAnnualRevenue() {
         try {
             const pdfDataUri = await fileToDataUri(file);
             const extractedData: PgdasData = await extractDataFromPgdas({ pdfDataUri });
-
-            form.setValue("rbt12", extractedData.rbt12, { shouldValidate: true, shouldDirty: true });
-            form.setValue("fp12", extractedData.folha12, { shouldValidate: true, shouldDirty: true });
             
-            toast({
-                title: "Extração Concluída!",
-                description: `Dados do extrato de ${extractedData.periodoApuracao} preenchidos com sucesso.`,
-                className: 'bg-green-100 border-green-200 text-green-900',
-            });
+            if (extractedData.competencias && extractedData.competencias.length > 0) {
+                setMonthlyData(extractedData.competencias);
+                toast({
+                    title: "Extração Concluída!",
+                    description: `Dados de ${extractedData.competencias.length} meses preenchidos. Confira os valores na grade.`,
+                    className: 'bg-green-100 border-green-200 text-green-900',
+                });
+            } else {
+                 form.setValue("rbt12", extractedData.totalRBT12, { shouldValidate: true, shouldDirty: true });
+                 form.setValue("fp12", extractedData.totalFolha12, { shouldValidate: true, shouldDirty: true });
+                 setMonthlyData([]);
+                 toast({
+                    title: "Extração Parcial",
+                    description: "A IA extraiu os totais, mas não os detalhes mensais. Preencha a grade se precisar de mais precisão.",
+                    variant: "default"
+                });
+            }
             
-            setActiveTab("manual"); // Volta para a aba manual para conferência
+            setActiveTab("manual");
 
         } catch (error) {
             console.error("Error extracting data from PGDAS PDF:", error);
@@ -71,7 +93,6 @@ export function FormSectionAnnualRevenue() {
         } finally {
             setIsUploading(false);
         }
-
     }, [form, toast]);
     
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -110,85 +131,107 @@ export function FormSectionAnnualRevenue() {
                         <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl font-bold">Receita Anual</CardTitle>
-                        <CardDescription>Esta informação é crucial para determinar a alíquota correta do Simples Nacional.</CardDescription>
+                        <CardTitle className="text-xl font-bold">Receita e Folha Anual (12 Meses)</CardTitle>
+                        <CardDescription>Informação crucial para determinar a alíquota do Simples Nacional (Fator R).</CardDescription>
                     </div>
                 </div>
             </CardHeader>
             <CardContent className='p-6 md:p-8'>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="manual">Preenchimento Manual</TabsTrigger>
-                        <TabsTrigger value="import">Importar Extrato PGDAS (PDF)</TabsTrigger>
+                        <TabsTrigger value="manual">Preenchimento</TabsTrigger>
+                        <TabsTrigger value="import">Importar Extrato PGDAS</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="manual" className="mt-6">
+                    <TabsContent value="manual" className="mt-6 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
-                            <FormField control={form.control} name="rbt12" render={({ field }) => {
-                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const { value } = e.target;
-                                    const digitsOnly = value.replace(/\D/g, '');
-                                    field.onChange(Number(digitsOnly) / 100);
-                                };
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Faturamento Total (RBT12)</FormLabel>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                            <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    inputMode="decimal"
-                                                    placeholder="Ex: 250.000,00"
-                                                    onChange={handleChange}
-                                                    onBlur={field.onBlur}
-                                                    value={field.value ? formatBRL(field.value) : ''}
-                                                    name={field.name}
-                                                    ref={field.ref}
-                                                    className="pl-9"
-                                                />
-                                            </FormControl>
-                                        </div>
-                                        <FormDescription>
-                                            Receita Bruta dos últimos 12 meses.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                );
-                            }} />
-                            <FormField control={form.control} name="fp12" render={({ field }) => {
-                                const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const { value } = e.target;
-                                    const digitsOnly = value.replace(/\D/g, '');
-                                    field.onChange(Number(digitsOnly) / 100);
-                                };
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Folha de Pagamento (FP12)</FormLabel>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                            <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    inputMode="decimal"
-                                                    placeholder="Ex: 70.000,00"
-                                                    onChange={handleChange}
-                                                    onBlur={field.onBlur}
-                                                    value={field.value ? formatBRL(field.value) : ''}
-                                                    name={field.name}
-                                                    ref={field.ref}
-                                                    className="pl-9"
-                                                />
-                                            </FormControl>
-                                        </div>
-                                        <FormDescription>
-                                            Soma da folha dos últimos 12 meses.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                );
-                            }} />
+                             <FormField control={form.control} name="rbt12" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Faturamento Total (RBT12)</FormLabel>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                inputMode="decimal"
+                                                placeholder="Ex: 250.000,00"
+                                                onChange={(e) => field.onChange(parseBRL(e.target.value))}
+                                                value={formatBRL(field.value)}
+                                                readOnly={monthlyData.length > 0}
+                                                className="pl-9 read-only:bg-muted/50"
+                                            />
+                                        </FormControl>
+                                    </div>
+                                    <FormDescription>Receita Bruta dos últimos 12 meses.</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="fp12" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Folha de Pagamento (FP12)</FormLabel>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                inputMode="decimal"
+                                                placeholder="Ex: 70.000,00"
+                                                onChange={(e) => field.onChange(parseBRL(e.target.value))}
+                                                value={formatBRL(field.value)}
+                                                readOnly={monthlyData.length > 0}
+                                                className="pl-9 read-only:bg-muted/50"
+                                            />
+                                        </FormControl>
+                                    </div>
+                                    <FormDescription>Soma da folha dos últimos 12 meses.</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
                         </div>
+                        
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger>
+                                    <div className="flex items-center gap-2">
+                                        <List className="h-5 w-5 text-primary"/>
+                                        <span className="font-semibold">Detalhes Mês a Mês (Editável)</span>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="overflow-x-auto">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[120px]">Competência</TableHead>
+                                                    <TableHead>Receita</TableHead>
+                                                    <TableHead>Folha / Pró-labore</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {monthlyData.length > 0 ? monthlyData.map((data, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell className="font-medium">{data.mes}</TableCell>
+                                                        <TableCell>
+                                                            <Input type="text" value={formatBRL(data.receita)} onChange={(e) => handleMonthlyDataChange(index, 'receita', parseBRL(e.target.value))} className="h-8"/>
+                                                        </TableCell>
+                                                         <TableCell>
+                                                            <Input type="text" value={formatBRL(data.folha)} onChange={(e) => handleMonthlyDataChange(index, 'folha', parseBRL(e.target.value))} className="h-8"/>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={3} className="text-center text-muted-foreground">
+                                                            Importe um extrato PGDAS ou preencha os totais manualmente.
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </TabsContent>
+
                     <TabsContent value="import" className="mt-6">
                         <div 
                             {...getRootProps()} 
