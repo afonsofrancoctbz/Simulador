@@ -313,6 +313,7 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
   const { rbt12, totalSalaryExpense, proLabores, fp12, domesticActivities = [], exportActivities = [], exchangeRate, year = 2026 } = values;
+  const fiscalConfig = getFiscalParameters(year);
 
   const totalRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0) + exportActivities.reduce((acc, act) => acc + (act.revenue * (exchangeRate || 1)), 0);
   const totalProLaboreBruto = proLabores.reduce((acc, p) => acc + p.value, 0);
@@ -334,8 +335,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
   if (hasAnnexVActivity && totalRevenue > 0) {
-      const fiscalConfig = getFiscalParameters(values.year || 2026) as FiscalConfigPostReform;
-      const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
+      const limiteFatorR = (fiscalConfig as FiscalConfigPostReform).simples_nacional.limite_fator_r;
       
       const currentTotalProLabore = values.proLabores.reduce((acc, p) => acc + p.value, 0);
       const currentPayroll = values.totalSalaryExpense + currentTotalProLabore;

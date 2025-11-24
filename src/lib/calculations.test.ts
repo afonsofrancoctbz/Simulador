@@ -148,6 +148,7 @@ describe('Tax Calculation Engine (2025)', () => {
   });
 
   test('Cenário 5: INSS Sócio - Deve respeitar o teto', () => {
+      const config = getFiscalParameters(2025);
       const input: TaxFormValues = {
       selectedCnaes: [{ code: '7020-4/00' }],
       rbt12: 0,
@@ -169,9 +170,7 @@ describe('Tax Calculation Engine (2025)', () => {
     
     // Teto INSS 2025 = 8157.41
     // INSS = 8157.41 * 0.11 = 897.3151
-    expect(inssSocio).toBeCloseTo(897.32);
+    expect(inssSocio).toBeCloseTo(config.teto_inss * config.aliquota_inss_prolabore);
   })
 
 });
-
-    

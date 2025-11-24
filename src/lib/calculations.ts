@@ -1,6 +1,6 @@
 
 
-import type { FiscalConfig } from './fiscal';
+import type { FiscalConfig, FiscalConfigPostReform } from './fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -25,7 +25,7 @@ import { getFiscalParameters } from '../config/fiscal';
  * Calculates partner-specific taxes (INSS and IRRF).
  * This is a pure function that depends only on its inputs.
  */
-export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
+export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig | FiscalConfigPostReform): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
 
@@ -73,7 +73,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
  * @param config The fiscal configuration.
  * @returns The calculated CPP value.
  */
-export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): number {
+export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig | FiscalConfigPostReform): number {
     if (monthlyPayroll <= 0) {
         return 0;
     }
@@ -274,7 +274,8 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 // 4. MAIN ORCHESTRATOR FUNCTION
 // =================================================================================
 
-export function calculateTaxes(values: TaxFormValues, config: FiscalConfig): CalculationResults {
+export function calculateTaxes(values: TaxFormValues): CalculationResults {
+  const config = getFiscalParameters(values.year || 2025);
   
   const totalRevenue = (values.domesticActivities || []).reduce((acc, act) => acc + act.revenue, 0) + (values.exportActivities || []).reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
   
