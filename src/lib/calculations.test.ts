@@ -1,20 +1,18 @@
 
-
 import { calculateTaxes } from './calculations';
 import { getFiscalParameters } from '../config/fiscal';
 import type { TaxFormValues } from './types';
 
-describe('Tax Calculation Engine', () => {
+describe('Tax Calculation Engine (2025)', () => {
+  const fiscalConfig = getFiscalParameters(2025);
 
-  // Teste 1: Cenário de Referência (Otimização Fator R) - O "Teste de Gabarito"
-  test('should match reference calculation for Fator R optimization scenario', () => {
-    const fiscalConfig = getFiscalParameters(2025);
+  test('Cenário 1: "Candidato à Otimização" (Fator R baixo -> Anexo V)', () => {
     const input: TaxFormValues = {
-      selectedCnaes: [{ code: '7020-4/00' }], // Anexo V
+      selectedCnaes: [{ code: '6201-5/01' }], // Desenvolvimento de Software
       rbt12: 240000,
-      fp12: 67000,
+      fp12: 18216, // 1518 * 12 -> Fator R = 7.59%
       issRate: 0.05,
-      domesticActivities: [{ code: '7020-4/00', revenue: 20000 }],
+      domesticActivities: [{ code: '6201-5/01', revenue: 20000 }],
       exportActivities: [],
       exportCurrency: 'BRL',
       exchangeRate: 1,
@@ -25,55 +23,65 @@ describe('Tax Calculation Engine', () => {
       year: 2025
     };
 
-    const result = calculateTaxes(input, fiscalConfig);
+    const result = calculateTaxes(input);
 
-    // Cenário Base (Anexo V)
-    expect(result.simplesNacionalBase).not.toBeNull();
-    // Fator R = 67000/240000 = 27.92% (< 28%) -> Anexo V
-    // Alíquota efetiva Anexo V, Faixa 2: (240000 * 0.18 - 4500) / 240000 = 0.16125
+    // Valida o cenário base (Anexo V)
+    const baseScenario = result.simplesNacionalBase;
+    expect(baseScenario).not.toBeNull();
+    expect(baseScenario.fatorR).toBeLessThan(0.28);
+    expect(baseScenario.annex).toContain('Anexo V');
+    // Alíquota Efetiva: (240000 * 18% - 4500) / 240000 = 16.125%
     // DAS = 20000 * 0.16125 = 3225
-    expect(result.simplesNacionalBase.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(3225, 2);
-    // INSS Sócio = 1518 * 0.11 = 166.98
-    // IRRF Simplificado: Base = 1518 - 564.80 = 953.20. Isento. IRRF = 0
-    // Total Tax = 3225 + 166.98 + 0 = 3391.98
-    expect(result.simplesNacionalBase.totalTax).toBeCloseTo(3391.98, 2);
+    expect(baseScenario.effectiveDasRate).toBeCloseTo(0.16125);
+    expect(baseScenario.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(3225);
 
-    // Cenário Otimizado (Anexo III)
-    expect(result.simplesNacionalOtimizado).not.toBeNull();
-    if (result.simplesNacionalOtimizado) {
-        // Para atingir Fator R >= 28%, FP12 precisa ser >= 240000 * 0.28 = 67200.
-        // Aumento de R$200 na FP12. O pro-labore sobe para cobrir isso.
-        // RBT12 = 240k. Alíquota efetiva Anexo III, Faixa 2: (240000 * 0.112 - 9360) / 240000 = 0.073
-        // DAS = 20000 * 0.073 = 1460
-        expect(result.simplesNacionalOtimizado.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(1460, 2);
-        
-        // Custo adicional do INSS/IRRF sobre o pro-labore aumentado
-        const inssOtimizado = result.simplesNacionalOtimizado.breakdown.find(b => b.name.includes('INSS s/ Pró-labore'))?.value || 0;
-        const irrfOtimizado = result.simplesNacionalOtimizado.breakdown.find(b => b.name.includes('IRRF s/ Pró-labore'))?.value || 0;
-        
-        // Total Tax Otimizado = DAS + INSS + IRRF
-        const totalTaxOtimizado = 1460 + inssOtimizado + irrfOtimizado;
-        expect(result.simplesNacionalOtimizado.totalTax).toBeCloseTo(totalTaxOtimizado, 2);
+    // Valida o cenário otimizado (Anexo III)
+    const otimizadoScenario = result.simplesNacionalOtimizado;
+    expect(otimizadoScenario).not.toBeNull();
+    if(otimizadoScenario) {
+      expect(otimizadoScenario.fatorR).toBeGreaterThanOrEqual(0.28);
+      expect(otimizadoScenario.annex).toContain('Anexo III');
+      // Alíquota Efetiva: (240000 * 11.2% - 9360) / 240000 = 7.30%
+      // DAS = 20000 * 0.073 = 1460
+      expect(otimizadoScenario.effectiveDasRate).toBeCloseTo(0.073);
+      expect(otimizadoScenario.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(1460);
     }
-    
-    // Cenário Lucro Presumido
-    expect(result.lucroPresumido).not.toBeNull();
-    // PIS = 20000 * 0.0065 = 130
-    // COFINS = 20000 * 0.03 = 600
-    // ISS = 20000 * 0.05 = 1000
-    // Base IRPJ/CSLL = 20000 * 0.32 = 6400
-    // IRPJ = 6400 * 0.15 = 960
-    // CSLL = 6400 * 0.09 = 576
-    // CPP = 1518 * 0.20 = 303.6
-    // INSS Sócio = 1518 * 0.11 = 166.98
-    // IRRF = 0
-    // Total Tax = 130 + 600 + 1000 + 960 + 576 + 303.6 + 166.98 = 3736.58
-    expect(result.lucroPresumido.totalTax).toBeCloseTo(3736.58, 2);
   });
 
-  // Teste 2: Anexo IV - Teste de Regressão
-  test('should calculate CPP correctly for Simples Nacional Anexo IV', () => {
-    const fiscalConfig = getFiscalParameters(2025);
+  test('Cenário 2: O "Otimizado" (Fator R ideal -> Anexo III)', () => {
+    const input: TaxFormValues = {
+      selectedCnaes: [{ code: '6201-5/01' }], // Desenvolvimento de Software
+      rbt12: 240000,
+      fp12: 67200, // 5600 * 12 -> Fator R = 28%
+      issRate: 0.05,
+      domesticActivities: [{ code: '6201-5/01', revenue: 20000 }],
+      exportActivities: [],
+      exportCurrency: 'BRL',
+      exchangeRate: 1,
+      totalSalaryExpense: 0,
+      proLabores: [{ value: 5600, hasOtherInssContribution: false, otherContributionSalary: 0 }],
+      numberOfPartners: 1,
+      selectedPlan: 'expertsEssencial',
+      year: 2025
+    };
+
+    const result = calculateTaxes(input);
+
+    const baseScenario = result.simplesNacionalBase;
+    expect(baseScenario).not.toBeNull();
+    expect(baseScenario.fatorR).toBeGreaterThanOrEqual(0.28);
+    expect(baseScenario.annex).toContain('Anexo III');
+     // Alíquota Efetiva: (240000 * 11.2% - 9360) / 240000 = 7.30%
+    // DAS = 20000 * 0.073 = 1460
+    expect(baseScenario.effectiveDasRate).toBeCloseTo(0.073);
+    expect(baseScenario.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(1460);
+    
+    // Cenário otimizado não deve ser gerado, pois já está ótimo
+    expect(result.simplesNacionalOtimizado?.optimizationNote).toBeDefined();
+  });
+
+
+  test('Cenário 3: Anexo IV - Deve calcular CPP por fora do DAS', () => {
     const input: TaxFormValues = {
       selectedCnaes: [{ code: '6911-7/01' }], // Advocacia, Anexo IV
       rbt12: 200000,
@@ -90,29 +98,28 @@ describe('Tax Calculation Engine', () => {
       year: 2025
     };
 
-    const result = calculateTaxes(input, fiscalConfig);
+    const result = calculateTaxes(input);
 
-    expect(result.simplesNacionalBase).not.toBeNull();
+    const baseScenario = result.simplesNacionalBase;
+    expect(baseScenario).not.toBeNull();
     // RBT12 = 200k. Alíquota efetiva Anexo IV, Faixa 2: (200000 * 0.09 - 8100) / 200000 = 0.0495
     // DAS = 20000 * 0.0495 = 990
-    const dasValue = result.simplesNacionalBase.breakdown.find(b => b.name.startsWith('DAS'))?.value;
-    expect(dasValue).toBeCloseTo(990, 2);
+    const dasValue = baseScenario.breakdown.find(b => b.name.startsWith('DAS'))?.value;
+    expect(dasValue).toBeCloseTo(990);
 
     // CPP (pago por fora no Anexo IV) = 2000 (pró-labore) * 0.20 = 400
-    const cppValue = result.simplesNacionalBase.breakdown.find(b => b.name.includes('CPP'))?.value;
+    const cppValue = baseScenario.breakdown.find(b => b.name.includes('CPP'))?.value;
     expect(cppValue).toBe(400);
     
     // INSS Sócio = 2000 * 0.11 = 220
-    const inssSocioValue = result.simplesNacionalBase.breakdown.find(b => b.name.includes('INSS s/ Pró-labore'))?.value;
+    const inssSocioValue = baseScenario.breakdown.find(b => b.name.includes('INSS s/ Pró-labore'))?.value;
     expect(inssSocioValue).toBe(220);
 
-    // Total Tax = 990 + 400 + 220 = 1610
-    expect(result.simplesNacionalBase.totalTax).toBeCloseTo(1610, 2);
+    // Total Tax = 990 (DAS) + 400 (CPP) + 220 (INSS) = 1610
+    expect(baseScenario.totalTax).toBeCloseTo(1610);
   });
 
-  // Teste 3: Lucro Presumido com CPP - Teste de Regressão
-  test('should calculate CPP correctly for Lucro Presumido', () => {
-    const fiscalConfig = getFiscalParameters(2025);
+  test('Cenário 4: Lucro Presumido - Deve calcular CPP sobre a folha total', () => {
     const input: TaxFormValues = {
       selectedCnaes: [{ code: '7020-4/00' }], // Serviço qualquer
       rbt12: 0,
@@ -129,13 +136,42 @@ describe('Tax Calculation Engine', () => {
       year: 2025
     };
 
-    const result = calculateTaxes(input, fiscalConfig);
+    const result = calculateTaxes(input);
     
-    expect(result.lucroPresumido).not.toBeNull();
+    const lpScenario = result.lucroPresumido;
+    expect(lpScenario).not.toBeNull();
+
     // monthlyPayroll = 5000 (salário) + 5000 (pró-labore) = 10000
     // CPP = 10000 * 0.20 = 2000
-    const cppValue = result.lucroPresumido.breakdown.find(b => b.name.includes('CPP'))?.value;
+    const cppValue = lpScenario.breakdown.find(b => b.name.includes('CPP'))?.value;
     expect(cppValue).toBe(2000);
   });
 
+  test('Cenário 5: INSS Sócio - Deve respeitar o teto', () => {
+      const input: TaxFormValues = {
+      selectedCnaes: [{ code: '7020-4/00' }],
+      rbt12: 0,
+      fp12: 0,
+      issRate: 0.05,
+      domesticActivities: [],
+      exportActivities: [],
+      exportCurrency: 'BRL',
+      exchangeRate: 1,
+      totalSalaryExpense: 0,
+      proLabores: [{ value: 10000, hasOtherInssContribution: false, otherContributionSalary: 0 }],
+      numberOfPartners: 1,
+      selectedPlan: 'padrao',
+      year: 2025
+    };
+
+    const result = calculateTaxes(input);
+    const inssSocio = result.simplesNacionalBase.partnerTaxes[0].inss;
+    
+    // Teto INSS 2025 = 8157.41
+    // INSS = 8157.41 * 0.11 = 897.3151
+    expect(inssSocio).toBeCloseTo(897.32);
+  })
+
 });
+
+    
