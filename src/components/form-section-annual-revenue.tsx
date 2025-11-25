@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { FileText, AlertTriangle, UploadCloud, Loader2, List, Edit } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { format, subMonths } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 import { formatCurrencyBRL, formatBRL, parseBRL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -28,28 +30,39 @@ function fileToDataUri(file: File): Promise<string> {
   });
 }
 
+function generateLast12Months(): MonthlyData[] {
+    const months: MonthlyData[] = [];
+    const today = new Date();
+    for (let i = 11; i >= 0; i--) {
+        const date = subMonths(today, i + 1); // +1 to get past months, not including current
+        months.push({
+            mes: format(date, 'MM/yyyy', { locale: ptBR }),
+            receita: 0,
+            folha: 0,
+        });
+    }
+    return months;
+}
+
 export function FormSectionAnnualRevenue() {
     const { control, setValue, getValues, watch } = useFormContext<CalculatorFormValues>();
     const { toast } = useToast();
     const [isUploading, setIsUploading] = useState(false);
     const [activeTab, setActiveTab] = useState("manual");
-    const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+    const [monthlyData, setMonthlyData] = useState<MonthlyData[]>(generateLast12Months());
 
     useEffect(() => {
-        // 1. Calculate the new totals based on the monthly data grid
         const newRbt12 = monthlyData.reduce((acc, item) => acc + (item.receita || 0), 0);
         const newFolha12 = monthlyData.reduce((acc, item) => acc + (item.folha || 0), 0);
     
-        // 2. Get the current values from the form without triggering a re-render
         const currentRbt12 = getValues('rbt12');
         const currentFolha12 = getValues('fp12');
     
-        // 3. GUARD CLAUSE: Only update if there's a real difference to prevent the loop
-        if (monthlyData.length > 0 && newRbt12 !== currentRbt12) {
+        if (newRbt12 !== currentRbt12) {
             setValue('rbt12', newRbt12, { shouldValidate: true, shouldDirty: true });
         }
         
-        if (monthlyData.length > 0 && newFolha12 !== currentFolha12) {
+        if (newFolha12 !== currentFolha12) {
             setValue('fp12', newFolha12, { shouldValidate: true, shouldDirty: true });
         }
     
@@ -77,19 +90,29 @@ export function FormSectionAnnualRevenue() {
             const extractedData: PgdasData = await extractDataFromPgdas({ pdfDataUri });
             
             if (extractedData.competencias && extractedData.competencias.length > 0) {
-                setMonthlyData(extractedData.competencias);
+                // Merge extracted data with existing grid to preserve order
+                const newGrid = generateLast12Months();
+                extractedData.competencias.forEach(extractedItem => {
+                    const index = newGrid.findIndex(gridItem => gridItem.mes === extractedItem.mes);
+                    if (index !== -1) {
+                        newGrid[index] = extractedItem;
+                    }
+                });
+                setMonthlyData(newGrid);
+
                 toast({
                     title: "Extração Concluída!",
-                    description: `Dados de ${extractedData.competencias.length} meses preenchidos. Confira os valores na grade.`,
+                    description: `Dados de ${extractedData.competencias.length} meses preenchidos. Confira e ajuste se necessário.`,
                     className: 'bg-green-100 border-green-200 text-green-900',
                 });
+                 setActiveTab("manual");
             } else {
                  setValue("rbt12", extractedData.totalRBT12, { shouldValidate: true, shouldDirty: true });
                  setValue("fp12", extractedData.totalFolha12, { shouldValidate: true, shouldDirty: true });
-                 setMonthlyData([]);
+                 setMonthlyData(generateLast12Months());
                  toast({
                     title: "Extração Parcial",
-                    description: "A IA extraiu os totais, mas não os detalhes mensais. Os campos foram preenchidos.",
+                    description: "A IA extraiu apenas os totais. Os campos foram preenchidos.",
                     variant: "default"
                 });
             }
@@ -142,18 +165,18 @@ export function FormSectionAnnualRevenue() {
                     </div>
                     <div>
                         <CardTitle className="text-xl font-bold">Receita e Folha Anual (12 Meses)</CardTitle>
-                        <CardDescription>Informação crucial para determinar a alíquota do Simples Nacional (Fator R).</CardDescription>
+                        <CardDescription>Preencha mês a mês ou importe seu extrato PGDAS para um cálculo preciso do Fator R.</CardDescription>
                     </div>
                 </div>
             </CardHeader>
             <CardContent className='p-6 md:p-8'>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="manual">Preenchimento</TabsTrigger>
+                        <TabsTrigger value="manual">Preenchimento Manual</TabsTrigger>
                         <TabsTrigger value="import">⚡ Importar Extrato PGDAS</TabsTrigger>
                     </TabsList>
                     <TabsContent value="manual" className="mt-6 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start p-4 border rounded-lg bg-muted/40">
                              <FormField control={control} name="rbt12" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Faturamento Total (RBT12)</FormLabel>
@@ -162,16 +185,13 @@ export function FormSectionAnnualRevenue() {
                                         <FormControl>
                                             <Input
                                                 type="text"
-                                                inputMode="decimal"
-                                                placeholder="Ex: 250.000,00"
-                                                onChange={(e) => field.onChange(parseBRL(e.target.value))}
+                                                readOnly
                                                 value={formatBRL(field.value)}
-                                                readOnly={monthlyData.length > 0}
-                                                className="pl-9 read-only:bg-muted/50"
+                                                className="pl-9 font-bold text-base bg-background/50"
                                             />
                                         </FormControl>
                                     </div>
-                                    <FormDescription>Receita Bruta dos últimos 12 meses.</FormDescription>
+                                    <FormDescription>Soma da receita dos últimos 12 meses.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
@@ -181,14 +201,11 @@ export function FormSectionAnnualRevenue() {
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                         <FormControl>
-                                            <Input
+                                             <Input
                                                 type="text"
-                                                inputMode="decimal"
-                                                placeholder="Ex: 70.000,00"
-                                                onChange={(e) => field.onChange(parseBRL(e.target.value))}
+                                                readOnly
                                                 value={formatBRL(field.value)}
-                                                readOnly={monthlyData.length > 0}
-                                                className="pl-9 read-only:bg-muted/50"
+                                                className="pl-9 font-bold text-base bg-background/50"
                                             />
                                         </FormControl>
                                     </div>
@@ -198,50 +215,32 @@ export function FormSectionAnnualRevenue() {
                             )} />
                         </div>
                         
-                        <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="item-1">
-                                <AccordionTrigger>
-                                    <div className="flex items-center gap-2">
-                                        <List className="h-5 w-5 text-primary"/>
-                                        <span className="font-semibold">Detalhes Mês a Mês (Editável)</span>
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <div className="overflow-x-auto">
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead className="w-[120px]">Competência</TableHead>
-                                                    <TableHead>Receita</TableHead>
-                                                    <TableHead>Folha / Pró-labore</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {monthlyData.length > 0 ? monthlyData.map((data, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell className="font-medium">{data.mes}</TableCell>
-                                                        <TableCell>
-                                                            <Input type="text" value={formatBRL(data.receita)} onChange={(e) => handleMonthlyDataChange(index, 'receita', parseBRL(e.target.value))} className="h-8"/>
-                                                        </TableCell>
-                                                         <TableCell>
-                                                            <Input type="text" value={formatBRL(data.folha)} onChange={(e) => handleMonthlyDataChange(index, 'folha', parseBRL(e.target.value))} className="h-8"/>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )) : (
-                                                    <TableRow>
-                                                        <TableCell colSpan={3} className="text-center text-muted-foreground py-6">
-                                                            Importe um extrato PGDAS ou preencha os totais manualmente.
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </TabsContent>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[120px]">Competência</TableHead>
+                                        <TableHead>Receita</TableHead>
+                                        <TableHead>Folha / Pró-labore</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {monthlyData.map((data, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-medium">{data.mes}</TableCell>
+                                            <TableCell>
+                                                <Input type="text" value={formatBRL(data.receita)} onChange={(e) => handleMonthlyDataChange(index, 'receita', parseBRL(e.target.value))} className="h-9"/>
+                                            </TableCell>
+                                                <TableCell>
+                                                <Input type="text" value={formatBRL(data.folha)} onChange={(e) => handleMonthlyDataChange(index, 'folha', parseBRL(e.target.value))} className="h-9"/>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
 
+                    </TabsContent>
                     <TabsContent value="import" className="mt-6">
                         <div 
                             {...getRootProps()} 

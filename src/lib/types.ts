@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 // Schema for a selected CNAE, which might include a user's choice of cClass
@@ -166,8 +165,8 @@ export interface FeeBracket {
  */
 export const MonthlyDataSchema = z.object({
   mes: z.string().describe("Formato MM/AAAA"),
-  receita: z.number().describe("Valor monetário da receita"),
-  folha: z.number().describe("Valor monetário da folha/pró-labore"),
+  receita: z.number().min(0, 'Receita não pode ser negativa').describe("Valor monetário da receita"),
+  folha: z.number().min(0, 'Folha não pode ser negativa').describe("Valor monetário da folha/pró-labore"),
 });
 export type MonthlyData = z.infer<typeof MonthlyDataSchema>;
 
