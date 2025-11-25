@@ -350,10 +350,8 @@ export function gerarAnaliseCompleta(
   // 1. Calcula situação atual
   const situacaoAtual = calcularSituacaoAtual(dadosMensais);
   
-  // 2. Verifica se já está otimizado
-  const jaOtimizado = situacaoAtual.fatorR >= 0.28;
-  
-  if (jaOtimizado) {
+  // 2. VERIFICAÇÃO DE SUCESSO IMEDIATO
+  if (situacaoAtual.fatorR >= 0.28) {
     return {
       situacaoAtual,
       analiseGap: { folhaNecessaria: 0, diferencaTotal: 0, percentualAumento: 0, viavel: true },
