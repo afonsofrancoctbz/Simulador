@@ -220,7 +220,14 @@ export const FatorRResponseSchema = z.object({
 export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 
 
-// Fator R Analysis Types
+// --- Fator R Migration Analysis Schemas ---
+export const DadosMensaisSchema = z.object({
+  mes: z.string(),
+  receita: z.number(),
+  folha: z.number(),
+});
+export type DadosMensais = z.infer<typeof DadosMensaisSchema>;
+
 export const SituacaoAtualSchema = z.object({
   rbt12: z.number(),
   folha12: z.number(),
@@ -231,6 +238,8 @@ export const SituacaoAtualSchema = z.object({
   receitaMensal: z.number(),
   folhaMensal: z.number(),
 });
+export type SituacaoAtual = z.infer<typeof SituacaoAtualSchema>;
+
 
 export const AnaliseGapSchema = z.object({
   folhaNecessaria: z.number(),
@@ -248,7 +257,7 @@ export const PlanoAdequacaoSchema = z.object({
   custoComEncargos: z.number(),
 });
 
-export const ProjectionMonthSchema = z.object({
+export const ProjecaoMesSchema = z.object({
   mes: z.number(),
   mesReferencia: z.string(),
   mesApuracao: z.string(),
@@ -261,8 +270,7 @@ export const ProjectionMonthSchema = z.object({
   economiaEstimada: z.number(),
   custoAdequacao: z.number(),
 });
-export type ProjectionMonth = z.infer<typeof ProjectionMonthSchema>;
-
+export type ProjecaoMes = z.infer<typeof ProjecaoMesSchema>;
 
 export const ROISchema = z.object({
   custoMensalAdequacao: z.number(),
@@ -273,26 +281,13 @@ export const ROISchema = z.object({
   retornoTotal12Meses: z.number(),
 });
 
-export const FatorRAnalysisSchema = z.object({
+export const AnaliseCompletaSchema = z.object({
   situacaoAtual: SituacaoAtualSchema,
   analiseGap: AnaliseGapSchema,
   planoAdequacao: PlanoAdequacaoSchema,
-  projecao: z.array(ProjectionMonthSchema),
+  projecao: z.array(ProjecaoMesSchema),
   roi: ROISchema,
   recomendacoes: z.array(z.string()),
   jaOtimizado: z.boolean(),
 });
-export type FatorRAnalysis = z.infer<typeof FatorRAnalysisSchema>;
-
-
-/**
- * Schema para análise do Fator R com plano de adequação
- */
-export const MigrationReportSchema = z.object({
-  pgdasData: PgdasDataSchema,
-  analysis: FatorRAnalysisSchema,
-  projection: z.array(ProjectionMonthSchema),
-  recommendations: z.array(z.string()).optional(),
-  createdAt: z.date().default(() => new Date()),
-});
-export type MigrationReport = z.infer<typeof MigrationReportSchema>;
+export type AnaliseCompleta = z.infer<typeof AnaliseCompletaSchema>;

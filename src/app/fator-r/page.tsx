@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import AppFooter from "@/components/app-footer";
 import AppHeader from "@/components/app-header";
+import AppFooter from "@/components/app-footer";
 import { useDropzone } from 'react-dropzone';
 import { Loader2, UploadCloud, FileText, AlertTriangle, LineChart, BarChart, CheckCircle, Info, Target, Wallet, ArrowRight, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -318,7 +318,7 @@ export default function FatorRPage() {
                         </CardContent>
                      </Card>
 
-                    {analysisResult && (
+                    {analysisResult && !analysisResult.jaOtimizado && (
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-3"><Wallet/> 2. Defina o Plano</CardTitle>
