@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 // Schema for a selected CNAE, which might include a user's choice of cClass

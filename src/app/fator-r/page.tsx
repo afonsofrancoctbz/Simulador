@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -399,7 +398,7 @@ export default function FatorRPage() {
                                     step={1}
                                     onValueChange={(value) => setMesesAdequacao(value[0])}
                                     className="w-full max-w-md"
-                                />
+                                 />
                             </CardContent>
                         </Card>
                     )}
