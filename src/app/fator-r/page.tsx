@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import AppHeader from "@/components/app-header";
@@ -186,8 +186,8 @@ function FatorRAnalysisComponent({ analysis }: { analysis: AnaliseCompleta }) {
                 <YAxis unit="%" />
                 <Tooltip formatter={(value: number) => `${value.toFixed(2)}%`} />
                 <Legend />
-                <ReferenceLine y={28} label="Meta" stroke="hsl(var(--primary))" strokeDasharray="3 3" />
-                <Line type="monotone" dataKey="Fator R" stroke="hsl(var(--accent))" strokeWidth={2} />
+                <ReferenceLine y={28} label={{ value: "Meta 28%", position: "insideTopLeft", fill: 'hsl(var(--primary))' }} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
+                <Line type="monotone" dataKey="Fator R" stroke="hsl(var(--accent))" strokeWidth={2} activeDot={{ r: 8 }} />
               </RechartsLineChart>
             </ResponsiveContainer>
           </div>
@@ -202,7 +202,7 @@ function FatorRAnalysisComponent({ analysis }: { analysis: AnaliseCompleta }) {
         <CardContent>
            <ul className="space-y-2 list-disc pl-5">
             {recomendacoes.map((rec, i) => (
-              <li key={i}>{rec}</li>
+              <li key={i} dangerouslySetInnerHTML={{ __html: rec.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>') }} />
             ))}
           </ul>
         </CardContent>

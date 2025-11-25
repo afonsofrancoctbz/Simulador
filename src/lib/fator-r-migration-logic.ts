@@ -103,7 +103,7 @@ export function calcularSituacaoAtual(dadosMensais: DadosMensais[]): SituacaoAtu
   // Calcula alíquota efetiva (simplificado - você pode usar tabela progressiva real)
   const aliquotaAtual = anexo === 'III' 
     ? calcularAliquotaEfetivaAnexoIII(rbt12)
-    : 0.18; // Anexo V médio
+    : calcularAliquotaEfetivaAnexoV(rbt12);
 
   const receitaMensal = rbt12 / 12;
   const folhaMensal = folha12 / 12;
@@ -138,6 +138,24 @@ function calcularAliquotaEfetivaAnexoIII(rbt12: number): number {
   const faixa = faixas.find(f => rbt12 <= f.ate) || faixas[faixas.length - 1];
   return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
 }
+
+/**
+ * Calcula a alíquota efetiva do Anexo V (tabela progressiva)
+ */
+function calcularAliquotaEfetivaAnexoV(rbt12: number): number {
+  const faixas = [
+      { ate: 180000, aliquota: 0.155, deducao: 0 },
+      { ate: 360000, aliquota: 0.18, deducao: 4500 },
+      { ate: 720000, aliquota: 0.195, deducao: 9900 },
+      { ate: 1800000, aliquota: 0.205, deducao: 17100 },
+      { ate: 3600000, aliquota: 0.23, deducao: 62100 },
+      { ate: 4800000, aliquota: 0.305, deducao: 540000 },
+  ];
+   if(rbt12 <= 0) return faixas[0].aliquota;
+  const faixa = faixas.find(f => rbt12 <= f.ate) || faixas[faixas.length - 1];
+  return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
+}
+
 
 /**
  * Analisa o GAP necessário para atingir Fator R de 28%
@@ -303,14 +321,14 @@ export function gerarRecomendacoes(
 
   // Economia anual
   recomendacoes.push(
-    `💰 Economia anual estimada: R$ ${roi.economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+    `💰 Economia anual estimada: **R$ ${roi.economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}**`
   );
 
   // Quando atinge objetivo
   const mesAtinge = projecao.findIndex(p => p.anexoProjetado === 'III') + 1;
   if (mesAtinge > 0) {
     recomendacoes.push(
-      `📅 Meta atingida no mês ${mesAtinge}. A partir daí, você pagará DAS com alíquota reduzida.`
+      `📅 Meta atingida no **mês ${mesAtinge}**. A partir daí, você pagará DAS com alíquota reduzida.`
     );
   }
 
@@ -328,7 +346,7 @@ export function gerarRecomendacoes(
 export function gerarAnaliseCompleta(
   dadosMensais: DadosMensais[],
   mesesParaAdequacao: number = 4
-): AnaliseCompleta | { jaOtimizado: true; situacaoAtual: SituacaoAtual; message: string } {
+): AnaliseCompleta {
   // 1. Calcula situação atual
   const situacaoAtual = calcularSituacaoAtual(dadosMensais);
   
@@ -337,9 +355,13 @@ export function gerarAnaliseCompleta(
   
   if (jaOtimizado) {
     return {
-      jaOtimizado: true,
       situacaoAtual,
-      message: '✅ Parabéns! Sua empresa já está otimizada no Anexo III.',
+      analiseGap: { folhaNecessaria: 0, diferencaTotal: 0, percentualAumento: 0, viavel: true },
+      planoAdequacao: { mesesParaAdequacao: 0, aumentoMensalNecessario: 0, folhaBaseAtual: situacaoAtual.folhaMensal, folhaTotalMensal: situacaoAtual.folhaMensal, custoComEncargos: 0 },
+      projecao: [],
+      roi: { custoMensalAdequacao: 0, economiaMensal: 0, economiaAnual: 0, paybackMeses: 0, investimentoTotal: 0, retornoTotal12Meses: 0 },
+      recomendacoes: ['✅ Sua empresa já está enquadrada no Anexo III! Mantenha o Fator R acima de 28%.'],
+      jaOtimizado: true,
     };
   }
 
