@@ -220,49 +220,73 @@ export const FatorRResponseSchema = z.object({
 export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 
 
-/**
- * Schema para análise do Fator R com plano de adequação
- */
+// Fator R Analysis Types
+export const SituacaoAtualSchema = z.object({
+  rbt12: z.number(),
+  folha12: z.number(),
+  fatorR: z.number(),
+  anexo: z.enum(['III', 'V']),
+  custoMensalAtual: z.number(),
+  aliquotaAtual: z.number(),
+  receitaMensal: z.number(),
+  folhaMensal: z.number(),
+});
+
+export const AnaliseGapSchema = z.object({
+  folhaNecessaria: z.number(),
+  diferencaTotal: z.number(),
+  percentualAumento: z.number(),
+  viavel: z.boolean(),
+  mensagemViabilidade: z.string().optional(),
+});
+
+export const PlanoAdequacaoSchema = z.object({
+  mesesParaAdequacao: z.number(),
+  aumentoMensalNecessario: z.number(),
+  folhaBaseAtual: z.number(),
+  folhaTotalMensal: z.number(),
+  custoComEncargos: z.number(),
+});
+
+export const ProjectionMonthSchema = z.object({
+  mes: z.number(),
+  mesReferencia: z.string(),
+  mesApuracao: z.string(),
+  folhaBase: z.number(),
+  aumentoAplicado: z.number(),
+  folhaTotal: z.number(),
+  folhaAcumulada12m: z.number(),
+  fatorRProjetado: z.number(),
+  anexoProjetado: z.enum(['III', 'V']),
+  economiaEstimada: z.number(),
+  custoAdequacao: z.number(),
+});
+export type ProjectionMonth = z.infer<typeof ProjectionMonthSchema>;
+
+
+export const ROISchema = z.object({
+  custoMensalAdequacao: z.number(),
+  economiaMensal: z.number(),
+  economiaAnual: z.number(),
+  paybackMeses: z.number(),
+  investimentoTotal: z.number(),
+  retornoTotal12Meses: z.number(),
+});
+
 export const FatorRAnalysisSchema = z.object({
-  fatorRAtual: z.number().min(0).max(1),
-  anexoAtual: z.enum(['III', 'V']),
-  rbt12Atual: z.number().min(0),
-  folha12Atual: z.number().min(0),
-  
-  folhaNecessaria: z.number().min(0).describe('Folha necessária para atingir 28%'),
-  diferenca: z.number().min(0).describe('Diferença para atingir o Fator R de 28%'),
-  
-  mesesParaAdequacao: z.number().int().min(1).max(12),
-  aumentoMensalNecessario: z.number().min(0),
-  folhaBaseAtual: z.number().min(0),
-  folhaTotalMensal: z.number().min(0).describe('Folha base + aumento'),
-  
-  economiaMensal: z.number().optional().describe('Economia tributária estimada após adequação'),
-  custoAdequacao: z.number().optional().describe('Custo total dos encargos sobre o aumento'),
-  paybackMeses: z.number().optional().describe('Tempo de retorno do investimento em meses'),
+  situacaoAtual: SituacaoAtualSchema,
+  analiseGap: AnaliseGapSchema,
+  planoAdequacao: PlanoAdequacaoSchema,
+  projecao: z.array(ProjectionMonthSchema),
+  roi: ROISchema,
+  recomendacoes: z.array(z.string()),
+  jaOtimizado: z.boolean(),
 });
 export type FatorRAnalysis = z.infer<typeof FatorRAnalysisSchema>;
 
 
 /**
- * Schema para a projeção mês a mês da adequação
- */
-export const ProjectionMonthSchema = z.object({
-  mesFolha: z.string().regex(/^\d{2}\/\d{4}$/),
-  mesApuracao: z.string().regex(/^\d{2}\/\d{4}$/),
-  folhaBase: z.number(),
-  aumento: z.number(),
-  folhaTotal: z.number(),
-  folhaAcumulada12m: z.number(),
-  fatorRProjetado: z.number(),
-  anexoProjetado: z.enum(['III', 'V']),
-  economiaEstimada: z.number().optional(),
-});
-export type ProjectionMonth = z.infer<typeof ProjectionMonthSchema>;
-
-
-/**
- * Schema completo do relatório de análise para migração
+ * Schema para análise do Fator R com plano de adequação
  */
 export const MigrationReportSchema = z.object({
   pgdasData: PgdasDataSchema,

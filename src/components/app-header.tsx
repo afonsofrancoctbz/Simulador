@@ -20,6 +20,9 @@ export default function AppHeader() {
                 <Link href="/">Calculadora de Impostos</Link>
             </Button>
             <Button variant="ghost" asChild>
+                <Link href="/fator-r">Análise Fator R</Link>
+            </Button>
+            <Button variant="ghost" asChild>
                 <Link href="/custo-funcionario">Custo do Funcionário</Link>
             </Button>
             <Button variant="ghost" asChild>
