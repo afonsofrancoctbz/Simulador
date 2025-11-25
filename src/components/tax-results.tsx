@@ -207,7 +207,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
 
             const groupedTaxes = groupTaxes(scenario);
-            const costPercentage = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
+            const effectiveRate = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
 
             let title = scenario.regime.replace(/ \(.+\)/, ''); // Remove parênteses como (Anexo V)
             let subtitle = scenario.regime.match(/\((.+)\)/)?.[1] || '';
@@ -397,9 +397,9 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                                   {formatCurrencyBRL(scenario.totalMonthlyCost)}
                               </div>
                               <div className="w-full bg-muted rounded-full h-2 mt-1 overflow-hidden print-hidden">
-                                  <div className="bg-gradient-to-r from-green-300 via-primary to-blue-800 h-2.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(costPercentage*100, 100)}%` }}></div>
+                                  <div className="bg-gradient-to-r from-green-300 via-primary to-blue-800 h-2.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(effectiveRate*100, 100)}%` }}></div>
                               </div>
-                              <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(scenario.effectiveRate)} do faturamento</p>
+                              <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(effectiveRate)} do faturamento</p>
                           </div>
                       </div>
                   </div>

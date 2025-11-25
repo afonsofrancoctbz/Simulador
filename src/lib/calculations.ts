@@ -175,8 +175,9 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     
+    // Se for cenário otimizado, a folha anualizada é a nova folha simulada. Senão, usa o histórico.
     const annualPayroll = proLaboreOverride 
-      ? (totalSalaryExpense + proLaboresToUse.reduce((sum, p) => sum + p.value, 0)) * 12 
+      ? (totalSalaryExpense + totalProLaboreBruto) * 12 
       : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
       
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
@@ -198,8 +199,13 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
         if (revenueForActivity === 0) return;
 
-        // Determinar Anexo
-        let effectiveAnnex: Annex = (cnaeInfo.requiresFatorR && fatorR >= config.simples_nacional.limite_fator_r) ? 'III' : cnaeInfo.annex;
+        // Determinar Anexo - CORREÇÃO PRINCIPAL AQUI
+        let effectiveAnnex: Annex;
+        if (cnaeInfo.requiresFatorR) {
+            effectiveAnnex = (fatorR >= config.simples_nacional.limite_fator_r) ? 'III' : 'V';
+        } else {
+            effectiveAnnex = cnaeInfo.annex;
+        }
         finalAnnexes.add(effectiveAnnex);
         if (effectiveAnnex === 'IV') {
             hasAnnexIVActivity = true;
@@ -335,7 +341,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
-
-    
-
-    
