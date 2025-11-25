@@ -169,7 +169,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const exportRevenueValue = exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenueValue;
     
-    const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => sum + p.value, 0);
+    const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     // Passo 1: Calcular Bases Anuais e Fator R
@@ -293,7 +293,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < config.simples_nacional.limite_fator_r && totalRevenue > 0) {
       
       const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
-      const totalProLaboreOriginal = proLaboresCopy.reduce((sum, p) => sum + p.value, 0);
+      const totalProLaboreOriginal = proLaboresCopy.reduce((acc, p) => acc + p.value, 0);
 
       const requiredAnnualPayroll = (values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12) * config.simples_nacional.limite_fator_r;
       const currentAnnualPayroll = (values.fp12 > 0 ? values.fp12 : (values.totalSalaryExpense + totalProLaboreOriginal) * 12);
@@ -335,5 +335,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+    
 
     

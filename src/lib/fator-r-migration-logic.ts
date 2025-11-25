@@ -404,3 +404,5 @@ function formatarMesAno(data: Date): string {
   const ano = data.getFullYear();
   return `${mes}/${ano}`;
 }
+
+    
