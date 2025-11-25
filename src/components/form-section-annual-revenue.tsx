@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -164,8 +165,8 @@ export function FormSectionAnnualRevenue() {
                         <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-xl font-bold">Receita e Folha Anual (12 Meses)</CardTitle>
-                        <CardDescription>Preencha mês a mês ou importe seu extrato PGDAS para um cálculo preciso do Fator R.</CardDescription>
+                        <CardTitle className="text-xl font-bold">Receita e Folha Anual (Histórico)</CardTitle>
+                        <CardDescription>Preencha os dados dos 12 meses anteriores para o cálculo preciso do Fator R.</CardDescription>
                     </div>
                 </div>
             </CardHeader>
@@ -191,7 +192,7 @@ export function FormSectionAnnualRevenue() {
                                             />
                                         </FormControl>
                                     </div>
-                                    <FormDescription>Soma da receita dos últimos 12 meses.</FormDescription>
+                                    <FormDescription>Soma da receita dos 12 meses anteriores ao período de apuração.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
@@ -209,7 +210,7 @@ export function FormSectionAnnualRevenue() {
                                             />
                                         </FormControl>
                                     </div>
-                                    <FormDescription>Soma da folha dos últimos 12 meses.</FormDescription>
+                                    <FormDescription>Soma da folha de pagamento dos 12 meses anteriores.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />

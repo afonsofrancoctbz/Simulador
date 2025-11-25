@@ -13,6 +13,10 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
 import type { FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
+import { FatorRAnalysisComponent } from '@/app/fator-r/page';
+import type { AnaliseCompleta, DadosMensais } from '@/lib/fator-r-migration-logic';
+import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
+import { format } from 'date-fns';
 
 interface TaxResultsProps {
   year: number;
@@ -20,6 +24,7 @@ interface TaxResultsProps {
   results: CalculationResults | CalculationResults2026 | null;
   error: string | null;
   fatorRProjection: FatorRResponse | null;
+  formValues: any;
 }
 
 type SelectedScenario = {
@@ -27,7 +32,7 @@ type SelectedScenario = {
   optimizationNote?: string | null;
 } | null;
 
-export default function TaxResults({ year, isLoading, results, error, fatorRProjection }: TaxResultsProps) {
+export default function TaxResults({ year, isLoading, results, error, fatorRProjection, formValues }: TaxResultsProps) {
   const [selectedScenarioId, setSelectedScenarioId] = useState<SelectedScenario>(null);
 
   const scenariosToShow = useMemo(() => {
@@ -81,6 +86,35 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     if (!selectedScenarioId) return null;
     return scenariosToShow.find(s => s.regime === selectedScenarioId.regime && (s.optimizationNote ?? null) === selectedScenarioId.optimizationNote) ?? null;
   }, [selectedScenarioId, scenariosToShow]);
+
+  const fatorRAnalysisData: AnaliseCompleta | null = useMemo(() => {
+    if (!results || !results.simplesNacionalBase || results.simplesNacionalOtimizado) {
+        return null;
+    }
+
+    const { rbt12, fp12 } = formValues;
+
+    if (!rbt12 || rbt12 <= 0) return null;
+    
+    // Simula o histórico mensal caso não venha do formulário detalhado
+    const dadosMensais: DadosMensais[] = Array.from({ length: 12 }, (_, i) => {
+        const date = new Date();
+        date.setMonth(date.getMonth() - (11 - i));
+        return {
+            mes: format(date, 'MM/yyyy'),
+            receita: rbt12 / 12,
+            folha: fp12 / 12
+        };
+    });
+    
+    try {
+        const analysis = gerarAnaliseCompleta(dadosMensais, 4);
+        if(analysis.jaOtimizado) return null; // Não mostra se já estiver otimizado.
+        return analysis;
+    } catch (e) {
+        return null;
+    }
+  }, [results, formValues]);
 
 
   if (isLoading) {
@@ -374,15 +408,35 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
           })}
         </div>
       </div>
+      
+      {fatorRAnalysisData && (
+        <div className="mt-12 border-t pt-8 animate-in slide-in-from-bottom-4">
+             <div className="text-center mb-8">
+                <span className="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">
+                    OPORTUNIDADE IDENTIFICADA
+                </span>
+                <h2 className="text-2xl font-bold text-foreground mt-4">
+                    Plano de Redução Tributária Inteligente
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto mt-2">Sua empresa pode economizar migrando do Anexo V para o Anexo III. Veja abaixo o plano de ação e a projeção de resultados.</p>
+            </div>
+          <FatorRAnalysisComponent analysis={fatorRAnalysisData} />
+        </div>
+      )}
 
-      <Separator className="my-16 separator-print" />
-      <div className="details-card">
-        <PartnerDetailsCard details={selectedDetails} />
-      </div>
-      <Separator className="my-16 separator-print" />
-      <div className="profit-card">
-        <ProfitStatementCard details={selectedDetails} />
-      </div>
+
+      {selectedDetails && (
+        <>
+            <Separator className="my-16 separator-print" />
+            <div className="details-card">
+                <PartnerDetailsCard details={selectedDetails} />
+            </div>
+            <Separator className="my-16 separator-print" />
+            <div className="profit-card">
+                <ProfitStatementCard details={selectedDetails} />
+            </div>
+        </>
+      )}
 
     </div>
   );

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
@@ -117,6 +118,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
                 results={results}
                 error={error}
                 fatorRProjection={fatorRProjection}
+                formValues={form.getValues()}
             />
         </div>
     </div>
