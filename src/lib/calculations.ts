@@ -138,7 +138,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         domesticRevenue,
         exportRevenue: exportRevenueBRL,
         proLabore: totalProLaboreBruto,
-        effectiveRate: totalRevenue > 0 ? totalTax / totalRevenue : 0,
+        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
         contabilizeiFee,
         breakdown: [
           { name: 'PIS', value: pis },
@@ -169,16 +169,17 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const exportRevenueValue = exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenueValue;
     
-    const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
+    const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => sum + p.value, 0);
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    const effectiveFp12 = proLaboreOverride
-        ? (totalSalaryExpense + proLaboresToUse.reduce((sum, p) => sum + p.value, 0)) * 12
-        : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
-
-    const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
+    
+    const annualPayroll = proLaboreOverride 
+      ? (totalSalaryExpense + proLaboresToUse.reduce((sum, p) => sum + p.value, 0)) * 12 
+      : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
+      
+    const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
 
