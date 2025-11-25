@@ -2,6 +2,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import AppHeader from "@/components/app-header";
 import AppFooter from "@/components/app-footer";
 import { useDropzone } from 'react-dropzone';
@@ -13,11 +16,20 @@ import { useToast } from '@/hooks/use-toast';
 import { extractDataFromPgdas } from '@/ai/flows/extract-pgdas-flow';
 import type { PgdasData, DadosMensais, AnaliseCompleta, ProjecaoMes } from '@/lib/fator-r-migration-logic';
 import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
-import { formatCurrencyBRL, formatPercent } from '@/lib/utils';
+import { formatCurrencyBRL, formatPercent, formatBRL, parseBRL } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from 'recharts';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+
+const FatorRFormSchema = z.object({
+  rbt12: z.coerce.number().min(1, "O faturamento anual deve ser maior que zero."),
+  folha12: z.coerce.number().min(0, "A folha de pagamento não pode ser negativa."),
+});
+
+type FatorRFormValues = z.infer<typeof FatorRFormSchema>;
 
 
 function FatorRAnalysisComponent({ analysis }: { analysis: AnaliseCompleta }) {
@@ -204,9 +216,13 @@ function FatorRAnalysisComponent({ analysis }: { analysis: AnaliseCompleta }) {
 export default function FatorRPage() {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
-    const [pgdasData, setPgdasData] = useState<PgdasData | null>(null);
     const [dadosMensais, setDadosMensais] = useState<DadosMensais[] | null>(null);
     const [mesesAdequacao, setMesesAdequacao] = useState<number>(4);
+
+    const form = useForm<FatorRFormValues>({
+        resolver: zodResolver(FatorRFormSchema),
+        defaultValues: { rbt12: 0, folha12: 0 }
+    });
     
     const onDrop = async (acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
@@ -218,7 +234,6 @@ export default function FatorRPage() {
         }
 
         setIsLoading(true);
-        setPgdasData(null);
         setDadosMensais(null);
 
         try {
@@ -234,7 +249,8 @@ export default function FatorRPage() {
                   return;
                 }
                 
-                setPgdasData(extractedData);
+                form.setValue('rbt12', extractedData.totalRBT12);
+                form.setValue('folha12', extractedData.totalFolha12);
                 setDadosMensais(extractedData.competencias as DadosMensais[]);
 
                 toast({
@@ -257,6 +273,21 @@ export default function FatorRPage() {
         maxFiles: 1,
         disabled: isLoading,
     });
+
+    const onSubmit = (data: FatorRFormValues) => {
+        const receitaMensal = data.rbt12 / 12;
+        const folhaMensal = data.folha12 / 12;
+        const historicoSimulado: DadosMensais[] = Array.from({ length: 12 }, (_, i) => {
+            const date = new Date();
+            date.setMonth(date.getMonth() - (11 - i));
+            return {
+                mes: `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`,
+                receita: receitaMensal,
+                folha: folhaMensal
+            };
+        });
+        setDadosMensais(historicoSimulado);
+    };
 
     const analysisResult = useMemo(() => {
         if (!dadosMensais || dadosMensais.length !== 12) return null;
@@ -283,46 +314,80 @@ export default function FatorRPage() {
                 </section>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12 max-w-5xl space-y-12">
-                     <Card>
+                    <Card>
                         <CardHeader>
-                          <CardTitle className="flex items-center gap-3"><FileText/> 1. Importe seu Extrato PGDAS</CardTitle>
-                          <CardDescription>Faça o upload do extrato do Simples Nacional (PGDAS-D) dos últimos 12 meses para iniciar a análise.</CardDescription>
+                            <CardTitle className="flex items-center gap-3"><FileText/> 1. Informe seus Dados Anuais</CardTitle>
+                            <CardDescription>Insira os totais do seu negócio ou importe seu extrato PGDAS para preenchimento automático.</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                          <div 
-                              {...getRootProps()} 
-                              className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors
-                              ${isDragActive ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
-                          >
-                              <input {...getInputProps()} />
-                              {isLoading ? (
-                                  <div className="flex flex-col items-center gap-4 text-primary">
-                                      <Loader2 className="h-10 w-10 animate-spin" />
-                                      <p className="font-semibold">Analisando o extrato...</p>
-                                  </div>
-                              ) : (
-                                  <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                                      <UploadCloud className="h-10 w-10" />
-                                      <p className="font-semibold text-foreground">Arraste seu extrato aqui</p>
-                                      <p className="text-sm">ou clique para selecionar o arquivo PDF.</p>
-                                  </div>
-                              )}
-                          </div>
-                           <Alert variant="default" className="mt-4">
-                              <AlertTriangle className="h-4 w-4" />
-                              <AlertTitle>Onde encontrar o extrato?</AlertTitle>
-                              <AlertDescription>
-                                  Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" &gt; "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
-                              </AlertDescription>
-                          </Alert>
+                        <CardContent className="space-y-6">
+                            <FormProvider {...form}>
+                                <Form {...form}>
+                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                            <FormField control={form.control} name="rbt12" render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Faturamento Bruto Anual (RBT12)</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="text" placeholder="Ex: 300000,00" value={formatBRL(field.value)} onChange={e => field.onChange(parseBRL(e.target.value))}/>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                            <FormField control={form.control} name="folha12" render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Folha de Pagamento Anual (FP12)</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="text" placeholder="Ex: 40000,00" value={formatBRL(field.value)} onChange={e => field.onChange(parseBRL(e.target.value))}/>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        </div>
+                                        <Button type="submit" className="w-full">Analisar com Dados Manuais</Button>
+                                    </form>
+                                </Form>
+                            </FormProvider>
+                            
+                            <div className="relative flex py-5 items-center">
+                                <div className="flex-grow border-t border-gray-200"></div>
+                                <span className="flex-shrink mx-4 text-gray-400 font-semibold">OU</span>
+                                <div className="flex-grow border-t border-gray-200"></div>
+                            </div>
+                            
+                            <div 
+                                {...getRootProps()} 
+                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+                                ${isDragActive ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
+                            >
+                                <input {...getInputProps()} />
+                                {isLoading ? (
+                                    <div className="flex flex-col items-center gap-4 text-primary">
+                                        <Loader2 className="h-10 w-10 animate-spin" />
+                                        <p className="font-semibold">Analisando o extrato...</p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                                        <UploadCloud className="h-10 w-10" />
+                                        <p className="font-semibold text-foreground">Arraste seu extrato PGDAS aqui</p>
+                                        <p className="text-sm">para preenchimento automático.</p>
+                                    </div>
+                                )}
+                            </div>
+                            <Alert variant="default" className="mt-4">
+                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTitle>Onde encontrar o extrato?</AlertTitle>
+                                <AlertDescription>
+                                    Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" &gt; "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
+                                </AlertDescription>
+                            </Alert>
                         </CardContent>
-                     </Card>
+                    </Card>
 
                     {analysisResult && !analysisResult.jaOtimizado && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-3"><Wallet/> 2. Defina o Plano</CardTitle>
-                                <CardDescription>Selecione em quantos meses você deseja realizar a adequação da sua folha de pagamento para atingir o Fator R de 28%.</CardDescription>
+                                <CardTitle className="flex items-center gap-3"><Wallet/> 2. Defina o Plano de Adequação</CardTitle>
+                                <CardDescription>Selecione em quantos meses você deseja realizar o ajuste da sua folha de pagamento para atingir o Fator R de 28%.</CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-col items-center gap-4">
                                 <p className="font-semibold">Meses para Adequação: <span className="text-primary text-xl">{mesesAdequacao}</span></p>
@@ -366,3 +431,6 @@ function calcularAliquotaEfetivaAnexoIII(rbt12: number): number {
   const faixa = faixas.find(f => rbt12 <= f.ate) || faixas[faixas.length - 1];
   return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
 }
+
+
+    
