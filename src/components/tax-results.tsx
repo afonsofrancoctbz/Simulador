@@ -168,7 +168,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
             const isOtimizado = scenario.regime.includes('Otimizado');
             
-            const projectionNote = isOtimizado && fatorRProjection && !fatorRProjection.isEnquadradoAgora ? fatorRProjection.textoMensagem : null;
+            const projectionNote = isOtimizado && fatorRProjection ? fatorRProjection.textoMensagem : null;
             const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
 
 
@@ -312,26 +312,16 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                   </div>
                 
                   <div className="p-4 mt-auto space-y-2 bg-muted/30 rounded-b-xl">
-                      {scenario.fatorR !== undefined && !isOtimizado && (
-                      <div className={cn(
-                          "text-center rounded-lg p-2 text-sm font-semibold flex items-center justify-center gap-2",
-                          scenario.fatorR >= 0.28 ? 'bg-green-100/80 text-green-900 border border-green-200/80' : 'bg-amber-100/80 text-amber-900 border border-amber-200/80'
-                      )}>
-                          {scenario.fatorR >= 0.28 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                          <span>Fator R: {formatPercent(scenario.fatorR)}</span>
-                      </div>
-                      )}
-
-                      {projectionNote && (
-                        <Alert variant="default" className={cn("bg-primary/10 border-primary/20 text-primary-foreground p-3", {
+                      {fatorRProjection && !fatorRProjection.isEnquadradoAgora && projectionNote && (
+                        <Alert variant="default" className={cn("p-3", {
                             'bg-green-100/80 border-green-200/80 text-green-900': projectionStatus === 'success',
                             'bg-amber-100/80 border-amber-200/80 text-amber-900': projectionStatus === 'warning' || projectionStatus === 'error',
+                            'bg-primary/10 border-primary/20': !projectionStatus || projectionStatus === 'info'
                         })}>
                             <AlertDescription className="text-xs font-medium flex items-start gap-2">
-                                <span className={cn({
+                                <span className={cn('text-primary/90', {
                                     'text-green-600': projectionStatus === 'success',
                                     'text-amber-600': projectionStatus === 'warning' || projectionStatus === 'error',
-                                    'text-primary/90': projectionStatus === 'info'
                                 })}>
                                     <BadgeInfo className="h-4 w-4 mt-0.5 shrink-0" />
                                 </span>

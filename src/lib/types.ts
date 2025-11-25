@@ -211,11 +211,11 @@ export type PgdasData = z.infer<typeof PgdasDataSchema>;
  * Schema para a resposta da análise de projeção do Fator R
  */
 export const FatorRResponseSchema = z.object({
-  fatorR_Atual: z.number(),
-  isEnquadradoAgora: z.boolean(),
-  mesesParaEnquadramento: z.number(),
+  fatorR_Atual: z.number(),           // Fator R atual (Ex: 0.2792)
+  isEnquadradoAgora: z.boolean(),     // Se o Fator R atual >= 0.28
+  mesesParaEnquadramento: z.number(), // Meses projetados (Ex: 12). Retorna 0 se já enquadrado.
   statusMensagem: z.enum(['success', 'warning', 'info', 'error']),
-  textoMensagem: z.string(),
+  textoMensagem: z.string(),          // O "prompt" exato para exibir no balão/tooltip.
 });
 export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 

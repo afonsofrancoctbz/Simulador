@@ -2,6 +2,7 @@
 'use server';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { FatorRResponseSchema } from '@/lib/types';
 
 // --- Constantes de Configuração (Idealmente via Remote Config) ---
 const META_FATOR_R = 0.28;
@@ -29,14 +30,6 @@ const FatorRInputSchema = z.object({
   receitaMensalProjetada: z.number(), // Ex: 20000
 });
 
-export const FatorRResponseSchema = z.object({
-  fatorR_Atual: z.number(),           // Fator R atual (Ex: 0.2792)
-  isEnquadradoAgora: z.boolean(),     // Se o Fator R atual >= 0.28
-  mesesParaEnquadramento: z.number(), // Meses projetados (Ex: 12). Retorna 0 se já enquadrado.
-  statusMensagem: z.enum(['success', 'warning', 'info', 'error']),
-  textoMensagem: z.string(),          // O "prompt" exato para exibir no balão/tooltip.
-});
-
 export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 
 
@@ -49,8 +42,8 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
     const { RBT12_atual, FS12_atual, receitaMensalProjetada } = data;
 
     // --- Validação de Entrada ---
-    if (!RBT12_atual || RBT12_atual <= 0 || !FS12_atual || !receitaMensalProjetada) {
-         throw new Error('Valores de entrada inválidos.');
+    if (!RBT12_atual || RBT12_atual <= 0 || !FS12_atual || FS12_atual < 0 || !receitaMensalProjetada) {
+         throw new Error('Valores de entrada inválidos para projeção do Fator R.');
     }
 
     // --- Cálculo Inicial ---
