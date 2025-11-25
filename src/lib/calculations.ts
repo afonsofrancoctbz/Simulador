@@ -174,7 +174,10 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
+    const effectiveFp12 = proLaboreOverride
+        ? (totalSalaryExpense + proLaboresToUse.reduce((sum, p) => sum + p.value, 0)) * 12
+        : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
+
     const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
@@ -327,7 +330,9 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
 
   return {
     simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2: 1 },
-    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, regime: 'Simples Nacional (Otimizado)', order: 1 } : null,
+    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+    
