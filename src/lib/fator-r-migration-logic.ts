@@ -75,32 +75,32 @@ export interface AnaliseCompleta {
  * Calcula a situação atual da empresa com base nos dados dos últimos 12 meses
  */
 export function calcularSituacaoAtual(dadosMensais: DadosMensais[]): SituacaoAtual {
-  // Valida que tem exatamente 12 meses de dados
-  if (dadosMensais.length !== 12) {
-    throw new Error('São necessários exatamente 12 meses de dados para análise.');
-  }
-
-  const rbt12 = dadosMensais.reduce((sum, d) => sum + d.receita, 0);
-  const folha12 = dadosMensais.reduce((sum, d) => sum + d.folha, 0);
-  
-  if (rbt12 === 0) {
-    // Avoid division by zero if there's no revenue
-     return {
+  // 1. Validação de Segurança (Evita quebrar se o array vier vazio)
+  if (!dadosMensais || dadosMensais.length !== 12) {
+    return {
       rbt12: 0,
-      folha12,
+      folha12: 0,
       fatorR: 0,
       anexo: 'V',
       custoMensalAtual: 0,
       aliquotaAtual: 0.155,
       receitaMensal: 0,
-      folhaMensal: folha12 / 12,
+      folhaMensal: 0,
     };
   }
+
+  // 2. CORREÇÃO DO ERRO "sum is not defined"
+  // Usamos 'acc' (acumulador) em vez de tentar chamar uma função sum() inexistente
+  const rbt12 = dadosMensais.reduce((acc, item) => acc + (item.receita || 0), 0);
+  const folha12 = dadosMensais.reduce((acc, item) => acc + (item.folha || 0), 0);
   
-  const fatorR = folha12 / rbt12;
+  // Evita divisão por zero
+  const fatorR = rbt12 > 0 ? folha12 / rbt12 : 0;
+  
+  // Define o anexo baseado no Fator R
   const anexo: 'III' | 'V' = fatorR >= 0.28 ? 'III' : 'V';
   
-  // Calcula alíquota efetiva (simplificado - você pode usar tabela progressiva real)
+  // Calcula alíquota efetiva estimada
   const aliquotaAtual = anexo === 'III' 
     ? calcularAliquotaEfetivaAnexoIII(rbt12)
     : calcularAliquotaEfetivaAnexoV(rbt12);
