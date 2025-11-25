@@ -22,7 +22,7 @@ export function useTaxCalculator(year: number) {
     const [error, setError] = useState<string | null>(null);
 
     const { toast } = useToast();
-    const fiscalConfig = getFiscalParameters(year);
+    const fiscalConfig = getFiscalParameters(year as 2025 | 2026);
 
     const form = useForm<CalculatorFormValues>({
         resolver: zodResolver(CalculatorFormSchema),

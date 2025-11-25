@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Schema for a selected CNAE, which might include a user's choice of cClass
@@ -204,6 +205,19 @@ export const PgdasDataSchema = z.object({
     .describe('Anexo do Simples Nacional aplicado'),
 });
 export type PgdasData = z.infer<typeof PgdasDataSchema>;
+
+
+/**
+ * Schema para a resposta da análise de projeção do Fator R
+ */
+export const FatorRResponseSchema = z.object({
+  fatorR_Atual: z.number(),
+  isEnquadradoAgora: z.boolean(),
+  mesesParaEnquadramento: z.number(),
+  statusMensagem: z.enum(['success', 'warning', 'info', 'error']),
+  textoMensagem: z.string(),
+});
+export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 
 
 /**
