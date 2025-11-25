@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -46,11 +45,11 @@ export function FormSectionAnnualRevenue() {
         const currentFolha12 = getValues('fp12');
     
         // 3. GUARD CLAUSE: Only update if there's a real difference to prevent the loop
-        if (newRbt12 !== currentRbt12) {
+        if (monthlyData.length > 0 && newRbt12 !== currentRbt12) {
             setValue('rbt12', newRbt12, { shouldValidate: true, shouldDirty: true });
         }
         
-        if (newFolha12 !== currentFolha12) {
+        if (monthlyData.length > 0 && newFolha12 !== currentFolha12) {
             setValue('fp12', newFolha12, { shouldValidate: true, shouldDirty: true });
         }
     
@@ -90,7 +89,7 @@ export function FormSectionAnnualRevenue() {
                  setMonthlyData([]);
                  toast({
                     title: "Extração Parcial",
-                    description: "A IA extraiu os totais, mas não os detalhes mensais. Preencha a grade se precisar de mais precisão.",
+                    description: "A IA extraiu os totais, mas não os detalhes mensais. Os campos foram preenchidos.",
                     variant: "default"
                 });
             }
@@ -151,7 +150,7 @@ export function FormSectionAnnualRevenue() {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="manual">Preenchimento</TabsTrigger>
-                        <TabsTrigger value="import">Importar Extrato PGDAS</TabsTrigger>
+                        <TabsTrigger value="import">⚡ Importar Extrato PGDAS</TabsTrigger>
                     </TabsList>
                     <TabsContent value="manual" className="mt-6 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
@@ -230,7 +229,7 @@ export function FormSectionAnnualRevenue() {
                                                     </TableRow>
                                                 )) : (
                                                     <TableRow>
-                                                        <TableCell colSpan={3} className="text-center text-muted-foreground">
+                                                        <TableCell colSpan={3} className="text-center text-muted-foreground py-6">
                                                             Importe um extrato PGDAS ou preencha os totais manualmente.
                                                         </TableCell>
                                                     </TableRow>
@@ -264,6 +263,13 @@ export function FormSectionAnnualRevenue() {
                                 </div>
                             )}
                         </div>
+                         <Alert variant="default" className="mt-4">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Onde encontrar o extrato?</AlertTitle>
+                            <AlertDescription>
+                                Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" &gt; "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
+                            </AlertDescription>
+                        </Alert>
                     </TabsContent>
                 </Tabs>
                 
