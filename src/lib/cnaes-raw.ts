@@ -3932,3 +3932,6 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     
 
 
+
+
+    
