@@ -148,7 +148,8 @@ export interface CnaeData {
   presumedProfitRateCSLL?: number;
   isRegulated?: boolean;
   notes?: string;
-  ivaReduction?: number;
+  // This is deprecated in favor of the new granular system in cnae-data-2026.ts
+  // ivaReduction?: number; 
 }
 
 export interface FeeBracket {

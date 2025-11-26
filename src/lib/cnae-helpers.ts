@@ -1,5 +1,6 @@
 import { CNAE_DATA_RAW } from './cnaes-raw';
 import type { CnaeData, FeeBracket, Plan } from './types';
+import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 // This file is for helper functions related to CNAEs.
 // The raw data is now in cnaes-raw.ts to keep this file cleaner.
@@ -7,6 +8,11 @@ import type { CnaeData, FeeBracket, Plan } from './types';
 export function getCnaeData(code: string): CnaeData | undefined {
   return CNAE_DATA_RAW.find(c => c.code === code);
 }
+
+export function getCnaeOptions(cnaeCode: string) {
+    const numericCode = cnaeCode.replace(/\D/g, '');
+    return CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === numericCode);
+};
 
 export const CONTABILIZEI_FEES_LUCRO_PRESUMIDO: FeeBracket[] = [
     { label: 'até R$ 25.000', min: 0, max: 25000, plans: { basico: 239, padrao: 295, multibeneficios: 325, expertsEssencial: 459 } },

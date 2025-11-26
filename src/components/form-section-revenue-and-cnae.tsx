@@ -5,9 +5,8 @@
 import { useFormContext } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
 import { cn, formatBRL, parseBRL } from "@/lib/utils";
-import { getCnaeData } from "@/lib/cnae-helpers";
+import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
-import { CNAE_LC116_RELATIONSHIP } from "@/lib/cnae-data-2026";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -76,11 +75,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         });
         return Array.from(annexSet).sort();
     }, [selectedCnaes]);
-
-    const getCnaeOptions = (cnaeCode: string) => {
-        const numericCode = cnaeCode.replace(/\D/g, '');
-        return CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === numericCode);
-    };
 
     const removeCnae = (codeToRemove: string) => {
         const updatedCnaes = selectedCnaes.filter((cnae: CnaeSelection) => cnae.code !== codeToRemove);
@@ -255,11 +249,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             <Input 
                                                 type="number" 
                                                 step="0.01" 
-                                                min="2" 
+                                                min="0" 
                                                 max="5"
                                                 placeholder="5"
                                                 {...field} 
-                                                onChange={e => field.onChange(e.target.valueAsNumber)}
+                                                onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -340,4 +334,3 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
-

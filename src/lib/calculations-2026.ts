@@ -16,7 +16,14 @@ import {
 } from './types';
 import { formatPercent, findBracket, findFeeBracket, formatCurrencyBRL } from './utils';
 import { getCnaeData } from './cnae-helpers';
+import { CNAE_CLASSES_2026 } from './cnae-data-2026';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
+
+function getIvaReduction(cnaeCode: string, cClass?: string): number {
+    if(!cClass) return 0; // Default to 0 if no class is selected
+    const cnaeClass = CNAE_CLASSES_2026.find(c => c.cClass === cClass);
+    return cnaeClass?.ibsReduction ?? 0;
+}
 
 function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean): TaxDetails | TaxDetails2026 {
     const year = values.year || 2026;
@@ -91,19 +98,16 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         let totalIbsCredit = 0;
         
         domesticActivities.forEach(activity => {
-            const cnaeInfo = getCnaeData(activity.code);
-            const reduction = cnaeInfo?.ivaReduction ?? 0;
-            
-            totalCbsDebit += activity.revenue * (baseCbsRate * (1 - reduction));
-            totalIbsDebit += activity.revenue * (baseIbsRate * (1 - reduction));
+            const reductionPercent = getIvaReduction(activity.code, activity.cClass) / 100;
+            totalCbsDebit += activity.revenue * (baseCbsRate * (1 - reductionPercent));
+            totalIbsDebit += activity.revenue * (baseIbsRate * (1 - reductionPercent));
         });
-
-        // O crédito é calculado sobre as despesas usando a alíquota cheia do setor
+        
         if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
-             const representativeCnae = getCnaeData(domesticActivities[0].code);
-             const reduction = representativeCnae?.ivaReduction ?? 0;
-             totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reduction));
-             totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reduction));
+             const firstActivity = domesticActivities[0];
+             const reductionPercent = getIvaReduction(firstActivity.code, firstActivity.cClass) / 100;
+             totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reductionPercent));
+             totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reductionPercent));
         }
         
         const cbsFinal = Math.max(0, totalCbsDebit - totalCbsCredit);
@@ -230,20 +234,19 @@ function _calculateSimples2026(values: TaxFormValues, isHybrid: boolean, fatorRE
       
       domesticActivities.forEach(activity => {
           if(activity.revenue > 0) {
-            const cnaeInfo = getCnaeData(activity.code);
-            const reduction = cnaeInfo?.ivaReduction ?? 0;
+            const reductionPercent = getIvaReduction(activity.code, activity.cClass) / 100;
             const activityB2bRevenue = activity.revenue * b2bRevenuePortion;
             
-            totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - reduction));
-            totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - reduction));
+            totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - reductionPercent));
+            totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - reductionPercent));
           }
       });
       
       if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
-        const representativeCnae = getCnaeData(domesticActivities[0].code);
-        const reduction = representativeCnae?.ivaReduction ?? 0;
-        totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reduction));
-        totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reduction));
+        const firstActivity = domesticActivities[0];
+        const reductionPercent = getIvaReduction(firstActivity.code, firstActivity.cClass) / 100;
+        totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reductionPercent));
+        totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reductionPercent));
       }
 
       const finalIbs = Math.max(0, totalIbsDebit - totalIbsCredit);

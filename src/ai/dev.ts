@@ -2,9 +2,27 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/calculate-taxes-flow.ts';
-import '@/ai/flows/calculate-taxes-2026-flow.ts';
-import '@/ai/flows/fator-r-projection-flow.ts';
-import '@/ai/flows/extract-pgdas-flow.ts';
+import { runMCP } from './mcp-server';
+import { run } from 'genkit-cli/runner';
 
+// Import flows so that they are registered with Genkit.
+import '@/ai/flows/calculate-taxes-flow';
+import '@/ai/flows/calculate-taxes-2026-flow';
+import '@/ai/flows/fator-r-projection-flow';
+import '@/ai/flows/extract-pgdas-flow';
 
+async function main() {
+  const mcp = await runMCP();
+
+  // The runner takes the path to the current file so it can find the flows to
+  // serve.
+  run(process.argv.slice(2), {
+    // Expose the MCP server to Genkit.
+    // NOTE: This feature is experimental and subject to change.
+    modelContextServer: mcp.server,
+  });
+}
+
+if (require.main === module) {
+  main();
+}

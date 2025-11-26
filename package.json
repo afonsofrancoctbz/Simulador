@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
+    "genkit:dev": "tsx src/ai/dev.ts",
+    "genkit:watch": "tsx --watch src/ai/dev.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@genkit-ai/googleai": "1.8.0",
+    "@google/generative-ai": "^0.15.0",
     "@hookform/resolvers": "^3.9.0",
+    "@modelcontextprotocol/sdk": "0.1.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-avatar": "^1.1.0",
@@ -44,6 +46,7 @@
     "embla-carousel-react": "^8.1.7",
     "firebase": "^10.12.3",
     "genkit": "1.8.0",
+    "glob": "^11.0.0",
     "lucide-react": "^0.417.0",
     "next": "14.2.5",
     "react": "18.3.1",
@@ -58,6 +61,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -69,6 +73,7 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.2.3",
+    "tsx": "^4.16.2",
     "typescript": "^5"
   }
 }
