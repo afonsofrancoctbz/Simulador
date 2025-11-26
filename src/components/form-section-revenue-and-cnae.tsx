@@ -34,7 +34,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     const [exchangeRate, setExchangeRate] = useState<number|null>(null);
     const [debouncedCurrency, setDebouncedCurrency] = useState(form.watch('exportCurrency'));
 
-    const fiscalConfig = getFiscalParameters(year);
+    const fiscalConfig = getFiscalParameters(year as 2025 | 2026);
 
     useDebounce(() => {
         setDebouncedCurrency(form.watch('exportCurrency'));

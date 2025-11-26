@@ -796,6 +796,39 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     presumedProfitRateCSLL: 0.32,
     isRegulated: false,
   },
+    {
+    code: '7911-2/00',
+    description: 'Agências de viagens',
+    category: 'Turismo e Eventos',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo Ministério do Turismo (CADASTUR). Obrigatório registro da PJ.'
+  },
+  {
+    code: '7912-1/00',
+    description: 'Operadores turísticos',
+    category: 'Turismo e Eventos',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo Ministério do Turismo (CADASTUR). Obrigatório registro da PJ.'
+  },
+  {
+    code: '7990-2/00',
+    description: 'Serviços de reservas e outros serviços de turismo não especificados anteriormente',
+    category: 'Turismo e Eventos',
+    annex: 'V',
+    requiresFatorR: true,
+    presumedProfitRateIRPJ: 0.32,
+    presumedProfitRateCSLL: 0.32,
+    isRegulated: true,
+    notes: 'Atividade regulamentada pelo Ministério do Turismo (CADASTUR). Obrigatório registro da PJ.'
+  },
   // --- REGIMES ESPECÍFICOS (REDUÇÃO 40%) ---
   {
     code: '5510-8/01',
@@ -3897,4 +3930,5 @@ export const CNAE_DATA_RAW: CnaeData[] = [
 ];
 
     
+
 
