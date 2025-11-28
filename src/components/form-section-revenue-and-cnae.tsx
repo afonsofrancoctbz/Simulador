@@ -180,7 +180,9 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                         <CardContent className='p-6 md:p-8 space-y-6'>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-grow space-y-4">
-                                    <Label>Receita Nacional (em BRL)</Label>
+                                    <div className="flex items-center">
+                                        <Label>Receita Nacional (em BRL)</Label>
+                                    </div>
                                     {annexes.map(annex => (
                                         <FormField
                                             key={`domestic_${annex}`}
@@ -250,9 +252,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                 type="text"
                                                 inputMode="decimal"
                                                 placeholder="Ex: 5,0"
-                                                {...field}
                                                 onChange={e => field.onChange(parseDecimal(e.target.value))}
+                                                onBlur={field.onBlur}
                                                 value={formatDecimal(field.value) || ''}
+                                                name={field.name}
+                                                ref={field.ref}
                                             />
                                         </FormControl>
                                         <FormDescription>
