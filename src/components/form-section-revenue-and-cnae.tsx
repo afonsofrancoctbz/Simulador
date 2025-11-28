@@ -252,7 +252,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                 placeholder="Ex: 5,0"
                                                 {...field}
                                                 onChange={e => field.onChange(parseDecimal(e.target.value))}
-                                                value={formatDecimal(field.value)}
+                                                value={formatDecimal(field.value) || ''}
                                             />
                                         </FormControl>
                                         <FormDescription>
