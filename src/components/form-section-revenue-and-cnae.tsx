@@ -4,7 +4,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
-import { cn, formatBRL, parseBRL, parseDecimal } from "@/lib/utils";
+import { cn, formatBRL, parseBRL, parseDecimal, formatDecimal } from "@/lib/utils";
 import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -249,10 +249,10 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             <Input
                                                 type="text"
                                                 inputMode="decimal"
-                                                placeholder="Ex: 2,9"
+                                                placeholder="Ex: 5,0"
                                                 {...field}
                                                 onChange={e => field.onChange(parseDecimal(e.target.value))}
-                                                value={field.value !== undefined ? String(field.value).replace('.', ',') : ''}
+                                                value={formatDecimal(field.value)}
                                             />
                                         </FormControl>
                                         <FormDescription>

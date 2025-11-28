@@ -26,11 +26,18 @@ export const parseBRL = (value: string): number => {
     return isNaN(numberValue) ? 0 : numberValue;
 };
 
-export const parseDecimal = (value: string): number => {
-    if (typeof value !== 'string' || !value) return 0;
-    const normalizedValue = value.replace(',', '.');
+export const formatDecimal = (value: number | null | undefined): string => {
+    if (typeof value !== 'number' || isNaN(value)) return '';
+    return String(value).replace('.', ',');
+};
+
+export const parseDecimal = (value: string): number | undefined => {
+    if (typeof value !== 'string' || !value.trim()) return undefined;
+    const normalizedValue = value.replace(',', '.').trim();
+    // Allow empty string to clear value, otherwise parse it
+    if (normalizedValue === '') return undefined;
     const numberValue = parseFloat(normalizedValue);
-    return isNaN(numberValue) ? 0 : numberValue;
+    return isNaN(numberValue) ? undefined : numberValue;
 };
 
 
