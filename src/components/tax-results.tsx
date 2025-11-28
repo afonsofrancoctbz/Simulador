@@ -207,7 +207,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
 
             const groupedTaxes = groupTaxes(scenario);
-            const effectiveRate = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
+            const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / scenario.totalRevenue : 0;
 
             let title = scenario.regime.replace(/ \(.+\)/, ''); // Remove parênteses como (Anexo V)
             let subtitle = scenario.regime.match(/\((.+)\)/)?.[1] || '';
@@ -307,8 +307,11 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
                               if (lowerCaseName.includes('inss s/ pró-labore')) rateInfo = '(11,00%)';
                               else if (lowerCaseName.includes('cpp')) rateInfo = '(20,00%)';
-                              else if (lowerCaseName.startsWith('das') && scenario.effectiveDasRate) {
-                                  rateInfo = formatPercent(scenario.effectiveDasRate);
+                              else if (lowerCaseName.startsWith('das') && scenario.totalRevenue > 0) {
+                                  const dasItem = scenario.breakdown.find(b => b.name.toLowerCase().startsWith('das'));
+                                  if (dasItem) {
+                                      rateInfo = formatPercent(dasItem.value / scenario.totalRevenue);
+                                  }
                               } else if (lowerCaseName.includes('iss')) {
                                   const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1] || '0') / 100;
                                   rateInfo = formatPercent(rateFromName);
@@ -447,4 +450,5 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
+
 
