@@ -26,6 +26,13 @@ export const parseBRL = (value: string): number => {
     return isNaN(numberValue) ? 0 : numberValue;
 };
 
+export const parseDecimal = (value: string): number => {
+    if (typeof value !== 'string' || !value) return 0;
+    const normalizedValue = value.replace(',', '.');
+    const numberValue = parseFloat(normalizedValue);
+    return isNaN(numberValue) ? 0 : numberValue;
+};
+
 
 export const formatPercent = (value: number) => {
     if (typeof value !== 'number' || isNaN(value)) return 'N/A';

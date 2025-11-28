@@ -4,7 +4,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
-import { cn, formatBRL, parseBRL } from "@/lib/utils";
+import { cn, formatBRL, parseBRL, parseDecimal } from "@/lib/utils";
 import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -246,18 +246,17 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     <FormItem>
                                         <FormLabel>Alíquota de ISS (%)</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                type="number" 
-                                                step="0.01" 
-                                                min="0" 
-                                                max="5"
-                                                placeholder="5"
-                                                {...field} 
-                                                onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                            <Input
+                                                type="text"
+                                                inputMode="decimal"
+                                                placeholder="Ex: 2,9"
+                                                {...field}
+                                                onChange={e => field.onChange(parseDecimal(e.target.value))}
+                                                value={field.value !== undefined ? String(field.value).replace('.', ',') : ''}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, deixe em branco para usar o padrão de 5%.
+                                            Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, use o padrão de 5%.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

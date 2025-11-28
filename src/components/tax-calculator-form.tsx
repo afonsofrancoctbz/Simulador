@@ -25,7 +25,7 @@ export const CalculatorFormSchema = z.object({
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
-  issRate: z.coerce.number().min(2, "O ISS deve ser no mínimo 2%.").max(5, "O ISS não pode ser maior que 5%.").optional(),
+  issRate: z.coerce.number().min(0, "O ISS deve ser no mínimo 0%.").max(5, "O ISS não pode ser maior que 5%.").optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
   proLabores: z.array(ProLaboreFormSchema).min(1),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
