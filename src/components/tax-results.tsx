@@ -303,20 +303,26 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                               const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
                               
                               let rateInfo: string | null = null;
-                              if (item.name.toLowerCase().includes('inss s/ pró-labore')) rateInfo = '(11,00%)';
-                              else if (item.name.toLowerCase().includes('cpp')) rateInfo = '(20,00%)';
-                              else if (item.name.toLowerCase().startsWith('das') && scenario.effectiveDasRate) {
-                                  rateInfo = `(${(scenario.effectiveDasRate * 100).toFixed(2).replace('.',',')}%)`;
-                              } else if (item.name.toLowerCase().includes('iss')) {
+                              const lowerCaseName = item.name.toLowerCase();
+
+                              if (lowerCaseName.includes('inss s/ pró-labore')) rateInfo = '(11,00%)';
+                              else if (lowerCaseName.includes('cpp')) rateInfo = '(20,00%)';
+                              else if (lowerCaseName.startsWith('das') && scenario.effectiveDasRate) {
+                                  rateInfo = formatPercent(scenario.effectiveDasRate);
+                              } else if (lowerCaseName.includes('iss')) {
                                   const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1] || '0') / 100;
-                                  rateInfo = `(${(rateFromName * 100).toFixed(2).replace('.', ',')}%)`;
-                              } else if (item.value > 0 && scenario.regime.includes('Lucro Presumido') && (item.name.toLowerCase().includes('irpj') || item.name.toLowerCase().includes('csll'))) {
-                                  rateInfo = `(${(item.value / scenario.totalRevenue * 100).toFixed(2).replace('.', ',')}%)`;
-                              } else if (item.value > 0 && scenario.regime.includes('Lucro Presumido') && (item.name.toLowerCase().includes('pis') || item.name.toLowerCase().includes('cofins'))) {
-                                    if (domesticRevenue > 0) rateInfo = `(${(item.value / domesticRevenue * 100).toFixed(2).replace('.',',')}%)`;
+                                  rateInfo = formatPercent(rateFromName);
+                              } else if (scenario.totalRevenue > 0) {
+                                if (lowerCaseName.includes('cbs') || lowerCaseName.includes('ibs') || lowerCaseName.includes('iva')) {
+                                    rateInfo = formatPercent(item.value / scenario.totalRevenue);
+                                } else if (scenario.regime.includes('Lucro Presumido') && (lowerCaseName.includes('irpj') || lowerCaseName.includes('csll'))) {
+                                    rateInfo = formatPercent(item.value / scenario.totalRevenue);
+                                } else if (scenario.regime.includes('Lucro Presumido') && domesticRevenue > 0 && (lowerCaseName.includes('pis') || lowerCaseName.includes('cofins'))) {
+                                    rateInfo = formatPercent(item.value / domesticRevenue);
+                                }
                               }
                               
-                              const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
+                              const showRate = !lowerCaseName.includes('irrf') && !lowerCaseName.includes('mensalidade');
 
                               return (
                               <div key={item.name} className="flex justify-between items-center text-sm">
@@ -441,3 +447,4 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
+
