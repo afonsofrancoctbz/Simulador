@@ -28,13 +28,14 @@ export const parseBRL = (value: string): number => {
 
 export const formatDecimal = (value: number | null | undefined): string => {
     if (typeof value !== 'number' || isNaN(value)) return '';
-    return String(value).replace('.', ',');
+    // Always use comma for display consistency
+    return value.toString().replace('.', ',');
 };
 
 export const parseDecimal = (value: string): number | undefined => {
     if (typeof value !== 'string' || !value.trim()) return undefined;
+    // Replace comma with dot for parsing
     const normalizedValue = value.replace(',', '.').trim();
-    // Allow empty string to clear value, otherwise parse it
     if (normalizedValue === '') return undefined;
     const numberValue = parseFloat(normalizedValue);
     return isNaN(numberValue) ? undefined : numberValue;
