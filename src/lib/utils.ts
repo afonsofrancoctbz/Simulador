@@ -28,13 +28,13 @@ export const parseBRL = (value: string): number => {
 
 export const formatDecimal = (value: number | null | undefined): string => {
     if (typeof value !== 'number' || isNaN(value)) return '';
-    // Always use comma for display consistency
+    // Always use comma for display consistency in Brazil.
     return value.toString().replace('.', ',');
 };
 
 export const parseDecimal = (value: string): number | undefined => {
     if (typeof value !== 'string' || !value.trim()) return undefined;
-    // Replace comma with dot for parsing
+    // Replace comma with dot for parsing, as parseFloat requires a dot.
     const normalizedValue = value.replace(',', '.').trim();
     if (normalizedValue === '') return undefined;
     const numberValue = parseFloat(normalizedValue);
