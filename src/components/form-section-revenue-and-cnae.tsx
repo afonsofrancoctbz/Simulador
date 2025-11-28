@@ -110,7 +110,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     const cnae = getCnaeData(cnaeItem.code);
                                     if (!cnae) return null;
 
-                                    const cnaeOptions = year >= 2026 ? getCnaeOptions(cnae.code) : [];
+                                    const cnaeOptions = year >= 2026 ? getCnaeOptions(cnaeItem.code) : [];
 
                                     return (
                                         <div key={index} className="p-4 border rounded-lg bg-background/50 relative">
@@ -180,7 +180,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                         <CardContent className='p-6 md:p-8 space-y-6'>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-grow space-y-4">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center mb-4">
                                         <Label>Receita Nacional (em BRL)</Label>
                                     </div>
                                     {annexes.map(annex => (
@@ -203,7 +203,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     ))}
                                 </div>
                                 <div className="flex-grow space-y-4">
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 mb-4">
                                         <Label htmlFor="exportCurrency">Receita de Exportação</Label>
                                         <Select name="exportCurrency" value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
                                             <SelectTrigger className="w-[120px]">
