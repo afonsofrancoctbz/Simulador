@@ -1,6 +1,6 @@
 
 
-import type { FiscalConfig, TaxBracket } from '@/config/fiscal';
+import type { FiscalConfigType as FiscalConfig } from '@/config/fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -110,7 +110,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
+    const issValue = (values.issRate ?? 5) / 100;
     const iss = domesticRevenue * issValue;
 
     // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
@@ -180,11 +180,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
-    const annualPayroll = fp12 > 0 
-        ? fp12 
-        : (proLaboreOverride 
-            ? (totalSalaryExpense + totalProLaboreBruto) * 12 
-            : monthlyPayroll * 12);
+    const annualPayroll = fp12 > 0 ? fp12 : monthlyPayroll * 12;
       
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
@@ -205,7 +201,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
         if (revenueForActivity === 0) return;
 
-        // Determinar Anexo - CORREÇÃO PRINCIPAL AQUI
+        // Determinar Anexo
         let effectiveAnnex: Annex;
         if (cnaeInfo.requiresFatorR) {
             effectiveAnnex = (fatorR >= config.simples_nacional.limite_fator_r) ? 'III' : 'V';

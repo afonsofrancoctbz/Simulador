@@ -25,10 +25,11 @@ export interface SimplesBracket extends TaxBracket {
   distribution: SimplesDistribution;
 }
 
-export interface FiscalConfigType {
+export interface FiscalConfig {
   ano_vigencia: number;
   salario_minimo: number;
   teto_inss: number;
+  aliquota_inss_prolabore: number;
   tabela_inss_clt_progressiva: TaxBracket[];
   tabela_irrf: TaxBracket[];
   simples_nacional: {
@@ -39,14 +40,32 @@ export interface FiscalConfigType {
     IV: SimplesBracket[];
     V: SimplesBracket[];
   };
+  lucro_presumido_rates: {
+    PIS: number;
+    COFINS: number;
+    ISS: number;
+    IRPJ_BASE: number;
+    IRPJ_ADICIONAL_BASE: number;
+    CSLL: number;
+    LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL: number;
+  };
+  aliquotas_cpp_patronal: {
+    base: number;
+    rat: number;
+    terceiros: number;
+    total: number;
+  };
   reforma_tributaria?: {
       cbs_aliquota_padrao: number;
       ibs_aliquota_padrao: number;
       pis_cofins_multiplier: number;
       iss_icms_multiplier: number;
   };
+  deducao_simplificada_irrf?: number;
+  deducao_dependente_irrf?: number;
   [key: string]: any; // Flexibilidade para outros campos
 }
+
 
 // --- CONFIGURAÇÕES ---
 
@@ -56,13 +75,14 @@ const SIMPLES_COMMON_LIMITS = {
     FAIXA_3: { min: 360000.01, max: 720000 },
     FAIXA_4: { min: 720000.01, max: 1800000 },
     FAIXA_5: { min: 1800000.01, max: 3600000 },
-    FAIXA_6: { min: 3600000.01, max: 4800000 },
+    FAIXA_6: { min: 360000.01, max: 4800000 },
 };
 
-const FISCAL_CONFIG_2025: FiscalConfigType = {
+const FISCAL_CONFIG_2025: FiscalConfig = {
   ano_vigencia: 2025,
   salario_minimo: 1518.00,
   teto_inss: 8157.41,
+  aliquota_inss_prolabore: 0.11,
   tabela_inss_clt_progressiva: [
       { min: 0, max: 1518.00, rate: 0.075, deduction: 0 },
       { min: 1518.01, max: 2793.88, rate: 0.09, deduction: 22.77 },
@@ -76,6 +96,22 @@ const FISCAL_CONFIG_2025: FiscalConfigType = {
       { min: 3751.06, max: 4664.68, rate: 0.225, deduction: 662.77 },
       { min: 4664.69, max: Infinity, rate: 0.275, deduction: 896.00 },
   ],
+  deducao_simplificada_irrf: 564.80, // (2824 * 0.25) / 1.25 -> (25% do limite da isenção)
+  lucro_presumido_rates: {
+    PIS: 0.0065,
+    COFINS: 0.03,
+    ISS: 0.05, // Default, can be overridden by user input
+    IRPJ_BASE: 0.15,
+    IRPJ_ADICIONAL_BASE: 0.10,
+    CSLL: 0.09,
+    LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL: 20000,
+  },
+  aliquotas_cpp_patronal: {
+    base: 0.20,
+    rat: 0.01, // Risco Leve
+    terceiros: 0, // Simples Nacional não tem
+    total: 0.21,
+  },
   simples_nacional: {
     limite_fator_r: 0.28,
     I: [
@@ -121,7 +157,7 @@ const FISCAL_CONFIG_2025: FiscalConfigType = {
   }
 };
 
-const FISCAL_CONFIG_2026: FiscalConfigType = {
+const FISCAL_CONFIG_2026: FiscalConfig = {
   ...FISCAL_CONFIG_2025, // Cópia rasa inicial
   simples_nacional: structuredClone(FISCAL_CONFIG_2025.simples_nacional), // Cópia profunda crucial
   ano_vigencia: 2026,
