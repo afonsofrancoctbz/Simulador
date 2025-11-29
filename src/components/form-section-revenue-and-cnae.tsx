@@ -4,7 +4,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
-import { cn, formatBRL, parseBRL, parseDecimal, formatDecimal } from "@/lib/utils";
+import { cn, formatBRL, parseBRL } from "@/lib/utils";
 import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import { useDebounce } from "react-use";
 import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
+import { NumericFormat } from "react-number-format";
 
 // This is the new combined component for Step 4
 // It includes CNAE selection and monthly revenue input
@@ -248,15 +249,16 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     <FormItem>
                                         <FormLabel>Alíquota de ISS (%)</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="text"
-                                                inputMode="decimal"
+                                             <NumericFormat
+                                                customInput={Input}
+                                                decimalSeparator=","
+                                                decimalScale={2}
+                                                fixedDecimalScale={false}
                                                 placeholder="Ex: 5,0"
-                                                onChange={e => field.onChange(parseDecimal(e.target.value))}
-                                                onBlur={field.onBlur}
-                                                value={formatDecimal(field.value) || ''}
-                                                name={field.name}
-                                                ref={field.ref}
+                                                value={field.value}
+                                                onValueChange={(values) => {
+                                                    field.onChange(values.floatValue);
+                                                }}
                                             />
                                         </FormControl>
                                         <FormDescription>

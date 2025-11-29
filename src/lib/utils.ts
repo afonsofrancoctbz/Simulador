@@ -26,20 +26,6 @@ export const parseBRL = (value: string): number => {
     return isNaN(numberValue) ? 0 : numberValue;
 };
 
-export const formatDecimal = (value: number | null | undefined): string | null => {
-  if (typeof value !== "number" || isNaN(value)) return null;
-  // Always use comma for display consistency.
-  return value.toString().replace(".", ",");
-};
-
-export const parseDecimal = (value: string): number | undefined => {
-  if (typeof value !== "string" || !value.trim()) return undefined;
-  // Replace comma with dot for reliable parsing, handle multiple commas.
-  const normalizedValue = value.replace(/,/g, ".").replace(/(\..*)\./g, '$1');
-  const numberValue = parseFloat(normalizedValue);
-  return isNaN(numberValue) ? undefined : numberValue;
-};
-
 
 export const formatPercent = (value: number) => {
     if (typeof value !== 'number' || isNaN(value)) return 'N/A';
