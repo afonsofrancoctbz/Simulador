@@ -110,7 +110,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    const issValue = (values.issRate ?? 5) / 100;
+    const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
     const iss = domesticRevenue * issValue;
 
     // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
