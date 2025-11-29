@@ -1,6 +1,6 @@
 
 
-import type { FiscalConfig } from '@/config/fiscal';
+import type { FiscalConfig, TaxBracket } from '@/config/fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -28,6 +28,8 @@ import { getFiscalParameters } from '../config/fiscal';
 export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
+    const { deducao_dependente_irrf = 0, deducao_simplificada_irrf = 0 } = config;
+
 
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
@@ -47,11 +49,14 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         const irrfBracketLegal = findBracket(config.tabela_irrf, baseCalculoIRRF_Legal);
         const irrfLegal = Math.max(0, baseCalculoIRRF_Legal * irrfBracketLegal.rate - irrfBracketLegal.deduction);
 
-        const baseCalculoIRRF_Simplificado = proLaboreBruto; // Para o simplificado, a base é a bruta
-        const irrfBracketSimplificado = findBracket(config.tabela_irrf, baseCalculoIRRF_Simplificado - config.deducao_simplificada_irrf);
-        const irrfSimplificado = Math.max(0, (baseCalculoIRRF_Simplificado - config.deducao_simplificada_irrf) * irrfBracketSimplificado.rate - irrfBracketSimplificado.deduction);
-          
-        const irrf = Math.min(irrfLegal, irrfSimplificado);
+        // Para o simplificado, a base de cálculo é o valor bruto, e a dedução é um valor fixo.
+        const baseCalculoIRRF_Simplificado = proLaboreBruto; 
+        const irrfBracketSimplificado = findBracket(config.tabela_irrf, baseCalculoIRRF_Simplificado);
+        // A dedução simplificada se aplica ANTES da alíquota, mas o cálculo do Zod/Excel subtrai da base.
+        const valorAposDeducaoSimplificada = Math.max(0, baseCalculoIRRF_Simplificado - deducao_simplificada_irrf);
+        const irrfSimplificado = (valorAposDeducaoSimplificada * irrfBracketSimplificado.rate) - irrfBracketSimplificado.deduction;
+
+        const irrf = Math.max(0, Math.min(irrfLegal, irrfSimplificado));
         
         totalIRRFRetido += irrf;
 
@@ -174,11 +179,12 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    
-    // Se for cenário otimizado, a folha anualizada é a nova folha simulada. Senão, usa o histórico.
-    const annualPayroll = proLaboreOverride 
-      ? (totalSalaryExpense + totalProLaboreBruto) * 12 
-      : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
+
+    const annualPayroll = fp12 > 0 
+        ? fp12 
+        : (proLaboreOverride 
+            ? (totalSalaryExpense + totalProLaboreBruto) * 12 
+            : monthlyPayroll * 12);
       
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
