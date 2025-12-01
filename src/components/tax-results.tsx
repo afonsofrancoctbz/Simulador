@@ -321,8 +321,11 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                                       rateInfo = formatPercent(dasItem.value / scenario.totalRevenue);
                                   }
                               } else if (lowerCaseName.includes('iss')) {
-                                  const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1]?.replace(',', '.') || '0');
-                                  rateInfo = `(${(rateFromName).toFixed(2).replace('.',',')}%)`;
+                                  // Extract rate from name like "ISS (5,00%)"
+                                  const rateMatch = item.name.match(/\(([^%]+)%\)/);
+                                  if (rateMatch && rateMatch[1]) {
+                                    rateInfo = `(${rateMatch[1]}%)`;
+                                  }
                               } else if (scenario.totalRevenue > 0) {
                                 if (lowerCaseName.includes('cbs') || lowerCaseName.includes('ibs') || lowerCaseName.includes('iva')) {
                                     rateInfo = formatPercent(item.value / scenario.totalRevenue);
