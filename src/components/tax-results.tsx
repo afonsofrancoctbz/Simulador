@@ -13,10 +13,10 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
 import type { FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
-import { FatorRAnalysisComponent } from '@/app/fator-r/page';
 import type { AnaliseCompleta, DadosMensais } from '@/lib/fator-r-migration-logic';
 import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
 import { format } from 'date-fns';
+import { YearSelector } from './year-selector';
 
 interface TaxResultsProps {
   year: number;
@@ -25,6 +25,7 @@ interface TaxResultsProps {
   error: string | null;
   fatorRProjection: FatorRResponse | null;
   formValues: any;
+  onYearChange?: (year: number) => void;
 }
 
 type SelectedScenario = {
@@ -32,7 +33,7 @@ type SelectedScenario = {
   optimizationNote?: string | null;
 } | null;
 
-export default function TaxResults({ year, isLoading, results, error, fatorRProjection, formValues }: TaxResultsProps) {
+export default function TaxResults({ year, isLoading, results, error, fatorRProjection, formValues, onYearChange }: TaxResultsProps) {
   const [selectedScenarioId, setSelectedScenarioId] = useState<SelectedScenario>(null);
 
   const scenariosToShow = useMemo(() => {
@@ -96,16 +97,17 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
     if (!rbt12 || rbt12 <= 0) return null;
     
-    // Simula o histórico mensal caso não venha do formulário detalhado
-    const dadosMensais: DadosMensais[] = Array.from({ length: 12 }, (_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - (11 - i));
-        return {
-            mes: format(date, 'MM/yyyy'),
-            receita: rbt12 / 12,
-            folha: fp12 / 12
-        };
-    });
+    const dadosMensais: DadosMensais[] = formValues.monthlyData && formValues.monthlyData.length === 12
+      ? formValues.monthlyData
+      : Array.from({ length: 12 }, (_, i) => {
+          const date = new Date();
+          date.setMonth(date.getMonth() - (11 - i));
+          return {
+              mes: format(date, 'MM/yyyy'),
+              receita: rbt12 / 12,
+              folha: fp12 / 12
+          };
+      });
     
     try {
         const analysis = gerarAnaliseCompleta(dadosMensais, 4);
@@ -185,12 +187,18 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
   return (
     <div id="results-section" className="mt-16 w-full space-y-12">
       <div>
-        <div className="text-center mb-12 print-hidden">
+        <div className="text-center mb-8 print-hidden">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
           <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
             Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
           </p>
         </div>
+
+        {year >= 2026 && onYearChange && (
+          <div className="sticky top-16 z-20 py-4 mb-8 bg-background/80 backdrop-blur-sm print-hidden">
+             <YearSelector selectedYear={year} onYearChange={onYearChange} />
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8 results-grid">
           {scenariosToShow.map((scenario) => {
@@ -313,8 +321,8 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                                       rateInfo = formatPercent(dasItem.value / scenario.totalRevenue);
                                   }
                               } else if (lowerCaseName.includes('iss')) {
-                                  const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1] || '0') / 100;
-                                  rateInfo = formatPercent(rateFromName);
+                                  const rateFromName = parseFloat(item.name.match(/\(([^)]+)\)/)?.[1]?.replace(',', '.') || '0');
+                                  rateInfo = `(${(rateFromName).toFixed(2).replace('.',',')}%)`;
                               } else if (scenario.totalRevenue > 0) {
                                 if (lowerCaseName.includes('cbs') || lowerCaseName.includes('ibs') || lowerCaseName.includes('iva')) {
                                     rateInfo = formatPercent(item.value / scenario.totalRevenue);
@@ -429,7 +437,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto mt-2">Sua empresa pode economizar migrando do Anexo V para o Anexo III. Veja abaixo o plano de ação e a projeção de resultados.</p>
             </div>
-          <FatorRAnalysisComponent analysis={fatorRAnalysisData} />
+          {/* <FatorRAnalysisComponent analysis={fatorRAnalysisData} /> */}
         </div>
       )}
 
@@ -450,5 +458,3 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
-
-

@@ -83,7 +83,7 @@ export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): num
         return 0;
     }
     // Para Lucro Presumido e Anexo IV, a alíquota é 20% sobre a folha.
-    return monthlyPayroll * config.aliquotas_cpp_patronal.total;
+    return monthlyPayroll * config.aliquotas_cpp_patronal.base;
 }
 
 
@@ -110,6 +110,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
+    // CORREÇÃO: O valor do formulário já é a porcentagem (ex: 5 para 5%), então dividimos por 100 aqui.
     const issValue = (values.issRate ?? 5) / 100;
     const iss = domesticRevenue * issValue;
 
@@ -214,11 +215,6 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         // Encontrar faixa e calcular alíquota efetiva
         const annexTable = config.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
-        if (!bracket) {
-            // This is a safeguard. The findBracket function should always return a bracket.
-            // If it doesn't, we throw an error to make the issue visible.
-            throw new Error(`Could not find tax bracket for annex ${effectiveAnnex} with RBT12 of ${effectiveRbt12}`);
-        }
         const { rate, deduction, distribution } = bracket;
         
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
@@ -228,12 +224,9 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         
         // Aplicar isenção de exportação
         if (activity.isExport) {
-            // The check for distribution is crucial
-            if (distribution) {
-                const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
-                const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-                dasDaAtividade *= (1 - exportExemptionRatio);
-            }
+            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
+            const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
+            dasDaAtividade *= (1 - exportExemptionRatio);
         }
         
         totalDas += dasDaAtividade;
