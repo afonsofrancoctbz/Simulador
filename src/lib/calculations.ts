@@ -110,9 +110,9 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    // CORREÇÃO: O valor do formulário já é a porcentagem (ex: 5 para 5%), então dividimos por 100 aqui.
-    const issValue = (values.issRate ?? 5) / 100;
-    const iss = domesticRevenue * issValue;
+    
+    const issRateAsDecimal = (values.issRate ?? 5) / 100;
+    const iss = domesticRevenue * issRateAsDecimal;
 
     // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
     let presumedProfitBase = 0;
@@ -149,7 +149,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         breakdown: [
           { name: 'PIS', value: pis },
           { name: 'COFINS', value: cofins },
-          { name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss },
+          { name: `ISS (${(issRateAsDecimal * 100).toFixed(2).replace('.',',')}%)`, value: iss },
           { name: 'IRPJ', value: irpj },
           { name: 'CSLL', value: csll },
           { name: 'CPP (INSS Patronal)', value: cpp },

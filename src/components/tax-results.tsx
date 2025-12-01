@@ -195,7 +195,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
         </div>
 
         {year >= 2026 && onYearChange && (
-          <div className="sticky top-16 z-20 py-4 mb-8 bg-background/80 backdrop-blur-sm print-hidden">
+          <div className="sticky top-[68px] z-20 py-4 mb-8 bg-background/80 backdrop-blur-sm -mt-8 print-hidden">
              <YearSelector selectedYear={year} onYearChange={onYearChange} />
           </div>
         )}
@@ -309,34 +309,17 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                             <div className="space-y-1">
                             {filteredItems.map(item => {
                               const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
+                              const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
                               
                               let rateInfo: string | null = null;
-                              const lowerCaseName = item.name.toLowerCase();
-
-                              if (lowerCaseName.includes('inss s/ pró-labore')) rateInfo = '(11,00%)';
-                              else if (lowerCaseName.includes('cpp')) rateInfo = '(20,00%)';
-                              else if (lowerCaseName.startsWith('das') && scenario.totalRevenue > 0) {
-                                  const dasItem = scenario.breakdown.find(b => b.name.toLowerCase().startsWith('das'));
-                                  if (dasItem) {
-                                      rateInfo = formatPercent(dasItem.value / scenario.totalRevenue);
+                              if (item.name.toLowerCase().includes('iss')) {
+                                  rateInfo = `(${(formValues.issRate || 5).toFixed(2).replace('.', ',')}%)`;
+                              } else {
+                                  const rateMatch = item.name.match(/\(([^%]+%)\)/);
+                                  if (rateMatch) {
+                                      rateInfo = `(${rateMatch[1]})`;
                                   }
-                              } else if (lowerCaseName.includes('iss')) {
-                                  // Extract rate from name like "ISS (5,00%)"
-                                  const rateMatch = item.name.match(/\(([^%]+)%\)/);
-                                  if (rateMatch && rateMatch[1]) {
-                                    rateInfo = `(${rateMatch[1]}%)`;
-                                  }
-                              } else if (scenario.totalRevenue > 0) {
-                                if (lowerCaseName.includes('cbs') || lowerCaseName.includes('ibs') || lowerCaseName.includes('iva')) {
-                                    rateInfo = formatPercent(item.value / scenario.totalRevenue);
-                                } else if (scenario.regime.includes('Lucro Presumido') && (lowerCaseName.includes('irpj') || lowerCaseName.includes('csll'))) {
-                                    rateInfo = formatPercent(item.value / scenario.totalRevenue);
-                                } else if (scenario.regime.includes('Lucro Presumido') && domesticRevenue > 0 && (lowerCaseName.includes('pis') || lowerCaseName.includes('cofins'))) {
-                                    rateInfo = formatPercent(item.value / domesticRevenue);
-                                }
                               }
-                              
-                              const showRate = !lowerCaseName.includes('irrf') && !lowerCaseName.includes('mensalidade');
 
                               return (
                               <div key={item.name} className="flex justify-between items-center text-sm">
