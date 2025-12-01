@@ -47,7 +47,7 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
     }
 
     // --- Cálculo Inicial ---
-    const fatorR_Atual = FS12_atual / RBT12_atual;
+    const fatorR_Atual = RBT12_atual > 0 ? FS12_atual / RBT12_atual : 0;
     const isEnquadradoAgora = fatorR_Atual >= META_FATOR_R;
 
     if (isEnquadradoAgora) {

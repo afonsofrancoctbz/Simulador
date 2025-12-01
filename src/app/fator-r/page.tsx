@@ -274,6 +274,14 @@ export default function FatorRPage() {
     });
 
     const onSubmit = (data: FatorRFormValues) => {
+        if (data.rbt12 <= 0) {
+            toast({
+                title: "Faturamento Inválido",
+                description: "O faturamento anual (RBT12) deve ser maior que zero para realizar a análise.",
+                variant: "destructive"
+            });
+            return;
+        }
         const receitaMensal = data.rbt12 / 12;
         const folhaMensal = data.folha12 / 12;
         const historicoSimulado: DadosMensais[] = Array.from({ length: 12 }, (_, i) => {

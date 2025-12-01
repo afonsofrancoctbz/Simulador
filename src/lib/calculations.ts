@@ -28,9 +28,7 @@ import { getFiscalParameters } from '../config/fiscal';
 export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
-    const { deducao_dependente_irrf = 0, deducao_simplificada_irrf = 0 } = config;
-
-
+    
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
         if (proLaboreBruto <= 0) {
@@ -146,12 +144,12 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
         contabilizeiFee,
         breakdown: [
-          { name: 'PIS', value: pis, rate: pisRate },
-          { name: 'COFINS', value: cofins, rate: cofinsRate },
+          { name: `PIS`, value: pis, rate: pisRate },
+          { name: `COFINS`, value: cofins, rate: cofinsRate },
           { name: `ISS`, value: iss, rate: issRateAsDecimal },
           { name: 'IRPJ', value: irpj, rate: irpjRate },
           { name: 'CSLL', value: csll, rate: csllRate },
-          { name: 'CPP (INSS Patronal)', value: cpp, rate: cppRate },
+          { name: 'CPP', value: cpp, rate: cppRate },
           { name: 'INSS s/ Pró-labore', value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
           { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
         ].filter(item => item.value > 0.001),
@@ -250,7 +248,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     
     const breakdown = [
         { name: 'DAS', value: totalDas, rate: effectiveDasRate },
-        { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV, rate: cppRate },
+        { name: 'CPP', value: cppFromAnnexIV, rate: cppRate },
         { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0, rate: config.aliquota_inss_prolabore },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
     ].filter(item => item.value > 0.001);
@@ -321,14 +319,16 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
                 minProLaborePartnersCount++;
             }
           });
-          
-          const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / minProLaborePartnersCount;
-          
-          proLaboresCopy.forEach(p => {
-              if (p.value === minProLaboreValue) {
-                  p.value += valueToAddPerPartner;
-              }
-          });
+
+          if (minProLaborePartnersCount > 0) {
+            const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / minProLaborePartnersCount;
+            
+            proLaboresCopy.forEach(p => {
+                if (p.value === minProLaboreValue) {
+                    p.value += valueToAddPerPartner;
+                }
+            });
+          }
           
           simplesNacionalOtimizado = _calculateSimplesNacional(values, config, proLaboresCopy);
       }

@@ -369,9 +369,17 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                             </AlertDescription>
                         </Alert>
                       )}
+                        {isCurrentLpFor2026 && (
+                            <Alert variant="default" className="bg-sky-100/80 border-sky-200/80 text-sky-900 p-3">
+                                <AlertDescription className="text-xs font-medium flex items-start gap-2">
+                                    <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                                    <span>Este card mostra como seria o Lucro Presumido sem a Reforma Tributária, servindo como linha de base para comparação.</span>
+                                </AlertDescription>
+                            </Alert>
+                        )}
 
 
-                      {scenario.notes.length > 0 && (
+                      {scenario.notes.length > 0 && !isCurrentLpFor2026 && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
