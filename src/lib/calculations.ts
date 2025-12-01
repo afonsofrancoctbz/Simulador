@@ -1,6 +1,6 @@
 
 
-import type { FiscalConfigType as FiscalConfig } from '@/config/fiscal';
+import type { FiscalConfig } from '@/config/fiscal';
 import {
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     CONTABILIZEI_FEES_SIMPLES_NACIONAL,
@@ -110,7 +110,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
     const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
-    const issValue = values.issRate ?? config.lucro_presumido_rates.ISS;
+    const issValue = (values.issRate ?? 5) / 100;
     const iss = domesticRevenue * issValue;
 
     // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
@@ -179,9 +179,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
     // Passo 1: Calcular Bases Anuais e Fator R
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-
     const annualPayroll = fp12 > 0 ? fp12 : monthlyPayroll * 12;
-      
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
@@ -216,6 +214,11 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         // Encontrar faixa e calcular alíquota efetiva
         const annexTable = config.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
+        if (!bracket) {
+            // This is a safeguard. The findBracket function should always return a bracket.
+            // If it doesn't, we throw an error to make the issue visible.
+            throw new Error(`Could not find tax bracket for annex ${effectiveAnnex} with RBT12 of ${effectiveRbt12}`);
+        }
         const { rate, deduction, distribution } = bracket;
         
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
@@ -225,9 +228,12 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         
         // Aplicar isenção de exportação
         if (activity.isExport) {
-            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
-            const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-            dasDaAtividade *= (1 - exportExemptionRatio);
+            // The check for distribution is crucial
+            if (distribution) {
+                const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
+                const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
+                dasDaAtividade *= (1 - exportExemptionRatio);
+            }
         }
         
         totalDas += dasDaAtividade;

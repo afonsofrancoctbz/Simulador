@@ -34,6 +34,15 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
     form.setValue('year', year);
   }, [year, form]);
 
+  useEffect(() => {
+    // If results already exist, re-run the calculation when the year changes
+    if (results) {
+      onSubmit(form.getValues());
+    }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year]);
+
+
   const handleCnaeConfirm = (cnaes: CnaeSelection[]) => {
       form.setValue('selectedCnaes', cnaes, { shouldValidate: true });
       const newRevenues: Record<string, number | undefined> = {};

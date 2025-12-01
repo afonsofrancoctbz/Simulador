@@ -145,7 +145,7 @@ export function useTaxCalculator(year: number) {
             selectedPlan: values.selectedPlan,
             rbt12: values.rbt12 ?? 0,
             fp12: values.fp12 ?? 0,
-            issRate: (values.issRate ?? 5) / 100, // Convert percentage to decimal
+            issRate: values.issRate, // Keep as percentage
             revenues: values.revenues, // Correctly include the revenues object
             domesticActivities,
             exportActivities,
@@ -177,6 +177,7 @@ export function useTaxCalculator(year: number) {
         setError(null);
         setSelectedCity(values.city);
 
+        // Ensure calculation happens after UI update
         setTimeout(() => {
             document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
@@ -184,7 +185,7 @@ export function useTaxCalculator(year: number) {
         const submissionValues = transformFormToSubmission(values);
 
         try {
-            if (year <= 2025) {
+            if (values.year <= 2025) {
                 const calculatedResults = await calculateTaxesOnServer(submissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo não retornou resultados.");
                 setResults(calculatedResults);
@@ -195,11 +196,11 @@ export function useTaxCalculator(year: number) {
                 setResults(calculatedResults);
             }
         } catch (e) {
-            console.error(`Erro ao calcular impostos (${year}):`, e);
+            console.error(`Erro ao calcular impostos (${values.year}):`, e);
             const errorMessage = e instanceof Error ? e.message : "Ocorreu um erro inesperado.";
             setError(`Falha no cálculo. Por favor, verifique os dados e tente novamente. Detalhe: ${errorMessage}`);
             toast({
-                title: `Erro no Cálculo (${year})`,
+                title: `Erro no Cálculo (${values.year})`,
                 description: "Não foi possível completar o cálculo. Tente novamente mais tarde.",
                 variant: "destructive",
             });

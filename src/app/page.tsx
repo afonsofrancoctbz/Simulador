@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -124,7 +125,7 @@ export default function Home() {
              <section id="socii-law" className="py-16 lg:py-24 bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <SociiLawSection />
-              </div>
+              </section>
             </section>
 
              <section id="faq" className="py-16 lg:py-24 bg-slate-50/70">

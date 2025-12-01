@@ -25,14 +25,17 @@ export const CalculatorFormSchema = z.object({
   revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
-  issRate: z.coerce.number().min(2, "A alíquota de ISS deve ser no mínimo 2%.").max(5, "A alíquota de ISS não pode ser maior que 5%.").optional(),
+  issRate: z.coerce.number({invalid_type_error: "A alíquota de ISS deve ser um número."})
+             .min(2, "A alíquota de ISS deve ser no mínimo 2%.")
+             .max(5, "A alíquota de ISS não pode ser maior que 5%.")
+             .optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
   proLabores: z.array(ProLaboreFormSchema).min(1),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
   b2bRevenuePercentage: z.coerce.number().min(0, "O percentual deve ser no mínimo 0.").max(100, "O percentual não pode ser maior que 100.").optional().default(50),
   creditGeneratingExpenses: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
-  year: z.number().optional(), // Added to pass the selected year to the calculation
+  year: z.number().optional(),
 }).refine(data => {
     const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
