@@ -44,19 +44,9 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         
         totalINSSRetido += inss;
         
-        // "Smart Selection" for IRRF (O Duelo)
-        const baseCalculoIRRF_Legal = proLaboreBruto - inss;
-        const irrfBracketLegal = findBracket(config.tabela_irrf, baseCalculoIRRF_Legal);
-        const irrfLegal = Math.max(0, baseCalculoIRRF_Legal * irrfBracketLegal.rate - irrfBracketLegal.deduction);
-
-        // Para o simplificado, a base de cálculo é o valor bruto, e a dedução é um valor fixo.
-        const baseCalculoIRRF_Simplificado = proLaboreBruto; 
-        const irrfBracketSimplificado = findBracket(config.tabela_irrf, baseCalculoIRRF_Simplificado);
-        // A dedução simplificada se aplica ANTES da alíquota, mas o cálculo do Zod/Excel subtrai da base.
-        const valorAposDeducaoSimplificada = Math.max(0, baseCalculoIRRF_Simplificado - deducao_simplificada_irrf);
-        const irrfSimplificado = (valorAposDeducaoSimplificada * irrfBracketSimplificado.rate) - irrfBracketSimplificado.deduction;
-
-        const irrf = Math.max(0, Math.min(irrfLegal, irrfSimplificado));
+        const baseCalculoIRRF = proLaboreBruto - inss;
+        const irrfBracket = findBracket(config.tabela_irrf, baseCalculoIRRF);
+        const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
         
         totalIRRFRetido += irrf;
 
@@ -108,8 +98,11 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
     
     // Grupo 1: Impostos s/ Faturamento (Mensais)
-    const pis = domesticRevenue * config.lucro_presumido_rates.PIS;
-    const cofins = domesticRevenue * config.lucro_presumido_rates.COFINS;
+    const pisRate = config.lucro_presumido_rates.PIS;
+    const pis = domesticRevenue * pisRate;
+
+    const cofinsRate = config.lucro_presumido_rates.COFINS;
+    const cofins = domesticRevenue * cofinsRate;
     
     const issRateAsDecimal = (values.issRate ?? 5) / 100;
     const iss = domesticRevenue * issRateAsDecimal;
@@ -123,11 +116,17 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
       presumedProfitBase += activity.revenue * presuncao;
     });
 
-    const irpjAdicional = Math.max(0, (presumedProfitBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
-    const irpj = presumedProfitBase * config.lucro_presumido_rates.IRPJ_BASE + irpjAdicional;
-    const csll = presumedProfitBase * config.lucro_presumido_rates.CSLL;
+    const irpjRate = config.lucro_presumido_rates.IRPJ_BASE;
+    const irpjAdicionalRate = config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
+    const irpjAdicional = Math.max(0, (presumedProfitBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * irpjAdicionalRate;
+    const irpj = presumedProfitBase * irpjRate + irpjAdicional;
+    
+    const csllRate = config.lucro_presumido_rates.CSLL;
+    const csll = presumedProfitBase * csllRate;
+
 
     // Grupo 3: Encargos sobre a Folha
+    const cppRate = config.aliquotas_cpp_patronal.base;
     const cpp = _calculateCpp(monthlyPayroll, config);
 
     // Custo Total
@@ -147,13 +146,13 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
         contabilizeiFee,
         breakdown: [
-          { name: 'PIS', value: pis },
-          { name: 'COFINS', value: cofins },
-          { name: `ISS (${(issRateAsDecimal * 100).toFixed(2).replace('.',',')}%)`, value: iss },
-          { name: 'IRPJ', value: irpj },
-          { name: 'CSLL', value: csll },
-          { name: 'CPP (INSS Patronal)', value: cpp },
-          { name: 'INSS s/ Pró-labore', value: totalINSSRetido },
+          { name: 'PIS', value: pis, rate: pisRate },
+          { name: 'COFINS', value: cofins, rate: cofinsRate },
+          { name: `ISS`, value: iss, rate: issRateAsDecimal },
+          { name: 'IRPJ', value: irpj, rate: irpjRate },
+          { name: 'CSLL', value: csll, rate: csllRate },
+          { name: 'CPP (INSS Patronal)', value: cpp, rate: cppRate },
+          { name: 'INSS s/ Pró-labore', value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
           { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
         ].filter(item => item.value > 0.001),
         notes:[],
@@ -234,6 +233,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
     // Passo 3: Calcular CPP (Apenas para Anexo IV)
     let cppFromAnnexIV = 0;
+    const cppRate = config.aliquotas_cpp_patronal.base;
     if (hasAnnexIVActivity) {
         cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
     }
@@ -246,11 +246,12 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
+    const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
     
     const breakdown = [
-        { name: `DAS (${formatPercent(totalRevenue > 0 ? totalDas / totalRevenue : 0)})`, value: totalDas },
-        { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV },
-        { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0 },
+        { name: 'DAS', value: totalDas, rate: effectiveDasRate },
+        { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV, rate: cppRate },
+        { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0, rate: config.aliquota_inss_prolabore },
         { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
     ].filter(item => item.value > 0.001);
 
@@ -265,7 +266,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         proLabore: totalProLaboreBruto,
         fatorR: [...finalAnnexes].includes('III') || [...finalAnnexes].includes('V') ? fatorR : undefined,
         effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
-        effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
+        effectiveDasRate: effectiveDasRate,
         contabilizeiFee,
         breakdown,
         notes: [],

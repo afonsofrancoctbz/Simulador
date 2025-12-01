@@ -154,7 +154,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
   }
     
   const groupTaxes = (details: TaxDetails) => {
-    const groups: { [key: string]: { name: string; value: number }[] } = {
+    const groups: { [key: string]: { name: string; value: number, rate?: number }[] } = {
         'IMPOSTOS S/ FATURAMENTO MENSAL': [],
         'IMPOSTOS S/ FATURAMENTO TRIMESTRAL': [],
         'ENCARGOS S/ FOLHA E PRÓ-LABORE': [],
@@ -308,32 +308,21 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                             {isTrimestral && <p className='text-muted-foreground -mt-2' style={{fontSize: '0.6rem'}}>Valores provisionados mensalmente.</p>}
                             <div className="space-y-1">
                             {filteredItems.map(item => {
-                              const nameWithoutRate = item.name.replace(/\s*\([^)]+\)$/, '');
-                              const showRate = !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
-                              
-                              let rateInfo: string | null = null;
-                              if (item.name.toLowerCase().includes('iss')) {
-                                  rateInfo = `(${(formValues.issRate || 5).toFixed(2).replace('.', ',')}%)`;
-                              } else {
-                                  const rateMatch = item.name.match(/\(([^%]+%)\)/);
-                                  if (rateMatch) {
-                                      rateInfo = `(${rateMatch[1]})`;
-                                  }
-                              }
-
-                              return (
-                              <div key={item.name} className="flex justify-between items-center text-sm">
-                                  <span className="text-foreground flex items-center gap-1.5">
-                                    {nameWithoutRate}
-                                    {showRate && rateInfo && (
-                                        <span className="text-primary font-semibold text-xs">{rateInfo}</span>
-                                    )}
-                                  </span>
-                                  <span className="font-medium text-foreground">
-                                    {formatCurrencyBRL(item.value)}
-                                  </span>
-                              </div>
-                            )})}
+                                const showRate = item.rate !== undefined && !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
+                                
+                                return (
+                                <div key={item.name} className="flex justify-between items-center text-sm">
+                                    <span className="text-foreground flex items-center gap-1.5">
+                                      {item.name}
+                                      {showRate && (
+                                          <span className="text-muted-foreground font-semibold text-xs">({formatPercent(item.rate as number)})</span>
+                                      )}
+                                    </span>
+                                    <span className="font-medium text-foreground">
+                                      {formatCurrencyBRL(item.value)}
+                                    </span>
+                                </div>
+                              )})}
                             </div>
                             
                             {scenario.regime.includes('Lucro Presumido') && groupName.includes('TRIMESTRAL') && (

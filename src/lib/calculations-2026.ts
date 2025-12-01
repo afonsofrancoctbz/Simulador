@@ -51,6 +51,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
+    const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
     const inssPatronal = _calculateCpp(monthlyPayroll, fiscalConfig);
 
     // Cálculo da base presumida
@@ -59,16 +60,20 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateIRPJ ?? 0.32));
     }, 0);
 
-    const irpj = presumedProfitBase * fiscalConfig.lucro_presumido_rates.IRPJ_BASE;
-    const irpjAdicional = Math.max(0, (presumedProfitBase - (fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL * 1))) * fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
-    const csll = presumedProfitBase * fiscalConfig.lucro_presumido_rates.CSLL;
+    const irpjRate = fiscalConfig.lucro_presumido_rates.IRPJ_BASE;
+    const irpjAdicionalRate = fiscalConfig.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
+    const irpj = presumedProfitBase * irpjRate;
+    const irpjAdicional = Math.max(0, (presumedProfitBase - (fiscalConfig.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL * 1))) * irpjAdicionalRate;
+    
+    const csllRate = fiscalConfig.lucro_presumido_rates.CSLL;
+    const csll = presumedProfitBase * csllRate;
     
     let consumptionTaxes = 0;
     const breakdown = [
-        { name: `IRPJ`, value: irpj + irpjAdicional },
-        { name: `CSLL`, value: csll }, 
-        { name: `CPP (INSS Patronal)`, value: inssPatronal },
-        { name: "INSS s/ Pró-labore", value: totalINSSRetido },
+        { name: `IRPJ`, value: irpj + irpjAdicional, rate: irpjRate },
+        { name: `CSLL`, value: csll, rate: csllRate }, 
+        { name: `CPP (INSS Patronal)`, value: inssPatronal, rate: cppRate },
+        { name: "INSS s/ Pró-labore", value: totalINSSRetido, rate: fiscalConfig.aliquota_inss_prolabore },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
     ];
     
@@ -77,28 +82,34 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
 
     if (isCurrentRules || !configTransition) {
         // PRÉ-REFORMA: PIS, COFINS e ISS cumulativos
-        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS;
-        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS;
-        const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
-        const iss = domesticRevenue * issValue;
+        const pisRate = fiscalConfig.lucro_presumido_rates.PIS;
+        const pis = domesticRevenue * pisRate;
+        
+        const cofinsRate = fiscalConfig.lucro_presumido_rates.COFINS;
+        const cofins = domesticRevenue * cofinsRate;
+
+        const issRateAsDecimal = (values.issRate ?? 5) / 100;
+        const iss = domesticRevenue * issRateAsDecimal;
         consumptionTaxes = pis + cofins + iss;
         
-        if (pis > 0) breakdown.push({ name: `PIS`, value: pis });
-        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins });
-        if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
+        if (pis > 0) breakdown.push({ name: `PIS`, value: pis, rate: pisRate });
+        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins, rate: cofinsRate });
+        if (iss > 0) breakdown.push({ name: `ISS`, value: iss, rate: issRateAsDecimal });
         notes.push("Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas.");
     } else {
         // PÓS-REFORMA: Transição com IBS/CBS
+        const pisRate = fiscalConfig.lucro_presumido_rates.PIS;
+        const cofinsRate = fiscalConfig.lucro_presumido_rates.COFINS;
+        const issRateAsDecimal = (values.issRate ?? 5) / 100;
         
         // Impostos antigos (reduzidos gradualmente)
-        const pis = domesticRevenue * fiscalConfig.lucro_presumido_rates.PIS * configTransition.pis_cofins_multiplier;
-        const cofins = domesticRevenue * fiscalConfig.lucro_presumido_rates.COFINS * configTransition.pis_cofins_multiplier;
-        if (pis > 0) breakdown.push({ name: `PIS (${formatPercent(fiscalConfig.lucro_presumido_rates.PIS * configTransition.pis_cofins_multiplier)})`, value: pis });
-        if (cofins > 0) breakdown.push({ name: `COFINS (${formatPercent(fiscalConfig.lucro_presumido_rates.COFINS * configTransition.pis_cofins_multiplier)})`, value: cofins });
+        const pis = domesticRevenue * pisRate * configTransition.pis_cofins_multiplier;
+        const cofins = domesticRevenue * cofinsRate * configTransition.pis_cofins_multiplier;
+        if (pis > 0) breakdown.push({ name: `PIS`, value: pis, rate: pisRate * configTransition.pis_cofins_multiplier });
+        if (cofins > 0) breakdown.push({ name: `COFINS`, value: cofins, rate: cofinsRate * configTransition.pis_cofins_multiplier });
 
-        const issValue = values.issRate ?? fiscalConfig.lucro_presumido_rates.ISS;
-        const iss = domesticRevenue * issValue * configTransition.iss_icms_multiplier;
-        if (iss > 0) breakdown.push({ name: `ISS (${(issValue * 100).toFixed(2).replace('.',',')}%)`, value: iss });
+        const iss = domesticRevenue * issRateAsDecimal * configTransition.iss_icms_multiplier;
+        if (iss > 0) breakdown.push({ name: `ISS`, value: iss, rate: issRateAsDecimal * configTransition.iss_icms_multiplier });
         
         const oldTaxesCost = pis + cofins + iss;
         
@@ -119,11 +130,9 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
                 activity.cClassTrib
             );
             
-            // Converter percentual para decimal (60% -> 0.60)
             const reducaoIBSDecimal = reduction.reducaoIBS / 100;
             const reducaoCBSDecimal = reduction.reducaoCBS / 100;
             
-            // Aplicar redução nas alíquotas
             totalCbsDebit += activity.revenue * (baseCbsRate * (1 - reducaoCBSDecimal));
             totalIbsDebit += activity.revenue * (baseIbsRate * (1 - reducaoIBSDecimal));
         });
@@ -149,13 +158,13 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
 
         if (year === 2026) {
             notes.push(`IVA de Teste (2026): O valor de CBS/IBS (${formatCurrencyBRL(cbsFinal + ibsFinal)}) é informativo e compensável com PIS/COFINS, não representando custo adicional de caixa.`);
-            if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste/Compensável - ${formatPercent(baseCbsRate)})`, value: cbsFinal });
-            if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste/Compensável - ${formatPercent(baseIbsRate)})`, value: ibsFinal });
+            if (cbsFinal > 0) breakdown.push({ name: `CBS (Teste/Compensável)`, value: cbsFinal, rate: baseCbsRate });
+            if (ibsFinal > 0) breakdown.push({ name: `IBS (Teste/Compensável)`, value: ibsFinal, rate: baseIbsRate });
             consumptionTaxes = oldTaxesCost;
         } else {
             consumptionTaxes = oldTaxesCost + cbsFinal + ibsFinal;
-            if (cbsFinal > 0) breakdown.push({ name: `CBS (Líquida)`, value: cbsFinal });
-            if (ibsFinal > 0) breakdown.push({ name: `IBS (Líquido)`, value: ibsFinal });
+            if (cbsFinal > 0) breakdown.push({ name: `CBS (Líquida)`, value: cbsFinal, rate: baseCbsRate });
+            if (ibsFinal > 0) breakdown.push({ name: `IBS (Líquido)`, value: ibsFinal, rate: baseIbsRate });
             
             if (year > 2026 && year < 2033) {
               notes.push(`Cálculo em transição: PIS/COFINS reduzidos gradualmente. ISS sendo substituído pelo IBS. Reduções aplicadas conforme atividade.`);
@@ -232,6 +241,7 @@ function _calculateSimples2026(
     let cppFromAnnexIV = 0;
     let ivaTaxes = 0;
     let finalAnnex: Annex = 'III'; 
+    const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
 
     const allActivities = [
         ...domesticActivities.map(a => ({...a, isExport: false})), 
@@ -330,10 +340,10 @@ function _calculateSimples2026(
     const totalMonthlyCost = totalTax + fee;
 
     const breakdown = [
-        { name: 'DAS (Simples Nacional)', value: totalDas },
+        { name: 'DAS (Simples Nacional)', value: totalDas, rate: totalRevenue > 0 ? totalDas / totalRevenue : 0 },
         { name: 'IVA (IBS/CBS pago por fora)', value: ivaTaxes },
-        { name: `CPP (INSS Patronal - Anexo IV)`, value: cppFromAnnexIV },
-        { name: "INSS s/ Pró-labore", value: totalINSSRetido },
+        { name: `CPP (INSS Patronal)`, value: cppFromAnnexIV, rate: cppRate },
+        { name: "INSS s/ Pró-labore", value: totalINSSRetido, rate: fiscalConfig.aliquota_inss_prolabore },
         { name: "IRRF s/ Pró-labore", value: totalIRRFRetido }
     ].filter(item => item.value > 0.001);
 
@@ -352,7 +362,7 @@ function _calculateSimples2026(
         }
     }
     if (cppFromAnnexIV > 0) {
-      notes.push(`Anexo IV: CPP (${formatPercent(fiscalConfig.aliquotas_cpp_patronal.base)}) calculada sobre a folha.`);
+      notes.push(`Anexo IV: CPP (${formatPercent(cppRate)}) calculada sobre a folha.`);
     }
 
     let regimeName: TaxDetails2026['regime'];

@@ -1,4 +1,5 @@
 
+
 import { z } from "zod";
 
 // =================================================================================
@@ -82,6 +83,7 @@ export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 export const TaxBreakdownItemSchema = z.object({
     name: z.string(),
     value: z.number(),
+    rate: z.number().optional(),
 });
 export type TaxBreakdownItem = z.infer<typeof TaxBreakdownItemSchema>;
 
