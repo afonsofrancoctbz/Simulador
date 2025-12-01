@@ -1,20 +1,36 @@
+
 import { z } from "zod";
+
+// =================================================================================
+// CNAE AND ACTIVITY SCHEMAS
+// =================================================================================
 
 // Schema for a selected CNAE, which might include a user's choice of cClass
 export const CnaeSelectionSchema = z.object({
   code: z.string(),
-  cClass: z.string().optional(),
+  cClass: z.string().optional(), // Legacy/deprecated - maintaned for compatibility
+  cClassTrib: z.string().optional(),
 });
 export type CnaeSelection = z.infer<typeof CnaeSelectionSchema>;
 
-// Schema for an individual CNAE item with revenue
+// ATUALIZAÇÃO: Schema para CnaeItem agora inclui nbsCode e cClassTrib
 export const CnaeItemSchema = z.object({
   code: z.string(),
   revenue: z.coerce.number().min(0, "O faturamento deve ser maior que zero.").or(z.literal(0)),
+  
+  // NOVOS CAMPOS para suportar reduções específicas de IVA
+  nbsCode: z.string().optional(),
+  cClassTrib: z.string().optional(),
+  
+  // Mantido para compatibilidade (deprecado)
   cClass: z.string().optional(),
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
+
+// =================================================================================
+// FORM AND INPUT SCHEMAS
+// =================================================================================
 
 // Schema for an individual pro-labore input from the form
 export const ProLaboreFormSchema = z.object({
@@ -58,6 +74,10 @@ export const TaxFormValuesSchema = z.object({
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
 
 
+// =================================================================================
+// CALCULATION RESULT SCHEMAS
+// =================================================================================
+
 // Schema for the breakdown of taxes in the results
 export const TaxBreakdownItemSchema = z.object({
     name: z.string(),
@@ -75,7 +95,7 @@ export const PartnerTaxDetailsSchema = z.object({
 export type PartnerTaxDetails = z.infer<typeof PartnerTaxDetailsSchema>;
 
 
-// Schema for the details of a single tax scenario
+// Schema for the details of a single tax scenario (2025)
 export const TaxDetailsSchema = z.object({
     regime: z.enum([
       "Simples Nacional", 
@@ -110,7 +130,7 @@ export const CalculationResultsSchema = z.object({
 export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
 
 
-// Schemas for 2026 and beyond
+// Schemas for 2026 and beyond (Post-Reform)
 export const TaxDetails2026Schema = TaxDetailsSchema.extend({
   regime: z.enum([
     'Lucro Presumido',
@@ -136,6 +156,10 @@ export const CalculationResults2026Schema = z.object({
 export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
 
 
+// =================================================================================
+// DATA AND CONFIGURATION INTERFACES/TYPES
+// =================================================================================
+
 export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
 
 export interface CnaeData {
@@ -148,8 +172,6 @@ export interface CnaeData {
   presumedProfitRateCSLL?: number;
   isRegulated?: boolean;
   notes?: string;
-  // This is deprecated in favor of the new granular system in cnae-data-2026.ts
-  // ivaReduction?: number; 
 }
 
 export interface FeeBracket {
@@ -160,6 +182,11 @@ export interface FeeBracket {
         [key in Plan]: number;
     }
 }
+
+
+// =================================================================================
+// PGDAS and Fator R ANALYSIS SCHEMAS
+// =================================================================================
 
 /**
  * Schema para os dados mensais da janela móvel (12 meses)
@@ -291,3 +318,59 @@ export const AnaliseCompletaSchema = z.object({
   jaOtimizado: z.boolean(),
 });
 export type AnaliseCompleta = z.infer<typeof AnaliseCompletaSchema>;
+
+
+// =================================================================================
+// TAX REFORM (2026+) SPECIFIC INTERFACES
+// =================================================================================
+
+export interface NBSReduction {
+  nbs: string;
+  descricao: string;
+  cClassTrib: string;
+  cClassTribDescricao: string;
+  reducaoIBS: number; // em decimal (0.60 = 60%)
+  reducaoCBS: number; // em decimal (0.60 = 60%)
+  itemLC116: string;
+  itemLC116Descricao: string;
+}
+
+export interface CNAEWithReductions {
+  code: string;
+  description: string;
+  annex?: Annex;
+  requiresFatorR?: boolean;
+  presumedProfitRateIRPJ?: number;
+  reductions: NBSReduction[];
+  defaultReduction?: {
+    ibs: number;
+    cbs: number;
+  };
+}
+
+export interface ActivitySelection {
+  cnaeCode: string;
+  selectedNBS?: string; // Opcional - se não especificado, usa defaultReduction
+  selectedCClassTrib?: string; // Para casos onde mesmo NBS tem múltiplas classificações
+  revenue: number;
+  description?: string; // Descrição customizada pelo usuário
+}
+
+export interface ActivityWithReduction extends CnaeItem {
+  nbsDescription?: string;
+  cClassTribDescription?: string;
+  appliedReduction?: {
+    ibs: number;
+    cbs: number;
+  };
+}
+
+export function activityToItem(activity: ActivityWithReduction): CnaeItem {
+  return {
+    code: activity.code,
+    revenue: activity.revenue,
+    nbsCode: activity.nbsCode,
+    cClassTrib: activity.cClassTrib,
+    cClass: activity.cClass, // mantido para compatibilidade
+  };
+}
