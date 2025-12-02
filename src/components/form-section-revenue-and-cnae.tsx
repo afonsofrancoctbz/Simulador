@@ -20,7 +20,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
-import { getReductionForActivity, CNAE_CLASSES_2026_MAP } from "@/lib/cnae-data-2026";
+import { CNAE_CLASSES_2026_MAP } from "@/lib/cnae-data-2026";
+import { getIvaReductionByCnae } from "@/lib/cnae-reductions-2026";
 import { Badge } from "./ui/badge";
 
 interface FormSectionRevenueAndCnaeProps {
@@ -111,7 +112,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     if (!cnae) return null;
 
                                     const cnaeOptions = year >= 2026 ? getCnaeOptions(cnaeItem.code) : [];
-                                    const reduction = getReductionForActivity(cnaeItem.code, cnaeItem.cClassTrib);
+                                    const reduction = getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib);
 
                                     return (
                                         <div key={index} className="p-4 border rounded-lg bg-background/50 relative">
@@ -361,4 +362,5 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     );
 }
 
+    
     
