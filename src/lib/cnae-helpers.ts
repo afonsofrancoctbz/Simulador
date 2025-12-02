@@ -5,8 +5,38 @@ import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 // This file is for helper functions related to CNAEs.
 // The raw data is now in cnaes-raw.ts to keep this file cleaner.
 
+function getUnifiedCnaeData(): CnaeData[] {
+  const cnaeMap = new Map<string, CnaeData>();
+
+  // Primeiro, popule o mapa com os dados base
+  CNAE_DATA_RAW.forEach(cnae => {
+    cnaeMap.set(cnae.code, cnae);
+  });
+
+  // Em seguida, adicione ou atualize com os dados da relação, se necessário
+  CNAE_LC116_RELATIONSHIP.forEach(rel => {
+    const numericCode = rel.cnae;
+    const formattedCode = `${numericCode.slice(0, 4)}-${numericCode.slice(4, 5)}/${numericCode.slice(5, 7)}`;
+    
+    if (!cnaeMap.has(formattedCode)) {
+      // Se o CNAE não existe na base, adicione uma entrada mínima
+      cnaeMap.set(formattedCode, {
+        code: formattedCode,
+        description: rel.descriptionLC116 || 'Descrição não disponível',
+        annex: 'V', // Default, pode ser ajustado se a info existir
+        category: 'Outras Atividades', // Categoria padrão
+      });
+    }
+  });
+
+  return Array.from(cnaeMap.values());
+}
+
+export const UNIFIED_CNAE_DATA = getUnifiedCnaeData();
+
+
 export function getCnaeData(code: string): CnaeData | undefined {
-  return CNAE_DATA_RAW.find(c => c.code === code);
+  return UNIFIED_CNAE_DATA.find(c => c.code === code);
 }
 
 export function getCnaeOptions(cnaeCode: string) {

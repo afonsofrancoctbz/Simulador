@@ -88,7 +88,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
   }, [results, error, onResultsChange]);
 
   return (
-    <div className='printable-section'>
+    <div className='mt-8'>
         <div className="print-hidden">
              <FormProvider {...form}>
               <MultiStepFormProvider>

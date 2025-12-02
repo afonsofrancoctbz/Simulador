@@ -4,7 +4,7 @@
 import * as React from "react"
 import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle, Stethoscope, DraftingCompass, Building, Handshake, Clapperboard, ShoppingCart, Utensils, VenetianMask, AlertTriangle, Badge } from "lucide-react"
 
-import { CNAE_DATA_RAW as CNAE_DATA } from "@/lib/cnaes-raw"
+import { UNIFIED_CNAE_DATA as CNAE_DATA } from "@/lib/cnae-helpers"
 import { Badge as BadgeUI } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
