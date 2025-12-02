@@ -1,5 +1,3 @@
-
-
 // Fonte de dados para as classificações tributárias da Reforma (2026+)
 // Baseado na tabela fornecida.
 
@@ -22,11 +20,13 @@ export interface CnaeRelationship2026 {
 
 export const CNAE_CLASSES_2026: CnaeClass2026[] = [
     { cClass: '000001', description: 'Situações tributadas integralmente pelo IBS e CBS.', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '200025', description: 'Serviços de educação de ensino superior (Prouni)', ibsReduction: 100, cbsReduction: 30},
     { cClass: '200028', description: 'Serviços de educação (Anexo II)', ibsReduction: 60, cbsReduction: 60 },
     { cClass: '200029', description: 'Serviços de saúde humana (Anexo III)', ibsReduction: 60, cbsReduction: 60 },
     { cClass: '200039', description: 'Serviços e licenciamento para produções nacionais artísticas (Anexo X)', ibsReduction: 60, cbsReduction: 60 },
     { cClass: '200041', description: 'Serviço de educação desportiva (art. 141. I)', ibsReduction: 60, cbsReduction: 60 },
     { cClass: '200045', description: 'Projetos de reabilitação urbana de zonas históricas', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200046', description: 'Operações com bens imóveis', ibsReduction: 50, cbsReduction: 50},
     { cClass: '200047', description: 'Bares e Restaurantes', ibsReduction: 40, cbsReduction: 40 },
     { cClass: '200048', description: 'Hotelaria, Parques de Diversão e Temáticos', ibsReduction: 40, cbsReduction: 40 },
     { cClass: '200049', description: 'Transporte coletivo de passageiros rodoviário, ferroviário e hidroviário', ibsReduction: 40, cbsReduction: 40 },
@@ -50,7 +50,6 @@ export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     { itemLC116: '07.01', descriptionLC116: 'Engenharia, agronomia, agrimensura, arquitetura, geologia, urbanismo, paisagismo e congêneres.', nationalCode: '070101', cnae: '7112000', nbs: '1.1403.22.11', nbsDescription: 'Serviços de engenharia para projetos de exploração de minerais', cClassTrib: '200052' },
     { itemLC116: '08.01', descriptionLC116: 'Educação infantil, ensino fundamental, médio e superior.', nationalCode: '080101', cnae: '8531700', nbs: '1.2204.10.00', nbsDescription: 'Serviços educacionais de graduação', cClassTrib: '200028' },
     { itemLC116: '08.01', descriptionLC116: 'Educação infantil, ensino fundamental, médio e superior.', nationalCode: '080101', cnae: '8531700', nbs: '1.2204.10.00', nbsDescription: 'Serviços educacionais de graduação (Prouni)', cClassTrib: '200025' },
-    // DADOS ADICIONADOS
     { itemLC116: '01.01', descriptionLC116: 'Desenvolvimento de software', nationalCode: '010101', cnae: '6203100', nbs: '1.1502.90.00', nbsDescription: 'Serviços de projeto e desenvolvimento de aplicativos e programas em tecnologia da informação (TI) não classificados em subposições anteriores', cClassTrib: '200039' },
     { itemLC116: '01.01', descriptionLC116: 'Consultoria em TI', nationalCode: '010101', cnae: '6204000', nbs: '1.1502.90.00', nbsDescription: 'Serviços de projeto e desenvolvimento de aplicativos e programas em tecnologia da informação (TI) não classificados em subposições anteriores', cClassTrib: '200039' },
     { itemLC116: '01.01', descriptionLC116: 'Desenvolvimento de software', nationalCode: '010101', cnae: '0203100', nbs: '1.1502.90.04', nbsDescription: 'Serviços de projeto e desenvolvimento de aplicativos e programas em tecnologia da informação (TI) não classificados em subposições anteriores', cClassTrib: '200039' },
@@ -138,41 +137,68 @@ export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     { itemLC116: '17.01', descriptionLC116: 'Relações públicas', nationalCode: '170101', cnae: '7020400', nbs: '1.1401.32.00', nbsDescription: 'Serviços de relações públicas', cClassTrib: '200052' },
     { itemLC116: '18.01', descriptionLC116: 'Atuação artística', nationalCode: '180101', cnae: '9002701', nbs: '1.2503.10.00', nbsDescription: 'Serviços de atuação artística', cClassTrib: '200039' },
     { itemLC116: '19.01', descriptionLC116: 'Museus', nationalCode: '190101', cnae: '9102301', nbs: '1.2504.11.00', nbsDescription: 'Serviços de museus', cClassTrib: '200039' },
+    // DADOS ADICIONAIS COM 0% e 30% DE REDUÇÃO
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6201501', nbs: '1.1502.20.00', nbsDescription: 'Serviços de projeto e desenvolvimento, adaptação e instalação de aplicativos e programas personalizados (customizados)', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6202300', nbs: '1.1502.20.00', nbsDescription: 'Serviços de projeto e desenvolvimento, adaptação e instalação de aplicativos e programas personalizados (customizados)', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6203100', nbs: '1.1502.20.00', nbsDescription: 'Serviços de projeto e desenvolvimento, adaptação e instalação de aplicativos e programas personalizados (customizados)', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.20.00', nbsDescription: 'Serviços de projeto e desenvolvimento, adaptação e instalação de aplicativos e programas personalizados (customizados)', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7500100', nbs: '1.1405.12.00', nbsDescription: 'Serviços de atendimento, assistência ou tratamento para animais domésticos', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7500100', nbs: '1.1405.90.00', nbsDescription: 'Serviços veterinários não classificados em subposições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8531700', nbs: '1.2204.10.00', nbsDescription: 'Serviços educacionais de graduação (PROUNI)', cClassTrib: '200025' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8542200', nbs: '1.2204.40.00', nbsDescription: 'Serviços educacionais de cursos sequenciais (PROUNI)', cClassTrib: '200025' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7111100', nbs: '1.1402.11.00', nbsDescription: 'Serviços de consultoria em arquitetura', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7111100', nbs: '1.1402.12.00', nbsDescription: 'Serviços de arquitetura para projetos de construções residenciais', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7111100', nbs: '1.1402.13.00', nbsDescription: 'Serviços de arquitetura para projetos de construções não residenciais', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7111100', nbs: '1.1402.14.00', nbsDescription: 'Serviços de arquitetura para restauração de prédios históricos', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7111100', nbs: '1.1402.90.00', nbsDescription: 'Serviços de arquitetura, de planejamento urbano e de áreas rurais e de paisagismo não classificados em subposições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.21.10', nbsDescription: 'Serviços de engenharia para projetos de construção residencial', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.21.20', nbsDescription: 'Serviços de engenharia para projetos de construção não residencial', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.12', nbsDescription: 'Serviços de engenharia para projetos de exploração de petróleo e gás', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.13', nbsDescription: 'Serviços de engenharia para projetos de refino de petróleo e petroquímica', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.14', nbsDescription: 'Serviços de engenharia para projetos de unidades de produção de biocombustíveis', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.21', nbsDescription: 'Serviços de engenharia para projetos de veículos terrestres', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.22', nbsDescription: 'Serviços de engenharia para projetos de embarcações', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.23', nbsDescription: 'Serviços de engenharia para projetos de veículos aéreos e aeroespaciais', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.22.90', nbsDescription: 'Serviços de engenharia para outros projetos industriais e de fabricação, exceto para projetos de energia', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.23.00', nbsDescription: 'Serviços de engenharia para projetos de infraestrutura de transportes', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.24.00', nbsDescription: 'Serviços de engenharia para projetos de energia', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.25.00', nbsDescription: 'Serviços de engenharia para projetos de telecomunicações, radiodifusão e televisão', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.26.00', nbsDescription: 'Serviços de engenharia para projetos de gerenciamento de resíduos (perigosos e não perigosos)', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.27.00', nbsDescription: 'Serviços de engenharia para projetos de distribuição de água e rede de esgoto', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '4399101', nbs: '1.1403.30.00', nbsDescription: 'Serviços de gerenciamento de projetos de construção', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.30.00', nbsDescription: 'Serviços de gerenciamento de projetos de construção', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.90.00', nbsDescription: 'Serviços de engenharia não classificados em subposições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6911701', nbs: '1.1301.10.00', nbsDescription: 'Serviços de representação e consultoria jurídica criminal', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6911701', nbs: '1.1301.20.00', nbsDescription: 'Serviços de representação e consultoria jurídica em outras áreas do direito, exceto consultoria tributária', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6911701', nbs: '1.1301.90.00', nbsDescription: 'Serviços jurídicos não classificados em subposições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6920602', nbs: '1.1302.11.00', nbsDescription: 'Serviços de auditoria contábil', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6920601', nbs: '1.1302.21.00', nbsDescription: 'Serviços de contabilidade', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '6920601', nbs: '1.1302.22.00', nbsDescription: 'Serviços de escrituração mercantil', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7490199', nbs: '1.1415.00.00', nbsDescription: 'Serviços profissionais, técnicos e gerenciais não classificados em posições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8800600', nbs: '1.2304.11.00', nbsDescription: 'Serviços de reabilitação vocacional para pessoas com deficiência', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8800600', nbs: '1.2304.12.00', nbsDescription: 'Serviços de reabilitação vocacional para desempregados', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8720401', nbs: '1.2304.19.00', nbsDescription: 'Serviço de reabilitação vocacional não classificados nas subposições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8800600', nbs: '1.2304.20.00', nbsDescription: 'Serviços de orientação e aconselhamento relacionados a crianças e adolescentes', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8800600', nbs: '1.2304.90.00', nbsDescription: 'Serviços de assistência social sem acomodação não classificados em subposições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '9101500', nbs: '1.1705.10.00', nbsDescription: 'Serviços de biblioteca', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '9101500', nbs: '1.1705.20.00', nbsDescription: 'Serviços de arquivo', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '9313100', nbs: '1.1415.00.00', nbsDescription: 'Serviços profissionais, técnicos e gerenciais não classificados em posições anteriores', cClassTrib: '200052' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7210000', nbs: '1.1201.11.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências físicas', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.12.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em química e biologia', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.19.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências não classificados em subposições anteriores', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.20.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em biotecnologia', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.31.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em Tecnologia da Informação e Comunicação (TIC)', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.32.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em nanotecnologia', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.33.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em engenharia e tecnologia nucleares', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.34.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em engenharia e tecnologia em micro-ondas de potência', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.39.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em engenharia e tecnologia não classificados em subposições anteriores', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.40.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências médicas, odontológicas e farmacêuticas', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1201.50.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências agrárias', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '8299799', nbs: '1.1201.90.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências, engenharia e tecnologia não classificados em subposições anteriores', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1202.10.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em psicologia', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1202.20.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências econômicas', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1202.30.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em direito', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1202.40.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em línguas e literatura', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1202.90.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento em ciências sociais e humanidades não classificados em subposições anteriores', cClassTrib: '000001' },
+    { itemLC116: '00.00', descriptionLC116: 'Não especificado', nationalCode: '000000', cnae: '7320300', nbs: '1.1203.00.00', nbsDescription: 'Serviços de pesquisa e desenvolvimento interdisciplinar', cClassTrib: '000001' }
 ];
-
-/**
- * Busca a redução de IVA para um CNAE específico
- * @param cnaeCode Código do CNAE
- * @param cClassTrib Classificação tributária (opcional)
- * @returns Objeto com reduções de IBS e CBS em percentual (0-100)
- */
-export function getReductionForActivity(
-    cnaeCode: string,
-    cClassTrib?: string
-): { reducaoIBS: number; reducaoCBS: number; cClassTrib: string } {
-    const defaultReduction = { reducaoIBS: 0, reducaoCBS: 0, cClassTrib: '000001' };
-    const numericCode = cnaeCode.replace(/\D/g, '');
-
-    const cnaeOptions = CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === numericCode);
-    if (cnaeOptions.length === 0) return defaultReduction;
-
-    let targetOption: CnaeRelationship2026 | undefined;
-
-    if (cClassTrib) {
-        targetOption = cnaeOptions.find(opt => opt.cClassTrib === cClassTrib);
-    }
-
-    if (!targetOption) {
-        // Se não houver uma seleção específica, ou a seleção for inválida, pegue a primeira opção como padrão.
-        targetOption = cnaeOptions[0];
-    }
-    
-    const cClassInfo = CNAE_CLASSES_2026_MAP[targetOption.cClassTrib];
-    if (!cClassInfo) return { ...defaultReduction, cClassTrib: targetOption.cClassTrib };
-
-    return {
-        reducaoIBS: cClassInfo.ibsReduction,
-        reducaoCBS: cClassInfo.cbsReduction,
-        cClassTrib: targetOption.cClassTrib
-    };
-}
