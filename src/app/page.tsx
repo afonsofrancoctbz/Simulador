@@ -58,8 +58,14 @@ export default function Home() {
             </TabsContent>
             <TabsContent value="2026">
                  <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <TaxCalculator year={selectedYear} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults} />
-                    <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} />
+                    <TaxCalculator 
+                        year={selectedYear} 
+                        onExportRevenueChange={setShowExportInfo} 
+                        onResultsChange={(hasResults) => {
+                            setShowResults(hasResults);
+                        }}
+                        onYearChange={setSelectedYear} 
+                    />
                 </div>
             </TabsContent>
         </Tabs>

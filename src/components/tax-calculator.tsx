@@ -15,7 +15,14 @@ import TaxResults from './tax-results';
 import { TaxCalculatorForm } from './tax-calculator-form';
 import { MultiStepFormProvider } from './multi-step-form';
 
-export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange }: { year: number, onExportRevenueChange: (show: boolean) => void, onResultsChange: (show: boolean) => void }) {
+interface TaxCalculatorProps {
+  year: number;
+  onExportRevenueChange: (show: boolean) => void;
+  onResultsChange: (show: boolean) => void;
+  onYearChange?: (year: number) => void;
+}
+
+export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange, onYearChange }: TaxCalculatorProps) {
   const {
     form,
     onSubmit,
@@ -32,10 +39,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
 
   useEffect(() => {
     form.setValue('year', year);
-  }, [year, form]);
-
-  useEffect(() => {
-    // If results already exist, re-run the calculation when the year changes
+    // If results already exist and the year prop changes, re-run the calculation
     if (results) {
       onSubmit(form.getValues());
     }
@@ -128,6 +132,7 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
                 error={error}
                 fatorRProjection={fatorRProjection}
                 formValues={form.getValues()}
+                onYearChange={onYearChange}
             />
         </div>
     </div>
