@@ -47,7 +47,7 @@ export const CNAE_CLASSES_2026: CnaeClass2026[] = [
     { cClass: '200013', description: 'Fornecimento de tampões higiênicos, absorventes higiênicos internos ou externos', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200014', description: 'Fornecimento dos produtos hortícolas, frutas e ovos (Anexo XV)', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200015', description: 'Venda de automóveis de passageiros de fabricação nacional adquiridos por motoristas profissionais ou pessoas com deficiência', ibsReduction: 100, cbsReduction: 100 },
-    { cClass: '200016', description: 'Prestação de serviços de pesquisa e desenvolvimento por Instituição Científica, Tecnológica e de Inovação (ICT)', ibsReduction: 100, cbsReduction: 100 },
+    { cClass: '200016', description: 'Serviços de pesquisa e desenvolvimento por Instituição Científica, Tecnológica e de Inovação (ICT)', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200017', description: 'Operações relacionadas ao FGTS', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200018', description: 'Operações de resseguro e retrocessão', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200019', description: 'Importador dos serviços financeiros contribuinte', ibsReduction: 100, cbsReduction: 100 },
@@ -56,69 +56,69 @@ export const CNAE_CLASSES_2026: CnaeClass2026[] = [
     { cClass: '200022', description: 'Operação originada fora da ZFM que destine bem material industrializado a contribuinte estabelecido na ZFM', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200023', description: 'Operação realizada por indústria incentivada que destine bem material intermediário para outra indústria incentivada na ZFM', ibsReduction: 100, cbsReduction: 100 },
     { cClass: '200024', description: 'Operação originada fora das Áreas de Livre Comércio destinadas a contribuinte estabelecido nas Áreas de Livre Comércio', ibsReduction: 100, cbsReduction: 100 },
-    { cClass: '200025', description: 'Fornecimento dos serviços de educação relacionados ao Programa Universidade para Todos (Prouni)', ibsReduction: 100, cbsReduction: 30 },
+    { cClass: '200025', description: 'Serviços de educação relacionados ao Programa Universidade para Todos (Prouni)', ibsReduction: 100, cbsReduction: 30 },
     { cClass: '200026', description: 'Locação de imóveis localizados nas zonas reabilitadas', ibsReduction: 80, cbsReduction: 80 },
     { cClass: '200027', description: 'Operações de locação, cessão onerosa e arrendamento de bens imóveis', ibsReduction: 70, cbsReduction: 70 },
-    { cClass: '200028', description: 'Fornecimento dos serviços de educação (Anexo II)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200029', description: 'Fornecimento dos serviços de saúde humana (Anexo III)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200030', description: 'Venda dos dispositivos médicos (Anexo IV)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200031', description: 'Fornecimento dos dispositivos de acessibilidade próprios para pessoas com deficiência (Anexo V)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200032', description: 'Fornecimento dos medicamentos registrados na Anvisa ou produzidos por farmácias de manipulação, ressalvados os medicamentos sujeitos à alíquota zero', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200033', description: 'Fornecimento das composições para nutrição enteral e parenteral (Anexo VI)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200034', description: 'Fornecimento dos alimentos destinados ao consumo humano (Anexo VII)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200035', description: 'Fornecimento dos produtos de higiene pessoal e limpeza (Anexo VIII)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200036', description: 'Fornecimento de produtos agropecuários, aquícolas, pesqueiros, florestais e extrativistas vegetais in natura', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200037', description: 'Fornecimento de serviços ambientais de conservação ou recuperação da vegetação nativa', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200038', description: 'Fornecimento dos insumos agropecuários e aquícolas (Anexo IX)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200039', description: 'Fornecimento dos serviços e o licenciamento ou cessão dos direitos destinados às produções nacionais artísticas (Anexo X)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200040', description: 'Fornecimento de serviços de comunicação institucional à administração pública', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200041', description: 'Fornecimento de serviço de educação desportiva (art. 141. I)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200042', description: 'Fornecimento de serviço de educação desportiva (art. 141. II)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200043', description: 'Fornecimento à administração pública dos serviços e dos bens relativos à soberania (Anexo XI)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200044', description: 'Operações e prestações de serviços de segurança da informação e segurança cibernética desenv por sociedade que tenha sócio brasileiro (Anexo XI)', ibsReduction: 60, cbsReduction: 60 },
-    { cClass: '200045', description: 'Operações relacionadas a projetos de reabilitação urbana de zonas históricas e de áreas críticas de recuperação e reconversão urbanística', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200028', description: 'Serviços de educação (Anexo II)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200029', description: 'Serviços de saúde humana (Anexo III)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200030', description: 'Dispositivos médicos (Anexo IV)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200031', description: 'Dispositivos de acessibilidade para pessoas com deficiência (Anexo V)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200032', description: 'Medicamentos registrados na Anvisa ou manipulados', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200033', description: 'Composições para nutrição enteral e parenteral (Anexo VI)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200034', description: 'Alimentos para consumo humano (Anexo VII)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200035', description: 'Produtos de higiene pessoal e limpeza (Anexo VIII)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200036', description: 'Produtos agropecuários, aquícolas, pesqueiros, florestais e extrativistas vegetais in natura', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200037', description: 'Serviços ambientais de conservação ou recuperação da vegetação nativa', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200038', description: 'Insumos agropecuários e aquícolas (Anexo IX)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200039', description: 'Serviços e licenciamento para produções nacionais artísticas (Anexo X)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200040', description: 'Serviços de comunicação institucional à administração pública', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200041', description: 'Serviço de educação desportiva (art. 141. I)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200042', description: 'Serviço de educação desportiva (art. 141. II)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200043', description: 'Serviços e bens para soberania (Anexo XI)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200044', description: 'Operações de segurança da informação e cibernética por sociedade com sócio brasileiro (Anexo XI)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '200045', description: 'Projetos de reabilitação urbana de zonas históricas', ibsReduction: 60, cbsReduction: 60 },
     { cClass: '200046', description: 'Operações com bens imóveis', ibsReduction: 50, cbsReduction: 50 },
     { cClass: '200047', description: 'Bares e Restaurantes', ibsReduction: 40, cbsReduction: 40 },
-    { cClass: '200048', description: 'Hotelaria, Parques de Diversão e Parques Temáticos', ibsReduction: 40, cbsReduction: 40 },
+    { cClass: '200048', description: 'Hotelaria, Parques de Diversão e Temáticos', ibsReduction: 40, cbsReduction: 40 },
     { cClass: '200049', description: 'Transporte coletivo de passageiros rodoviário, ferroviário e hidroviário', ibsReduction: 40, cbsReduction: 40 },
-    { cClass: '200050', description: 'Serviços de transporte aéreo regional coletivo de passageiros ou de carga', ibsReduction: 40, cbsReduction: 40 },
+    { cClass: '200050', description: 'Transporte aéreo regional de passageiros ou carga', ibsReduction: 40, cbsReduction: 40 },
     { cClass: '200051', description: 'Agências de Turismo', ibsReduction: 40, cbsReduction: 40 },
-    { cClass: '200052', description: 'Prestação de serviços de profissões intelectuais', ibsReduction: 30, cbsReduction: 30 },
+    { cClass: '200052', description: 'Serviços de profissão intelectual, científica ou artística', ibsReduction: 30, cbsReduction: 30 },
     { cClass: '220001', description: 'Incorporação imobiliária submetida ao regime especial de tributação', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '220002', description: 'Incorporação imobiliária submetida ao regime especial de tributação', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '220003', description: 'Alienação de imóvel decorrente de parcelamento do solo', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '221001', description: 'Locação, cessão onerosa ou arrendamento de bem imóvel com alíquota sobre a receita bruta', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '222001', description: 'Transporte internacional de passageiros, caso os trechos de ida e volta sejam vendidos em conjunto', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '400001', description: 'Fornecimento de serviços de transporte público coletivo de passageiros rodoviário e metroviário', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410001', description: 'Fornecimento de bonificações quando constem no documento fiscal e que não dependam de evento posterior', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410002', description: 'Transferências entre estabelecimentos pertencentes ao mesmo contribuinte', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410003', description: 'Doações sem contraprestação em benefício do doador', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '222001', description: 'Transporte internacional de passageiros (ida e volta vendidos em conjunto)', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '400001', description: 'Transporte público coletivo de passageiros rodoviário e metroviário', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410001', description: 'Bonificações em documento fiscal sem evento posterior', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410002', description: 'Transferências entre estabelecimentos do mesmo contribuinte', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410003', description: 'Doações sem contraprestação', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410004', description: 'Exportações de bens e serviços', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410005', description: 'Fornecimentos realizados pela União, pelos Estados, pelo Distrito Federal e pelos Municípios', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410006', description: 'Fornecimentos realizados por entidades religiosas e templos de qualquer culto', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410007', description: 'Fornecimentos realizados por partidos políticos', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410008', description: 'Fornecimentos de livros, jornais, periódicos e do papel destinado a sua impressão', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410009', description: 'Fornecimentos de fonogramas e videofonogramas musicais produzidos no Brasil', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410010', description: 'Fornecimentos de serviço de comunicação nas modalidades de radiodifusão sonora e de sons e imagens de recepção livre e gratuita', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410011', description: 'Fornecimentos de ouro, quando definido em lei como ativo financeiro ou instrumento cambial', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410012', description: 'Fornecimento de condomínio edilício não optante pelo regime regular', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410005', description: 'Fornecimentos pela União, Estados, DF e Municípios', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410006', description: 'Fornecimentos por entidades religiosas e templos', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410007', description: 'Fornecimentos por partidos políticos', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410008', description: 'Livros, jornais, periódicos e papel para impressão', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410009', description: 'Fonogramas e videofonogramas musicais produzidos no Brasil', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410010', description: 'Comunicação em radiodifusão sonora e de sons e imagens de recepção livre', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410011', description: 'Ouro como ativo financeiro ou instrumento cambial', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410012', description: 'Condomínio edilício não optante pelo regime regular', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410013', description: 'Exportações de combustíveis', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410014', description: 'Fornecimento de produtor rural não contribuinte', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410015', description: 'Fornecimento por transportador autônomo não contribuinte', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410016', description: 'Fornecimento ou aquisição de resíduos sólidos', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410017', description: 'Aquisição de bem móvel com crédito presumido sob condição de revenda realizada', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410018', description: 'Operações relacionadas aos fundos garantidores e executores de políticas públicas', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410017', description: 'Aquisição de bem móvel com crédito presumido sob condição de revenda', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410018', description: 'Operações relacionadas a fundos garantidores e executores de políticas públicas', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410019', description: 'Exclusão da gorjeta na base de cálculo no fornecimento de alimentação', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410020', description: 'Exclusão do valor de intermediação na base de cálculo no fornecimento de alimentação', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410021', description: 'Contribuição de que trata o art. 149-A da Constituição Federal', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410022', description: 'Consolidação da propriedade do bem pelo credor', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410023', description: 'Alienação de bens móveis ou imóveis que tenham sido objeto de garantia em que o prestador da garantia não seja contribuinte', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410023', description: 'Alienação de bens móveis ou imóveis de garantia por não contribuinte', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410024', description: 'Consolidação da propriedade do bem pelo grupo de consórcio', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410025', description: 'Alienação de bem que tenha sido objeto de garantia em que o prestador da garantia não seja contribuinte', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '410025', description: 'Alienação de bem de garantia por não contribuinte', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '410026', description: 'Doação com anulação de crédito', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '410999', description: 'Operações não onerosas sem previsão de tributação, não especificadas anteriormente', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '510001', description: 'Operações, sujeitas a diferimento, com energia elétrica, relativas à geração, comercialização, distribuição e transmissão', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '515001', description: 'Operações, sujeitas a diferimento, com insumos agropecuários e aquícolas destinados a produtor rural não contribuinte (Anexo IX)', ibsReduction: 60, cbsReduction: 60 },
+    { cClass: '410999', description: 'Operações não onerosas sem previsão de tributação', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '510001', description: 'Operações com energia elétrica (diferimento)', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '515001', description: 'Operações com insumos agropecuários e aquícolas para não contribuinte (diferimento)', ibsReduction: 60, cbsReduction: 60 },
     { cClass: '550001', description: 'Exportações de bens materiais', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '550002', description: 'Regime de Trânsito', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '550003', description: 'Regimes de Depósito (art. 85)', ibsReduction: 0, cbsReduction: 0 },
@@ -126,29 +126,35 @@ export const CNAE_CLASSES_2026: CnaeClass2026[] = [
     { cClass: '550005', description: 'Regimes de Depósito (art. 87, Parágrafo único)', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '550006', description: 'Regimes de Permanência Temporária', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '550007', description: 'Regimes de Aperfeiçoamento', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '550008', description: 'Importação de bem material por indústria incentivada para utilização na ZFM', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '550008', description: 'Importação de bem material por indústria incentivada na ZFM', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '550009', description: 'Áreas de livre comércio', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '550010', description: 'Industrialização destinada a exportações', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '620001', description: 'Tributação monofásica sobre combustíveis', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '620002', description: 'Tributação monofásica com responsabilidade pela retenção sobre combustíveis', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '620003', description: 'Tributação monofásica com tributos retidos por responsabilidade sobre combustíveis', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '620004', description: 'Tributação monofásica sobre mistura de EAC com gasolina A em percentual superior ao obrigatório', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '620005', description: 'Tributação monofásica sobre mistura de EAC com gasolina A em percentual inferior ao obrigatório', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '620003', description: 'Tributação monofásica com tributos retidos sobre combustíveis', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '620004', description: 'Tributação monofásica sobre mistura de EAC com gasolina A (superior ao obrigatório)', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '620005', description: 'Tributação monofásica sobre mistura de EAC com gasolina A (inferior ao obrigatório)', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '620006', description: 'Tributação monofásica sobre combustíveis cobrada anteriormente', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '800001', description: 'Fusão, cisão ou incorporação', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '800002', description: 'Transferência de crédito do associado, inclusive as cooperativas singulares', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '810001', description: 'Crédito presumido sobre o valor apurado nos fornecimentos a partir da ZFM', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '800002', description: 'Transferência de crédito do associado', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '810001', description: 'Crédito presumido sobre valor apurado nos fornecimentos a partir da ZFM', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '811001', description: 'Anulação de Crédito por Saídas Imunes/Isentas', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '811002', description: 'Débitos de notas fiscais não processadas na apuração', ibsReduction: 0, cbsReduction: 0 },
     { cClass: '811003', description: 'Desenquadramento do Simples Nacional', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '820001', description: 'Documento com informações de fornecimento de serviços de planos de assistência à saúde', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '820002', description: 'Documento com informações de fornecimento de serviços de planos de assistência funerária', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '820003', description: 'Documento com informações de fornecimento de serviços de planos de assistência à saúde de animais domésticos', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '820004', description: 'Documento com informações de prestação de serviços de consursos de prognósticos', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '820005', description: 'Documento com informações de alienação de bens imóveis', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '820006', description: 'Documento com informações de fornecimento de serviços de exploração de via', ibsReduction: 0, cbsReduction: 0 },
-    { cClass: '830001', description: 'Documento com exclusão da BC da CBS e do IBS de energia elétrica fornecida pela distribuidora à UC', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '820001', description: 'Documento de informações de planos de assistência à saúde', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '820002', description: 'Documento de informações de planos de assistência funerária', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '820003', description: 'Documento de informações de planos de assistência à saúde de animais domésticos', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '820004', description: 'Documento de informações de concursos de prognósticos', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '820005', description: 'Documento de informações de alienação de bens imóveis', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '820006', description: 'Documento de informações de exploração de via', ibsReduction: 0, cbsReduction: 0 },
+    { cClass: '830001', description: 'Documento com exclusão da BC de energia elétrica fornecida pela distribuidora', ibsReduction: 0, cbsReduction: 0 },
 ];
+
+export const CNAE_CLASSES_2026_MAP = CNAE_CLASSES_2026.reduce((acc, curr) => {
+    acc[curr.cClass] = curr;
+    return acc;
+}, {} as Record<string, CnaeClass2026>);
+
 
 export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     { itemLC116: '01.01', descriptionLC116: 'Análise E Desenvolvimento De Sistemas.', nationalCode: '010101', cnae: '6201501', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos e programas não personalizados (não customizados)', cClassTrib: '000001'},
@@ -198,10 +204,40 @@ export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     { itemLC116: '08.01', descriptionLC116: 'Educação infantil, ensino fundamental, médio e superior.', nationalCode: '080101', cnae: '8531700', nbs: '1.2204.10.00', nbsDescription: 'Serviços educacionais de graduação (Prouni)', cClassTrib: '200025' },
 ];
 
+/**
+ * Busca a redução de IVA para um CNAE específico
+ * @param cnaeCode Código do CNAE
+ * @param cClassTrib Classificação tributária (opcional)
+ * @returns Objeto com reduções de IBS e CBS em percentual (0-100)
+ */
+export function getReductionForActivity(
+    cnaeCode: string,
+    cClassTrib?: string
+): { reducaoIBS: number; reducaoCBS: number; cClassTrib: string } {
+    const defaultReduction = { reducaoIBS: 0, reducaoCBS: 0, cClassTrib: '000001' };
+
+    const cnaeOptions = CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === cnaeCode.replace(/\D/g, ''));
+    if (cnaeOptions.length === 0) return defaultReduction;
+
+    let targetOption: CnaeRelationship2026 | undefined;
+
+    if (cClassTrib) {
+        targetOption = cnaeOptions.find(opt => opt.cClassTrib === cClassTrib);
+    }
+
+    if (!targetOption) {
+        // Se não houver uma seleção específica, ou a seleção for inválida, pegue a primeira opção como padrão.
+        targetOption = cnaeOptions[0];
+    }
     
+    const cClassInfo = CNAE_CLASSES_2026_MAP[targetOption.cClassTrib];
+    if (!cClassInfo) return { ...defaultReduction, cClassTrib: targetOption.cClassTrib };
+
+    return {
+        reducaoIBS: cClassInfo.ibsReduction,
+        reducaoCBS: cClassInfo.cbsReduction,
+        cClassTrib: targetOption.cClassTrib
+    };
+}
 
     
-
-    
-
-

@@ -3,8 +3,8 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
-import { cn, formatBRL, parseBRL } from "@/lib/utils";
+import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info } from 'lucide-react';
+import { cn, formatBRL, parseBRL, formatPercent } from "@/lib/utils";
 import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,9 +20,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
-
-// This is the new combined component for Step 4
-// It includes CNAE selection and monthly revenue input
+import { getReductionForActivity, CNAE_CLASSES_2026_MAP } from "@/lib/cnae-data-2026";
+import { Badge } from "./ui/badge";
 
 interface FormSectionRevenueAndCnaeProps {
     year: number;
@@ -112,6 +111,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     if (!cnae) return null;
 
                                     const cnaeOptions = year >= 2026 ? getCnaeOptions(cnaeItem.code) : [];
+                                    const reduction = getReductionForActivity(cnaeItem.code, cnaeItem.cClassTrib);
 
                                     return (
                                         <div key={index} className="p-4 border rounded-lg bg-background/50 relative">
@@ -126,31 +126,52 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             </Button>
                                             <p className="font-bold text-primary pr-8">{cnae.code}</p>
                                             <p className="text-sm text-muted-foreground">{cnae.description}</p>
-                                            {year >= 2026 && cnaeOptions.length > 1 && (
-                                                 <FormField
-                                                    control={form.control}
-                                                    name={`selectedCnaes.${index}.cClass`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="mt-3">
-                                                            <FormLabel>Tipo de Serviço (Tributação)</FormLabel>
-                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                <FormControl>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Selecione a classificação do serviço..." />
-                                                                </SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                {cnaeOptions.map(opt => (
-                                                                    <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
-                                                                        {opt.nbsDescription}
-                                                                    </SelectItem>
-                                                                ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                            <FormMessage />
-                                                        </FormItem>
+                                            
+                                            {cnae.isRegulated && (
+                                                <Badge variant="outline" className="mt-2 text-amber-600 border-amber-500">Atividade Regulamentada</Badge>
+                                            )}
+                                            
+                                            {year >= 2026 && (
+                                                <div className="mt-3 space-y-3">
+                                                    {cnaeOptions.length > 1 && (
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`selectedCnaes.${index}.cClassTrib`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="text-xs font-semibold">Classificação do Serviço (Tributação)</FormLabel>
+                                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                        <FormControl>
+                                                                        <SelectTrigger>
+                                                                            <SelectValue placeholder="Selecione a classificação..." />
+                                                                        </SelectTrigger>
+                                                                        </FormControl>
+                                                                        <SelectContent>
+                                                                        {cnaeOptions.map(opt => (
+                                                                            <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
+                                                                                {opt.nbsDescription}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
                                                     )}
-                                                 />
+                                                     <div className="p-3 bg-primary/5 border border-dashed border-primary/20 rounded-lg text-sm">
+                                                        <p className="font-bold text-primary mb-1">Reduções de IVA (IBS/CBS)</p>
+                                                        <div className="flex justify-between">
+                                                            <span>Redução IBS:</span>
+                                                            <span className="font-semibold">{formatPercent(reduction.reducaoIBS / 100)}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span>Redução CBS:</span>
+                                                            <span className="font-semibold">{formatPercent(reduction.reducaoCBS / 100)}</span>
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground mt-2">{CNAE_CLASSES_2026_MAP[reduction.cClassTrib]?.description || 'Tributação padrão.'}</p>
+                                                     </div>
+                                                </div>
                                             )}
                                         </div>
                                     )
@@ -339,3 +360,5 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
+
+    

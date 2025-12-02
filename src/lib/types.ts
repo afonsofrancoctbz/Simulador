@@ -9,22 +9,15 @@ import { z } from "zod";
 // Schema for a selected CNAE, which might include a user's choice of cClass
 export const CnaeSelectionSchema = z.object({
   code: z.string(),
-  cClass: z.string().optional(), // Legacy/deprecated - maintaned for compatibility
   cClassTrib: z.string().optional(),
 });
 export type CnaeSelection = z.infer<typeof CnaeSelectionSchema>;
 
-// ATUALIZAÇÃO: Schema para CnaeItem agora inclui nbsCode e cClassTrib
+// Schema for an individual CNAE item with revenue, used in calculations
 export const CnaeItemSchema = z.object({
   code: z.string(),
   revenue: z.coerce.number().min(0, "O faturamento deve ser maior que zero.").or(z.literal(0)),
-  
-  // NOVOS CAMPOS para suportar reduções específicas de IVA
-  nbsCode: z.string().optional(),
   cClassTrib: z.string().optional(),
-  
-  // Mantido para compatibilidade (deprecado)
-  cClass: z.string().optional(),
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
@@ -190,9 +183,6 @@ export interface FeeBracket {
 // PGDAS and Fator R ANALYSIS SCHEMAS
 // =================================================================================
 
-/**
- * Schema para os dados mensais da janela móvel (12 meses)
- */
 export const MonthlyDataSchema = z.object({
   mes: z.string().describe("Formato MM/AAAA"),
   receita: z.number().min(0, 'Receita não pode ser negativa').describe("Valor monetário da receita"),
@@ -200,10 +190,6 @@ export const MonthlyDataSchema = z.object({
 });
 export type MonthlyData = z.infer<typeof MonthlyDataSchema>;
 
-
-/**
- * Schema Zod para validação dos dados extraídos do PGDAS-D
- */
 export const PgdasDataSchema = z.object({
   competencias: z.array(MonthlyDataSchema).describe("Lista extraída das tabelas '2.2 Receitas Brutas Anteriores' e '2.3 Folha de Salários'"),
   totalRBT12: z
@@ -235,21 +221,15 @@ export const PgdasDataSchema = z.object({
 });
 export type PgdasData = z.infer<typeof PgdasDataSchema>;
 
-
-/**
- * Schema para a resposta da análise de projeção do Fator R
- */
 export const FatorRResponseSchema = z.object({
-  fatorR_Atual: z.number(),           // Fator R atual (Ex: 0.2792)
-  isEnquadradoAgora: z.boolean(),     // Se o Fator R atual >= 0.28
-  mesesParaEnquadramento: z.number(), // Meses projetados (Ex: 12). Retorna 0 se já enquadrado.
+  fatorR_Atual: z.number(),
+  isEnquadradoAgora: z.boolean(),
+  mesesParaEnquadramento: z.number(),
   statusMensagem: z.enum(['success', 'warning', 'info', 'error']),
-  textoMensagem: z.string(),          // O "prompt" exato para exibir no balão/tooltip.
+  textoMensagem: z.string(),
 });
 export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 
-
-// --- Fator R Migration Analysis Schemas ---
 export const DadosMensaisSchema = z.object({
   mes: z.string(),
   receita: z.number(),
@@ -326,38 +306,6 @@ export type AnaliseCompleta = z.infer<typeof AnaliseCompletaSchema>;
 // TAX REFORM (2026+) SPECIFIC INTERFACES
 // =================================================================================
 
-export interface NBSReduction {
-  nbs: string;
-  descricao: string;
-  cClassTrib: string;
-  cClassTribDescricao: string;
-  reducaoIBS: number; // em decimal (0.60 = 60%)
-  reducaoCBS: number; // em decimal (0.60 = 60%)
-  itemLC116: string;
-  itemLC116Descricao: string;
-}
-
-export interface CNAEWithReductions {
-  code: string;
-  description: string;
-  annex?: Annex;
-  requiresFatorR?: boolean;
-  presumedProfitRateIRPJ?: number;
-  reductions: NBSReduction[];
-  defaultReduction?: {
-    ibs: number;
-    cbs: number;
-  };
-}
-
-export interface ActivitySelection {
-  cnaeCode: string;
-  selectedNBS?: string; // Opcional - se não especificado, usa defaultReduction
-  selectedCClassTrib?: string; // Para casos onde mesmo NBS tem múltiplas classificações
-  revenue: number;
-  description?: string; // Descrição customizada pelo usuário
-}
-
 export interface ActivityWithReduction extends CnaeItem {
   nbsDescription?: string;
   cClassTribDescription?: string;
@@ -371,8 +319,8 @@ export function activityToItem(activity: ActivityWithReduction): CnaeItem {
   return {
     code: activity.code,
     revenue: activity.revenue,
-    nbsCode: activity.nbsCode,
     cClassTrib: activity.cClassTrib,
-    cClass: activity.cClass, // mantido para compatibilidade
   };
 }
+
+    
