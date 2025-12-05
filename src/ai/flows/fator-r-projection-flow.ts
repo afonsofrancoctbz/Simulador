@@ -1,3 +1,4 @@
+
 'use server';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
@@ -54,7 +55,7 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
             fatorR_Atual,
             isEnquadradoAgora: true,
             mesesParaEnquadramento: 0,
-            statusMensagem: 'success' as const, // Fix: Tipagem literal explícita
+            statusMensagem: 'success',
             textoMensagem: TEXTS.success( (fatorR_Atual * 100).toFixed(2) )
         };
     }
@@ -101,7 +102,7 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
             fatorR_Atual,
             isEnquadradoAgora: false,
             mesesParaEnquadramento: meses,
-            statusMensagem: 'warning' as const, // Fix: Tipagem literal explícita
+            statusMensagem: 'warning',
             textoMensagem: TEXTS.warning_projection(fatorRStr, meses, proLaboreStr) + TEXTS.warning_disclaimer
         };
     } else {
@@ -110,7 +111,7 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
             fatorR_Atual,
             isEnquadradoAgora: false,
             mesesParaEnquadramento: -1, // Sinaliza que não atingiu
-            statusMensagem: 'error' as const, // Fix: Tipagem literal explícita
+            statusMensagem: 'error',
             textoMensagem: TEXTS.error_unreachable(fatorRStr, proLaboreStr)
         };
     }
