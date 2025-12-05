@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -17,6 +15,8 @@ import type { AnaliseCompleta, DadosMensais } from '@/lib/fator-r-migration-logi
 import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
 import { format } from 'date-fns';
 import { YearSelector } from './year-selector';
+// Importamos a tabela para garantir que o relatório esteja completo
+import { ComparisonTable } from './comparison-table';
 
 interface TaxResultsProps {
   year: number;
@@ -40,13 +40,15 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     if (!results) return [];
     
     let scenarios: (TaxDetails | null)[] = [];
-    if ('simplesNacionalBase' in results) { // 2025 results
+    
+    // Type Guard: Verifica se é o tipo de resultado de 2025 (tem simplesNacionalBase)
+    if ('simplesNacionalBase' in results) { 
        scenarios = [
         results.simplesNacionalOtimizado,
         results.simplesNacionalBase,
         results.lucroPresumido,
       ];
-    } else if ('lucroPresumido' in results) { // 2026 results
+    } else if ('simplesNacionalHibrido' in results) { // Validação correta para 2026
        scenarios = [
           results.simplesNacionalOtimizado,
           results.simplesNacionalOtimizadoHibrido,
@@ -89,7 +91,8 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
   }, [selectedScenarioId, scenariosToShow]);
 
   const fatorRAnalysisData: AnaliseCompleta | null = useMemo(() => {
-    if (!results || !results.simplesNacionalBase || results.simplesNacionalOtimizado) {
+    // Verificação segura de propriedade ('in' operator)
+    if (!results || !('simplesNacionalBase' in results) || !results.simplesNacionalBase || results.simplesNacionalOtimizado) {
         return null;
     }
 
@@ -111,7 +114,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     
     try {
         const analysis = gerarAnaliseCompleta(dadosMensais, 4);
-        if(analysis.jaOtimizado) return null; // Não mostra se já estiver otimizado.
+        if(analysis.jaOtimizado) return null;
         return analysis;
     } catch (e) {
         return null;
@@ -126,10 +129,10 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
           <Skeleton className="h-10 w-1/2 mx-auto" />
           <Skeleton className="h-5 w-3/4 mx-auto mt-4" />
         </div>
-        <div className='max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8'>
-          <Skeleton className="h-[450px] w-full max-w-sm rounded-xl" />
-          <Skeleton className="h-[450px] w-full max-w-sm rounded-xl" />
-          <Skeleton className="h-[450px] w-full max-w-sm rounded-xl" />
+        <div className='max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8'>
+          <Skeleton className="h-[450px] w-full rounded-xl" />
+          <Skeleton className="h-[450px] w-full rounded-xl" />
+          <Skeleton className="h-[450px] w-full rounded-xl" />
         </div>
       </div>
     );
@@ -186,21 +189,18 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     
   return (
     <div id="results-section" className="mt-16 w-full space-y-12">
-      <div>
-        <div className="text-center mb-8 print-hidden">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Sua Análise Tributária</h2>
-          <p className="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
-            Comparamos os regimes para encontrar o menor custo para sua empresa. A recomendação destaca o cenário mais econômico.
-          </p>
-        </div>
-
+      <div className="results-container mt-8">
         {year >= 2026 && onYearChange && (
-          <div className="sticky top-[68px] z-20 py-4 mb-8 bg-background/80 backdrop-blur-sm -mt-8 print-hidden">
+          <div className="py-4 print-hidden mb-4 relative">
              <YearSelector selectedYear={year} onYearChange={onYearChange} />
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row flex-wrap justify-center items-stretch gap-8 results-grid">
+        {/* ALTERAÇÃO DE LAYOUT (SIMETRIA):
+            1. Substituído 'place-items-center' por 'items-stretch' -> Força mesma altura para todos os cards
+            2. gap-8 mantido para bom espaçamento
+        */}
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch results-grid mb-12">
           {scenariosToShow.map((scenario) => {
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
             
@@ -217,7 +217,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             const groupedTaxes = groupTaxes(scenario);
             const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / scenario.totalRevenue : 0;
 
-            let title = scenario.regime.replace(/ \(.+\)/, ''); // Remove parênteses como (Anexo V)
+            let title = scenario.regime.replace(/ \(.+\)/, ''); 
             let subtitle = scenario.regime.match(/\((.+)\)/)?.[1] || '';
 
 
@@ -229,7 +229,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                   title = 'Simples Nacional';
                   subtitle = scenario.regime.replace('Simples Nacional', '').trim();
                 }
-            } else { // year 2025
+            } else { 
                 if (scenario.regime === 'Simples Nacional (Otimizado)') {
                     title = 'Simples Nacional';
                     subtitle = 'Com Fator R Otimizado (Anexo III)';
@@ -239,25 +239,18 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 }
             }
             
-
             const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva|ibs|cbs/));
-            const totalRevenueTaxes = revenueTaxes.reduce((sum, tax) => sum + tax.value, 0);
-            const effectiveRevenueTaxRate = scenario.totalRevenue > 0 ? totalRevenueTaxes / scenario.totalRevenue : 0;
-
-            const domesticRevenue = scenario.domesticRevenue ?? 0;
-            const exportRevenue = scenario.exportRevenue ?? 0;
-
-            let projectionIcon = BadgeInfo;
-            if (projectionStatus === 'success') projectionIcon = CheckCircle;
-            if (projectionStatus === 'warning') projectionIcon = AlertTriangle;
-            if (projectionStatus === 'error') projectionIcon = AlertTriangle;
-
 
             return (
+              /* ALTERAÇÃO CARD (SIMETRIA):
+                 1. Removido 'max-w-sm' -> Permite que o card ocupe toda a largura da coluna grid
+                 2. Adicionado 'h-full' -> Garante que o card ocupe toda a altura (esticado pelo items-stretch do pai)
+                 3. Adicionado 'w-full' -> Força largura total
+              */
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 onClick={() => setSelectedScenarioId({regime: scenario.regime, optimizationNote: scenario.optimizationNote ?? null})}
                 className={cn(
-                  "border rounded-xl w-full max-w-sm flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer printable-card",
+                  "border rounded-xl w-full flex flex-col h-full transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer printable-card",
                   isRecommended ? "border-primary shadow-lg" : "border-border bg-card",
                   isSelected && !isRecommended && "ring-2 ring-primary",
                   isCurrentLpFor2026 && "bg-slate-50 opacity-80"
@@ -266,26 +259,18 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                   {isRecommended && (
                    <Badge className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 print-hidden" variant="default" >
                       Recomendado
-                  </Badge>
+                   </Badge>
                   )}
                   <div className={cn("p-2 rounded-t-xl text-center overflow-hidden", isRecommended ? "bg-primary/5" : "bg-muted/30")}>
-
                       <h3 className="text-xl font-bold text-foreground mt-2">{title}</h3>
                       <p className={cn("font-semibold", isRecommended ? "text-primary" : "text-muted-foreground")}>{subtitle}</p>
-
                   </div>
 
+                  {/* flex-grow aqui garante que este bloco empurre o rodapé para baixo, alinhando visualmente o final de todos os cards */}
                   <div className="px-4 pb-4 pt-2 flex-grow space-y-1">
                       <div className='text-center py-1 my-1 bg-muted/40 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
                         <div className='text-lg font-bold text-foreground'>{formatCurrencyBRL(scenario.totalRevenue)}</div>
-                        {exportRevenue > 0 && (
-                            <div className="text-xs text-muted-foreground">
-                                {domesticRevenue > 0 && <span>Nac: {formatCurrencyBRL(domesticRevenue)}</span>}
-                                {domesticRevenue > 0 && exportRevenue > 0 && <span> + </span>}
-                                {exportRevenue > 0 && <span>Exp: {formatCurrencyBRL(exportRevenue)}</span>}
-                            </div>
-                        )}
                       </div>
                       
                       <div className='text-center py-1 mb-1 bg-muted/40 rounded-md'>
@@ -309,7 +294,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                             <div className="space-y-1">
                             {filteredItems.map(item => {
                                 const showRate = item.rate !== undefined && !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
-                                
                                 return (
                                 <div key={item.name} className="flex justify-between items-center text-sm">
                                     <span className="text-foreground flex items-center gap-1.5">
@@ -324,19 +308,12 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                                 </div>
                               )})}
                             </div>
-                            
-                            {scenario.regime.includes('Lucro Presumido') && groupName.includes('TRIMESTRAL') && (
-                                <div className="text-right rounded-lg pt-1 text-xs font-semibold flex items-center justify-end gap-2">
-                                  <div className='border-primary/50 text-primary/90 rounded-md px-2 py-0.5 text-sm'>
-                                    <span>Alíquota Efetiva s/ Faturamento: {formatPercent(effectiveRevenueTaxRate)}</span>
-                                  </div>
-                                </div>
-                            )}
                           </div>
                         );
                       })}
                   </div>
                 
+                  {/* mt-auto garante que o bloco de notas e o total fiquem fixos na parte inferior */}
                   <div className="p-4 mt-auto space-y-2 bg-muted/30 rounded-b-xl">
                       {fatorRProjection && !fatorRProjection.isEnquadradoAgora && projectionNote && (
                         <Alert variant="default" className={cn("p-3", {
@@ -363,13 +340,12 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
-                                <span>
-                                    {scenario.optimizationNote}
-                                </span>
+                                <span>{scenario.optimizationNote}</span>
                             </AlertDescription>
                         </Alert>
                       )}
-                        {isCurrentLpFor2026 && (
+                      
+                      {isCurrentLpFor2026 && (
                             <Alert variant="default" className="bg-sky-100/80 border-sky-200/80 text-sky-900 p-3">
                                 <AlertDescription className="text-xs font-medium flex items-start gap-2">
                                     <Info className="h-4 w-4 mt-0.5 shrink-0" />
@@ -383,9 +359,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
-                                <span>
-                                    {scenario.notes.join(' ')}
-                                </span>
+                                <span>{scenario.notes.join(' ')}</span>
                             </AlertDescription>
                         </Alert>
                       )}
@@ -407,11 +381,17 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             )
           })}
         </div>
+        
+        {/* Nova Tabela Comparativa (Solicitada anteriormente) */}
+        <div className="max-w-7xl mx-auto px-1 sm:px-4 mb-16">
+          <ComparisonTable scenarios={scenariosToShow} />
+        </div>
+
       </div>
       
       {fatorRAnalysisData && (
         <div className="mt-12 border-t pt-8 animate-in slide-in-from-bottom-4">
-             <div className="text-center mb-8">
+              <div className="text-center mb-8">
                 <span className="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">
                     OPORTUNIDADE IDENTIFICADA
                 </span>

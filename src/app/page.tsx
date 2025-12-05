@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -18,8 +17,6 @@ import SociiLawSection from '@/components/socii-law-section';
 import TaxCalculator from '@/components/tax-calculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FloatingNav from '@/components/floating-nav';
-import { YearSelector } from '@/components/year-selector';
-
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
@@ -29,113 +26,141 @@ export default function Home() {
   return (
     <>
       <AppHeader />
-      <main className="relative">
+      <main className="relative bg-slate-50">
         <FloatingNav />
+        
         <div className='print-hidden'>
-            <section id="tax-calculator" className="bg-slate-50/70 border-b">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center">
-                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
-                  <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto pb-12">
+            <section id="tax-calculator" className="bg-white border-b border-slate-200">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 text-center">
+                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+                    Simule Seus Impostos
+                  </h1>
+                  <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
                     Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
                   </p>
                 </div>
             </section>
         </div>
 
-        <Tabs defaultValue="2025" className="w-full">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
-                <div className="w-full flex justify-center">
-                    <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
-                        <TabsTrigger value="2025">Cenário Atual (2025)</TabsTrigger>
-                        <TabsTrigger value="2026">Pós-Reforma (2026-2033)</TabsTrigger>
+        {/* Container Principal da Calculadora */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 print-hidden">
+            <Tabs defaultValue="2025" className="w-full">
+                <div className="w-full flex justify-center mb-8">
+                    <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto h-12 bg-white border border-slate-200 shadow-sm p-1">
+                        <TabsTrigger 
+                          value="2025"
+                          className="data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium transition-all"
+                        >
+                          Cenário Atual (2025)
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="2026"
+                          className="data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium transition-all"
+                        >
+                          Pós-Reforma (2026-2033)
+                        </TabsTrigger>
                     </TabsList>
                 </div>
-            </div>
-            <TabsContent value="2025">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <TaxCalculator key="2025" year={2025} onExportRevenueChange={setShowExportInfo} onResultsChange={setShowResults}/>
-                </div>
-            </TabsContent>
-            <TabsContent value="2026">
-                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <TaxCalculator 
-                        year={selectedYear} 
-                        onExportRevenueChange={setShowExportInfo} 
-                        onResultsChange={(hasResults) => {
-                            setShowResults(hasResults);
-                        }}
-                        onYearChange={setSelectedYear} 
-                    />
-                </div>
-            </TabsContent>
-        </Tabs>
+
+                <TabsContent value="2025" className="animate-in fade-in zoom-in-95 duration-300">
+                    <div className="py-4">
+                        <TaxCalculator 
+                            key="2025" 
+                            year={2025} 
+                            onExportRevenueChange={setShowExportInfo} 
+                            onResultsChange={setShowResults}
+                        />
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="2026" className="animate-in fade-in zoom-in-95 duration-300">
+                     <div className="py-4">
+                        {/* Aqui passamos o selectedYear controlado pelo estado da página.
+                           Se o usuário mudar o ano lá dentro do formulário, o onYearChange atualiza aqui.
+                        */}
+                        <TaxCalculator 
+                            key="2026-plus"
+                            year={selectedYear} 
+                            onExportRevenueChange={setShowExportInfo} 
+                            onResultsChange={(hasResults) => {
+                                setShowResults(hasResults);
+                            }}
+                            onYearChange={setSelectedYear} 
+                        />
+                    </div>
+                </TabsContent>
+            </Tabs>
+        </div>
         
+        {/* Espaço reservado para impressão */}
         <div id="results-print-only" className='hidden print:block'></div>
         
+        {/* Seção Informativa de Exportação (Condicional) */}
         {showExportInfo && (
-           <section className="py-16 lg:py-24 bg-background print-hidden">
+           <section className="py-16 bg-white border-t border-slate-100 print-hidden animate-in slide-in-from-bottom-8">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <ExportTaxInfoSection />
             </div>
           </section>
         )}
 
-        <div className='print-hidden'>
-            <section id="opening-steps" className="py-16 lg:py-24 bg-background">
+        {/* Seções Institucionais (Rodapé da Landing Page) */}
+        <div className='print-hidden space-y-px bg-slate-200'>
+            <section id="opening-steps" className="py-16 lg:py-24 bg-white">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <OpeningStepsSection />
               </div>
             </section>
             
-            <section id="digital-certificate" className="py-16 lg:py-24 bg-slate-50/70">
+            <section id="digital-certificate" className="py-16 lg:py-24 bg-slate-50">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <DigitalCertificateSection />
               </div>
             </section>
 
-            <section id="roc" className="py-16 lg:py-24 bg-background">
+            <section id="roc" className="py-16 lg:py-24 bg-white">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <RocSection />
               </div>
             </section>
 
-            <section id="pj-account" className="py-16 lgpy-24 bg-slate-50/70">
+            <section id="pj-account" className="py-16 lg:py-24 bg-slate-50">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <PjAccountSection />
               </div>
             </section>
             
-            <section id="capital-social" className="py-16 lg:py-24 bg-background">
+            <section id="capital-social" className="py-16 lg:py-24 bg-white">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <CapitalSocialSection />
               </div>
             </section>
 
-            <section id="health-benefits" className="py-16 lg:py-24 bg-slate-50/70">
+            <section id="health-benefits" className="py-16 lg:py-24 bg-slate-50">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <BenefitsSection />
               </div>
             </section>
 
-            <section id="multibenefits-section" className="py-16 lg:py-24 bg-background">
+            <section id="multibenefits-section" className="py-16 lg:py-24 bg-white">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <MultibenefitsSection />
               </div>
             </section>
             
-            <section id="contabilizei-mais" className="py-16 lg:py-24 bg-slate-50/70">
+            <section id="contabilizei-mais" className="py-16 lg:py-24 bg-slate-50">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <ContabilizeiMaisSection />
               </div>
             </section>
 
-             <section id="socii-law" className="py-16 lg:py-24 bg-background">
+             <section id="socii-law" className="py-16 lg:py-24 bg-white">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <SociiLawSection />
               </div>
             </section>
 
-             <section id="faq" className="py-16 lg:py-24 bg-slate-50/70">
+             <section id="faq" className="py-16 lg:py-24 bg-slate-50">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <FaqSection />
               </div>

@@ -13,7 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { extractDataFromPgdas } from '@/ai/flows/extract-pgdas-flow';
-import type { PgdasData, DadosMensais, AnaliseCompleta, ProjecaoMes } from '@/lib/fator-r-migration-logic';
+// CORREÇÃO: Importar tipos de '@/lib/types' em vez de '@/lib/fator-r-migration-logic'
+import type { PgdasData, DadosMensais, AnaliseCompleta, ProjecaoMes } from '@/lib/types';
 import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
 import { formatCurrencyBRL, formatPercent, formatBRL, parseBRL } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
@@ -438,6 +439,3 @@ function calcularAliquotaEfetivaAnexoIII(rbt12: number): number {
   const faixa = faixas.find(f => rbt12 <= f.ate) || faixas[faixas.length - 1];
   return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
 }
-
-
-    
