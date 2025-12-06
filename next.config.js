@@ -45,6 +45,12 @@ const nextConfig = {
     '@genkit-ai/googleai',
     '@opentelemetry/instrumentation',
   ],
+  experimental: {
+    // This is required to allow requests from the Firebase Studio preview environment
+    allowedDevOrigins: [
+      'https://*.cloudworkstations.dev',
+    ],
+  }
 };
 
 module.exports = nextConfig;
