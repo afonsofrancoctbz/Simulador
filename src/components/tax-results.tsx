@@ -49,6 +49,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
         results.lucroPresumido,
       ];
     } else if ('simplesNacionalHibrido' in results) { // Validação correta para 2026
+        // CORREÇÃO: Type Assertion para forçar o TS a aceitar os regimes novos de 2026
        scenarios = [
           results.simplesNacionalOtimizado,
           results.simplesNacionalOtimizadoHibrido,
@@ -56,7 +57,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
           results.simplesNacionalHibrido,
           results.lucroPresumido,
           results.lucroPresumidoAtual,
-      ];
+      ] as (TaxDetails | null)[];
     }
 
     const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));

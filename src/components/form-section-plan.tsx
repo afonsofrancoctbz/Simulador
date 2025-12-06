@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useFormContext } from "react-hook-form";
@@ -27,8 +25,10 @@ export function FormSectionPlan() {
     const selectedCnaes = form.watch("selectedCnaes");
     
     const isCommerceOnly = useMemo(() => {
-        if (selectedCnaes.length === 0) return false;
-        return selectedCnaes.every(code => getCnaeData(code)?.annex === 'I');
+        if (!selectedCnaes || selectedCnaes.length === 0) return false;
+        
+        // CORREÇÃO: O 'cnae' aqui é um objeto, precisamos passar 'cnae.code'
+        return selectedCnaes.every(cnae => getCnaeData(cnae.code)?.annex === 'I');
     }, [selectedCnaes]);
       
     useEffect(() => {
@@ -93,8 +93,8 @@ export function FormSectionPlan() {
                                                        field.value === plan.value && isExperts && "text-amber-900",
                                                        field.value === plan.value && !isExperts && "text-primary",
 
-                                                    )}>
-                                                      {plan.title}
+                                                     )}>
+                                                       {plan.title}
                                                   </span>
                                               </Label>
                                           </FormItem>
@@ -110,5 +110,3 @@ export function FormSectionPlan() {
         </Card>
     );
 }
-
-    

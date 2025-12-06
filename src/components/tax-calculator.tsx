@@ -22,31 +22,49 @@ interface TaxCalculatorProps {
 }
 
 export default function TaxCalculator({ year, onExportRevenueChange, onResultsChange, onYearChange }: TaxCalculatorProps) {
+    // O hook useTaxCalculator recebe o ano atualizado.
+    // Presume-se que o onSubmit retornado por ele já contemple a lógica do ano passado.
     const { form, onSubmit, results, isLoading, error, selectedCity, fatorRProjection } = useTaxCalculator(year);
     const [isCnaeSelectorOpen, setIsCnaeSelectorOpen] = useState(false);
     
     const watchSelectedCnaes = form.watch('selectedCnaes');
-    const watchRevenues = form.watch('revenues');
+    // watchRevenues retorna um objeto onde os valores podem ser undefined
+    const watchRevenues = form.watch('revenues') || {}; 
 
+    // EFFECT 1: Monitora Receita de Exportação
     useEffect(() => {
+        if (!watchRevenues) return;
+
         const hasExportRevenue = Object.entries(watchRevenues)
             .filter(([key]) => key.startsWith('export_'))
-            .some(([, value]) => value > 0);
+            // CORREÇÃO: Usamos (value ?? 0) para garantir que seja um número, mesmo se undefined
+            .some(([, value]) => (value ?? 0) > 0);
+            
         onExportRevenueChange(hasExportRevenue);
     }, [watchRevenues, onExportRevenueChange]);
 
+    // EFFECT 2: Comunica ao pai se tem resultados
     useEffect(() => {
         onResultsChange(results !== null && !isLoading && !error);
     }, [results, isLoading, error, onResultsChange]);
 
+    // EFFECT 3 (NOVO): Recálculo Automático ao mudar o Ano
+    // Se o ano mudar E já tivermos resultados na tela (o usuário já calculou antes),
+    // disparamos o onSubmit novamente para atualizar os valores sem o usuário precisar clicar.
+    useEffect(() => {
+        if (results !== null) {
+            // handleSubmit executa a validação e, se ok, chama o onSubmit
+            form.handleSubmit(onSubmit)();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [year]); // Dependência principal: year. 
+
     const handleConfirmCnaes = (cnaes: CnaeSelection[]) => {
         form.setValue('selectedCnaes', cnaes, { shouldValidate: true, shouldDirty: true });
-        // After selecting, let's move to the next logical step if they were at step 1
-        // This is a UX improvement
     };
 
-    const hasHealthCnae = watchSelectedCnaes.some(c => getCnaeData(c.code)?.category === "Saúde e Bem-estar");
-    const hasOdontologyCnae = watchSelectedCnaes.some(c => getCnaeData(c.code)?.category === "Odontologia");
+    const hasHealthCnae = watchSelectedCnaes?.some(c => getCnaeData(c.code)?.category === "Saúde e Bem-estar");
+    const hasOdontologyCnae = watchSelectedCnaes?.some(c => getCnaeData(c.code)?.category === "Odontologia");
 
     return (
         <>

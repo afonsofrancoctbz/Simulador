@@ -1,5 +1,3 @@
-
-
 'use server';
 
 /**
@@ -11,7 +9,6 @@
 import {ai} from '@/ai/genkit';
 import { calculateTaxes } from '@/lib/calculations';
 import { CNAE_DATA_RAW } from '@/lib/cnaes-raw';
-import { getFiscalParameters } from '@/config/fiscal';
 import type { CalculationResults, TaxFormValues } from '@/lib/types';
 import { CalculationResultsSchema, TaxFormValuesSchema } from '@/lib/types';
 import { getCnaeData } from '@/lib/cnae-helpers';
@@ -29,10 +26,10 @@ const calculateTaxesFlow = ai.defineFlow(
   },
   async (formValues) => {
     
-    const fiscalConfig = getFiscalParameters(2025);
+    // A lógica de obter parametros fiscais agora é interna do calculateTaxes
+    // ou não é mais necessária como injeção externa.
     
-    // Here we call the new, pure calculation logic.
-    const results = calculateTaxes(formValues, fiscalConfig);
+    const results = calculateTaxes(formValues);
     return results;
   }
 );

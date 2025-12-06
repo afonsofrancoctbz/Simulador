@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -93,10 +92,10 @@ export function useTaxCalculator(year: number) {
         values.selectedCnaes.forEach(item => {
             const cnae = getCnaeData(item.code);
             if (cnae) {
-                // For this transformation, we use the base annex. Fator R logic will be applied in the backend.
                 const annex = cnae.annex;
                 if (!cnaesByAnnex[annex]) cnaesByAnnex[annex] = [];
-                cnaesByAnnex[annex].push({ code: item.code, cClass: item.cClass });
+                // Aqui armazenamos como 'cClass' internamente neste objeto agrupado
+                cnaesByAnnex[annex].push({ code: item.code, cClass: item.cClassTrib });
             }
         });
 
@@ -110,7 +109,12 @@ export function useTaxCalculator(year: number) {
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
                     const revenuePerCnae = revenue / cnaesInAnnex.length;
                     cnaesInAnnex.forEach(cnaeItem => {
-                        domesticActivities.push({ code: cnaeItem.code, revenue: revenuePerCnae, cClass: cnaeItem.cClass });
+                        // CORREÇÃO: Mapeamos a propriedade interna 'cClass' para a esperada 'cClassTrib'
+                        domesticActivities.push({ 
+                            code: cnaeItem.code, 
+                            revenue: revenuePerCnae, 
+                            cClassTrib: cnaeItem.cClass 
+                        });
                     });
                 }
             }
@@ -126,7 +130,12 @@ export function useTaxCalculator(year: number) {
                 if (revenue > 0 && cnaesInAnnex && cnaesInAnnex.length > 0) {
                     const revenuePerCnae = revenue / cnaesInAnnex.length;
                     cnaesInAnnex.forEach(cnaeItem => {
-                        exportActivities.push({ code: cnaeItem.code, revenue: revenuePerCnae, cClass: cnaeItem.cClass });
+                        // CORREÇÃO: Mapeamos a propriedade interna 'cClass' para a esperada 'cClassTrib'
+                        exportActivities.push({ 
+                            code: cnaeItem.code, 
+                            revenue: revenuePerCnae, 
+                            cClassTrib: cnaeItem.cClass 
+                        });
                     });
                 }
             }
@@ -145,8 +154,8 @@ export function useTaxCalculator(year: number) {
             selectedPlan: values.selectedPlan,
             rbt12: values.rbt12 ?? 0,
             fp12: values.fp12 ?? 0,
-            issRate: values.issRate, // Keep as percentage
-            revenues: values.revenues, // Correctly include the revenues object
+            issRate: values.issRate, 
+            revenues: values.revenues, 
             domesticActivities,
             exportActivities,
             exportCurrency: values.exportCurrency,
@@ -161,7 +170,6 @@ export function useTaxCalculator(year: number) {
 
     async function onSubmit(values: CalculatorFormValues) {
         
-        // We use getValues() here to ensure we get the latest form state at the time of submission.
         const isValid = await form.trigger();
         if (!isValid) {
             toast({
@@ -177,7 +185,9 @@ export function useTaxCalculator(year: number) {
         setError(null);
         setSelectedCity(values.city);
 
-        // Ensure calculation happens after UI update
+        // CORREÇÃO: Garantir que o ano de cálculo nunca seja undefined
+        const calculationYear = values.year ?? year;
+
         setTimeout(() => {
             document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
@@ -185,22 +195,22 @@ export function useTaxCalculator(year: number) {
         const submissionValues = transformFormToSubmission(values);
 
         try {
-            if (values.year <= 2025) {
+            if (calculationYear <= 2025) {
                 const calculatedResults = await calculateTaxesOnServer(submissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo não retornou resultados.");
                 setResults(calculatedResults);
 
-            } else { // Year is 2026 or later
+            } else { 
                 const calculatedResults = await calculateTaxes2026OnServer(submissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo para 2026 não retornou resultados.");
                 setResults(calculatedResults);
             }
         } catch (e) {
-            console.error(`Erro ao calcular impostos (${values.year}):`, e);
+            console.error(`Erro ao calcular impostos (${calculationYear}):`, e);
             const errorMessage = e instanceof Error ? e.message : "Ocorreu um erro inesperado.";
             setError(`Falha no cálculo. Por favor, verifique os dados e tente novamente. Detalhe: ${errorMessage}`);
             toast({
-                title: `Erro no Cálculo (${values.year})`,
+                title: `Erro no Cálculo (${calculationYear})`,
                 description: "Não foi possível completar o cálculo. Tente novamente mais tarde.",
                 variant: "destructive",
             });

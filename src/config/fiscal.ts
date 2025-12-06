@@ -194,7 +194,8 @@ const TRANSITION_TABLE = {
     2033: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs, pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
 } as const; // 'as const' para garantir que os valores não sejam alterados
 
-export function getFiscalParameters(year: 2025 | 2026): FiscalConfigType {
+// CORREÇÃO AQUI: FiscalConfigType -> FiscalConfig
+export function getFiscalParameters(year: 2025 | 2026): FiscalConfig {
   // Retorna uma cópia profunda para evitar mutações acidentais por quem chama a função
   if (year === 2026) {
     return structuredClone(FISCAL_CONFIG_2026);
@@ -202,7 +203,8 @@ export function getFiscalParameters(year: 2025 | 2026): FiscalConfigType {
   return structuredClone(FISCAL_CONFIG_2025);
 }
 
-export function getFiscalParametersPostReform(year: number): FiscalConfigType {
+// CORREÇÃO AQUI: FiscalConfigType -> FiscalConfig
+export function getFiscalParametersPostReform(year: number): FiscalConfig {
     // 1. Obter configuração base e garantir CLONAGEM PROFUNDA
     // O spread (...) não clona objetos aninhados como 'simples_nacional', o que causaria bugs severos.
     const baseConfig = getFiscalParameters(year === 2025 ? 2025 : 2026);

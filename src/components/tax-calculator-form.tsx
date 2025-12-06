@@ -25,9 +25,9 @@ export const CalculatorFormSchema = z.object({
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
   issRate: z.coerce.number({invalid_type_error: "A alíquota de ISS deve ser um número."})
-             .min(2, "A alíquota de ISS deve ser no mínimo 2%.")
-             .max(5, "A alíquota de ISS não pode ser maior que 5%.")
-             .optional(),
+              .min(2, "A alíquota de ISS deve ser no mínimo 2%.")
+              .max(5, "A alíquota de ISS não pode ser maior que 5%.")
+              .optional(),
   totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
   proLabores: z.array(ProLaboreFormSchema).min(1),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
@@ -36,8 +36,10 @@ export const CalculatorFormSchema = z.object({
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
   year: z.number().optional(),
 }).refine(data => {
-    const totalRevenue = Object.values(data.revenues || {}).reduce((acc, revenue) => acc + (revenue || 0), 0);
-    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
+    // CORREÇÃO: Adicionada tipagem explícita (acc: number) para evitar erro de inferência
+    const totalRevenue = Object.values(data.revenues || {}).reduce((acc: number, revenue) => acc + (revenue || 0), 0);
+    const totalProLabore = data.proLabores.reduce((acc: number, pl) => acc + (pl.value || 0), 0);
+    
     return totalRevenue > 0 || totalProLabore > 0 || (data.rbt12 ?? 0) > 0 || data.selectedCnaes.length > 0;
 }, {
     message: "Informe ao menos um valor de faturamento para calcular.",

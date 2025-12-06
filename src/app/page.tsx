@@ -20,48 +20,36 @@ import FloatingNav from '@/components/floating-nav';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
+  // Nota: showResults está declarado mas não está sendo usado no JSX abaixo. 
+  // Mantive o estado caso você pretenda usá-lo futuramente.
   const [showResults, setShowResults] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(2026);
 
   return (
     <>
-      <AppHeader />
-      <main className="relative bg-slate-50">
-        <FloatingNav />
-        
-        <div className='print-hidden'>
-            <section id="tax-calculator" className="bg-white border-b border-slate-200">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 text-center">
-                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
-                    Simule Seus Impostos
-                  </h1>
-                  <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
-                    Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
-                  </p>
-                </div>
-            </section>
-        </div>
-
-        {/* Container Principal da Calculadora */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 print-hidden">
-            <Tabs defaultValue="2025" className="w-full">
-                <div className="w-full flex justify-center mb-8">
-                    <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto h-12 bg-white border border-slate-200 shadow-sm p-1">
-                        <TabsTrigger 
-                          value="2025"
-                          className="data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium transition-all"
-                        >
-                          Cenário Atual (2025)
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="2026"
-                          className="data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium transition-all"
-                        >
-                          Pós-Reforma (2026-2033)
-                        </TabsTrigger>
-                    </TabsList>
-                </div>
-
+    <AppHeader />
+    <main className="relative">
+      <FloatingNav />
+      <div className='print-hidden'>
+          <section id="tax-calculator" className="bg-slate-50/70 border-b">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center">
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
+                <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto pb-12">
+                  Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
+                </p>
+              </div>
+          </section>
+      </div>
+      
+      <Tabs defaultValue="2025" className="w-full">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
+              <div className="w-full flex justify-center">
+                  <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
+                      <TabsTrigger value="2025">Cenário Atual (2025)</TabsTrigger>
+                      <TabsTrigger value="2026">Pós-Reforma (2026-2033)</TabsTrigger>
+                  </TabsList>
+              </div>
+                
                 <TabsContent value="2025" className="animate-in fade-in zoom-in-95 duration-300">
                     <div className="py-4">
                         <TaxCalculator 
@@ -74,9 +62,9 @@ export default function Home() {
                 </TabsContent>
 
                 <TabsContent value="2026" className="animate-in fade-in zoom-in-95 duration-300">
-                     <div className="py-4">
+                      <div className="py-4">
                         {/* Aqui passamos o selectedYear controlado pelo estado da página.
-                           Se o usuário mudar o ano lá dentro do formulário, o onYearChange atualiza aqui.
+                            Se o usuário mudar o ano lá dentro do formulário, o onYearChange atualiza aqui.
                         */}
                         <TaxCalculator 
                             key="2026-plus"
@@ -89,8 +77,8 @@ export default function Home() {
                         />
                     </div>
                 </TabsContent>
-            </Tabs>
-        </div>
+          </div>
+      </Tabs>
         
         {/* Espaço reservado para impressão */}
         <div id="results-print-only" className='hidden print:block'></div>

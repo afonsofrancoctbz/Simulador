@@ -19,14 +19,14 @@ import { getIvaReductionByCnae } from './cnae-reductions-2026';
 
 /**
  * Função corrigida para obter redução de IVA
- * Agora busca corretamente por CNAE + NBS + cClassTrib
+ * Agora busca corretamente por CNAE + cClassTrib (NBS code removido pois não é utilizado na assinatura atual)
  */
 function getIvaReduction(
   cnaeCode: string,
-  nbsCode?: string,
   cClassTrib?: string
 ): { reducaoIBS: number; reducaoCBS: number } {
-  return getIvaReductionByCnae(cnaeCode, nbsCode, cClassTrib);
+  // CORREÇÃO: Removido o argumento do meio (nbsCode) que causava o erro
+  return getIvaReductionByCnae(cnaeCode, cClassTrib);
 }
 
 function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean): TaxDetails | TaxDetails2026 {
@@ -36,7 +36,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     const { 
         domesticActivities = [], 
         exportActivities = [], 
-        exchangeRate, 
+        exchangeRate = 1, // CORREÇÃO: Valor padrão para evitar 'undefined'
         totalSalaryExpense, 
         proLabores, 
         selectedPlan, 
@@ -126,7 +126,6 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         domesticActivities.forEach(activity => {
             const reduction = getIvaReduction(
                 activity.code,
-                activity.nbsCode,
                 activity.cClassTrib
             );
             
@@ -142,7 +141,6 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
              const firstActivity = domesticActivities[0];
              const reduction = getIvaReduction(
                  firstActivity.code,
-                 firstActivity.nbsCode,
                  firstActivity.cClassTrib
              );
              
@@ -213,7 +211,7 @@ function _calculateSimples2026(
     const { 
         domesticActivities = [], 
         exportActivities = [], 
-        exchangeRate, 
+        exchangeRate = 1, // CORREÇÃO: Valor padrão para evitar 'undefined'
         totalSalaryExpense, 
         proLabores, 
         b2bRevenuePercentage = 100, 
@@ -287,8 +285,10 @@ function _calculateSimples2026(
     // Calcular IVA por fora (apenas no Simples Híbrido a partir de 2027)
     if (isHybrid && year >= 2027) {
       const config2026 = getFiscalParametersPostReform(2026);
-      const baseCbsRate = config2026.reforma_tributaria.cbs_aliquota_padrao;
-      const baseIbsRate = config2026.reforma_tributaria.ibs_aliquota_padrao;
+      
+      // CORREÇÃO: Usamos o operador de coalescência nula (??) para garantir um valor numérico
+      const baseCbsRate = config2026.reforma_tributaria?.cbs_aliquota_padrao ?? 0;
+      const baseIbsRate = config2026.reforma_tributaria?.ibs_aliquota_padrao ?? 0;
 
       let totalIbsDebit = 0;
       let totalCbsDebit = 0;
@@ -301,7 +301,6 @@ function _calculateSimples2026(
           if(activity.revenue > 0) {
             const reduction = getIvaReduction(
                 activity.code,
-                activity.nbsCode,
                 activity.cClassTrib
             );
             
@@ -319,7 +318,6 @@ function _calculateSimples2026(
         const firstActivity = domesticActivities[0];
         const reduction = getIvaReduction(
             firstActivity.code,
-            firstActivity.nbsCode,
             firstActivity.cClassTrib
         );
         
@@ -451,7 +449,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
           
           const addPerPartner = additionalMonthlyProLaboreNeeded / minCount;
           proLaboresCopy.forEach(p => {
-              if (p.value === minValue) p.value += addPerPartner;
+             if (p.value === minValue) p.value += addPerPartner;
           });
           
           const optimizedValues = { ...values, proLabores: proLaboresCopy };

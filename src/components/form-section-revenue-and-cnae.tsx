@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useFormContext } from "react-hook-form";
@@ -35,6 +33,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     const [exchangeRate, setExchangeRate] = useState<number|null>(null);
     const [debouncedCurrency, setDebouncedCurrency] = useState(form.watch('exportCurrency'));
 
+    // fiscalConfig pode ser usado futuramente ou removido se não usado neste componente
     const fiscalConfig = getFiscalParameters(year as 2025 | 2026);
 
     useDebounce(() => {
@@ -170,7 +169,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                             <span>Redução CBS:</span>
                                                             <span className="font-semibold">{formatPercent(reduction.reducaoCBS / 100)}</span>
                                                         </div>
-                                                        <p className="text-xs text-muted-foreground mt-2">{CNAE_CLASSES_2026_MAP[reduction.cClassTrib]?.description || 'Tributação padrão.'}</p>
+                                                        <p className="text-xs text-muted-foreground mt-2">
+                                                            {cnaeItem.cClassTrib && CNAE_CLASSES_2026_MAP[cnaeItem.cClassTrib]?.description 
+                                                                ? CNAE_CLASSES_2026_MAP[cnaeItem.cClassTrib]?.description 
+                                                                : 'Tributação padrão.'}
+                                                        </p>
                                                      </div>
                                                 </div>
                                             )}
@@ -180,9 +183,17 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             </div>
                         </div>
                     )}
-                    <FormField control={form.control} name="selectedCnaes" render={({ fieldState }) => (
-                        fieldState.error ? <p className="text-sm font-medium text-destructive text-center">{fieldState.error.message}</p> : null
-                    )} />
+                    
+                    {/* CORREÇÃO AQUI: Substituímos o render condicional manual por FormItem + FormMessage */}
+                    <FormField 
+                        control={form.control} 
+                        name="selectedCnaes" 
+                        render={() => (
+                            <FormItem>
+                                <FormMessage className="text-center" />
+                            </FormItem>
+                        )} 
+                    />
                 </CardContent>
             </Card>
 
@@ -361,6 +372,3 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
-
-    
-    

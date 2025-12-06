@@ -1,18 +1,16 @@
-
-
 import type { FiscalConfig } from '@/config/fiscal';
 import {
-    CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
-    CONTABILIZEI_FEES_SIMPLES_NACIONAL,
-    getCnaeData,
+  CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
+  CONTABILIZEI_FEES_SIMPLES_NACIONAL,
+  getCnaeData,
 } from './cnae-helpers';
 import {
-    type CalculationResults,
-    type TaxDetails,
-    type Annex,
-    type ProLaboreForm,
-    type PartnerTaxDetails,
-    type TaxFormValues
+  type CalculationResults,
+  type TaxDetails,
+  type Annex,
+  type ProLaboreForm,
+  type PartnerTaxDetails,
+  type TaxFormValues
 } from './types';
 import { findBracket, findFeeBracket, formatPercent } from './utils';
 import { getFiscalParameters } from '../config/fiscal';
@@ -84,7 +82,8 @@ export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): num
  * Follows the rules specified in the requirements document.
  */
 function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): TaxDetails {
-    const { totalSalaryExpense, selectedPlan, exchangeRate, proLabores, domesticActivities = [], exportActivities = [] } = values;
+    // CORREÇÃO: Adicionado valor padrão exchangeRate = 1
+    const { totalSalaryExpense, selectedPlan, exchangeRate = 1, proLabores, domesticActivities = [], exportActivities = [] } = values;
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
     const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
@@ -109,9 +108,9 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     let presumedProfitBase = 0;
     const allActivities = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
     allActivities.forEach(activity => {
-      const cnaeInfo = getCnaeData(activity.code);
-      const presuncao = cnaeInfo?.presumedProfitRateIRPJ ?? 0.32;
-      presumedProfitBase += activity.revenue * presuncao;
+        const cnaeInfo = getCnaeData(activity.code);
+        const presuncao = cnaeInfo?.presumedProfitRateIRPJ ?? 0.32;
+        presumedProfitBase += activity.revenue * presuncao;
     });
 
     const irpjRate = config.lucro_presumido_rates.IRPJ_BASE;
@@ -164,7 +163,8 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
  * Follows the rules specified in the requirements document.
  */
 function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, proLaboreOverride?: ProLaboreForm[]): TaxDetails {
-    const { selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate, domesticActivities = [], exportActivities = [] } = values;
+    // CORREÇÃO: Adicionado valor padrão exchangeRate = 1 também aqui
+    const { selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate = 1, domesticActivities = [], exportActivities = [] } = values;
     
     const proLaboresToUse = proLaboreOverride || values.proLabores;
 
