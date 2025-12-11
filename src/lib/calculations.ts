@@ -16,13 +16,9 @@ import { findBracket, findFeeBracket, formatPercent } from './utils';
 import { getFiscalParameters } from '../config/fiscal';
 
 // =================================================================================
-// 2. CORE CALCULATION LOGIC (HELPER FUNCTIONS)
+// 2. CORE CALCULATION LOGIC
 // =================================================================================
 
-/**
- * Calculates partner-specific taxes (INSS and IRRF).
- * This is a pure function that depends only on its inputs.
- */
 export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
@@ -33,7 +29,6 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
             return { proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 };
         }
 
-        // SÓCIOS (PARTNERS) SEMPRE USAM A ALÍQUOTA FIXA DE 11%
         const remainingContributionRoom = Math.max(0, config.teto_inss - (proLabore.hasOtherInssContribution ? proLabore.otherContributionSalary || 0 : 0));
         const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
         const inss = baseCalculoINSS * config.aliquota_inss_prolabore;
@@ -57,32 +52,16 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
     return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
 }
 
-
-/**
- * Calculates the CPP (INSS Patronal) for Lucro Presumido or Simples Nacional Anexo IV.
- * @param monthlyPayroll The total monthly payroll (salaries + pro-labore).
- * @param config The fiscal configuration.
- * @returns The calculated CPP value.
- */
 export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): number {
-    if (monthlyPayroll <= 0) {
-        return 0;
-    }
-    // Para Lucro Presumido e Anexo IV, a alíquota é 20% sobre a folha.
+    if (monthlyPayroll <= 0) return 0;
     return monthlyPayroll * config.aliquotas_cpp_patronal.base;
 }
-
 
 // =================================================================================
 // 3. REGIME-SPECIFIC CALCULATION FUNCTIONS
 // =================================================================================
 
-/**
- * Calculates the total cost under the Lucro Presumido regime.
- * Follows the rules specified in the requirements document.
- */
 function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): TaxDetails {
-    // CORREÇÃO: Adicionado valor padrão exchangeRate = 1
     const { totalSalaryExpense, selectedPlan, exchangeRate = 1, proLabores, domesticActivities = [], exportActivities = [] } = values;
 
     const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
@@ -94,7 +73,6 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
     
-    // Grupo 1: Impostos s/ Faturamento (Mensais)
     const pisRate = config.lucro_presumido_rates.PIS;
     const pis = domesticRevenue * pisRate;
 
@@ -104,7 +82,6 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const issRateAsDecimal = (values.issRate ?? 5) / 100;
     const iss = domesticRevenue * issRateAsDecimal;
 
-    // Grupo 2: Impostos s/ Lucro Presumido (Trimestrais, provisionado mensalmente)
     let presumedProfitBase = 0;
     const allActivities = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
     allActivities.forEach(activity => {
@@ -121,12 +98,9 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const csllRate = config.lucro_presumido_rates.CSLL;
     const csll = presumedProfitBase * csllRate;
 
-
-    // Grupo 3: Encargos sobre a Folha
     const cppRate = config.aliquotas_cpp_patronal.base;
     const cpp = _calculateCpp(monthlyPayroll, config);
 
-    // Custo Total
     const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
@@ -157,13 +131,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     };
 }
 
-
-/**
- * Calculates the total cost under the Simples Nacional regime.
- * Follows the rules specified in the requirements document.
- */
 function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, proLaboreOverride?: ProLaboreForm[]): TaxDetails {
-    // CORREÇÃO: Adicionado valor padrão exchangeRate = 1 também aqui
     const { selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate = 1, domesticActivities = [], exportActivities = [] } = values;
     
     const proLaboresToUse = proLaboreOverride || values.proLabores;
@@ -175,14 +143,19 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
-    // Passo 1: Calcular Bases Anuais e Fator R
+    // BASE DE CÁLCULO (RBT12)
+    // Se o usuário não preencheu RBT12, projeta-se o anual.
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    const annualPayroll = fp12 > 0 ? fp12 : monthlyPayroll * 12;
+    
+    // CORREÇÃO CRÍTICA (Linha da Verdade):
+    // Se estamos no cenário otimizado (proLaboreOverride existe), DEVEMOS usar a folha projetada para o futuro.
+    // Ignorar o histórico 'fp12' se estamos simulando uma adequação ao Anexo III.
+    const annualPayroll = (fp12 > 0 && !proLaboreOverride) ? fp12 : monthlyPayroll * 12;
+    
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
 
-    // Passo 2: Calcular Alíquota Efetiva e DAS
     let totalDas = 0;
     let hasAnnexIVActivity = false;
     const finalAnnexes = new Set<Annex>();
@@ -194,32 +167,27 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         if (!cnaeInfo) return;
 
         const revenueForActivity = activity.revenue;
-
         if (revenueForActivity === 0) return;
 
-        // Determinar Anexo
         let effectiveAnnex: Annex;
         if (cnaeInfo.requiresFatorR) {
+            // Regra do Fator R: >= 28% vai para Anexo III (menor), senão Anexo V (maior)
             effectiveAnnex = (fatorR >= config.simples_nacional.limite_fator_r) ? 'III' : 'V';
         } else {
             effectiveAnnex = cnaeInfo.annex;
         }
         finalAnnexes.add(effectiveAnnex);
-        if (effectiveAnnex === 'IV') {
-            hasAnnexIVActivity = true;
-        }
+        if (effectiveAnnex === 'IV') hasAnnexIVActivity = true;
 
-        // Encontrar faixa e calcular alíquota efetiva
         const annexTable = config.simples_nacional[effectiveAnnex];
         const bracket = findBracket(annexTable, effectiveRbt12);
         const { rate, deduction, distribution } = bracket;
         
+        // Fórmula Oficial da Alíquota Efetiva do Simples
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
         
-        // Calcular DAS para a atividade
         let dasDaAtividade = revenueForActivity * effectiveRate;
         
-        // Aplicar isenção de exportação
         if (activity.isExport) {
             const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
             const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
@@ -229,14 +197,12 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         totalDas += dasDaAtividade;
     });
 
-    // Passo 3: Calcular CPP (Apenas para Anexo IV)
     let cppFromAnnexIV = 0;
     const cppRate = config.aliquotas_cpp_patronal.base;
     if (hasAnnexIVActivity) {
         cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
     }
     
-    // Passo 4: Calcular Custo Total
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
@@ -279,11 +245,6 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     return finalResult;
 }
 
-
-// =================================================================================
-// 4. MAIN ORCHESTRATOR FUNCTION
-// =================================================================================
-
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const config = getFiscalParameters(values.year as 2025 | 2026 || 2025);
   
@@ -295,7 +256,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
-  // Condição para otimização do Fator R
   if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < config.simples_nacional.limite_fator_r && totalRevenue > 0) {
       
       const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
@@ -335,7 +295,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   } else if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR >= config.simples_nacional.limite_fator_r) {
     simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)", optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(simplesNacionalBase.fatorR)} e se beneficia do Anexo III.`};
   }
-
 
   return {
     simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2: 1 },

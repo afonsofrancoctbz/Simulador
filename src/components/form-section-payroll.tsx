@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Users, Wallet, Plus, Minus } from 'lucide-react';
 import { getFiscalParameters } from '@/config/fiscal';
-import { cn, formatBRL } from "@/lib/utils";
+import { cn, formatCurrencyBRL } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -72,7 +72,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                     placeholder="0,00"
                                     onChange={handleChange}
                                     onBlur={field.onBlur}
-                                    value={field.value ? formatBRL(field.value) : ''}
+                                    value={field.value ? formatCurrencyBRL(field.value) : ''}
                                     name={field.name}
                                     ref={field.ref}
                                     className="pl-9"
@@ -140,10 +140,10 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                         <Input
                                                         type="text"
                                                         inputMode="decimal"
-                                                        placeholder={formatBRL(MINIMUM_WAGE)}
+                                                        placeholder={formatCurrencyBRL(MINIMUM_WAGE)}
                                                         onChange={handleChange}
                                                         onBlur={field.onBlur}
-                                                        value={field.value ? formatBRL(field.value) : ''}
+                                                        value={field.value ? formatCurrencyBRL(field.value) : ''}
                                                         name={field.name}
                                                         ref={field.ref}
                                                         className="pl-9"
@@ -199,7 +199,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                                     placeholder="0,00"
                                                                     onChange={handleChange}
                                                                     onBlur={field.onBlur}
-                                                                    value={field.value ? formatBRL(field.value) : ''}
+                                                                    value={field.value ? formatCurrencyBRL(field.value) : ''}
                                                                     name={field.name}
                                                                     ref={field.ref}
                                                                     className="pl-9"
@@ -207,7 +207,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                             </FormControl>
                                                         </div>
                                                         <FormDescription className="text-xs">
-                                                            Salário base no outro vínculo (teto {formatBRL(fiscalConfig.teto_inss)}).
+                                                            Salário base no outro vínculo (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
                                                         </FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
@@ -225,5 +225,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
         </Card>
     );
 }
+
+    
 
     

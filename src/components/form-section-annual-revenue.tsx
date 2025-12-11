@@ -8,7 +8,7 @@ import { useDropzone } from 'react-dropzone';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import { formatCurrencyBRL, formatBRL, parseBRL } from "@/lib/utils";
+import { formatCurrencyBRL, parseBRL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -187,7 +187,7 @@ export function FormSectionAnnualRevenue() {
                                             <Input
                                                 type="text"
                                                 readOnly
-                                                value={formatBRL(field.value)}
+                                                value={formatCurrencyBRL(field.value)}
                                                 className="pl-9 font-bold text-base bg-background/50"
                                             />
                                         </FormControl>
@@ -205,7 +205,7 @@ export function FormSectionAnnualRevenue() {
                                              <Input
                                                 type="text"
                                                 readOnly
-                                                value={formatBRL(field.value)}
+                                                value={formatCurrencyBRL(field.value)}
                                                 className="pl-9 font-bold text-base bg-background/50"
                                             />
                                         </FormControl>
@@ -230,10 +230,10 @@ export function FormSectionAnnualRevenue() {
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{data.mes}</TableCell>
                                             <TableCell>
-                                                <Input type="text" value={formatBRL(data.receita)} onChange={(e) => handleMonthlyDataChange(index, 'receita', parseBRL(e.target.value))} className="h-9"/>
+                                                <Input type="text" value={formatCurrencyBRL(data.receita)} onChange={(e) => handleMonthlyDataChange(index, 'receita', parseBRL(e.target.value))} className="h-9"/>
                                             </TableCell>
                                                 <TableCell>
-                                                <Input type="text" value={formatBRL(data.folha)} onChange={(e) => handleMonthlyDataChange(index, 'folha', parseBRL(e.target.value))} className="h-9"/>
+                                                <Input type="text" value={formatCurrencyBRL(data.folha)} onChange={(e) => handleMonthlyDataChange(index, 'folha', parseBRL(e.target.value))} className="h-9"/>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -288,4 +288,6 @@ export function FormSectionAnnualRevenue() {
     );
 }
     
+    
+
     

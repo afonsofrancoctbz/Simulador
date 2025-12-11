@@ -15,7 +15,7 @@ import type { AnaliseCompleta, DadosMensais } from '@/lib/fator-r-migration-logi
 import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
 import { format } from 'date-fns';
 import { YearSelector } from './year-selector';
-// Importamos a tabela para garantir que o relatório esteja completo
+// Importação da tabela atualizada
 import { ComparisonTable } from './comparison-table';
 
 interface TaxResultsProps {
@@ -36,45 +36,64 @@ type SelectedScenario = {
 export default function TaxResults({ year, isLoading, results, error, fatorRProjection, formValues, onYearChange }: TaxResultsProps) {
   const [selectedScenarioId, setSelectedScenarioId] = useState<SelectedScenario>(null);
 
+  // Mapeamento Inteligente dos Resultados para Exibição
   const scenariosToShow = useMemo(() => {
     if (!results) return [];
     
     let scenarios: (TaxDetails | null)[] = [];
     
-    // Type Guard: Verifica se é o tipo de resultado de 2025 (tem simplesNacionalBase)
+    // CASO 1: Ano 2025 (Regime Atual)
     if ('simplesNacionalBase' in results) { 
        scenarios = [
         results.simplesNacionalOtimizado,
         results.simplesNacionalBase,
         results.lucroPresumido,
       ];
-    } else if ('simplesNacionalHibrido' in results) { // Validação correta para 2026
-        // CORREÇÃO: Type Assertion para forçar o TS a aceitar os regimes novos de 2026
+    } 
+    // CASO 2: Ano 2026+ (Pós-Reforma)
+    else if ('simplesNacionalHibrido' in results) { 
+       // A ordem aqui define a ordem das colunas na tabela
        scenarios = [
-          results.simplesNacionalOtimizado,
-          results.simplesNacionalOtimizadoHibrido,
+          // 1. Simples Nacional "Atual" (adaptado para o ano selecionado)
+          results.simplesNacionalOtimizado, 
+          
+          // 2. Simples Nacional Tradicional (Novo Regime)
           results.simplesNacionalTradicional,
-          results.simplesNacionalHibrido,
+          
+          // 3. Simples Nacional Híbrido (Novo Regime - Só aparece em 2027+)
+          results.simplesNacionalHibrido, 
+          
+          // 4. Lucro Presumido (Com Reforma)
           results.lucroPresumido,
+          
+          // 5. Lucro Presumido (Sem Reforma - Comparativo)
           results.lucroPresumidoAtual,
       ] as (TaxDetails | null)[];
     }
 
+    // Filtra cenários nulos ou zerados para não poluir a tela
     const validScenarios = scenarios.filter((s): s is TaxDetails => s !== null && (s.totalRevenue > 0 || (s.proLabore ?? 0) > 0));
+    
+    // Ordenação personalizada: Otimizados primeiro para destaque
     validScenarios.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+    
     return validScenarios;
   }, [results]);
 
 
+  // Lógica de Recomendação (Menor Custo)
   const cheapestScenario = useMemo(() => {
     if (scenariosToShow.length === 0) return null;
+    // Removemos o "Regras Atuais" da competição pois ele é hipotético em 2026+
     const scenariosForRecommendation = scenariosToShow.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)');
+    
     if (scenariosForRecommendation.length > 0) {
       return [...scenariosForRecommendation].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
     }
     return scenariosToShow[0];
   }, [scenariosToShow]);
   
+  // Seleciona automaticamente o melhor cenário ao carregar
   useEffect(() => {
     if (cheapestScenario) {
       setSelectedScenarioId({
@@ -91,8 +110,8 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     return scenariosToShow.find(s => s.regime === selectedScenarioId.regime && (s.optimizationNote ?? null) === selectedScenarioId.optimizationNote) ?? null;
   }, [selectedScenarioId, scenariosToShow]);
 
+  // Lógica de Análise de Fator R (apenas para Simples Nacional)
   const fatorRAnalysisData: AnaliseCompleta | null = useMemo(() => {
-    // Verificação segura de propriedade ('in' operator)
     if (!results || !('simplesNacionalBase' in results) || !results.simplesNacionalBase || results.simplesNacionalOtimizado) {
         return null;
     }
@@ -157,6 +176,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     return null;
   }
     
+  // Agrupador de Impostos para exibição nos cards
   const groupTaxes = (details: TaxDetails) => {
     const groups: { [key: string]: { name: string; value: number, rate?: number }[] } = {
         'IMPOSTOS S/ FATURAMENTO MENSAL': [],
@@ -197,10 +217,13 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
           </div>
         )}
 
-        {/* ALTERAÇÃO DE LAYOUT (SIMETRIA):
-            1. Substituído 'place-items-center' por 'items-stretch' -> Força mesma altura para todos os cards
-            2. gap-8 mantido para bom espaçamento
-        */}
+        {/* --- QUADRO COMPARATIVO ESTRATÉGICO --- */}
+        {/* Passamos o 'currentYear' para que a tabela saiba qual ano está sendo mostrado nos títulos */}
+        <div className="max-w-7xl mx-auto px-1 sm:px-4 mb-16">
+          <ComparisonTable scenarios={scenariosToShow} currentYear={year} />
+        </div>
+
+        {/* --- CARDS DE DETALHES (Grid) --- */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch results-grid mb-12">
           {scenariosToShow.map((scenario) => {
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
@@ -214,13 +237,12 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             const projectionNote = isOtimizado && fatorRProjection ? fatorRProjection.textoMensagem : null;
             const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
 
-
             const groupedTaxes = groupTaxes(scenario);
             const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / scenario.totalRevenue : 0;
 
+            // Formatação do Título do Card
             let title = scenario.regime.replace(/ \(.+\)/, ''); 
             let subtitle = scenario.regime.match(/\((.+)\)/)?.[1] || '';
-
 
             if (year >= 2026) {
                 if(scenario.regime.includes('Lucro Presumido')) {
@@ -240,14 +262,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 }
             }
             
-            const revenueTaxes = scenario.breakdown.filter(i => i.name.toLowerCase().match(/das|pis|cofins|iss|irpj|csll|iva|ibs|cbs/));
-
             return (
-              /* ALTERAÇÃO CARD (SIMETRIA):
-                 1. Removido 'max-w-sm' -> Permite que o card ocupe toda a largura da coluna grid
-                 2. Adicionado 'h-full' -> Garante que o card ocupe toda a altura (esticado pelo items-stretch do pai)
-                 3. Adicionado 'w-full' -> Força largura total
-              */
               <div key={scenario.regime + (scenario.annex || '') + (scenario.optimizationNote || '')}
                 onClick={() => setSelectedScenarioId({regime: scenario.regime, optimizationNote: scenario.optimizationNote ?? null})}
                 className={cn(
@@ -267,7 +282,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                       <p className={cn("font-semibold", isRecommended ? "text-primary" : "text-muted-foreground")}>{subtitle}</p>
                   </div>
 
-                  {/* flex-grow aqui garante que este bloco empurre o rodapé para baixo, alinhando visualmente o final de todos os cards */}
                   <div className="px-4 pb-4 pt-2 flex-grow space-y-1">
                       <div className='text-center py-1 my-1 bg-muted/40 rounded-md'>
                         <div className='text-xs uppercase text-muted-foreground font-semibold'>FATURAMENTO MENSAL</div>
@@ -314,7 +328,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                       })}
                   </div>
                 
-                  {/* mt-auto garante que o bloco de notas e o total fiquem fixos na parte inferior */}
                   <div className="p-4 mt-auto space-y-2 bg-muted/30 rounded-b-xl">
                       {fatorRProjection && !fatorRProjection.isEnquadradoAgora && projectionNote && (
                         <Alert variant="default" className={cn("p-3", {
@@ -355,7 +368,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                             </Alert>
                         )}
 
-
                       {scenario.notes.length > 0 && !isCurrentLpFor2026 && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
@@ -382,12 +394,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             )
           })}
         </div>
-        
-        {/* Nova Tabela Comparativa (Solicitada anteriormente) */}
-        <div className="max-w-7xl mx-auto px-1 sm:px-4 mb-16">
-          <ComparisonTable scenarios={scenariosToShow} />
-        </div>
-
       </div>
       
       {fatorRAnalysisData && (
@@ -401,10 +407,8 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto mt-2">Sua empresa pode economizar migrando do Anexo V para o Anexo III. Veja abaixo o plano de ação e a projeção de resultados.</p>
             </div>
-          {/* <FatorRAnalysisComponent analysis={fatorRAnalysisData} /> */}
         </div>
       )}
-
 
       {selectedDetails && (
         <>
