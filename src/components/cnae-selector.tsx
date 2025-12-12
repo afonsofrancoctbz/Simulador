@@ -4,7 +4,7 @@
 import * as React from "react"
 import { Check, Search, PlusCircle, X, List, FileSearch, HardHat, HeartPulse, Code, Megaphone, Leaf, Briefcase, Info, CheckCheck, XCircle, Stethoscope, DraftingCompass, Building, Handshake, Clapperboard, ShoppingCart, Utensils, VenetianMask, AlertTriangle, Badge } from "lucide-react"
 
-import { UNIFIED_CNAE_DATA as CNAE_DATA } from "@/lib/cnae-helpers"
+import { getCnaeData, UNIFIED_CNAE_DATA as CNAE_DATA } from "@/lib/cnae-helpers"
 import { Badge as BadgeUI } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,12 +16,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils"
 import { Textarea } from "./ui/textarea"
 import { Label } from "./ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { Separator } from "./ui/separator"
+import { useDebounce } from "@/hooks/use-debounce";
 import type { CnaeData, CnaeSelection } from "@/lib/types"
 
 const categories = [
@@ -61,6 +62,7 @@ function CnaeSelectorComponent({
   initialSelectedCnaes?: CnaeSelection[]
 }) {
   const [search, setSearch] = React.useState("")
+  const debouncedSearch = useDebounce(search, 300);
   const [activeView, setActiveView] = React.useState("Busca")
   const [selectedCnaes, setSelectedCnaes] = React.useState<CnaeSelection[]>(initialSelectedCnaes)
   const [codesToPaste, setCodesToPaste] = React.useState("");
@@ -77,7 +79,7 @@ function CnaeSelectorComponent({
 
   const filteredCnaes = React.useMemo(() => {
     if (activeView === "Busca") {
-        const lowercasedSearch = search.toLowerCase().trim()
+        const lowercasedSearch = debouncedSearch.toLowerCase().trim()
         if (lowercasedSearch.length < 2) return [];
         return CNAE_DATA.filter(
             (cnae) =>
@@ -89,7 +91,7 @@ function CnaeSelectorComponent({
     const category = categories.find(c => c.name === activeView);
     const cnaesForCategory = category?.cnaeCodes || [];
     return CNAE_DATA.filter((cnae) => cnaesForCategory.includes(cnae.code)).slice(0,100)
-  }, [search, activeView]);
+  }, [debouncedSearch, activeView]);
 
   const handleToggleCnae = (code: string) => {
     setSelectedCnaes((current) => {
@@ -269,12 +271,13 @@ function CnaeSelectorComponent({
                         {(activeView !== 'Busca' || search.length >= 2) && (
                             <>
                                 {filteredCnaes.length > 0 ? filteredCnaes.map(cnae => (
-                                    <div
+                                    <button
+                                        type="button"
                                         key={cnae.code}
                                         onMouseEnter={() => setHoveredCnae(cnae)}
                                         onMouseLeave={() => setHoveredCnae(null)}
                                         onClick={() => handleToggleCnae(cnae.code)}
-                                        className={cn("p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between hover:bg-muted/50", isCnaeSelected(cnae.code) && "border-primary ring-1 ring-primary/80")}
+                                        className={cn("w-full text-left", "p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between hover:bg-muted/50", isCnaeSelected(cnae.code) && "border-primary ring-1 ring-primary/80")}
                                     >
                                         <div className="flex-grow">
                                             <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
@@ -289,7 +292,7 @@ function CnaeSelectorComponent({
                                          <Button size="sm" variant="ghost" className="ml-4 shrink-0">
                                             {isCnaeSelected(cnae.code) ? <Check className="h-5 w-5 text-primary"/> : <PlusCircle className="h-5 w-5 text-muted-foreground"/>}
                                         </Button>
-                                    </div>
+                                    </button>
                                 )) : (
                                     <div className="text-center text-muted-foreground py-16">
                                         <p>Nenhum CNAE encontrado.</p>
@@ -328,8 +331,11 @@ function CnaeSelectorComponent({
                     <ScrollArea className="flex-grow bg-background border rounded-lg">
                         <div className="space-y-2 p-3">
                            {selectedCnaes.length > 0 ? selectedCnaes.map(cnaeItem => {
-                               const cnae = CNAE_DATA.find(c=>c.code===cnaeItem.code);
-                               if (!cnae) return null;
+                               const cnae = getCnaeData(cnaeItem.code);
+                               if (!cnae) {
+                                   console.warn(`CNAE ${cnaeItem.code} não encontrado`);
+                                   return null;
+                               }
                                return (
                                 <div key={cnaeItem.code} className="bg-muted/40 p-3 rounded-lg border text-sm relative">
                                     <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0 absolute top-1 right-1" onClick={() => handleToggleCnae(cnaeItem.code)}>

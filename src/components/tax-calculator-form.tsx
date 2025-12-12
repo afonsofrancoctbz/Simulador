@@ -21,7 +21,7 @@ export const CalculatorFormSchema = z.object({
   selectedCnaes: z.array(CnaeSelectionSchema).min(1, "Selecione ao menos uma atividade (CNAE)."),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
-  revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
+
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
   issRate: z.coerce.number({invalid_type_error: "A alíquota de ISS deve ser um número."})
@@ -36,14 +36,19 @@ export const CalculatorFormSchema = z.object({
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
   year: z.number().optional(),
 }).refine(data => {
-    // CORREÇÃO: Adicionada tipagem explícita (acc: number) para evitar erro de inferência
-    const totalRevenue = Object.values(data.revenues || {}).reduce((acc: number, revenue) => acc + (revenue || 0), 0);
-    const totalProLabore = data.proLabores.reduce((acc: number, pl) => acc + (pl.value || 0), 0);
+    const totalRevenue = data.selectedCnaes.reduce((acc, cnae) => acc + (cnae.domesticRevenue || 0) + (cnae.exportRevenue || 0), 0);
+    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
     
-    return totalRevenue > 0 || totalProLabore > 0 || (data.rbt12 ?? 0) > 0 || data.selectedCnaes.length > 0;
+    // Permite o cálculo se houver RBT12 (empresa existente) ou pró-labore (retirada sem faturamento).
+    if ((data.rbt12 ?? 0) > 0 || totalProLabore > 0) {
+        return true;
+    }
+
+    // Se não, exige que haja faturamento nos CNAEs.
+    return totalRevenue > 0;
 }, {
-    message: "Informe ao menos um valor de faturamento para calcular.",
-    path: ["revenues"],
+    message: "Informe ao menos um valor de faturamento, pró-labore ou receita bruta (RBT12) para calcular.",
+    path: ["selectedCnaes"],
 });
 
 export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;

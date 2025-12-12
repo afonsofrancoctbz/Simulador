@@ -63,8 +63,8 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
     const proLaboreMensalOtimizado = receitaMensalProjetada * META_FATOR_R;
 
     // A "proxy" para o valor que sai do cálculo (a média)
-    const rbt_media_antiga = RBT12_atual / 12.0;
-    const fs_media_antiga = FS12_atual / 12.0;
+    const rbt_media_antiga = RBT12_atual > 0 ? RBT12_atual / 12.0 : 0;
+    const fs_media_antiga = FS12_atual >= 0 ? FS12_atual / 12.0 : 0;
 
     let rbt_projetada = RBT12_atual;
     let fs_projetada = FS12_atual;

@@ -28,7 +28,7 @@ const extractPgdasPrompt = ai.definePrompt({
   name: 'extractPgdasPrompt',
   input: { schema: PgdasInputSchema },
   output: { schema: PgdasDataSchema },
-  model: 'googleai/gemini-2.5-flash',
+  model: 'googleai/gemini-1.5-flash',
   config: {
     temperature: 0.1,
   },
@@ -106,8 +106,9 @@ export async function extractDataFromPgdas(
       throw new Error('Total da Folha de Salários inválida ou não encontrada no documento.');
     }
 
-    if (!output.fatorR && output.totalRBT12 > 0) {
-        output.fatorR = output.totalFolha12 / output.totalRBT12;
+        if (!output.fatorR && output.totalRBT12 > 0) {
+      const folha = output.totalFolha12 ?? 0; 
+      output.fatorR = folha / output.totalRBT12;
     }
 
     if (!output.anexo && output.fatorR !== undefined) {

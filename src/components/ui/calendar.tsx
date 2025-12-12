@@ -56,12 +56,11 @@ function Calendar({
       }}
       components={{
         // Correção: IconLeft/Right removidos. Usamos Chevron com verificação de orientação.
-        Chevron: ({ ...props }) => {
-            if (props.orientation === "left") {
-                return <ChevronLeft className="h-4 w-4" />
-            }
-            return <ChevronRight className="h-4 w-4" />
-        }
+        Chevron: ({ orientation, ...props }: { orientation?: 'left' | 'right' }) => {
+          return orientation === "left" 
+              ? <ChevronLeft className="h-4 w-4" /> 
+              : <ChevronRight className="h-4 w-4" />
+      }
       }}
       {...props}
     />

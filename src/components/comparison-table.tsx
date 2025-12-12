@@ -15,37 +15,23 @@ export function ComparisonTable({ scenarios, currentYear }: ComparisonTableProps
   const scenariosForRanking = scenarios.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)');
   const bestScenario = scenariosForRanking.sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
 
-  // Função auxiliar para gerar o título customizado da coluna conforme seu pedido
+  // Centralized mapping for regime titles for better maintainability
+  const REGIME_TITLES: Record<string, string | ((year: number) => string)> = {
+    'Simples Nacional': 'Simples Nacional 2025/26 (Regime Atual)',
+    'Simples Nacional (Otimizado)': 'Simples Nacional 2025/26 (Otimizado)',
+    'Simples Nacional (Tradicional)': 'Simples Nacional Tradicional 2027/28',
+    'Simples Nacional (Híbrido)': 'Simples Nacional Híbrido 2027/28',
+    'Lucro Presumido': (year: number) => year >= 2027 ? 'Lucro Presumido 2027/28' : 'Lucro Presumido 2026',
+    'Lucro Presumido (Regras Atuais)': 'Lucro Presumido (Regras Atuais)',
+  };
+
+  // Function to get the custom column title based on the scenario
   const getCustomTitle = (scenario: TaxDetails) => {
-    const regime = scenario.regime;
-    const isOtimizado = regime.includes('Otimizado');
-
-    // Mapeamento de Títulos Solicitados
-    if (regime.includes('Simples Nacional') && !regime.includes('Tradicional') && !regime.includes('Híbrido')) {
-        // Se for o Simples Básico (sem sobrenome de reforma)
-        return isOtimizado 
-            ? "Simples Nacional 2025/26 (Otimizado)" 
-            : "Simples Nacional 2025/26 (Regime Atual)";
+    const titleOrFn = REGIME_TITLES[scenario.regime];
+    if (typeof titleOrFn === 'function') {
+      return titleOrFn(currentYear);
     }
-
-    if (regime.includes('Tradicional')) {
-        return "Simples Nacional Tradicional 2027/28";
-    }
-
-    if (regime.includes('Híbrido')) {
-        return "Simples Nacional Híbrido 2027/28";
-    }
-
-    if (regime === 'Lucro Presumido') {
-        return currentYear >= 2027 ? "Lucro Presumido 2027/28" : "Lucro Presumido 2026";
-    }
-
-    if (regime === 'Lucro Presumido (Regras Atuais)') {
-        return "Lucro Presumido (Regras Atuais)";
-    }
-
-    // Fallback
-    return regime;
+    return titleOrFn || scenario.regime; // Fallback to the original regime name
   };
 
   return (

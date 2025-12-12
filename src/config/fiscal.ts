@@ -197,6 +197,10 @@ export function getFiscalParameters(year: 2025 | 2026): FiscalConfig {
 }
 
 export function getFiscalParametersPostReform(year: number): FiscalConfig {
+    if (year < 2026 || year > 2033) {
+        console.warn(`Ano ${year} fora do range esperado (2026-2033) para a reforma tributária.`);
+    }
+
     const baseConfig = getFiscalParameters(year === 2025 ? 2025 : 2026);
     
     const safeYear = Math.max(2026, Math.min(year, 2033)) as keyof typeof TRANSITION_TABLE;

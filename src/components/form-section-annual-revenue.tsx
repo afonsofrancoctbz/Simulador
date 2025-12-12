@@ -138,21 +138,14 @@ export function FormSectionAnnualRevenue() {
 
 
     const rbt12Value = watch("rbt12");
-    const watchedRevenues = watch("revenues");
+    const watchedCnaes = watch("selectedCnaes");
 
     const projectedAnnualRevenue = useMemo(() => {
-        const domestic = Object.keys(watchedRevenues)
-            .filter(k => k.startsWith('domestic_'))
-            .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
-        
-        const exportVal = Object.keys(watchedRevenues)
-            .filter(k => k.startsWith('export_'))
-            .reduce((sum, k) => sum + (watchedRevenues[k] || 0), 0);
-
+        const monthlyDomestic = (watchedCnaes || []).reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
+        const monthlyExport = (watchedCnaes || []).reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
         const exchangeRate = getValues('exportCurrency') !== 'BRL' ? (getValues('exchangeRate') || 1) : 1;
-        
-        return (domestic + (exportVal * exchangeRate)) * 12;
-    }, [watchedRevenues, getValues]);
+        return (monthlyDomestic + (monthlyExport * exchangeRate)) * 12;
+    }, [watchedCnaes, getValues]);
       
     const SIMPLES_NACIONAL_LIMIT = 4800000;
     const showSimplesLimitWarning = (rbt12Value ?? 0) === 0 && projectedAnnualRevenue > SIMPLES_NACIONAL_LIMIT;

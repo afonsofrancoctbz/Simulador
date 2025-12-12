@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertTriangle, CheckCircle, Info, BadgeInfo } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, BadgeInfo, ChevronsUpDown } from 'lucide-react';
 import { type CalculationResults, type CalculationResults2026, type TaxDetails } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +14,7 @@ import type { FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
 import type { AnaliseCompleta, DadosMensais } from '@/lib/fator-r-migration-logic';
 import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
 import { format } from 'date-fns';
-import { YearSelector } from './year-selector';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 // Importação da tabela atualizada
 import { ComparisonTable } from './comparison-table';
 
@@ -35,6 +35,7 @@ type SelectedScenario = {
 
 export default function TaxResults({ year, isLoading, results, error, fatorRProjection, formValues, onYearChange }: TaxResultsProps) {
   const [selectedScenarioId, setSelectedScenarioId] = useState<SelectedScenario>(null);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   // Mapeamento Inteligente dos Resultados para Exibição
   const scenariosToShow = useMemo(() => {
@@ -298,32 +299,43 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                         if (filteredItems.length === 0) return null;
 
                         const isTrimestral = groupName.includes('TRIMESTRAL');
+                        const sectionId = `${scenario.regime}-${groupName}`;
+                        const isOpen = openSections[sectionId] ?? true;
 
                         return (
-                          <div key={groupName} className="space-y-1">
-                            <Separator className="my-2"/>
-                            <h4 className="font-bold text-primary text-xs uppercase tracking-wider pt-1">
-                                {groupName}
-                            </h4>
-                            {isTrimestral && <p className='text-muted-foreground -mt-2' style={{fontSize: '0.6rem'}}>Valores provisionados mensalmente.</p>}
-                            <div className="space-y-1">
-                            {filteredItems.map(item => {
-                                const showRate = item.rate !== undefined && !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
-                                return (
-                                <div key={item.name} className="flex justify-between items-center text-sm">
-                                    <span className="text-foreground flex items-center gap-1.5">
-                                      {item.name}
-                                      {showRate && (
-                                          <span className="text-muted-foreground font-semibold text-xs">({formatPercent(item.rate as number)})</span>
-                                      )}
-                                    </span>
-                                    <span className="font-medium text-foreground">
-                                      {formatCurrencyBRL(item.value)}
-                                    </span>
-                                </div>
-                              )})}
-                            </div>
-                          </div>
+                          <Collapsible
+                              key={groupName}
+                              open={isOpen}
+                              onOpenChange={(open) => setOpenSections(prev => ({ ...prev, [sectionId]: open }))}
+                              className="space-y-1"
+                          >
+                              <Separator className="my-2" />
+                              <CollapsibleTrigger className="w-full flex justify-between items-center py-1 group">
+                                  <h4 className="font-bold text-primary text-xs uppercase tracking-wider">
+                                      {groupName}
+                                  </h4>
+                                  <ChevronsUpDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:-rotate-180" />
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="space-y-1 pt-1 animate-in slide-in-from-top-2">
+                                  {isTrimestral && <p className='text-muted-foreground -mt-2 mb-2' style={{ fontSize: '0.6rem' }}>Valores provisionados mensalmente.</p>}
+                                  {filteredItems.map(item => {
+                                      const showRate = item.rate !== undefined && !item.name.toLowerCase().includes('irrf') && !item.name.toLowerCase().includes('mensalidade');
+                                      return (
+                                          <div key={item.name} className="flex justify-between items-center text-sm">
+                                              <span className="text-foreground flex items-center gap-1.5">
+                                                  {item.name}
+                                                  {showRate && (
+                                                      <span className="text-muted-foreground font-semibold text-xs">({formatPercent(item.rate as number)})</span>
+                                                  )}
+                                              </span>
+                                              <span className="font-medium text-foreground">
+                                                  {formatCurrencyBRL(item.value)}
+                                              </span>
+                                          </div>
+                                      )
+                                  })}
+                              </CollapsibleContent>
+                          </Collapsible>
                         );
                       })}
                   </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useTaxCalculator } from '@/hooks/use-tax-calculator';
 import TaxResults from '@/components/tax-results';
@@ -48,16 +48,23 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
         onResultsChange(results !== null && !isLoading && !error);
     }, [results, isLoading, error, onResultsChange]);
 
-    // EFFECT 3 (NOVO): Recálculo Automático ao mudar o Ano
-    // Se o ano mudar E já tivermos resultados na tela (o usuário já calculou antes),
-    // disparamos o onSubmit novamente para atualizar os valores sem o usuário precisar clicar.
+    const previousYear = useRef(year);
+
+    // EFFECT 3: Recálculo Automático ao mudar o Ano
     useEffect(() => {
-        if (results !== null) {
-            // handleSubmit executa a validação e, se ok, chama o onSubmit
-            form.handleSubmit(onSubmit)();
+    // Só executa se o ano mudou de fato
+    if (previousYear.current !== year) {
+    if (results !== null) {
+        const recalculate = async () => {
+            // O handleSubmit obtém os valores atuais do formulário e os passa para o onSubmit
+        await form.handleSubmit(onSubmit)();
+    };
+    recalculate();
+    }
+    // Atualiza o ano anterior após a verificação
+        previousYear.current = year;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [year]); // Dependência principal: year. 
+    }, [year, results, form, onSubmit]);
 
     const handleConfirmCnaes = (cnaes: CnaeSelection[]) => {
         form.setValue('selectedCnaes', cnaes, { shouldValidate: true, shouldDirty: true });

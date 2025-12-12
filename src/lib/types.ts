@@ -10,6 +10,8 @@ import { z } from "zod";
 export const CnaeSelectionSchema = z.object({
   code: z.string(),
   cClassTrib: z.string().optional(),
+  domesticRevenue: z.coerce.number().min(0, "O faturamento deve ser positivo.").optional(),
+  exportRevenue: z.coerce.number().min(0, "O faturamento deve ser positivo.").optional(),
 });
 export type CnaeSelection = z.infer<typeof CnaeSelectionSchema>;
 
@@ -52,7 +54,7 @@ export const TaxFormValuesSchema = z.object({
   selectedCnaes: z.array(CnaeSelectionSchema),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo."),
-  revenues: z.record(z.string(), z.coerce.number().min(0).optional()),
+
   domesticActivities: z.array(CnaeItemSchema).optional(),
   exportActivities: z.array(CnaeItemSchema).optional(),
   exportCurrency: z.string(),
