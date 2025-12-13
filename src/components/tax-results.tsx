@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 // Importação da tabela atualizada
 import { ComparisonTable } from './comparison-table';
+import { YearSelector } from './year-selector';
 
 interface TaxResultsProps {
   year: number;
@@ -438,3 +439,5 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
+
+    
