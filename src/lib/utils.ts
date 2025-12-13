@@ -56,24 +56,37 @@ export function formatPercent(value: number | undefined | null) {
 }
 
 
-// Helper to find the correct tax bracket based on a value (e.g., revenue)
-// Assumes brackets are sorted by limit (or max) ascending
-export function findBracket<T extends { max: number }>(brackets: T[], value: number): T {
-  // Validação estrita para garantir que recebemos um array válido
+// Novo helper defensivo
+export function safeFindBracket<T extends { max: number }>(
+  value: number,
+  brackets: T[] | undefined | null,
+  context?: { who?: string; year?: number; annex?: string }
+): T {
+  // Contextual logging para debugar (mostra quem chamou e qual ano/anexo)
+  const ctx = context ? ` [who=${context.who ?? '-'}, year=${context.year ?? '-'}, annex=${context.annex ?? '-'}]` : '';
+
   if (!Array.isArray(brackets) || brackets.length === 0) {
-    console.error("Erro crítico: Tabela de faixas (brackets) inválida ou vazia.", { value, brackets });
-    throw new Error(`Dados de cálculo (tabela de impostos) não encontrados ou inválidos. Verifique se o ano e o anexo estão corretos.`);
+    console.error(`Erro crítico: Tabela de faixas (brackets) inválida ou vazia.${ctx}`, {
+      value,
+      brackets,
+      context,
+      stack: new Error().stack,
+    });
+    throw new Error(
+      `Dados de cálculo (tabela de impostos) não encontrados ou inválidos${ctx}. Verifique se o ano e o anexo estão corretos.`
+    );
   }
 
-  // Se o valor for inválido, assume 0 para evitar erros de comparação
-  const safeValue = isNaN(value) ? 0 : value;
-
-  // UPDATED: Using .max instead of .limit to match your FiscalConfig type
-  const found = brackets.find((bracket) => safeValue <= bracket.max);
-  
-  // Fallback para a última faixa (maior alíquota) se o valor exceder todos os limites
+  const safeValue = isNaN(Number(value)) ? 0 : Number(value);
+  const found = brackets.find((b) => safeValue <= b.max);
   return found || brackets[brackets.length - 1];
 }
+
+// Mantemos findBracket compatível com chamadas existentes, mas delegamos ao safeFindBracket
+export function findBracket<T extends { max: number }>(value: number, brackets: T[]): T {
+  return safeFindBracket(value, brackets, { who: 'findBracket (legacy)' });
+}
+
 
 // Alias for findBracket
 export const findFeeBracket = findBracket;

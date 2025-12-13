@@ -13,7 +13,7 @@ import {
   type PartnerTaxDetails,
   type TaxFormValues
 } from './types';
-import { findBracket, findFeeBracket, formatPercent } from './utils';
+import { findBracket, findFeeBracket, formatPercent, safeFindBracket } from './utils';
 import { getFiscalParameters } from '../config/fiscal';
 
 // =================================================================================
@@ -21,23 +21,21 @@ import { getFiscalParameters } from '../config/fiscal';
 // =================================================================================
 
 export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
-    let totalINSSRetido = 0;
-    let totalIRRFRetido = 0;
-
-    const inssTable = config.tabela_inss_clt_progressiva;
-    const irrfTable =
-        config.reforma_tributaria?.tabela_irrf?.length
-            ? config.reforma_tributaria.tabela_irrf
-            : config.tabela_irrf;
+    
+    const inssTable = config?.tabela_inss_clt_progressiva;
+    const irrfTable = config?.reforma_tributaria?.tabela_irrf?.length
+        ? config.reforma_tributaria.tabela_irrf
+        : config?.tabela_irrf;
 
     if (!Array.isArray(inssTable) || inssTable.length === 0) {
-        throw new Error('Tabela de INSS inválida ou ausente para cálculo do pró-labore.');
+        throw new Error('Tabela de INSS inválida ou ausente no FiscalConfig — impossível calcular pró-labore.');
+    }
+    if (!Array.isArray(irrfTable) || irrfTable.length === 0) {
+        throw new Error('Tabela de IRRF inválida ou ausente no FiscalConfig — impossível calcular pró-labore.');
     }
 
-    if (!Array.isArray(irrfTable) || irrfTable.length === 0) {
-        throw new Error('Tabela de IRRF inválida ou ausente para cálculo do pró-labore.');
-    }
-    
+    let totalINSSRetido = 0;
+    let totalIRRFRetido = 0;
 
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
@@ -53,7 +51,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         
         const baseCalculoIRRF = proLaboreBruto - inss;
 
-        const irrfBracket = findBracket(irrfTable, baseCalculoIRRF);
+        const irrfBracket = safeFindBracket(baseCalculoIRRF, irrfTable, { who: '_calculatePartnerTaxes.IRRF', year: config.ano_vigencia });
         const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
         
         totalIRRFRetido += irrf;
@@ -119,7 +117,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
     const cpp = _calculateCpp(monthlyPayroll, config);
 
     const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
-    const feeBracket = findFeeBracket(totalRevenue, CONTABILIZEI_FEES_LUCRO_PRESUMIDO);
+    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + contabilizeiFee;
     
@@ -197,7 +195,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         if (effectiveAnnex === 'IV') hasAnnexIVActivity = true;
 
         const annexTable = config.simples_nacional[effectiveAnnex];
-        const bracket = findBracket(annexTable, effectiveRbt12);
+        const bracket = findBracket(effectiveRbt12, annexTable);
         const { rate, deduction, distribution } = bracket;
         
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
@@ -221,7 +219,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     
-    const feeBracket = findFeeBracket(totalRevenue, CONTABILIZEI_FEES_SIMPLES_NACIONAL);
+    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
     const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
     const totalMonthlyCost = totalTax + contabilizeiFee;
 
@@ -318,5 +316,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
-
-    

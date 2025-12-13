@@ -13,7 +13,7 @@ import {
   type TaxDetails,
   type ProLaboreForm,
 } from './types';
-import { formatPercent, findBracket, findFeeBracket, formatCurrencyBRL } from './utils';
+import { formatPercent, findBracket, findFeeBracket, safeFindBracket } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { getIvaReductionByCnae } from './cnae-reductions-2026';
@@ -319,7 +319,7 @@ function _calculateSimples2026(
     const annexTable = fiscalConfig.simples_nacional?.[effectiveAnnex];
     ensureAnnexTable(annexTable, effectiveAnnex, year);
 
-    const bracket = findBracket(effectiveRbt12, annexTable);
+    const bracket = safeFindBracket(effectiveRbt12, annexTable, { who: '_calculateSimples2026', year, annex: effectiveAnnex });
     const { rate, deduction, distribution } = bracket;
     const effectiveDasRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate - deduction) / effectiveRbt12) : rate;
 
@@ -338,26 +338,7 @@ function _calculateSimples2026(
     }
   });
 
-  if (!hasProcessedActivity) {
-    if(totalProLaboreBruto > 0){
-      const { totalINSSRetido, totalIRRFRetido, partnerTaxes } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig);
-       return {
-          regime: isHybrid ? 'Simples Nacional Híbrido (Anexo V)' : 'Simples Nacional Tradicional (Anexo V)',
-          annex: 'V',
-          totalTax: totalINSSRetido + totalIRRFRetido,
-          totalMonthlyCost: (fee ?? 0) + totalINSSRetido + totalIRRFRetido,
-          totalRevenue: 0,
-          domesticRevenue: 0,
-          exportRevenue: 0,
-          proLabore: totalProLaboreBruto,
-          fatorR: fatorREffective,
-          effectiveRate: 0,
-          contabilizeiFee: fee,
-          breakdown: [],
-          notes: ['Nenhum CNAE válido processado. Apenas impostos sobre pró-labore foram calculados.'],
-          partnerTaxes: partnerTaxes,
-      };
-    }
+  if (!hasProcessedActivity && totalProLaboreBruto <= 0) {
     throw new Error('Não foi possível calcular o Simples Nacional: nenhum CNAE válido foi processado.');
   }
 
