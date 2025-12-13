@@ -36,7 +36,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         totalINSSRetido += inss;
         
         const baseCalculoIRRF = proLaboreBruto - inss;
-        const irrfBracket = findBracket(config.tabela_irrf, baseCalculoIRRF);
+        const irrfBracket = findBracket(baseCalculoIRRF, config.tabela_irrf);
         const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
         
         totalIRRFRetido += irrf;

@@ -284,7 +284,7 @@ function _calculateSimples2026(
 
     // Calcular IVA por fora (apenas no Simples Híbrido a partir de 2027)
     if (isHybrid && year >= 2027) {
-      const config2026 = getFiscalParametersPostReform(2026);
+      const config2026 = getFiscalParametersPostReform(year); // Use o ano da simulação
       
       // CORREÇÃO: Usamos o operador de coalescência nula (??) para garantir um valor numérico
       const baseCbsRate = config2026.reforma_tributaria?.cbs_aliquota_padrao ?? 0;
