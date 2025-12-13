@@ -425,15 +425,15 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
-  if (hasAnnexVActivity && totalRevenue > 0) {
+  // FIX: This entire block should only run if optimization is possible and needed.
+  if (hasAnnexVActivity && totalRevenue > 0 && fatorR_naoOtimizado < fiscalConfig.simples_nacional.limite_fator_r) {
       const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
-      const requiredAnnualPayroll = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
-      const currentAnnualPayroll = (fp12 > 0 ? fp12 : (totalSalaryExpense + totalProLaboreBruto) * 12);
-      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - currentAnnualPayroll;
+      const requiredAnnualPayroll = effectiveRbt12 * limiteFatorR;
+      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - effectiveFp12;
       
-      if (fatorR_naoOtimizado < limiteFatorR && additionalAnnualPayrollNeeded > 0) {
+      if (additionalAnnualPayrollNeeded > 0) {
           const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
-          const additionalMonthlyProLaboreNeeded = Math.max(0, additionalAnnualPayrollNeeded / 12);
+          const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
 
           let minValue = Infinity;
           let minCount = 0;
@@ -447,30 +447,31 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
             }
           });
           
-          const addPerPartner = additionalMonthlyProLaboreNeeded / minCount;
-          proLaboresCopy.forEach(p => {
-             if (p.value === minValue) p.value += addPerPartner;
-          });
-          
-          const optimizedValues = { ...values, proLabores: proLaboresCopy };
-          simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);
-          if (year >= 2027) {
-            simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, proLaboresCopy);
+          if(minCount > 0) {
+            const addPerPartner = additionalMonthlyProLaboreNeeded / minCount;
+            proLaboresCopy.forEach(p => {
+               if (p.value === minValue) p.value += addPerPartner;
+            });
+             const optimizedValues = { ...values, proLabores: proLaboresCopy };
+            simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);
+            if (year >= 2027) {
+              simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, proLaboresCopy);
+            }
           }
-      } else if (fatorR_naoOtimizado >= limiteFatorR) {
-        simplesNacionalOtimizado = { 
-            ...simplesNacionalTradicional, 
-            regime: 'Simples Nacional (Fator R Otimizado)', 
+      }
+  } else if (hasAnnexVActivity && fatorR_naoOtimizado >= fiscalConfig.simples_nacional.limite_fator_r) {
+    simplesNacionalOtimizado = { 
+        ...simplesNacionalTradicional, 
+        regime: 'Simples Nacional (Fator R Otimizado)', 
+        optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já no Anexo III.` 
+    };
+    if (year >= 2027 && simplesNacionalHibrido) {
+        simplesNacionalOtimizadoHibrido = { 
+            ...simplesNacionalHibrido, 
+            regime: 'Simples Nacional (Fator R Otimizado) Híbrido', 
             optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já no Anexo III.` 
         };
-        if (year >= 2027 && simplesNacionalHibrido) {
-            simplesNacionalOtimizadoHibrido = { 
-                ...simplesNacionalHibrido, 
-                regime: 'Simples Nacional (Fator R Otimizado) Híbrido', 
-                optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já no Anexo III.` 
-            };
-        }
-      }
+    }
   }
   
   const lucroPresumido = calculateLucroPresumido(values, false) as TaxDetails2026;
