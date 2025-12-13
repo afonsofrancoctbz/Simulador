@@ -1,3 +1,4 @@
+
 import type { FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -24,7 +25,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
     let totalIRRFRetido = 0;
     
     // Fallback to the correct IRRF table depending on the config structure
-    const irrfTable = config.reforma_tributaria?.tabela_irrf || config.tabela_irrf;
+    const irrfTable = config.tabela_irrf;
 
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
@@ -183,7 +184,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         if (effectiveAnnex === 'IV') hasAnnexIVActivity = true;
 
         const annexTable = config.simples_nacional[effectiveAnnex];
-        const bracket = findBracket(annexTable, effectiveRbt12);
+        const bracket = findBracket(effectiveRbt12, annexTable);
         const { rate, deduction, distribution } = bracket;
         
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
