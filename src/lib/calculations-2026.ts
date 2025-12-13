@@ -1,4 +1,3 @@
-
 // src/lib/calculations-2026.ts
 import { getFiscalParametersPostReform } from '@/config/fiscal';
 import {
@@ -18,6 +17,18 @@ import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { getIvaReductionByCnae } from './cnae-reductions-2026';
 import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
+
+
+const VALID_ANNEXES: Annex[] = ['I', 'II', 'III', 'IV', 'V'];
+
+function normalizeAnnex(annex?: string): Annex {
+  if (VALID_ANNEXES.includes(annex as Annex)) {
+    return annex as Annex;
+  }
+  // Fallback seguro para apresentação
+  return 'III';
+}
+
 
 function getIvaReduction(
   cnaeCode: string,
@@ -246,22 +257,26 @@ function _calculateSimples2026(
 
         let effectiveAnnex: Annex;
         if (cnaeInfo.requiresFatorR) {
-             effectiveAnnex = fatorREffective >= fiscalConfig.simples_nacional.limite_fator_r ? 'III' : 'V';
+            effectiveAnnex = fatorREffective >= fiscalConfig.simples_nacional.limite_fator_r ? 'III' : 'V';
         } else {
-            effectiveAnnex = cnaeInfo.annex;
+            effectiveAnnex = normalizeAnnex(cnaeInfo.annex);
         }
         finalAnnex = effectiveAnnex;
 
-        const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
+        if (!fiscalConfig.simples_nacional) {
+            throw new Error("Configuração do Simples Nacional ausente.");
+        }
         
-        // Guard clause to prevent crash
+        const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
+
         if (!Array.isArray(annexTable) || annexTable.length === 0) {
             console.error("Erro de configuração Simples 2026", {
-                annex: effectiveAnnex,
-                fiscalConfig: fiscalConfig.simples_nacional,
+              annex: effectiveAnnex,
+              fiscalConfig: fiscalConfig.simples_nacional,
             });
+          
             throw new Error(
-                `Tabela do Simples Nacional 2026 não encontrada para o Anexo ${effectiveAnnex}.`
+              `Tabela do Simples Nacional 2026 não encontrada para o Anexo ${effectiveAnnex}.`
             );
         }
         
@@ -356,7 +371,7 @@ function _calculateSimples2026(
     const regimeAnexo = `(Anexo ${finalAnnex})`;
 
     if (proLaboreOverride) {
-        regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
+        regimeName = `Simples Nacional (Fator R Otimizado)${isHybrid ? ' Híbrido' : ''}` as any;
     } else {
         regimeName = isHybrid ? `Simples Nacional Híbrido ${regimeAnexo}` : `Simples Nacional Tradicional ${regimeAnexo}`;
     }
@@ -473,7 +488,10 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     result.simplesNacionalOtimizadoHibrido = { ...simplesNacionalOtimizadoHibrido, order: order++ };
   }
   
-  result.simplesNacionalTradicional = { ...simplesNacionalTradicional, order: order++ };
+  if (simplesNacionalTradicional) {
+    result.simplesNacionalTradicional = { ...simplesNacionalTradicional, order: order++ };
+  }
+
 
   if (simplesNacionalHibrido) {
     result.simplesNacionalHibrido = { ...simplesNacionalHibrido, order: order++ };
