@@ -53,7 +53,7 @@ function ensureAnnexTable<T extends { max: number }>(annexTable: T[] | undefined
       annex,
       fiscalConfig: getFiscalParametersPostReform(year).simples_nacional,
     });
-    throw new Error(`Tabela do Simples Nacional 2026 não encontrada para o Anexo ${annex}.`);
+    throw new Error(`Tabela do Simples Nacional indisponível para o Anexo ${annex} no ano ${year}`);
   }
 }
 
@@ -96,7 +96,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     exchangeRate = 1,
     totalSalaryExpense = 0,
     proLabores = [],
-    selectedPlan = 0,
+    selectedPlan = 'expertsEssencial',
     creditGeneratingExpenses = 0,
     issRate = undefined,
   } = values;
@@ -257,6 +257,7 @@ function _calculateSimples2026(
   fatorREffective: number,
   proLaboreOverride?: ProLaboreForm[]
 ): TaxDetails2026 {
+  let hasProcessedActivity = false;
   const year = values.year || 2026;
   const fiscalConfig = getFiscalParametersPostReform(year);
 
@@ -271,8 +272,6 @@ function _calculateSimples2026(
     selectedPlan = 'expertsEssencial',
     creditGeneratingExpenses = 0,
   } = values;
-
-  let hasProcessedActivity = false;
 
   const proLaboresToUse = proLaboreOverride ?? proLabores;
   const totalProLaboreBruto = proLaboresToUse.reduce((s, p) => s + (p?.value || 0), 0);
@@ -299,25 +298,6 @@ function _calculateSimples2026(
     ...domesticActivities.map(a => ({ ...a, isExport: false })),
     ...exportActivities.map(a => ({ ...a, revenue: (a?.revenue || 0) * (exchangeRate || 1), isExport: true })),
   ];
-
-  if (allActivities.length === 0) {
-    return {
-      regime: 'Simples Nacional Tradicional (Anexo V)',
-      annex: 'V',
-      totalTax: 0,
-      totalMonthlyCost: fee ?? 0,
-      totalRevenue: 0,
-      domesticRevenue: 0,
-      exportRevenue: 0,
-      proLabore: totalProLaboreBruto,
-      fatorR: fatorREffective,
-      effectiveRate: 0,
-      contabilizeiFee: fee,
-      breakdown: [],
-      notes: ['Sem atividades informadas.'],
-      partnerTaxes: [],
-    };
-  }
 
   allActivities.forEach(activity => {
     if (!activity) return;
@@ -360,7 +340,7 @@ function _calculateSimples2026(
 
   if (!hasProcessedActivity) {
     return {
-      regime: 'Simples Nacional Tradicional (Anexo V)',
+      regime: isHybrid ? 'Simples Nacional Híbrido (Anexo V)' : 'Simples Nacional Tradicional (Anexo V)',
       annex: 'V',
       totalTax: totalProLaboreBruto > 0 ? _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalINSSRetido + _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalIRRFRetido : 0,
       totalMonthlyCost: (fee ?? 0) + (totalProLaboreBruto > 0 ? _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalINSSRetido + _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalIRRFRetido : 0),
@@ -441,12 +421,12 @@ function _calculateSimples2026(
     notes.push(`Anexo IV: CPP (${formatPercent(cppRate)}) calculada sobre a folha.`);
   }
 
-  let regimeName: TaxDetails2026['regime'] = 'Simples Nacional Tradicional (Anexo V)';
+  let regimeName: TaxDetails2026['regime'] = isHybrid
+    ? `Simples Nacional Híbrido (Anexo ${finalAnnex})`
+    : `Simples Nacional Tradicional (Anexo ${finalAnnex})`;
   
   if (proLaboreOverride) {
       regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
-  } else {
-      regimeName = isHybrid ? `Simples Nacional Híbrido (Anexo ${finalAnnex})` : `Simples Nacional Tradicional (Anexo ${finalAnnex})`;
   }
 
 
