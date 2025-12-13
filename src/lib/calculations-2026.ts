@@ -385,35 +385,42 @@ function _calculateSimples2026(
     const config2026 = getFiscalParametersPostReform(year);
     const baseCbsRate = config2026.reforma_tributaria?.cbs_aliquota_padrao ?? 0;
     const baseIbsRate = config2026.reforma_tributaria?.ibs_aliquota_padrao ?? 0;
+    const b2bPortion = ((b2bRevenuePercentage ?? 100) / 100);
 
     let totalIbsDebit = 0;
     let totalCbsDebit = 0;
-    let totalCbsCredit = 0;
     let totalIbsCredit = 0;
-
-    const b2bRevenuePortion = (b2bRevenuePercentage ?? 100) / 100;
+    let totalCbsCredit = 0;
 
     domesticActivities.forEach(activity => {
-      if (!activity || (activity.revenue || 0) <= 0) return;
-      const reduction = getIvaReduction(activity.code, activity.cClassTrib);
-      const reducaoIBSDecimal = (reduction.reducaoIBS ?? 0) / 100;
-      const reducaoCBSDecimal = (reduction.reducaoCBS ?? 0) / 100;
-      const activityB2bRevenue = (activity.revenue || 0) * b2bRevenuePortion;
-      totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - reducaoCBSDecimal));
-      totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - reducaoIBSDecimal));
+        const rev = Number(activity.revenue || 0);
+        if (rev <= 0) return;
+
+        const reduction = getIvaReduction(activity.code, activity.cClassTrib);
+        const reducaoIBS = (reduction?.reducaoIBS ?? 0) / 100;
+        const reducaoCBS = (reduction?.reducaoCBS ?? 0) / 100;
+
+        // Only the B2B portion of revenue pays IVA outside
+        const activityB2BRevenue = rev * b2bPortion;
+
+        totalCbsDebit += activityB2BRevenue * (baseCbsRate * (1 - reducaoCBS));
+        totalIbsDebit += activityB2BRevenue * (baseIbsRate * (1 - reducaoIBS));
     });
 
+    // Credits from deductible expenses — apply same CNAE-based reductions using first activity (best-effort)
     if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
-      const firstActivity = domesticActivities[0];
-      const reduction = getIvaReduction(firstActivity.code, firstActivity.cClassTrib);
-      const reducaoIBSDecimal = (reduction.reducaoIBS ?? 0) / 100;
-      const reducaoCBSDecimal = (reduction.reducaoCBS ?? 0) / 100;
-      totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reducaoCBSDecimal));
-      totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reducaoIBSDecimal));
+        const first = domesticActivities[0];
+        const reduction = getIvaReduction(first.code, first.cClassTrib);
+        const reducaoIBS = (reduction?.reducaoIBS ?? 0) / 100;
+        const reducaoCBS = (reduction?.reducaoCBS ?? 0) / 100;
+
+        totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reducaoCBS));
+        totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reducaoIBS));
     }
-    const finalIbs = Math.max(0, totalIbsDebit - totalIbsCredit);
+
     const finalCbs = Math.max(0, totalCbsDebit - totalCbsCredit);
-    ivaTaxes = finalIbs + finalCbs;
+    const finalIbs = Math.max(0, totalIbsDebit - totalIbsCredit);
+    ivaTaxes = finalCbs + finalIbs;
   }
 
   const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;

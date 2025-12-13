@@ -45,14 +45,22 @@ export function parseBRL(value: string) {
   return isNaN(number) ? 0 : number
 }
 
-export function formatPercent(value: number | undefined | null) {
-  if (value === undefined || value === null || isNaN(value)) return "0,00%";
+export function formatPercent(value: number | string | undefined | null) {
+  if (value === undefined || value === null) return "0,00%";
+
+  // Normalize input to number
+  const number = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(number)) return "0,00%";
+
+  // If the value appears > 1 (e.g., 13.29 meaning 13.29%), treat it as percentage and divide by 100.
+  // If it's between -1 and 1, treat it as fraction already (e.g., 0.1329).
+  const fraction = Math.abs(number) > 1 ? number / 100 : number;
 
   return new Intl.NumberFormat("pt-BR", {
     style: "percent",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value);
+  }).format(fraction);
 }
 
 

@@ -5,7 +5,7 @@
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
 import { cn, formatCurrencyBRL, parseBRL } from "@/lib/utils";
-import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
+import { getCnaeData } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
-import { getIvaReductionByCnae } from "@/lib/cnae-reductions-2026";
+import { getIvaReductionByCnae, getNBSOptionsByCnae } from "@/lib/cnae-reductions-2026";
 
 
 interface FormSectionRevenueAndCnaeProps {
@@ -124,7 +124,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     const cnae = getCnaeData(cnaeItem.code);
                                     if (!cnae) return null;
 
-                                    const cnaeOptions = year >= 2026 ? getCnaeOptions(cnaeItem.code) : [];
+                                    const cnaeOptions = year >= 2026 ? getNBSOptionsByCnae(cnaeItem.code) : [];
                                     const reduction = year >= 2026 ? getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib) : { reducaoIBS: 0, reducaoCBS: 0 };
 
 
@@ -362,3 +362,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
+

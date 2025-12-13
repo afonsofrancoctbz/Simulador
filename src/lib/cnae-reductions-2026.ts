@@ -73,7 +73,7 @@ export function getIvaReductionByCnae(
   cnaeCode: string,
   cClassTrib?: string
 ): { reducaoIBS: number; reducaoCBS: number } {
-  const cnaeData = CNAE_REDUCTIONS_DATABASE[cnaeCode.replace(/\D/g, '')];
+  const cnaeData = CNAE_REDUCTIONS_DATABASE[String(cnaeCode || '').replace(/\D/g, '')];
 
   if (!cnaeData) {
     return { reducaoIBS: 0, reducaoCBS: 0 };
@@ -88,7 +88,7 @@ export function getIvaReductionByCnae(
       };
     }
   }
-
+  // Fallback to default if cClassTrib specific reduction not found or not provided
   return {
     reducaoIBS: cnaeData.defaultReduction?.ibs ?? 0,
     reducaoCBS: cnaeData.defaultReduction?.cbs ?? 0,
