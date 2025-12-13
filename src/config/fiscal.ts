@@ -92,7 +92,7 @@ const FISCAL_CONFIG_2025: FiscalConfig = {
 
 const FISCAL_CONFIG_2026: FiscalConfig = {
   ...FISCAL_CONFIG_2025,
-  simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)), // Fallback for structureClone safety
+  simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)), // Deep copy
   ano_vigencia: 2026,
   salario_minimo: 1631.00,
   teto_inss: 8565.28,
@@ -132,34 +132,42 @@ export function getFiscalParameters(year: 2025 | 2026): FiscalConfig {
 }
 
 export function getFiscalParametersPostReform(year: number): FiscalConfig {
-    if (year < 2026 || year > 2033) {
-        console.warn(`Ano ${year} fora do range esperado (2026-2033) para a reforma tributária.`);
+    if (year < 2026) {
+      // For years before the reform, return the 2025 config but add a dummy reforma_tributaria object
+      const baseConfig = getFiscalParameters(2025);
+      return {
+        ...baseConfig,
+        reforma_tributaria: {
+          cbs_aliquota_padrao: 0,
+          ibs_aliquota_padrao: 0,
+          pis_cofins_multiplier: 1,
+          iss_icms_multiplier: 1,
+        }
+      }
     }
 
-    const baseConfig = getFiscalParameters(year === 2025 ? 2025 : 2026);
+    const baseConfig = getFiscalParameters(2026);
     
     const safeYear = Math.max(2026, Math.min(year, 2033)) as keyof typeof TRANSITION_TABLE;
     const transition = TRANSITION_TABLE[safeYear];
 
-    if (!transition && year < 2026) return baseConfig;
-
     const newConfig = {
       ...baseConfig,
+      simples_nacional: JSON.parse(JSON.stringify(baseConfig.simples_nacional)), // Deep copy to prevent mutation
       reforma_tributaria: {
           cbs_aliquota_padrao: transition.cbs,
           ibs_aliquota_padrao: transition.ibs,
           pis_cofins_multiplier: transition.pis_cofins_multiplier,
           iss_icms_multiplier: transition.iss_icms_multiplier,
-          tabela_irrf: baseConfig.tabela_irrf, // Propagando a tabela IRRF para o novo objeto
       }
     };
     
     const anexos = ['I', 'II', 'III', 'IV', 'V'] as const;
 
     anexos.forEach(annexKey => {
-        const brackets = baseConfig.simples_nacional[annexKey];
+        const brackets = newConfig.simples_nacional[annexKey] as SimplesBracket[];
         if (Array.isArray(brackets)) {
-            (newConfig.simples_nacional as any)[annexKey] = brackets.map(bracket => {
+            newConfig.simples_nacional[annexKey] = brackets.map(bracket => {
                 const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
                 
                 const newPIS = PIS * transition.pis_cofins_multiplier;

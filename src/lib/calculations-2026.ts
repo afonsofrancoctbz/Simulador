@@ -1,3 +1,4 @@
+
 // src/lib/calculations-2026.ts
 import { getFiscalParametersPostReform } from '@/config/fiscal';
 import {
@@ -16,17 +17,24 @@ import { formatPercent, findBracket, findFeeBracket, formatCurrencyBRL } from '.
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { getIvaReductionByCnae } from './cnae-reductions-2026';
+import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
-/**
- * Função corrigida para obter redução de IVA
- * Agora busca corretamente por CNAE + cClassTrib (NBS code removido pois não é utilizado na assinatura atual)
- */
 function getIvaReduction(
   cnaeCode: string,
   cClassTrib?: string
 ): { reducaoIBS: number; reducaoCBS: number } {
-  // CORREÇÃO: Removido o argumento do meio (nbsCode) que causava o erro
-  return getIvaReductionByCnae(cnaeCode, cClassTrib);
+  const cnaeNumeric = cnaeCode.replace(/\D/g, '');
+  
+  if (cClassTrib) {
+    const specificRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === cnaeNumeric && r.cClassTrib === cClassTrib);
+    if (specificRel) {
+      return getIvaReductionByCnae(cnaeCode, cClassTrib);
+    }
+  }
+
+  // Fallback to default if no specific cClassTrib is provided or found
+  const defaultReduction = getIvaReductionByCnae(cnaeCode);
+  return defaultReduction;
 }
 
 function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean): TaxDetails | TaxDetails2026 {
@@ -36,7 +44,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     const { 
         domesticActivities = [], 
         exportActivities = [], 
-        exchangeRate = 1, // CORREÇÃO: Valor padrão para evitar 'undefined'
+        exchangeRate = 1,
         totalSalaryExpense, 
         proLabores, 
         selectedPlan, 
@@ -54,7 +62,6 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     const cppRate = fiscalConfig.aliquotas_cpp_patronal.base;
     const inssPatronal = _calculateCpp(monthlyPayroll, fiscalConfig);
 
-    // Cálculo da base presumida
     let presumedProfitBase = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))].reduce((sum, activity) => {
         const cnaeInfo = getCnaeData(activity.code);
         return sum + (activity.revenue * (cnaeInfo?.presumedProfitRateIRPJ ?? 0.32));
@@ -81,7 +88,6 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     const configTransition = 'reforma_tributaria' in fiscalConfig ? fiscalConfig.reforma_tributaria : null;
 
     if (isCurrentRules || !configTransition) {
-        // PRÉ-REFORMA: PIS, COFINS e ISS cumulativos
         const pisRate = fiscalConfig.lucro_presumido_rates.PIS;
         const pis = domesticRevenue * pisRate;
         
@@ -97,12 +103,10 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         if (iss > 0) breakdown.push({ name: `ISS`, value: iss, rate: issRateAsDecimal });
         notes.push("Cálculo pré-reforma: PIS, COFINS e ISS cumulativos. Receitas de exportação são isentas.");
     } else {
-        // PÓS-REFORMA: Transição com IBS/CBS
         const pisRate = fiscalConfig.lucro_presumido_rates.PIS;
         const cofinsRate = fiscalConfig.lucro_presumido_rates.COFINS;
         const issRateAsDecimal = (values.issRate ?? 5) / 100;
         
-        // Impostos antigos (reduzidos gradualmente)
         const pis = domesticRevenue * pisRate * configTransition.pis_cofins_multiplier;
         const cofins = domesticRevenue * cofinsRate * configTransition.pis_cofins_multiplier;
         if (pis > 0) breakdown.push({ name: `PIS`, value: pis, rate: pisRate * configTransition.pis_cofins_multiplier });
@@ -113,7 +117,6 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         
         const oldTaxesCost = pis + cofins + iss;
         
-        // NOVOS IMPOSTOS: CBS e IBS com redução por CNAE
         const baseCbsRate = configTransition.cbs_aliquota_padrao;
         const baseIbsRate = configTransition.ibs_aliquota_padrao;
 
@@ -122,31 +125,19 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
         let totalCbsCredit = 0;
         let totalIbsCredit = 0;
         
-        // Calcular débito com redução específica por atividade
         domesticActivities.forEach(activity => {
-            const reduction = getIvaReduction(
-                activity.code,
-                activity.cClassTrib
-            );
-            
+            const reduction = getIvaReduction(activity.code, activity.cClassTrib);
             const reducaoIBSDecimal = reduction.reducaoIBS / 100;
             const reducaoCBSDecimal = reduction.reducaoCBS / 100;
-            
             totalCbsDebit += activity.revenue * (baseCbsRate * (1 - reducaoCBSDecimal));
             totalIbsDebit += activity.revenue * (baseIbsRate * (1 - reducaoIBSDecimal));
         });
         
-        // Calcular crédito (usa a redução da primeira atividade)
         if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
              const firstActivity = domesticActivities[0];
-             const reduction = getIvaReduction(
-                 firstActivity.code,
-                 firstActivity.cClassTrib
-             );
-             
+             const reduction = getIvaReduction(firstActivity.code, firstActivity.cClassTrib);
              const reducaoIBSDecimal = reduction.reducaoIBS / 100;
              const reducaoCBSDecimal = reduction.reducaoCBS / 100;
-             
              totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reducaoCBSDecimal));
              totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reducaoIBSDecimal));
         }
@@ -211,7 +202,7 @@ function _calculateSimples2026(
     const { 
         domesticActivities = [], 
         exportActivities = [], 
-        exchangeRate = 1, // CORREÇÃO: Valor padrão para evitar 'undefined'
+        exchangeRate = 1,
         totalSalaryExpense, 
         proLabores, 
         b2bRevenuePercentage = 100, 
@@ -246,7 +237,6 @@ function _calculateSimples2026(
         ...exportActivities.map(a => ({ ...a, revenue: a.revenue * exchangeRate, isExport: true }))
     ];
 
-    // Calcular DAS
     allActivities.forEach(activity => {
         const cnaeInfo = getCnaeData(activity.code);
         if (!cnaeInfo) return;
@@ -282,11 +272,9 @@ function _calculateSimples2026(
         if (effectiveAnnex === 'IV') cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig);
     });
 
-    // Calcular IVA por fora (apenas no Simples Híbrido a partir de 2027)
     if (isHybrid && year >= 2027) {
-      const config2026 = getFiscalParametersPostReform(year); // Use o ano da simulação
+      const config2026 = getFiscalParametersPostReform(year);
       
-      // CORREÇÃO: Usamos o operador de coalescência nula (??) para garantir um valor numérico
       const baseCbsRate = config2026.reforma_tributaria?.cbs_aliquota_padrao ?? 0;
       const baseIbsRate = config2026.reforma_tributaria?.ibs_aliquota_padrao ?? 0;
 
@@ -299,16 +287,10 @@ function _calculateSimples2026(
       
       domesticActivities.forEach(activity => {
           if(activity.revenue > 0) {
-            const reduction = getIvaReduction(
-                activity.code,
-                activity.cClassTrib
-            );
-            
+            const reduction = getIvaReduction(activity.code, activity.cClassTrib);
             const reducaoIBSDecimal = reduction.reducaoIBS / 100;
             const reducaoCBSDecimal = reduction.reducaoCBS / 100;
-            
             const activityB2bRevenue = activity.revenue * b2bRevenuePortion;
-            
             totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - reducaoCBSDecimal));
             totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - reducaoIBSDecimal));
           }
@@ -316,14 +298,9 @@ function _calculateSimples2026(
       
       if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
         const firstActivity = domesticActivities[0];
-        const reduction = getIvaReduction(
-            firstActivity.code,
-            firstActivity.cClassTrib
-        );
-        
+        const reduction = getIvaReduction(firstActivity.code, firstActivity.cClassTrib);
         const reducaoIBSDecimal = reduction.reducaoIBS / 100;
         const reducaoCBSDecimal = reduction.reducaoCBS / 100;
-        
         totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reducaoCBSDecimal));
         totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reducaoIBSDecimal));
       }
@@ -425,12 +402,11 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
   
-  // FIX: This entire block should only run if optimization is possible and needed.
   if (hasAnnexVActivity && totalRevenue > 0 && fatorR_naoOtimizado < fiscalConfig.simples_nacional.limite_fator_r) {
       const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
       const requiredAnnualPayroll = effectiveRbt12 * limiteFatorR;
       const additionalAnnualPayrollNeeded = requiredAnnualPayroll - effectiveFp12;
-      
+
       if (additionalAnnualPayrollNeeded > 0) {
           const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
           const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;

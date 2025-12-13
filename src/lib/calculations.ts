@@ -23,6 +23,9 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
     
+    // Fallback to the correct IRRF table depending on the config structure
+    const irrfTable = config.reforma_tributaria?.tabela_irrf || config.tabela_irrf;
+
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
         if (proLaboreBruto <= 0) {
@@ -36,7 +39,7 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         totalINSSRetido += inss;
         
         const baseCalculoIRRF = proLaboreBruto - inss;
-        const irrfBracket = findBracket(baseCalculoIRRF, config.tabela_irrf);
+        const irrfBracket = findBracket(baseCalculoIRRF, irrfTable);
         const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
         
         totalIRRFRetido += irrf;
@@ -144,16 +147,14 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
 
     // BASE DE CÁLCULO (RBT12)
-    // Se o usuário não preencheu RBT12, projeta-se o anual.
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     
     // SEMPRE usar a folha projetada quando estiver otimizando
     const annualPayroll = proLaboreOverride 
-    ? monthlyPayroll * 12  // Usa folha FUTURA projetada
-    : (fp12 > 0 ? fp12 : monthlyPayroll * 12); // Usa histórico apenas no cenário base
+    ? monthlyPayroll * 12
+    : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
-    // FIX: Ensure partnerTaxes is never empty, even with zero pro-labore.
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = proLaboresToUse.length > 0 
         ? _calculatePartnerTaxes(proLaboresToUse, config) 
         : { partnerTaxes: [{ proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 }], totalINSSRetido: 0, totalIRRFRetido: 0 };
@@ -174,7 +175,6 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
 
         let effectiveAnnex: Annex;
         if (cnaeInfo.requiresFatorR) {
-            // Regra do Fator R: >= 28% vai para Anexo III (menor), senão Anexo V (maior)
             effectiveAnnex = (fatorR >= config.simples_nacional.limite_fator_r) ? 'III' : 'V';
         } else {
             effectiveAnnex = cnaeInfo.annex;
@@ -186,7 +186,6 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         const bracket = findBracket(annexTable, effectiveRbt12);
         const { rate, deduction, distribution } = bracket;
         
-        // Fórmula Oficial da Alíquota Efetiva do Simples
         const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
         
         let dasDaAtividade = revenueForActivity * effectiveRate;
