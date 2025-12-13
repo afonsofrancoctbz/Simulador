@@ -45,23 +45,20 @@ export function parseBRL(value: string) {
   return isNaN(number) ? 0 : number
 }
 
-export function formatPercent(value: number | string | undefined | null) {
-  if (value === undefined || value === null) return "0,00%"
-  
-  const number = typeof value === "string" ? parseFloat(value) : value
-  
-  if (isNaN(number)) return "0,00%"
+export function formatPercent(value: number | undefined | null) {
+  if (value === undefined || value === null || isNaN(value)) return "0,00%";
 
   return new Intl.NumberFormat("pt-BR", {
     style: "percent",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(number / 100)
+  }).format(value);
 }
+
 
 // Helper to find the correct tax bracket based on a value (e.g., revenue)
 // Assumes brackets are sorted by limit (or max) ascending
-export function findBracket<T extends { max: number }>(value: number, brackets: T[]): T {
+export function findBracket<T extends { max: number }>(brackets: T[], value: number): T {
   // Validação estrita para garantir que recebemos um array válido
   if (!Array.isArray(brackets) || brackets.length === 0) {
     console.error("Erro crítico: Tabela de faixas (brackets) inválida ou vazia.", { value, brackets });

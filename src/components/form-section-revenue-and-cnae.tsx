@@ -20,6 +20,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
+import { getIvaReductionByCnae } from "@/lib/cnae-reductions-2026";
+
 
 interface FormSectionRevenueAndCnaeProps {
     year: number;
@@ -75,10 +77,12 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
       const revenuePerCnae = cnaes.length > 0 ? value / cnaes.length : 0;
       
-      cnaes.forEach((cnae, index) => {
+      const updatedCnaes = cnaes.map(cnae => {
         const fieldToUpdate = type === 'domestic' ? 'domesticRevenue' : 'exportRevenue';
-        update(index, { ...cnae, [fieldToUpdate]: revenuePerCnae });
+        return { ...cnae, [fieldToUpdate]: revenuePerCnae };
       });
+      
+      form.setValue('selectedCnaes', updatedCnaes, { shouldValidate: true, shouldDirty: true });
     };
 
     const totalDomesticRevenue = useMemo(() => {
@@ -121,9 +125,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     if (!cnae) return null;
 
                                     const cnaeOptions = year >= 2026 ? getCnaeOptions(cnaeItem.code) : [];
+                                    const reduction = year >= 2026 ? getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib) : { reducaoIBS: 0, reducaoCBS: 0 };
+
 
                                     return (
-                                        <div key={index} className="p-4 border rounded-lg bg-background/50 relative">
+                                        <div key={index} className="p-4 border rounded-lg bg-background/50 relative space-y-2">
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -135,6 +141,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             </Button>
                                             <p className="font-bold text-primary pr-8">{cnae.code}</p>
                                             <p className="text-sm text-muted-foreground">{cnae.description}</p>
+                                            {year >= 2026 && reduction.reducaoIBS > 0 && (
+                                                <div className="text-xs font-semibold text-green-700 bg-green-100/80 border border-green-200/80 rounded-md px-2 py-1 inline-block">
+                                                    Redução IVA: {reduction.reducaoIBS}%
+                                                </div>
+                                            )}
                                             {year >= 2026 && cnaeOptions.length > 1 && (
                                                  <FormField
                                                     control={form.control}
@@ -199,7 +210,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             prefix="R$ "
                                             decimalScale={2}
                                             fixedDecimalScale
-                                            placeholder="R$ 0,00"
+                                            placeholder="R$ 10.000,00"
                                             value={totalDomesticRevenue}
                                             onValueChange={(values) => {
                                                 handleRevenueChange(values.floatValue || 0, 'domestic');

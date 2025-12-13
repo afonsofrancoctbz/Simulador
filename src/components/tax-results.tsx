@@ -53,7 +53,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
       ];
     } 
     // CASO 2: Ano 2026+ (Pós-Reforma)
-    else if ('simplesNacionalHibrido' in results) { 
+    else if ('simplesNacionalHibrido' in results || 'simplesNacionalTradicional' in results) { 
        // A ordem aqui define a ordem das colunas na tabela
        scenarios = [
           // 1. Simples Nacional "Atual" (adaptado para o ano selecionado)
@@ -363,7 +363,16 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                         </Alert>
                       )}
 
-                      {scenario.optimizationNote && !projectionNote && (
+                      {scenario.regime.includes('Híbrido') && (
+                        <Alert variant="default" className="bg-amber-100/80 border-amber-200/80 text-amber-900 p-3">
+                          <AlertDescription className="text-xs font-medium flex items-start gap-2">
+                            <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                            <span>Cenário B2C: O IVA pago por fora não gera benefício ao cliente final (pessoa física), elevando a carga total.</span>
+                          </AlertDescription>
+                        </Alert>
+                      )}
+
+                      {scenario.optimizationNote && !projectionNote && !scenario.regime.includes('Híbrido') && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>
@@ -399,7 +408,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                               <div className="w-full bg-muted rounded-full h-2 mt-1 overflow-hidden print-hidden">
                                   <div className="bg-gradient-to-r from-green-300 via-primary to-blue-800 h-2.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(effectiveRate*100, 100)}%` }}></div>
                               </div>
-                              <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(effectiveRate)} do faturamento</p>
+                              <p className='text-xs text-muted-foreground text-right mt-1'>{formatPercent(effectiveRate)}</p>
                           </div>
                       </div>
                   </div>
@@ -439,5 +448,3 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
-
-    
