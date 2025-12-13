@@ -1,4 +1,3 @@
-
 import type { FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -22,16 +21,17 @@ import { getFiscalParameters } from '../config/fiscal';
 
 export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
     
+    // Validação / fallback das tabelas usadas
     const inssTable = config?.tabela_inss_clt_progressiva;
     const irrfTable = config?.reforma_tributaria?.tabela_irrf?.length
         ? config.reforma_tributaria.tabela_irrf
         : config?.tabela_irrf;
 
     if (!Array.isArray(inssTable) || inssTable.length === 0) {
-        throw new Error('Tabela de INSS inválida ou ausente no FiscalConfig — impossível calcular pró-labore.');
+        throw new Error('Tabela de INSS inválida/ausente no FiscalConfig — impossível calcular pró-labore.');
     }
     if (!Array.isArray(irrfTable) || irrfTable.length === 0) {
-        throw new Error('Tabela de IRRF inválida ou ausente no FiscalConfig — impossível calcular pró-labore.');
+        throw new Error('Tabela de IRRF inválida/ausente no FiscalConfig — impossível calcular pró-labore.');
     }
 
     let totalINSSRetido = 0;
@@ -52,7 +52,8 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
         const baseCalculoIRRF = proLaboreBruto - inss;
 
         const irrfBracket = safeFindBracket(baseCalculoIRRF, irrfTable, { who: '_calculatePartnerTaxes.IRRF', year: config.ano_vigencia });
-        const irrf = Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction);
+        
+        const irrf = irrfBracket ? Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction) : 0;
         
         totalIRRFRetido += irrf;
 

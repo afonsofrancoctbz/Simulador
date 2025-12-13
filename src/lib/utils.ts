@@ -61,30 +61,44 @@ export function safeFindBracket<T extends { max: number }>(
   value: number,
   brackets: T[] | undefined | null,
   context?: { who?: string; year?: number; annex?: string }
-): T {
+): T | null {
   // Contextual logging para debugar (mostra quem chamou e qual ano/anexo)
   const ctx = context ? ` [who=${context.who ?? '-'}, year=${context.year ?? '-'}, annex=${context.annex ?? '-'}]` : '';
 
   if (!Array.isArray(brackets) || brackets.length === 0) {
-    console.error(`Erro crítico: Tabela de faixas (brackets) inválida ou vazia.${ctx}`, {
+    console.warn(`[safeFindBracket] Tabela indisponível, retornando null.${ctx}`, {
       value,
       brackets,
       context,
-      stack: new Error().stack,
     });
-    throw new Error(
-      `Dados de cálculo (tabela de impostos) não encontrados ou inválidos${ctx}. Verifique se o ano e o anexo estão corretos.`
-    );
+    return null;
   }
 
-  const safeValue = isNaN(Number(value)) ? 0 : Number(value);
+  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
   const found = brackets.find((b) => safeValue <= b.max);
-  return found || brackets[brackets.length - 1];
+  return found ?? brackets[brackets.length - 1];
 }
 
 // Mantemos findBracket compatível com chamadas existentes, mas delegamos ao safeFindBracket
-export function findBracket<T extends { max: number }>(value: number, brackets: T[]): T {
-  return safeFindBracket(value, brackets, { who: 'findBracket (legacy)' });
+export function findBracket<T extends { max: number }>(
+  value: number,
+  brackets: T[] | undefined | null,
+  context?: {
+    year?: number;
+    annex?: string;
+    who?: string;
+  }
+): T {
+  const result = safeFindBracket(value, brackets, context);
+
+  if (!result) {
+    // fallback técnico seguro (primeira faixa “neutra”)
+    return {
+      max: Infinity,
+    } as T;
+  }
+
+  return result;
 }
 
 

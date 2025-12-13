@@ -263,9 +263,17 @@ function _calculateSimples2026(
   isHybrid: boolean,
   fatorREffective: number,
   proLaboreOverride?: ProLaboreForm[]
-): TaxDetails2026 {
-  let hasProcessedActivity = false;
+): TaxDetails2026 | null {
+  if (!values || typeof values !== 'object') {
+    throw new Error('Dados de entrada inválidos para cálculo do Simples Nacional.');
+  }
+
   const year = values.year || 2026;
+
+  if (!year || year < 2026) {
+    throw new Error(`Ano inválido (${year}) para cálculo do Simples Nacional pós-reforma.`);
+  }
+
   const fiscalConfig = getFiscalParametersPostReform(year);
 
   const {
@@ -305,6 +313,7 @@ function _calculateSimples2026(
     ...domesticActivities.map(a => ({ ...a, isExport: false })),
     ...exportActivities.map(a => ({ ...a, revenue: (a?.revenue || 0) * (exchangeRate || 1), isExport: true })),
   ];
+  let hasProcessedActivity = false;
 
   allActivities.forEach(activity => {
     if (!activity) return;
@@ -323,18 +332,16 @@ function _calculateSimples2026(
     }
     finalAnnex = effectiveAnnex;
 
+    if (!effectiveAnnex || !VALID_ANNEXES.includes(effectiveAnnex)) {
+      console.warn('Anexo inválido, pulando cálculo do Simples para esta atividade', { effectiveAnnex, year, activity });
+      return;
+    }
+
     const annexTable = fiscalConfig.simples_nacional?.[effectiveAnnex];
-    
-    if (!hasProcessedActivity && totalProLaboreBruto <= 0) {
-      throw new Error('Não foi possível calcular o Simples Nacional: nenhum CNAE válido foi processado.');
-    }
-    
-    if (!Array.isArray(annexTable) || annexTable.length === 0) {
-      console.error('Tabela do Simples Nacional ausente/inválida', { year, effectiveAnnex, annexTable });
-      throw new Error(`Tabela do Simples Nacional não encontrada para o Anexo ${effectiveAnnex} (ano ${year}).`);
-    }
-    
     const bracket = safeFindBracket(effectiveRbt12, annexTable, { who: '_calculateSimples2026', year, annex: effectiveAnnex });
+    
+    if(!bracket) return;
+
     const { rate, deduction, distribution } = bracket;
     const effectiveDasRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate - deduction) / effectiveRbt12) : rate;
 
@@ -354,7 +361,7 @@ function _calculateSimples2026(
   });
 
   if (!hasProcessedActivity && totalProLaboreBruto <= 0) {
-    throw new Error('Não foi possível calcular o Simples Nacional: nenhum CNAE válido foi processado.');
+      return null;
   }
 
   if (isHybrid && year >= 2027) {
@@ -480,8 +487,8 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
   const fatorR_naoOtimizado = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
 
-  const simplesNacionalTradicional = _calculateSimples2026(values, false, fatorR_naoOtimizado);
-  const simplesNacionalHibrido = year >= 2027 ? _calculateSimples2026(values, true, fatorR_naoOtimizado) : null;
+  const simplesNacionalTradicional = values.selectedCnaes?.length ? _calculateSimples2026(values, false, fatorR_naoOtimizado) : null;
+  const simplesNacionalHibrido = (year >= 2027 && values.selectedCnaes?.length) ? _calculateSimples2026(values, true, fatorR_naoOtimizado) : null;
 
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   let simplesNacionalOtimizadoHibrido: TaxDetails2026 | null = null;
@@ -523,11 +530,11 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
             }
         }
     } else if (fatorR_naoOtimizado >= limiteFatorR) {
-        simplesNacionalOtimizado = {
+        simplesNacionalOtimizado = simplesNacionalTradicional ? {
             ...simplesNacionalTradicional,
             regime: 'Simples Nacional (Fator R Otimizado)',
             optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já enquadrado no Anexo III.`,
-        };
+        } : null;
         if (year >= 2027 && simplesNacionalHibrido) {
             simplesNacionalOtimizadoHibrido = {
                 ...simplesNacionalHibrido,
@@ -558,7 +565,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     result.simplesNacionalOtimizadoHibrido = { ...simplesNacionalOtimizadoHibrido, order: orderCounter++ };
   }
 
-  result.simplesNacionalTradicional = { ...simplesNacionalTradicional, order: orderCounter++ };
+  result.simplesNacionalTradicional = simplesNacionalTradicional ? { ...simplesNacionalTradicional, order: orderCounter++ } : null;
 
   if (simplesNacionalHibrido) {
     result.simplesNacionalHibrido = { ...simplesNacionalHibrido, order: orderCounter++ };
