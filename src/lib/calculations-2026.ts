@@ -339,22 +339,26 @@ function _calculateSimples2026(
   });
 
   if (!hasProcessedActivity) {
-    return {
-      regime: isHybrid ? 'Simples Nacional Híbrido (Anexo V)' : 'Simples Nacional Tradicional (Anexo V)',
-      annex: 'V',
-      totalTax: totalProLaboreBruto > 0 ? _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalINSSRetido + _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalIRRFRetido : 0,
-      totalMonthlyCost: (fee ?? 0) + (totalProLaboreBruto > 0 ? _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalINSSRetido + _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalIRRFRetido : 0),
-      totalRevenue: 0,
-      domesticRevenue: 0,
-      exportRevenue: 0,
-      proLabore: totalProLaboreBruto,
-      fatorR: fatorREffective,
-      effectiveRate: 0,
-      contabilizeiFee: fee,
-      breakdown: [],
-      notes: ['Nenhum CNAE válido processado. Apenas impostos sobre pró-labore foram calculados.'],
-      partnerTaxes: partnerTaxes,
-    };
+    if(totalProLaboreBruto > 0){
+      const { totalINSSRetido, totalIRRFRetido, partnerTaxes } = _calculatePartnerTaxes(proLaboresToUse, fiscalConfig);
+       return {
+          regime: isHybrid ? 'Simples Nacional Híbrido (Anexo V)' : 'Simples Nacional Tradicional (Anexo V)',
+          annex: 'V',
+          totalTax: totalINSSRetido + totalIRRFRetido,
+          totalMonthlyCost: (fee ?? 0) + totalINSSRetido + totalIRRFRetido,
+          totalRevenue: 0,
+          domesticRevenue: 0,
+          exportRevenue: 0,
+          proLabore: totalProLaboreBruto,
+          fatorR: fatorREffective,
+          effectiveRate: 0,
+          contabilizeiFee: fee,
+          breakdown: [],
+          notes: ['Nenhum CNAE válido processado. Apenas impostos sobre pró-labore foram calculados.'],
+          partnerTaxes: partnerTaxes,
+      };
+    }
+    throw new Error('Não foi possível calcular o Simples Nacional: nenhum CNAE válido foi processado.');
   }
 
   if (isHybrid && year >= 2027) {
@@ -422,11 +426,11 @@ function _calculateSimples2026(
   }
 
   let regimeName: TaxDetails2026['regime'] = isHybrid
-    ? `Simples Nacional Híbrido (Anexo ${finalAnnex})`
-    : `Simples Nacional Tradicional (Anexo ${finalAnnex})`;
+    ? `Simples Nacional Híbrido`
+    : `Simples Nacional Tradicional`;
   
   if (proLaboreOverride) {
-      regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
+      regimeName = `Simples Nacional (Fator R Otimizado)`;
   }
 
 
