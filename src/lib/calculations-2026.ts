@@ -19,6 +19,14 @@ import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { getIvaReductionByCnae } from './cnae-reductions-2026';
 import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
+const VALID_ANNEXES: Annex[] = ['I', 'II', 'III', 'IV', 'V'];
+
+function normalizeAnnex(annex?: string | Annex | null): Annex {
+  if (isValidAnnex(annex)) return annex as Annex;
+  return 'III';
+}
+
+
 /**
  * Version: refactor + hardening
  * Este arquivo é uma versão segura e completa dos cálculos 2026+,
@@ -29,19 +37,10 @@ import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
    Helpers internos / validações
    --------------------------- */
 
-const VALID_ANNEXES: Annex[] = ['I', 'II', 'III', 'IV', 'V'];
-
 function isValidAnnex(a: unknown): a is Annex {
   return typeof a === 'string' && VALID_ANNEXES.includes(a as Annex);
 }
 
-/**
- * Normaliza um anexo (fallback seguro para 'III')
- */
-function normalizeAnnex(annex?: string | Annex | null): Annex {
-  if (isValidAnnex(annex)) return annex as Annex;
-  return 'III';
-}
 
 /**
  * Garantir que a tabela de faixas está presente e é utilizável.
@@ -50,8 +49,11 @@ function normalizeAnnex(annex?: string | Annex | null): Annex {
 function ensureAnnexTable<T extends { max: number }>(annexTable: T[] | undefined, annex: Annex, year: number) {
   if (!Array.isArray(annexTable) || annexTable.length === 0) {
     // Mensagem detalhada para debugging em ambiente de produção/studio
-    console.error('Configuração fiscal ausente/inválida no Simples Nacional.', { annex, year, annexTable });
-    throw new Error(`Tabela do Simples Nacional não encontrada para o Anexo ${annex} (ano ${year}). Verifique a configuração fiscal.`);
+    console.error('Erro de configuração Simples 2026', {
+      annex,
+      fiscalConfig: getFiscalParametersPostReform(year).simples_nacional,
+    });
+    throw new Error(`Tabela do Simples Nacional 2026 não encontrada para o Anexo ${annex}.`);
   }
 }
 
@@ -220,8 +222,8 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
   const companyRevenueTaxes = irpjTotal + csll + consumptionTaxes;
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
 
-  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-  const fee = feeBracket?.plans?.[values.selectedPlan ?? 0] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.[values.selectedPlan ?? 0];
+  const feeBracket = findFeeBracket(totalRevenue, CONTABILIZEI_FEES_LUCRO_PRESUMIDO);
+  const fee = feeBracket?.plans?.[values.selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.['expertsEssencial'];
 
   const totalMonthlyCost = totalTax + (fee ?? 0);
 
@@ -249,15 +251,6 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
    SIMPLES NACIONAL 2026+
    --------------------------- */
 
-/**
- * _calculateSimples2026
- * Mantive o nome original e funcionalidade completa, mas com validações:
- * - anexo normalizado
- * - ensureAnnexTable antes do findBracket
- * - cálculo de DAS por atividade
- * - suporte a SN Híbrido (a partir de 2027)
- * - otimização do Fator R (quando solicitado via proLaboreOverride)
- */
 function _calculateSimples2026(
   values: TaxFormValues,
   isHybrid: boolean,
@@ -275,10 +268,11 @@ function _calculateSimples2026(
     proLabores = [],
     b2bRevenuePercentage = 100,
     rbt12,
-    selectedPlan = 0,
+    selectedPlan = 'expertsEssencial',
     creditGeneratingExpenses = 0,
-    issRate = undefined,
   } = values;
+
+  let hasProcessedActivity = false;
 
   const proLaboresToUse = proLaboreOverride ?? proLabores;
   const totalProLaboreBruto = proLaboresToUse.reduce((s, p) => s + (p?.value || 0), 0);
@@ -292,7 +286,7 @@ function _calculateSimples2026(
 
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
-  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
+  const feeBracket = findFeeBracket(totalRevenue, CONTABILIZEI_FEES_SIMPLES_NACIONAL);
   const fee = feeBracket?.plans?.[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans?.[selectedPlan];
 
   let totalDas = 0;
@@ -301,17 +295,15 @@ function _calculateSimples2026(
   let finalAnnex: Annex = 'III';
   const cppRate = fiscalConfig.aliquotas_cpp_patronal?.base ?? 0;
 
-  // Todas as atividades, classificadas
   const allActivities = [
     ...domesticActivities.map(a => ({ ...a, isExport: false })),
     ...exportActivities.map(a => ({ ...a, revenue: (a?.revenue || 0) * (exchangeRate || 1), isExport: true })),
   ];
 
-  // Se nenhuma atividade, retorna zero
   if (allActivities.length === 0) {
     return {
-      regime: 'Simples Nacional (Sem Atividades)',
-      annex: 'III',
+      regime: 'Simples Nacional Tradicional (Anexo V)',
+      annex: 'V',
       totalTax: 0,
       totalMonthlyCost: fee ?? 0,
       totalRevenue: 0,
@@ -327,59 +319,64 @@ function _calculateSimples2026(
     };
   }
 
-  // Calcular DAS por atividade
   allActivities.forEach(activity => {
     if (!activity) return;
     const cnaeInfo = getCnaeData(activity.code);
-    if (!cnaeInfo) return; // IGNORA CNAE desconhecido, mas não quebra
+    if (!cnaeInfo) return;
 
+    hasProcessedActivity = true;
     const revenueForActivity = activity.revenue || 0;
     if (revenueForActivity === 0) return;
 
-    // determina anexo: considera Fator R quando aplicável
     let effectiveAnnex: Annex;
     if (cnaeInfo.requiresFatorR) {
       effectiveAnnex = fatorREffective >= (fiscalConfig.simples_nacional?.limite_fator_r ?? 0.28) ? 'III' : 'V';
     } else {
       effectiveAnnex = normalizeAnnex(cnaeInfo.annex);
     }
-
-    // guarda para apresentar
     finalAnnex = effectiveAnnex;
 
-    // garante tabela antes de usar
     const annexTable = fiscalConfig.simples_nacional?.[effectiveAnnex];
     ensureAnnexTable(annexTable, effectiveAnnex, year);
 
-    // procura a faixa correta
     const bracket = findBracket(effectiveRbt12, annexTable);
     const { rate, deduction, distribution } = bracket;
     const effectiveDasRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate - deduction) / effectiveRbt12) : rate;
 
-    // distribuição de componentes do DAS (agora já com CBS/IBS caso a reforma esteja em transição)
     const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0, CBS = 0, IBS = 0 } = distribution ?? {};
-
     const consumptionTaxProportionInDas = (CBS || 0) + (IBS || 0) + (PIS || 0) + (COFINS || 0) + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-
     let dasRateForActivity = effectiveDasRate;
 
-    // SN híbrido: desconta proporção de consumo do DAS para parte B2B (apenas a partir de 2027)
     if (isHybrid && !activity.isExport && year >= 2027) {
       dasRateForActivity *= (1 - consumptionTaxProportionInDas);
     } else if (activity.isExport) {
-      // exportação: excluir tributos de consumo do DAS
       dasRateForActivity -= effectiveDasRate * (PIS + COFINS + ISS + ICMS + IPI + (CBS || 0) + (IBS || 0));
     }
-
     totalDas += revenueForActivity * dasRateForActivity;
-
-    // Anexo IV: CPP calculada sobre a folha (tratamento separado)
     if (effectiveAnnex === 'IV') {
       cppFromAnnexIV = _calculateCpp(totalPayroll, fiscalConfig);
     }
   });
 
-  // Calcular IVA (IBS/CBS) "por fora" para Simples Híbrido (a partir de 2027)
+  if (!hasProcessedActivity) {
+    return {
+      regime: 'Simples Nacional Tradicional (Anexo V)',
+      annex: 'V',
+      totalTax: totalProLaboreBruto > 0 ? _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalINSSRetido + _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalIRRFRetido : 0,
+      totalMonthlyCost: (fee ?? 0) + (totalProLaboreBruto > 0 ? _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalINSSRetido + _calculatePartnerTaxes(proLaboresToUse, fiscalConfig).totalIRRFRetido : 0),
+      totalRevenue: 0,
+      domesticRevenue: 0,
+      exportRevenue: 0,
+      proLabore: totalProLaboreBruto,
+      fatorR: fatorREffective,
+      effectiveRate: 0,
+      contabilizeiFee: fee,
+      breakdown: [],
+      notes: ['Nenhum CNAE válido processado. Apenas impostos sobre pró-labore foram calculados.'],
+      partnerTaxes: partnerTaxes,
+    };
+  }
+
   if (isHybrid && year >= 2027) {
     const config2026 = getFiscalParametersPostReform(year);
     const baseCbsRate = config2026.reforma_tributaria?.cbs_aliquota_padrao ?? 0;
@@ -397,9 +394,7 @@ function _calculateSimples2026(
       const reduction = getIvaReduction(activity.code, activity.cClassTrib);
       const reducaoIBSDecimal = (reduction.reducaoIBS ?? 0) / 100;
       const reducaoCBSDecimal = (reduction.reducaoCBS ?? 0) / 100;
-
       const activityB2bRevenue = (activity.revenue || 0) * b2bRevenuePortion;
-
       totalCbsDebit += activityB2bRevenue * (baseCbsRate * (1 - reducaoCBSDecimal));
       totalIbsDebit += activityB2bRevenue * (baseIbsRate * (1 - reducaoIBSDecimal));
     });
@@ -412,10 +407,8 @@ function _calculateSimples2026(
       totalCbsCredit = creditGeneratingExpenses * (baseCbsRate * (1 - reducaoCBSDecimal));
       totalIbsCredit = creditGeneratingExpenses * (baseIbsRate * (1 - reducaoIBSDecimal));
     }
-
     const finalIbs = Math.max(0, totalIbsDebit - totalIbsCredit);
     const finalCbs = Math.max(0, totalCbsDebit - totalCbsCredit);
-
     ivaTaxes = finalIbs + finalCbs;
   }
 
@@ -444,21 +437,21 @@ function _calculateSimples2026(
       notes.push('Empresas do SN dispensadas da fase de testes do IVA em 2026.');
     }
   }
-
   if (cppFromAnnexIV > 0) {
     notes.push(`Anexo IV: CPP (${formatPercent(cppRate)}) calculada sobre a folha.`);
   }
 
-  let regimeName: TaxDetails2026['regime'];
+  let regimeName: TaxDetails2026['regime'] = 'Simples Nacional Tradicional (Anexo V)';
+  
   if (proLaboreOverride) {
-    regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
+      regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
   } else {
-    const regimeAnexo = `(Anexo ${finalAnnex})`;
-    regimeName = isHybrid ? `Simples Nacional Híbrido ${regimeAnexo}` : `Simples Nacional Tradicional ${regimeAnexo}`;
+      regimeName = isHybrid ? `Simples Nacional Híbrido (Anexo ${finalAnnex})` : `Simples Nacional Tradicional (Anexo ${finalAnnex})`;
   }
 
+
   const result: TaxDetails2026 = {
-    regime: regimeName as any,
+    regime: regimeName,
     annex: finalAnnex,
     totalTax,
     totalMonthlyCost,
@@ -511,71 +504,67 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const effectiveFp12 = fp12 > 0 ? fp12 : monthlyPayroll * 12;
   const fatorR_naoOtimizado = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
 
-  // Cálculo principais
   const simplesNacionalTradicional = _calculateSimples2026(values, false, fatorR_naoOtimizado);
   const simplesNacionalHibrido = year >= 2027 ? _calculateSimples2026(values, true, fatorR_naoOtimizado) : null;
 
   let simplesNacionalOtimizado: TaxDetails2026 | null = null;
   let simplesNacionalOtimizadoHibrido: TaxDetails2026 | null = null;
 
-  // Detecta se há atividade sujeita ao Fator R (Anexo V -> III)
   const hasAnnexVActivity = (selectedCnaes ?? []).some(item => getCnaeData(item.code)?.requiresFatorR);
 
   if (hasAnnexVActivity && totalRevenue > 0) {
     const limiteFatorR = fiscalConfig.simples_nacional?.limite_fator_r ?? 0.28;
-    const requiredAnnualPayroll = (rbt12 > 0 ? rbt12 : totalRevenue * 12) * limiteFatorR;
-    const currentAnnualPayroll = effectiveFp12;
-    const additionalAnnualPayrollNeeded = Math.max(0, requiredAnnualPayroll - currentAnnualPayroll);
+    if (fatorR_naoOtimizado < limiteFatorR) {
+        const requiredAnnualPayroll = effectiveRbt12 * limiteFatorR;
+        const currentAnnualPayroll = effectiveFp12;
+        const additionalAnnualPayrollNeeded = Math.max(0, requiredAnnualPayroll - currentAnnualPayroll);
+        
+        if (additionalAnnualPayrollNeeded > 0) {
+            const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(proLabores));
+            const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
 
-    if (fatorR_naoOtimizado < limiteFatorR && additionalAnnualPayrollNeeded > 0) {
-      // tenta ajustar pró-labore distribuindo entre sócios (estratégia conservadora: aumenta menor pró-labore)
-      const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(proLabores));
-      const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
+            if (proLaboresCopy.length > 0) {
+                let minValue = Infinity;
+                let minCount = 0;
+                proLaboresCopy.forEach(p => {
+                    if (p.value < minValue) {
+                        minValue = p.value;
+                        minCount = 1;
+                    } else if (p.value === minValue) {
+                        minCount++;
+                    }
+                });
+                const addPerPartner = additionalMonthlyProLaboreNeeded / Math.max(1, minCount);
+                proLaboresCopy.forEach(p => {
+                    if (p.value === minValue) p.value += addPerPartner;
+                });
+            }
 
-      if (proLaboresCopy.length > 0) {
-        // distribui de forma equitativa entre sócios que possuem menor pró-labore
-        let minValue = Infinity;
-        let minCount = 0;
-        proLaboresCopy.forEach(p => {
-          if (p.value < minValue) {
-            minValue = p.value;
-            minCount = 1;
-          } else if (p.value === minValue) {
-            minCount++;
-          }
-        });
-        const addPerPartner = additionalMonthlyProLaboreNeeded / Math.max(1, minCount);
-        proLaboresCopy.forEach(p => {
-          if (p.value === minValue) p.value += addPerPartner;
-        });
-      }
-
-      const optimizedValues = { ...values, proLabores: proLaboresCopy };
-      simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);
-      if (year >= 2027) {
-        simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, proLaboresCopy);
-      }
-    } else if (fatorR_naoOtimizado >= (fiscalConfig.simples_nacional?.limite_fator_r ?? 0.28)) {
-      // Já atende Fator R - apenas marca otimizado (sem alterar pró-labore)
-      simplesNacionalOtimizado = {
-        ...simplesNacionalTradicional,
-        regime: 'Simples Nacional (Fator R Otimizado)',
-        optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já enquadrado no Anexo III.`,
-      };
-      if (year >= 2027 && simplesNacionalHibrido) {
-        simplesNacionalOtimizadoHibrido = {
-          ...simplesNacionalHibrido,
-          regime: 'Simples Nacional (Fator R Otimizado) Híbrido',
-          optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já enquadrado no Anexo III.`,
+            const optimizedValues = { ...values, proLabores: proLaboresCopy };
+            simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);
+            if (year >= 2027) {
+                simplesNacionalOtimizadoHibrido = _calculateSimples2026(optimizedValues, true, limiteFatorR, proLaboresCopy);
+            }
+        }
+    } else if (fatorR_naoOtimizado >= limiteFatorR) {
+        simplesNacionalOtimizado = {
+            ...simplesNacionalTradicional,
+            regime: 'Simples Nacional (Fator R Otimizado)',
+            optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já enquadrado no Anexo III.`,
         };
-      }
+        if (year >= 2027 && simplesNacionalHibrido) {
+            simplesNacionalOtimizadoHibrido = {
+                ...simplesNacionalHibrido,
+                regime: 'Simples Nacional (Fator R Otimizado) Híbrido',
+                optimizationNote: `Fator R atual: ${formatPercent(fatorR_naoOtimizado)}. Já enquadrado no Anexo III.`,
+            };
+        }
     }
   }
 
   const lucroPresumido = calculateLucroPresumido(values, false) as TaxDetails2026;
   const lucroPresumidoAtual = calculateLucroPresumido(values, true) as TaxDetails;
 
-  // Monta resultado com ordem
   let orderCounter = 0;
   const result: CalculationResults2026 = {
     simplesNacionalOtimizado: null,
