@@ -24,8 +24,8 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
     let totalINSSRetido = 0;
     let totalIRRFRetido = 0;
     
-    // Fallback to the correct IRRF table depending on the config structure
-    const irrfTable = config.tabela_irrf;
+    // Correctly reference the IRRF table, checking for the post-reform structure first.
+    const irrfTable = config.reforma_tributaria?.tabela_irrf || config.tabela_irrf;
 
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
@@ -156,7 +156,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = proLaboresToUse.length > 0 
+    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = (proLaboresToUse && proLaboresToUse.length > 0)
         ? _calculatePartnerTaxes(proLaboresToUse, config) 
         : { partnerTaxes: [{ proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 }], totalINSSRetido: 0, totalIRRFRetido: 0 };
 

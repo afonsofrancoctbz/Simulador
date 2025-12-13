@@ -156,7 +156,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
             if (ibsFinal > 0) breakdown.push({ name: `IBS (Líquido)`, value: ibsFinal, rate: baseIbsRate });
             
             if (year > 2026 && year < 2033) {
-              notes.push(`Cálculo em transição: PIS/COFINS reduzidos gradualmente. ISS sendo substituído pelo IBS. Reduções aplicadas conforme atividade.`);
+              notes.push(`Cálculo em transição: PIS/COFINS reduzidos gradualmente. ISS sendo substituído pelo IBS. Reduções setoriais aplicadas.`);
             } else if (year >= 2033) {
               notes.push(`IVA Pleno: PIS, COFINS e ISS extintos. Tributação via CBS e IBS com crédito amplo e reduções setoriais.`);
             }
@@ -253,6 +253,18 @@ function _calculateSimples2026(
         finalAnnex = effectiveAnnex;
 
         const annexTable = fiscalConfig.simples_nacional[effectiveAnnex];
+        
+        // Guard clause to prevent crash
+        if (!Array.isArray(annexTable) || annexTable.length === 0) {
+            console.error("Erro de configuração Simples 2026", {
+                annex: effectiveAnnex,
+                fiscalConfig: fiscalConfig.simples_nacional,
+            });
+            throw new Error(
+                `Tabela do Simples Nacional 2026 não encontrada para o Anexo ${effectiveAnnex}.`
+            );
+        }
+        
         const bracket = findBracket(effectiveRbt12, annexTable);
         const { rate, deduction, distribution } = bracket;
         const effectiveDasRate = effectiveRbt12 > 0 ? (effectiveRbt12 * rate - deduction) / effectiveRbt12 : rate;
@@ -341,12 +353,12 @@ function _calculateSimples2026(
     }
 
     let regimeName: TaxDetails2026['regime'];
-    const regimeAnexo = `(${finalAnnex === 'III' ? 'Anexo III' : 'Anexo V'})`;
+    const regimeAnexo = `(Anexo ${finalAnnex})`;
 
     if (proLaboreOverride) {
-      regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
+        regimeName = isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)';
     } else {
-      regimeName = isHybrid ? `Simples Nacional Híbrido ${regimeAnexo}` : `Simples Nacional Tradicional ${regimeAnexo}`;
+        regimeName = isHybrid ? `Simples Nacional Híbrido ${regimeAnexo}` : `Simples Nacional Tradicional ${regimeAnexo}`;
     }
     
     const result: TaxDetails2026 = {
@@ -367,7 +379,7 @@ function _calculateSimples2026(
     };
 
      if (proLaboreOverride) {
-        result.optimizationNote = `Pró-labore ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} visando Anexo III.`;
+        result.optimizationNote = `Pró-labore ajustado para ${formatCurrencyBRL(totalProLaboreBruto)} visando Anexo III.`;
     }
     return result;
 }
@@ -409,15 +421,15 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   if (hasAnnexVActivity && simplesNacionalTradicional.fatorR !== undefined && simplesNacionalTradicional.fatorR < fiscalConfig.simples_nacional.limite_fator_r && totalRevenue > 0) {
       const limiteFatorR = fiscalConfig.simples_nacional.limite_fator_r;
       const requiredAnnualPayroll = effectiveRbt12 * limiteFatorR;
-      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - effectiveFp12;
+      const additionalAnnualPayrollNeeded = Math.max(0, requiredAnnualPayroll - effectiveFp12);
 
       if (additionalAnnualPayrollNeeded > 0) {
           const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
-          const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / proLaboresCopy.length;
+          const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
           
-          proLaboresCopy.forEach(p => {
-              p.value += additionalMonthlyProLaboreNeeded;
-          });
+          if(proLaboresCopy.length > 0) {
+            proLaboresCopy[0].value += additionalMonthlyProLaboreNeeded;
+          }
           
           const optimizedValues = { ...values, proLabores: proLaboresCopy };
           simplesNacionalOtimizado = _calculateSimples2026(optimizedValues, false, limiteFatorR, proLaboresCopy);

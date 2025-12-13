@@ -91,24 +91,31 @@ const FISCAL_CONFIG_2025: FiscalConfig = {
 };
 
 const FISCAL_CONFIG_2026: FiscalConfig = {
-  ...FISCAL_CONFIG_2025,
-  simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)), // Deep copy
+  ...FISCAL_CONFIG_2025, // Start with a shallow copy
+  // Deep copy nested objects that will be mutated
+  simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)),
+  tabela_irrf: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.tabela_irrf)),
+
   ano_vigencia: 2026,
   salario_minimo: 1631.00,
   teto_inss: 8565.28,
+  
   tabela_inss_clt_progressiva: [
       { min: 0, max: 1631.00, rate: 0.075, deduction: 0 },
       { min: 1631.01, max: 2980.00, rate: 0.09, deduction: 24.46 },
       { min: 2980.01, max: 4450.00, rate: 0.12, deduction: 113.86 },
       { min: 4450.01, max: 8565.28, rate: 0.14, deduction: 202.86 },
   ],
-  tabela_irrf: [
-      { min: 0, max: 5000.00, rate: 0, deduction: 0 },
-      { min: 5000.01, max: 5500.00, rate: 0.075, deduction: 375 },
-      { min: 5500.01, max: 6000.00, rate: 0.15, deduction: 787.5 },
-      { min: 6000.01, max: 6500.00, rate: 0.225, deduction: 1237.5 },
-      { min: 6500.01, max: Infinity, rate: 0.275, deduction: 1562.5 },
-  ],
+  reforma_tributaria: {
+    // This IRRF table is specific to the 2026+ configuration
+    tabela_irrf: [
+        { min: 0, max: 5000.00, rate: 0, deduction: 0 },
+        { min: 5000.01, max: 5500.00, rate: 0.075, deduction: 375 },
+        { min: 5500.01, max: 6000.00, rate: 0.15, deduction: 787.5 },
+        { min: 6000.01, max: 6500.00, rate: 0.225, deduction: 1237.5 },
+        { min: 6500.01, max: Infinity, rate: 0.275, deduction: 1562.5 },
+    ],
+  }
 };
 
 const IVA_FULL_RATE = { cbs: 0.09, ibs: 0.18 };
@@ -126,6 +133,7 @@ const TRANSITION_TABLE = {
 
 export function getFiscalParameters(year: 2025 | 2026): FiscalConfig {
   if (year === 2026) {
+    // Return a deep copy to prevent mutation issues
     return JSON.parse(JSON.stringify(FISCAL_CONFIG_2026));
   }
   return JSON.parse(JSON.stringify(FISCAL_CONFIG_2025));
@@ -133,33 +141,30 @@ export function getFiscalParameters(year: 2025 | 2026): FiscalConfig {
 
 export function getFiscalParametersPostReform(year: number): FiscalConfig {
     if (year < 2026) {
-      // For years before the reform, return the 2025 config but add a dummy reforma_tributaria object
       const baseConfig = getFiscalParameters(2025);
+      // Ensure a reforma_tributaria object exists for consistency
       return {
         ...baseConfig,
         reforma_tributaria: {
-          cbs_aliquota_padrao: 0,
-          ibs_aliquota_padrao: 0,
-          pis_cofins_multiplier: 1,
-          iss_icms_multiplier: 1,
+          ...TRANSITION_TABLE[2026],
+          tabela_irrf: baseConfig.tabela_irrf, // Use base IRRF table
         }
       }
     }
 
-    const baseConfig = getFiscalParameters(2026);
+    // Start with a clean, deep-copied 2026 config
+    const newConfig = JSON.parse(JSON.stringify(FISCAL_CONFIG_2026));
     
     const safeYear = Math.max(2026, Math.min(year, 2033)) as keyof typeof TRANSITION_TABLE;
     const transition = TRANSITION_TABLE[safeYear];
 
-    const newConfig = {
-      ...baseConfig,
-      simples_nacional: JSON.parse(JSON.stringify(baseConfig.simples_nacional)), // Deep copy to prevent mutation
-      reforma_tributaria: {
-          cbs_aliquota_padrao: transition.cbs,
-          ibs_aliquota_padrao: transition.ibs,
-          pis_cofins_multiplier: transition.pis_cofins_multiplier,
-          iss_icms_multiplier: transition.iss_icms_multiplier,
-      }
+    // Merge transition-specific rates into the reforma_tributaria object
+    newConfig.reforma_tributaria = {
+        ...newConfig.reforma_tributaria,
+        cbs_aliquota_padrao: transition.cbs,
+        ibs_aliquota_padrao: transition.ibs,
+        pis_cofins_multiplier: transition.pis_cofins_multiplier,
+        iss_icms_multiplier: transition.iss_icms_multiplier,
     };
     
     const anexos = ['I', 'II', 'III', 'IV', 'V'] as const;
