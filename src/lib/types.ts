@@ -229,6 +229,7 @@ export const FatorRResponseSchema = z.object({
   mesesParaEnquadramento: z.number(),
   statusMensagem: z.enum(['success', 'warning', 'info', 'error']),
   textoMensagem: z.string(),
+  proLaboreSugerido: z.number().optional(),
 });
 export type FatorRResponse = z.infer<typeof FatorRResponseSchema>;
 
@@ -390,30 +391,3 @@ export interface FiscalConfig {
   deducao_dependente_irrf?: number;
   [key: string]: any;
 }
-
-// Cnae types needed for other files
-export interface CnaeData {
-  code: string;
-  description: string;
-  annex: Annex;
-  factorR: boolean;
-  obs?: string;
-  anexo_base?: Annex; // For 2026+ logic
-}
-
-export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
-
-export interface CnaeSelection {
-  code: string;
-  cClass?: string; // Classification for IBS/CBS (e.g. "padrao", "profissional", etc)
-}
-
-export interface RevenueData {
-  [key: string]: number;
-}
-
-export interface ProLaboreForm {
-    proLabore: number;
-    dependents: number;
-}
-    

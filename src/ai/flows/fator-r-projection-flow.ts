@@ -1,3 +1,4 @@
+
 'use server';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
@@ -54,7 +55,7 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
             fatorR_Atual,
             isEnquadradoAgora: true,
             mesesParaEnquadramento: 0,
-            statusMensagem: 'success' as const, // CORREÇÃO: as const força o tipo literal
+            statusMensagem: 'success' as const, 
             textoMensagem: TEXTS.success( (fatorR_Atual * 100).toFixed(2) )
         };
     }
@@ -62,7 +63,6 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
     // --- Início da Lógica de Projeção ---
     const proLaboreMensalOtimizado = receitaMensalProjetada * META_FATOR_R;
 
-    // A "proxy" para o valor que sai do cálculo (a média)
     const rbt_media_antiga = RBT12_atual > 0 ? RBT12_atual / 12.0 : 0;
     const fs_media_antiga = FS12_atual >= 0 ? FS12_atual / 12.0 : 0;
 
@@ -74,15 +74,12 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
     while (fatorR_projetado < META_FATOR_R && meses < MAX_PROJECTION_MONTHS) {
         meses++;
 
-        // Remove o mês mais antigo (estimado pela média)
         rbt_projetada -= rbt_media_antiga;
         fs_projetada -= fs_media_antiga;
 
-        // Adiciona o novo mês (projetado)
         rbt_projetada += receitaMensalProjetada;
         fs_projetada += proLaboreMensalOtimizado;
 
-        // Evita divisão por zero se a receita projetada for negativa ou zerada
         if (rbt_projetada <= 0) {
             fatorR_projetado = 0;
             break; 
@@ -91,27 +88,26 @@ export const calculateFatorRProjectionFlow = ai.defineFlow({
         fatorR_projetado = fs_projetada / rbt_projetada;
     }
 
-    // --- Montagem da Resposta ---
     const proLaboreStr = proLaboreMensalOtimizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const fatorRStr = (fatorR_Atual * 100).toFixed(2);
 
     if (fatorR_projetado >= META_FATOR_R) {
-        // Atingiu a meta
         return {
             fatorR_Atual,
             isEnquadradoAgora: false,
             mesesParaEnquadramento: meses,
-            statusMensagem: 'warning' as const, // CORREÇÃO: as const
-            textoMensagem: TEXTS.warning_projection(fatorRStr, meses, proLaboreStr) + TEXTS.warning_disclaimer
+            statusMensagem: 'warning' as const, 
+            textoMensagem: TEXTS.warning_projection(fatorRStr, meses, proLaboreStr) + TEXTS.warning_disclaimer,
+            proLaboreSugerido: proLaboreMensalOtimizado
         };
     } else {
-        // Não atingiu a meta no tempo limite
         return {
             fatorR_Atual,
             isEnquadradoAgora: false,
-            mesesParaEnquadramento: -1, // Sinaliza que não atingiu
-            statusMensagem: 'error' as const, // CORREÇÃO: as const
-            textoMensagem: TEXTS.error_unreachable(fatorRStr, proLaboreStr)
+            mesesParaEnquadramento: -1, 
+            statusMensagem: 'error' as const,
+            textoMensagem: TEXTS.error_unreachable(fatorRStr, proLaboreStr),
+            proLaboreSugerido: proLaboreMensalOtimizado
         };
     }
 });

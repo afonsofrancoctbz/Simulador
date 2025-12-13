@@ -2,9 +2,9 @@
 
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useFieldArray } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
-import { cn, formatBRL, parseBRL } from "@/lib/utils";
+import { cn, formatCurrencyBRL, parseBRL } from "@/lib/utils";
 import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,9 +21,6 @@ import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
 
-// This is the new combined component for Step 4
-// It includes CNAE selection and monthly revenue input
-
 interface FormSectionRevenueAndCnaeProps {
     year: number;
     onCnaeSelectorOpen: () => void;
@@ -31,7 +28,11 @@ interface FormSectionRevenueAndCnaeProps {
 
 export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSectionRevenueAndCnaeProps) {
     const form = useFormContext();
-    const selectedCnaes = form.watch("selectedCnaes");
+    const { fields, update, remove } = useFieldArray({
+      control: form.control,
+      name: "selectedCnaes",
+    });
+
     const [exchangeRate, setExchangeRate] = useState<number|null>(null);
     const [debouncedCurrency, setDebouncedCurrency] = useState(form.watch('exportCurrency'));
 
@@ -40,7 +41,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     useDebounce(() => {
         setDebouncedCurrency(form.watch('exportCurrency'));
     }, 500, [form.watch('exportCurrency')]);
-
 
     useEffect(() => {
         async function fetchExchangeRate() {
@@ -65,22 +65,31 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         fetchExchangeRate();
     }, [debouncedCurrency, form]);
 
-
-    const annexes = useMemo(() => {
-        const annexSet = new Set<Annex>();
-        selectedCnaes.forEach((item: CnaeSelection) => {
-            const cnae = getCnaeData(item.code);
-            if (cnae) {
-                annexSet.add(cnae.annex);
-            }
-        });
-        return Array.from(annexSet).sort();
-    }, [selectedCnaes]);
-
-    const removeCnae = (codeToRemove: string) => {
-        const updatedCnaes = selectedCnaes.filter((cnae: CnaeSelection) => cnae.code !== codeToRemove);
-        form.setValue('selectedCnaes', updatedCnaes, { shouldValidate: true, shouldDirty: true });
+    const removeCnae = (index: number) => {
+        remove(index);
     };
+
+    const handleRevenueChange = (value: number, type: 'domestic' | 'export') => {
+      const cnaes: CnaeSelection[] = form.getValues('selectedCnaes');
+      if (cnaes.length === 0) return;
+
+      const revenuePerCnae = cnaes.length > 0 ? value / cnaes.length : 0;
+      
+      cnaes.forEach((cnae, index) => {
+        const fieldToUpdate = type === 'domestic' ? 'domesticRevenue' : 'exportRevenue';
+        update(index, { ...cnae, [fieldToUpdate]: revenuePerCnae });
+      });
+    };
+
+    const totalDomesticRevenue = useMemo(() => {
+        const cnaes: CnaeSelection[] = form.watch('selectedCnaes');
+        return cnaes.reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
+    }, [form.watch('selectedCnaes')]);
+
+    const totalExportRevenue = useMemo(() => {
+        const cnaes: CnaeSelection[] = form.watch('selectedCnaes');
+        return cnaes.reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
+    }, [form.watch('selectedCnaes')]);
 
     return (
         <div className="space-y-8">
@@ -103,11 +112,11 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             Selecionar ou Alterar CNAEs
                         </Button>
                     </div>
-                    {selectedCnaes && selectedCnaes.length > 0 && (
+                    {fields && fields.length > 0 && (
                         <div className="space-y-4 pt-4">
-                            <h4 className="font-semibold text-center text-muted-foreground">Atividades Selecionadas ({selectedCnaes.length}/20):</h4>
+                            <h4 className="font-semibold text-center text-muted-foreground">Atividades Selecionadas ({fields.length}/20):</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {selectedCnaes.map((cnaeItem: CnaeSelection, index: number) => {
+                                {fields.map((cnaeItem, index) => {
                                     const cnae = getCnaeData(cnaeItem.code);
                                     if (!cnae) return null;
 
@@ -120,7 +129,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                 variant="ghost"
                                                 size="icon"
                                                 className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                                onClick={() => removeCnae(cnaeItem.code)}
+                                                onClick={() => removeCnae(index)}
                                             >
                                                 <X className="h-4 w-4" />
                                             </Button>
@@ -129,7 +138,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             {year >= 2026 && cnaeOptions.length > 1 && (
                                                  <FormField
                                                     control={form.control}
-                                                    name={`selectedCnaes.${index}.cClass`}
+                                                    name={`selectedCnaes.${index}.cClassTrib`}
                                                     render={({ field }) => (
                                                         <FormItem className="mt-3">
                                                             <FormLabel>Tipo de Serviço (Tributação)</FormLabel>
@@ -164,7 +173,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                 </CardContent>
             </Card>
 
-            {selectedCnaes && selectedCnaes.length > 0 && (
+            {fields && fields.length > 0 && (
                 <>
                     <Card className='shadow-lg overflow-hidden border bg-card'>
                         <CardHeader className='border-b bg-muted/30'>
@@ -179,32 +188,28 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             </div>
                         </CardHeader>
                         <CardContent className='p-6 md:p-8 space-y-6'>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex-grow space-y-4">
-                                    <div className="flex items-center mb-4">
-                                        <Label>Receita Nacional (em BRL)</Label>
-                                    </div>
-                                    {annexes.map(annex => (
-                                        <FormField
-                                            key={`domestic_${annex}`}
-                                            control={form.control}
-                                            name={`revenues.domestic_${annex}`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="font-normal text-muted-foreground">Anexo {annex}</FormLabel>
-                                                     <div className="relative">
-                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                                        <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
-                                                        </FormControl>
-                                                    </div>
-                                                </FormItem>
-                                            )}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                <FormItem>
+                                    <FormLabel>Receita Nacional (em BRL)</FormLabel>
+                                    <FormControl>
+                                        <NumericFormat
+                                            customInput={Input}
+                                            thousandSeparator="."
+                                            decimalSeparator=","
+                                            prefix="R$ "
+                                            decimalScale={2}
+                                            fixedDecimalScale
+                                            placeholder="R$ 0,00"
+                                            value={totalDomesticRevenue}
+                                            onValueChange={(values) => {
+                                                handleRevenueChange(values.floatValue || 0, 'domestic');
+                                            }}
                                         />
-                                    ))}
-                                </div>
-                                <div className="flex-grow space-y-4">
-                                    <div className="flex items-center gap-4 mb-4">
+                                    </FormControl>
+                                </FormItem>
+
+                                <FormItem>
+                                    <div className="flex items-center gap-4">
                                         <Label htmlFor="exportCurrency">Receita de Exportação</Label>
                                         <Select name="exportCurrency" value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
                                             <SelectTrigger className="w-[120px]">
@@ -217,30 +222,27 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    {annexes.map(annex => (
-                                         <FormField
-                                            key={`export_${annex}`}
-                                            control={form.control}
-                                            name={`revenues.export_${annex}`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="font-normal text-muted-foreground">Anexo {annex}</FormLabel>
-                                                     <div className="relative">
-                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{form.watch('exportCurrency') === 'USD' ? '$' : form.watch('exportCurrency') === 'EUR' ? '€' : 'R$'}</span>
-                                                        <FormControl>
-                                                            <Input type="text" inputMode="decimal" placeholder="0,00" onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
-                                                        </FormControl>
-                                                    </div>
-                                                </FormItem>
-                                            )}
+                                    <FormControl>
+                                        <NumericFormat
+                                            customInput={Input}
+                                            thousandSeparator="."
+                                            decimalSeparator=","
+                                            prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '}
+                                            decimalScale={2}
+                                            fixedDecimalScale
+                                            placeholder="0,00"
+                                            value={totalExportRevenue}
+                                            onValueChange={(values) => {
+                                                handleRevenueChange(values.floatValue || 0, 'export');
+                                            }}
                                         />
-                                    ))}
-                                     {form.watch('exportCurrency') !== 'BRL' && (
+                                    </FormControl>
+                                    {form.watch('exportCurrency') !== 'BRL' && (
                                         <p className="text-sm text-muted-foreground">
-                                            Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? formatBRL(exchangeRate) : 'Carregando...'}
+                                            Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? formatCurrencyBRL(exchangeRate) : 'Carregando...'}
                                         </p>
                                     )}
-                                </div>
+                                </FormItem>
                             </div>
                              <FormField
                                 control={form.control}
@@ -254,6 +256,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                 decimalSeparator=","
                                                 decimalScale={2}
                                                 fixedDecimalScale={false}
+                                                suffix="%"
                                                 placeholder="Ex: 5,0"
                                                 value={field.value}
                                                 onValueChange={(values) => {
@@ -317,12 +320,21 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                         return (
                                             <FormItem>
                                                 <FormLabel>Despesas que Geram Crédito de IVA</FormLabel>
-                                                 <div className="relative">
-                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                                    <FormControl>
-                                                        <Input type="text" inputMode="decimal" placeholder="0,00" onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
-                                                    </FormControl>
-                                                </div>
+                                                 <FormControl>
+                                                    <NumericFormat
+                                                        customInput={Input}
+                                                        thousandSeparator="."
+                                                        decimalSeparator=","
+                                                        prefix="R$ "
+                                                        decimalScale={2}
+                                                        fixedDecimalScale
+                                                        placeholder="R$ 0,00"
+                                                        value={field.value}
+                                                        onValueChange={(values) => {
+                                                            field.onChange(values.floatValue || 0);
+                                                        }}
+                                                    />
+                                                </FormControl>
                                                 <FormDescription>
                                                     Ex: aluguel, energia, softwares, insumos. Não inclua folha de pagamento.
                                                 </FormDescription>

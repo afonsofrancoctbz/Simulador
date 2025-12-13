@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -151,22 +152,7 @@ export function useTaxCalculator(year: number) {
         const submissionValues = transformFormToSubmission(values);
 
         try {
-            let finalSubmissionValues = submissionValues;
-
-            // Se estamos em 2026+ e temos uma projeção de Fator R que sugere um novo valor de pró-labore...
-            if (calculationYear >= 2026 && fatorRProjection && fatorRProjection.proLaboreSugerido > 0) {
-                 const proLaboreOriginalTotal = submissionValues.proLabores.reduce((acc, p) => acc + p.value, 0);
-                
-                // ...e o valor sugerido é diferente do original, ajustamos o valor para o cálculo.
-                if (Math.abs(fatorRProjection.proLaboreSugerido - proLaboreOriginalTotal) > 1) {
-                    finalSubmissionValues = {
-                        ...submissionValues,
-                        // A API 2026+ já espera o valor total no campo `proLabore`
-                        proLabore: fatorRProjection.proLaboreSugerido
-                    };
-                }
-            }
-
+            const finalSubmissionValues = submissionValues;
 
             if (calculationYear <= 2025) {
                 const calculatedResults = await calculateTaxesOnServer(finalSubmissionValues);
