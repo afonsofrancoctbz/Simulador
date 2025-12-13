@@ -39,12 +39,10 @@ export const CalculatorFormSchema = z.object({
     const totalRevenue = data.selectedCnaes.reduce((acc, cnae) => acc + (cnae.domesticRevenue || 0) + (cnae.exportRevenue || 0), 0);
     const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
     
-    // Permite o cálculo se houver RBT12 (empresa existente) ou pró-labore (retirada sem faturamento).
     if ((data.rbt12 ?? 0) > 0 || totalProLabore > 0) {
         return true;
     }
 
-    // Se não, exige que haja faturamento nos CNAEs.
     return totalRevenue > 0;
 }, {
     message: "Informe ao menos um valor de faturamento, pró-labore ou receita bruta (RBT12) para calcular.",

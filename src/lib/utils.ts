@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type { FeeBracket } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -83,6 +84,7 @@ export function safeFindBracket<T extends { max: number }>(
   }
 
   const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
+
   const found = brackets.find((b) => safeValue <= b.max);
   return found ?? brackets[brackets.length - 1];
 }
@@ -109,6 +111,18 @@ export function findBracket<T extends { max: number }>(
   return result;
 }
 
+// Alias for findBracket, now hardened
+export function findFeeBracket(
+  brackets: FeeBracket[],
+  revenue: number
+): FeeBracket | null {
+  if (!Number.isFinite(revenue) || revenue < 0) {
+    return brackets.find(b => b.min === 0 && b.max === 0) ?? null;
+  }
 
-// Alias for findBracket
-export const findFeeBracket = findBracket;
+  return (
+    brackets.find(b => revenue >= b.min && revenue <= b.max) ??
+    brackets.find(b => b.max === Infinity) ??
+    null
+  );
+}

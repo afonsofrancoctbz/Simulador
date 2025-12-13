@@ -13,6 +13,7 @@ import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
 import { useDebounce } from 'react-use';
+import { getNBSOptionsByCnae, type CnaeRelationship2026 } from '@/lib/cnae-reductions-2026';
 
 export function useTaxCalculator(year: number) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
@@ -20,6 +21,7 @@ export function useTaxCalculator(year: number) {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
     const [error, setError] = useState<string | null>(null);
+    const [nbsOptions, setNbsOptions] = useState<Record<string, CnaeRelationship2026[]>>({});
 
     const { toast } = useToast();
     const fiscalConfig = getFiscalParameters(year as 2025 | 2026);
@@ -44,11 +46,29 @@ export function useTaxCalculator(year: number) {
         },
     });
 
-    const { watch, getValues } = form;
+    const { watch, getValues, setValue } = form;
 
     const watchedRbt12 = watch("rbt12");
     const watchedFp12 = watch("fp12");
     const watchedCnaes = watch("selectedCnaes");
+
+    useEffect(() => {
+        const updateNbsOptions = async () => {
+            const cnaes = getValues('selectedCnaes');
+            const newNbsOptions: Record<string, CnaeRelationship2026[]> = {};
+            for (const [index, cnae] of cnaes.entries()) {
+                if (cnae.code) {
+                    const options = await getNBSOptionsByCnae(cnae.code);
+                    newNbsOptions[cnae.code] = options;
+                    if (options.length === 1) {
+                        setValue(`selectedCnaes.${index}.nbsCode`, options[0].nbs);
+                    }
+                }
+            }
+            setNbsOptions(newNbsOptions);
+        };
+        updateNbsOptions();
+    }, [watchedCnaes, getValues, setValue]);
 
     useDebounce(() => {
         const fetchFatorRProjection = async () => {
@@ -88,7 +108,8 @@ export function useTaxCalculator(year: number) {
             .map(cnae => ({
                 code: cnae.code,
                 revenue: cnae.domesticRevenue!,
-                cClassTrib: cnae.cClassTrib
+                cClassTrib: cnae.cClassTrib,
+                nbsCode: cnae.nbsCode
             }));
 
         const exportActivities: CnaeItem[] = values.selectedCnaes
@@ -96,7 +117,8 @@ export function useTaxCalculator(year: number) {
             .map(cnae => ({
                 code: cnae.code,
                 revenue: cnae.exportRevenue!,
-                cClassTrib: cnae.cClassTrib
+                cClassTrib: cnae.cClassTrib,
+                nbsCode: cnae.nbsCode
             }));
 
 
@@ -136,13 +158,25 @@ export function useTaxCalculator(year: number) {
             });
             return;
         }
+        
+        // Validate NBS selection
+        for (const cnae of values.selectedCnaes) {
+            const options = nbsOptions[cnae.code];
+            if (options && options.length > 1 && !cnae.nbsCode) {
+                toast({
+                    title: "Seleção de NBS Pendente",
+                    description: `O CNAE ${cnae.code} requer a seleção de um NBS. Por favor, escolha uma opção para continuar.`,
+                    variant: "destructive",
+                });
+                return;
+            }
+        }
 
         setIsLoading(true);
         setResults(null);
         setError(null);
         setSelectedCity(values.city);
 
-        // CORREÇÃO: Garantir que o ano de cálculo nunca seja undefined
         const calculationYear = values.year ?? year;
 
         setTimeout(() => {
@@ -160,14 +194,13 @@ export function useTaxCalculator(year: number) {
                 setResults(calculatedResults);
 
             } else { 
-                // Passamos o valor final, que pode ter sido ajustado pelo Fator R.
                 const calculatedResults = await calculateTaxes2026OnServer(finalSubmissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo para 2026 não retornou resultados.");
                 setResults(calculatedResults);
             }
         } catch (e) {
             console.error(`Erro ao calcular impostos (${calculationYear}):`, e);
-            const errorMessage = e instanceof Error ? e.message : "Ocorreu um erro inesperado.";
+            const errorMessage = e instanceof Error ? e.message : "Ocorreu um inesperado.";
             setError(`Falha no cálculo. Por favor, verifique os dados e tente novamente. Detalhe: ${errorMessage}`);
             toast({
                 title: `Erro no Cálculo (${calculationYear})`,
@@ -186,6 +219,7 @@ export function useTaxCalculator(year: number) {
         fatorRProjection,
         isLoading,
         error,
-        selectedCity
+        selectedCity,
+        nbsOptions
     };
 }

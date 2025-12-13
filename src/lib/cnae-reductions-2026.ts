@@ -13,10 +13,7 @@ export interface CNAEReductionData {
   cnae: string;
   descricao: string;
   reducoes: NBSReduction[];
-  defaultReduction?: {
-    ibs: number;
-    cbs: number;
-  };
+  // DEPRECATED: defaultReduction was removed to enforce explicit NBS selection and ensure tax calculation correctness.
 }
 
 // Criar a base de dados a partir da relação
@@ -46,59 +43,78 @@ CNAE_LC116_RELATIONSHIP.forEach(item => {
   }
 });
 
-// Definir a redução padrão como a mais favorável para cada CNAE
-Object.values(cnaeReductionsDatabase).forEach(cnaeData => {
-  if (cnaeData.reducoes.length > 0) {
-    const bestReduction = cnaeData.reducoes.reduce((best, current) => {
-      const currentTotal = current.reducaoIBS + current.reducaoCBS;
-      const bestTotal = best.reducaoIBS + best.reducaoCBS;
-      return currentTotal > bestTotal ? current : best;
-    });
-    cnaeData.defaultReduction = {
-      ibs: bestReduction.reducaoIBS,
-      cbs: bestReduction.reducaoCBS,
-    };
-  } else {
-     cnaeData.defaultReduction = { ibs: 0, cbs: 0 };
-  }
-});
+// REMOVED: The logic for `defaultReduction` has been removed.
+// Tax reductions must now be determined by explicit user selection of an NBS code to ensure legal compliance.
 
 export const CNAE_REDUCTIONS_DATABASE: Record<string, CNAEReductionData> = cnaeReductionsDatabase;
 
 
 /**
- * Busca a redução de IVA para um CNAE específico
+ * Finds the specific NBS reduction data for a given CNAE and NBS code.
+ * This is a detailed lookup ideal for displaying rich information in the UI.
+ * @param cnaeCode The CNAE code.
+ * @param nbsCode The NBS code selected by the user.
+ * @returns The full NBSReduction object if found, otherwise null.
  */
-export function getIvaReductionByCnae(
+export function getSpecificNbsReduction(
   cnaeCode: string,
-  cClassTrib?: string
-): { reducaoIBS: number; reducaoCBS: number } {
-  const cnaeData = CNAE_REDUCTIONS_DATABASE[String(cnaeCode || '').replace(/\D/g, '')];
+  nbsCode: string | null | undefined,
+): NBSReduction | null {
+  if (!cnaeCode || !nbsCode) {
+    return null;
+  }
+
+  const numericCnae = String(cnaeCode).replace(/\D/g, '');
+  const cnaeData = CNAE_REDUCTIONS_DATABASE[numericCnae];
 
   if (!cnaeData) {
-    return { reducaoIBS: 0, reducaoCBS: 0 };
+    return null;
   }
 
-  if (cClassTrib) {
-    const specificReduction = cnaeData.reducoes.find(r => r.cClassTrib === cClassTrib);
-    if (specificReduction) {
-      return {
-        reducaoIBS: specificReduction.reducaoIBS,
-        reducaoCBS: specificReduction.reducaoCBS,
-      };
-    }
-  }
-  // Fallback to default if cClassTrib specific reduction not found or not provided
-  return {
-    reducaoIBS: cnaeData.defaultReduction?.ibs ?? 0,
-    reducaoCBS: cnaeData.defaultReduction?.cbs ?? 0,
-  };
+  const specificReduction = cnaeData.reducoes.find(r => r.nbs === nbsCode);
+  return specificReduction || null;
 }
 
 /**
- * Lista todas as opções de NBS disponíveis para um CNAE
+ * REFINED: Gets the IVA reduction percentages strictly based on CNAE and a selected NBS code.
+ * This function is optimized for the calculation engine, returning only the final numbers.
+ * For UI purposes, use `getSpecificNbsReduction` to get detailed data.
+ * @param cnaeCode The CNAE code for the activity.
+ * @param nbsCode The explicitly selected NBS code.
+ * @returns An object with IBS and CBS reduction percentages. Returns {0, 0} if criteria are not met, with audit logs.
+ */
+export function getIvaReductionByCnae(
+  cnaeCode: string,
+  nbsCode?: string | null
+): { reducaoIBS: number; reducaoCBS: number } {
+  const specificNbsData = getSpecificNbsReduction(cnaeCode, nbsCode);
+
+  if (specificNbsData) {
+    return {
+      reducaoIBS: specificNbsData.reducaoIBS,
+      reducaoCBS: specificNbsData.reducaoCBS,
+    };
+  }
+
+  // Audit and return zero if no specific reduction is found.
+  const numericCnae = String(cnaeCode || '').replace(/\D/g, '');
+  if (cnaeCode && !CNAE_REDUCTIONS_DATABASE[numericCnae]) {
+      console.warn(`[AUDIT] getIvaReductionByCnae: CNAE code '${numericCnae}' not found in reductions database. Returning zero reduction.`);
+  } else if (cnaeCode && nbsCode) {
+      console.warn(`[AUDIT] getIvaReductionByCnae: NBS code '${nbsCode}' not found for CNAE '${numericCnae}'. Returning zero reduction.`);
+  }
+
+  return { reducaoIBS: 0, reducaoCBS: 0 };
+}
+
+
+/**
+ * Lists all available NBS options (and their associated tax classes/reductions) for a given CNAE.
+ * This is essential for populating the mandatory NBS selector in the UI.
+ * @param cnaeCode The CNAE code to look up.
+ * @returns An array of CnaeRelationship2026 objects, each representing a valid NBS choice.
  */
 export function getNBSOptionsByCnae(cnaeCode: string): CnaeRelationship2026[] {
-  const numericCode = cnaeCode.replace(/\D/g, '');
+  const numericCode = String(cnaeCode || '').replace(/\D/g, '');
   return CNAE_LC116_RELATIONSHIP.filter(rel => rel.cnae === numericCode);
 }

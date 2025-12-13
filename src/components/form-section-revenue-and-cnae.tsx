@@ -1,9 +1,8 @@
 
-
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
+import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info, BadgeCheck } from 'lucide-react';
 import { cn, formatCurrencyBRL, parseBRL } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
@@ -17,11 +16,180 @@ import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { useDebounce } from "react-use";
 import { useEffect, useMemo, useState } from "react";
-import type { Annex, CnaeSelection } from "@/lib/types";
+import type { Annex, CnaeSelection, Plan } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
-import { getIvaReductionByCnae, getNBSOptionsByCnae } from "@/lib/cnae-reductions-2026";
+import { getIvaReductionByCnae, getNBSOptionsByCnae, NBSOption } from "@/lib/cnae-reductions-2026";
+import { Badge } from "./ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
+
+// ======================================================================================
+// 1. CnaeActivityCard: A new, dedicated component for handling all CNAE-NBS logic
+// This component encapsulates the complexity of NBS selection, ensuring a
+// deterministic and transparent UX, as required by the system architecture.
+// ======================================================================================
+
+interface CnaeActivityCardProps {
+    index: number;
+    year: number;
+    onRemove: () => void;
+}
+
+function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
+    const form = useFormContext();
+    const cnaeItem: CnaeSelection = form.watch(`selectedCnaes.${index}`);
+    const cnaeData = getCnaeData(cnaeItem.code);
+
+    const isPostReforma = year >= 2026;
+
+    // Fetch NBS options based on the CNAE code.
+    const nbsOptions: NBSOption[] = useMemo(() => 
+        isPostReforma ? getNBSOptionsByCnae(cnaeItem.code) : [],
+    [cnaeItem.code, isPostReforma]);
+
+    // Auto-select NBS if there's only one option.
+    useEffect(() => {
+        if (isPostReforma && nbsOptions.length === 1 && cnaeItem.cClassTrib !== nbsOptions[0].cClassTrib) {
+            form.setValue(`selectedCnaes.${index}.cClassTrib`, nbsOptions[0].cClassTrib, {
+                shouldValidate: true,
+                shouldDirty: true,
+            });
+        }
+    }, [isPostReforma, nbsOptions, cnaeItem.cClassTrib, form, index]);
+
+    const selectedNbsOption = useMemo(() =>
+        nbsOptions.find(opt => opt.cClassTrib === cnaeItem.cClassTrib),
+    [nbsOptions, cnaeItem.cClassTrib]);
+
+    // Derive IVA reduction directly from the selected NBS option.
+    const ivaReduction = selectedNbsOption 
+        ? { reducaoIBS: selectedNbsOption.reducaoIBS, reducaoCBS: selectedNbsOption.reducaoCBS }
+        : { reducaoIBS: 0, reducaoCBS: 0 };
+
+    if (!cnaeData) return null;
+
+    const renderNbsContent = () => {
+        if (!isPostReforma) return null;
+
+        // Case 1: Multiple NBS options require mandatory user selection.
+        if (nbsOptions.length > 1) {
+            return (
+                <FormField
+                    control={form.control}
+                    name={`selectedCnaes.${index}.cClassTrib`}
+                    render={({ field }) => (
+                        <FormItem className="mt-4 p-3 rounded-md bg-amber-50 border border-amber-200">
+                            <FormLabel className="flex items-center gap-2 text-amber-900 font-semibold">
+                                <AlertTriangle className="h-4 w-4" />
+                                Ação Requerida: Selecione o Tipo de Serviço
+                            </FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Defina a tributação deste CNAE..." />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {nbsOptions.map(opt => (
+                                        <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
+                                            {`(${opt.reducaoIBS}%) ${opt.nbsDescription}`}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormDescription className="text-amber-800 text-xs">
+                                Esta atividade requer uma seleção para determinar as reduções de impostos.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            );
+        }
+        
+        // Case 2: Single NBS option is auto-applied and displayed as read-only.
+        if (selectedNbsOption) {
+            return (
+                <div className="mt-4">
+                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                               <div className="p-3 rounded-md bg-green-50 border border-green-200 text-green-900 text-sm w-full">
+                                    <div className="flex items-center font-semibold mb-1">
+                                        <BadgeCheck className="h-4 w-4 mr-2 shrink-0"/>
+                                        <span>Tributação de IVA (Auto-Aplicada)</span>
+                                    </div>
+                                    <p className="font-normal text-xs pl-6">{selectedNbsOption.nbsDescription}</p>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs text-center bg-foreground text-background">
+                                <p>Este benefício fiscal foi aplicado automaticamente com base na classificação do seu CNAE, garantindo conformidade e o cálculo correto dos impostos.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <div className="p-4 border rounded-lg bg-card/60 relative space-y-2">
+            <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={onRemove}
+            >
+                <X className="h-4 w-4" />
+            </Button>
+            
+            <p className="font-bold text-primary pr-8">{cnaeData.code}</p>
+            <p className="text-sm text-muted-foreground">{cnaeData.description}</p>
+            
+            {/* Always display the resulting IVA reduction */}
+            {isPostReforma && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {ivaReduction.reducaoIBS > 0 && (
+                          <Badge variant="default" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80">
+                              Redução IBS: {ivaReduction.reducaoIBS}%
+                          </Badge>
+                      )}
+                      {ivaReduction.reducaoCBS > 0 && (
+                          <Badge variant="default" className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100/80">
+                              Redução CBS: {ivaReduction.reducaoCBS}%
+                          </Badge>
+                      )}
+                      {ivaReduction.reducaoIBS === 0 && ivaReduction.reducaoCBS === 0 && (
+                           <Badge variant="secondary">
+                              Sem redução de IBS/CBS
+                          </Badge>
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs bg-foreground text-background">
+                    <p>IBS and CBS reductions are defined by law based on the selected NBS classification.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+            {renderNbsContent()}
+        </div>
+    );
+}
+
+
+// ======================================================================================
+// 2. FormSectionRevenueAndCnae: The main component, now refactored to use
+// the new CnaeActivityCard for a cleaner and more maintainable structure.
+// ======================================================================================
 
 interface FormSectionRevenueAndCnaeProps {
     year: number;
@@ -30,15 +198,13 @@ interface FormSectionRevenueAndCnaeProps {
 
 export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSectionRevenueAndCnaeProps) {
     const form = useFormContext();
-    const { fields, update, remove } = useFieldArray({
+    const { fields, remove } = useFieldArray({
       control: form.control,
       name: "selectedCnaes",
     });
 
     const [exchangeRate, setExchangeRate] = useState<number|null>(null);
     const [debouncedCurrency, setDebouncedCurrency] = useState(form.watch('exportCurrency'));
-
-    const fiscalConfig = getFiscalParameters(year as 2025 | 2026);
 
     useDebounce(() => {
         setDebouncedCurrency(form.watch('exportCurrency'));
@@ -66,10 +232,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         }
         fetchExchangeRate();
     }, [debouncedCurrency, form]);
-
-    const removeCnae = (index: number) => {
-        remove(index);
-    };
 
     const handleRevenueChange = (value: number, type: 'domestic' | 'export') => {
       const cnaes: CnaeSelection[] = form.getValues('selectedCnaes');
@@ -120,61 +282,15 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                         <div className="space-y-4 pt-4">
                             <h4 className="font-semibold text-center text-muted-foreground">Atividades Selecionadas ({fields.length}/20):</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {fields.map((cnaeItem, index) => {
-                                    const cnae = getCnaeData(cnaeItem.code);
-                                    if (!cnae) return null;
-
-                                    const cnaeOptions = year >= 2026 ? getNBSOptionsByCnae(cnaeItem.code) : [];
-                                    const reduction = year >= 2026 ? getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib) : { reducaoIBS: 0, reducaoCBS: 0 };
-
-
-                                    return (
-                                        <div key={index} className="p-4 border rounded-lg bg-background/50 relative space-y-2">
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                                onClick={() => removeCnae(index)}
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                            <p className="font-bold text-primary pr-8">{cnae.code}</p>
-                                            <p className="text-sm text-muted-foreground">{cnae.description}</p>
-                                            {year >= 2026 && reduction.reducaoIBS > 0 && (
-                                                <div className="text-xs font-semibold text-green-700 bg-green-100/80 border border-green-200/80 rounded-md px-2 py-1 inline-block">
-                                                    Redução IVA: {reduction.reducaoIBS}%
-                                                </div>
-                                            )}
-                                            {year >= 2026 && cnaeOptions.length > 1 && (
-                                                 <FormField
-                                                    control={form.control}
-                                                    name={`selectedCnaes.${index}.cClassTrib`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="mt-3">
-                                                            <FormLabel>Tipo de Serviço (Tributação)</FormLabel>
-                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                <FormControl>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Selecione a classificação do serviço..." />
-                                                                </SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                {cnaeOptions.map(opt => (
-                                                                    <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
-                                                                        {opt.nbsDescription}
-                                                                    </SelectItem>
-                                                                ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                 />
-                                            )}
-                                        </div>
-                                    )
-                                })}
+                                {/* Refactored to use the new CnaeActivityCard component */}
+                                {fields.map((cnaeItem, index) => (
+                                    <CnaeActivityCard
+                                        key={cnaeItem.id}
+                                        index={index}
+                                        year={year}
+                                        onRemove={() => remove(index)}
+                                    />
+                                ))}
                             </div>
                         </div>
                     )}
@@ -280,8 +396,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )}
-                            />
+                                )}/>
                         </CardContent>
                     </Card>
                     
@@ -362,4 +477,3 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
-

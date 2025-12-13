@@ -1,357 +1,504 @@
-
-import type { FiscalConfig } from '@/config/fiscal';
+import type { FiscalConfig } from "@/config/fiscal";
+import { getFiscalParameters } from "@/config/fiscal";
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
   CONTABILIZEI_FEES_SIMPLES_NACIONAL,
   getCnaeData,
-} from './cnae-helpers';
+} from "./cnae-helpers";
+import type {
+  CalculationResults,
+  TaxDetails,
+  Annex,
+  ProLaboreForm,
+  PartnerTaxDetails,
+  TaxFormValues,
+  Plan,
+} from "./types";
 import {
-  type CalculationResults,
-  type TaxDetails,
-  type Annex,
-  type ProLaboreForm,
-  type PartnerTaxDetails,
-  type TaxFormValues
-} from './types';
-import { findBracket, findFeeBracket, formatPercent, safeFindBracket, formatCurrencyBRL } from './utils';
-import { getFiscalParameters } from '../config/fiscal';
+  findFeeBracket,
+  formatCurrencyBRL,
+  formatPercent,
+  safeFindBracket,
+} from "./utils";
 
-function resolveSelectedPlan(
+// Define the single source of truth for the default plan.
+const DEFAULT_SIMULATION_PLAN: Plan = "expertsEssencial";
+
+interface ResolvedFee {
+  fee: number;
+  planName: Plan;
+  isDefault: boolean;
+}
+
+/**
+ * Strict, deterministic function to resolve the Contabilizei monthly fee.
+ * Throws an error if a fee cannot be determined. No silent fallbacks.
+ */
+export function resolveSelectedPlan(
   plans: Record<string, number> | undefined,
-  selectedPlan: string | undefined
-): number {
-  if (!plans || typeof plans !== 'object') {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[FeeResolver] Plans object is invalid. Falling back to 0.');
-    }
-    return 0;
+  selectedPlan: Plan | undefined | null
+): ResolvedFee {
+  if (!plans || typeof plans !== 'object' || Object.keys(plans).length === 0) {
+    throw new Error(
+      `[AUDIT] Fee resolution failed: Invalid or empty fee bracket provided. Plans: ${JSON.stringify(plans)}`
+    );
   }
+
+  let planToUse: Plan = DEFAULT_SIMULATION_PLAN;
+  let isDefault = true;
 
   if (selectedPlan && plans[selectedPlan] !== undefined) {
-    return plans[selectedPlan];
+    planToUse = selectedPlan;
+    isDefault = false;
+  } else if (plans[DEFAULT_SIMULATION_PLAN] === undefined) {
+     const firstAvailablePlanKey = Object.keys(plans)[0] as Plan | undefined;
+     if(firstAvailablePlanKey) {
+        planToUse = firstAvailablePlanKey;
+     }
   }
 
-  if (plans['expertsEssencial'] !== undefined) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(`[FeeResolver] selectedPlan '${selectedPlan}' not found. Falling back to 'expertsEssencial'.`);
-    }
-    return plans['expertsEssencial'];
-  }
 
-  const firstAvailablePlan = Object.values(plans)[0];
-  if (typeof firstAvailablePlan === 'number') {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(`[FeeResolver] 'expertsEssencial' not found. Falling back to first available plan.`);
-    }
-    return firstAvailablePlan;
-  }
+  const fee = plans[planToUse];
   
-  if (process.env.NODE_ENV === 'development') {
-      console.error(`[FeeResolver] No valid plan could be resolved. Fee is 0.`);
-  }
-  return 0;
-}
-
-
-// =================================================================================
-// 2. CORE CALCULATION LOGIC
-// =================================================================================
-
-export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: FiscalConfig): { partnerTaxes: PartnerTaxDetails[], totalINSSRetido: number, totalIRRFRetido: number } {
-    
-    // Validação / fallback das tabelas usadas
-    const inssTable = config?.tabela_inss_clt_progressiva;
-    const irrfTable = config?.reforma_tributaria?.tabela_irrf?.length
-        ? config.reforma_tributaria.tabela_irrf
-        : config?.tabela_irrf;
-
-    if (!Array.isArray(inssTable) || inssTable.length === 0) {
-        throw new Error('Tabela de INSS inválida/ausente no FiscalConfig — impossível calcular pró-labore.');
-    }
-    if (!Array.isArray(irrfTable) || irrfTable.length === 0) {
-        throw new Error('Tabela de IRRF inválida/ausente no FiscalConfig — impossível calcular pró-labore.');
-    }
-
-    let totalINSSRetido = 0;
-    let totalIRRFRetido = 0;
-
-    const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
-        const proLaboreBruto = proLabore.value;
-        if (proLaboreBruto <= 0) {
-            return { proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 };
-        }
-
-        const remainingContributionRoom = Math.max(0, config.teto_inss - (proLabore.hasOtherInssContribution ? proLabore.otherContributionSalary || 0 : 0));
-        const baseCalculoINSS = Math.min(proLaboreBruto, remainingContributionRoom);
-        const inss = baseCalculoINSS * config.aliquota_inss_prolabore;
-        
-        totalINSSRetido += inss;
-        
-        const baseCalculoIRRF = proLaboreBruto - inss;
-
-        const irrfBracket = safeFindBracket(baseCalculoIRRF, irrfTable, { who: '_calculatePartnerTaxes.IRRF', year: config.ano_vigencia });
-        
-        const irrf = irrfBracket ? Math.max(0, baseCalculoIRRF * irrfBracket.rate - irrfBracket.deduction) : 0;
-        
-        totalIRRFRetido += irrf;
-
-        return {
-            proLaboreBruto,
-            inss,
-            irrf,
-            proLaboreLiquido: proLaboreBruto - inss - irrf,
-        };
-    });
-
-    return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
-}
-
-export function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): number {
-    if (monthlyPayroll <= 0) return 0;
-    return monthlyPayroll * config.aliquotas_cpp_patronal.base;
-}
-
-// =================================================================================
-// 3. REGIME-SPECIFIC CALCULATION FUNCTIONS
-// =================================================================================
-
-function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): TaxDetails {
-    const { totalSalaryExpense, selectedPlan, exchangeRate = 1, proLabores, domesticActivities = [], exportActivities = [] } = values;
-
-    const domesticRevenue = domesticActivities.reduce((sum, act) => sum + act.revenue, 0);
-    const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act.revenue * exchangeRate), 0);
-    const totalRevenue = domesticRevenue + exportRevenueBRL;
-
-    const totalProLaboreBruto = proLabores.reduce((a, p) => a + p.value, 0);
-    const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
-
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, config);
-    
-    const pisRate = config.lucro_presumido_rates.PIS;
-    const pis = domesticRevenue * pisRate;
-
-    const cofinsRate = config.lucro_presumido_rates.COFINS;
-    const cofins = domesticRevenue * cofinsRate;
-    
-    const issRateAsDecimal = (values.issRate ?? 5) / 100;
-    const iss = domesticRevenue * issRateAsDecimal;
-
-    let presumedProfitBase = 0;
-    const allActivities = [...domesticActivities, ...exportActivities.map(a => ({...a, revenue: a.revenue * exchangeRate}))];
-    allActivities.forEach(activity => {
-        const cnaeInfo = getCnaeData(activity.code);
-        const presuncao = cnaeInfo?.presumedProfitRateIRPJ ?? 0.32;
-        presumedProfitBase += activity.revenue * presuncao;
-    });
-
-    const irpjRate = config.lucro_presumido_rates.IRPJ_BASE;
-    const irpjAdicionalRate = config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
-    const irpjAdicional = Math.max(0, (presumedProfitBase - config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL)) * irpjAdicionalRate;
-    const irpj = presumedProfitBase * irpjRate + irpjAdicional;
-    
-    const csllRate = config.lucro_presumido_rates.CSLL;
-    const csll = presumedProfitBase * csllRate;
-
-    const cppRate = config.aliquotas_cpp_patronal.base;
-    const cpp = _calculateCpp(monthlyPayroll, config);
-
-    const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
-    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-    const contabilizeiFee = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
-    const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
-    
-    return {
-        regime: 'Lucro Presumido',
-        totalTax,
-        totalMonthlyCost,
-        totalRevenue,
-        domesticRevenue,
-        exportRevenue: exportRevenueBRL,
-        proLabore: totalProLaboreBruto,
-        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
-        contabilizeiFee: contabilizeiFee ?? 0,
-        breakdown: [
-          { name: `PIS`, value: pis, rate: pisRate },
-          { name: `COFINS`, value: cofins, rate: cofinsRate },
-          { name: `ISS`, value: iss, rate: issRateAsDecimal },
-          { name: 'IRPJ', value: irpj, rate: irpjRate },
-          { name: 'CSLL', value: csll, rate: csllRate },
-          { name: 'CPP', value: cpp, rate: cppRate },
-          { name: 'INSS s/ Pró-labore', value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
-          { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido },
-        ].filter(item => item.value > 0.001),
-        notes:[],
-        partnerTaxes,
-    };
-}
-
-function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, proLaboreOverride?: ProLaboreForm[]): TaxDetails {
-    const { selectedPlan, totalSalaryExpense, fp12, rbt12, exchangeRate = 1, domesticActivities = [], exportActivities = [] } = values;
-    
-    const proLaboresToUse = proLaboreOverride || values.proLabores;
-
-    const domesticRevenue = domesticActivities.reduce((acc, act) => acc + act.revenue, 0);
-    const exportRevenueValue = exportActivities.reduce((acc, act) => acc + (act.revenue * exchangeRate), 0);
-    const totalRevenue = domesticRevenue + exportRevenueValue;
-    
-    const totalProLaboreBruto = proLaboresToUse.reduce((acc, p) => acc + p.value, 0);
-    const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
-
-    // BASE DE CÁLCULO (RBT12)
-    const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
-    
-    // SEMPRE usar a folha projetada quando estiver otimizando
-    const annualPayroll = proLaboreOverride 
-    ? monthlyPayroll * 12
-    : (fp12 > 0 ? fp12 : monthlyPayroll * 12);
-    const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
-    
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = (proLaboresToUse && proLaboresToUse.length > 0)
-        ? _calculatePartnerTaxes(proLaboresToUse, config) 
-        : { partnerTaxes: [{ proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 }], totalINSSRetido: 0, totalIRRFRetido: 0 };
-
-
-    let totalDas = 0;
-    let hasAnnexIVActivity = false;
-    const finalAnnexes = new Set<Annex>();
-
-    const allActivities = [...domesticActivities.map(a => ({...a, isExport: false})), ...exportActivities.map(a => ({...a, isExport: true, revenue: a.revenue * exchangeRate}))];
-
-    allActivities.forEach(activity => {
-        const cnaeInfo = getCnaeData(activity.code);
-        if (!cnaeInfo) return;
-
-        const revenueForActivity = activity.revenue;
-        if (revenueForActivity === 0) return;
-
-        let effectiveAnnex: Annex;
-        if (cnaeInfo.requiresFatorR) {
-            effectiveAnnex = (fatorR >= config.simples_nacional.limite_fator_r) ? 'III' : 'V';
-        } else {
-            effectiveAnnex = cnaeInfo.annex;
-        }
-        finalAnnexes.add(effectiveAnnex);
-        if (effectiveAnnex === 'IV') hasAnnexIVActivity = true;
-
-        const annexTable = config.simples_nacional[effectiveAnnex];
-        const bracket = findBracket(effectiveRbt12, annexTable);
-        const { rate, deduction, distribution } = bracket;
-        
-        const effectiveRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate) - deduction) / effectiveRbt12 : rate;
-        
-        let dasDaAtividade = revenueForActivity * effectiveRate;
-        
-        if (activity.isExport) {
-            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = distribution;
-            const exportExemptionRatio = PIS + COFINS + (ISS || 0) + (ICMS || 0) + (IPI || 0);
-            dasDaAtividade *= (1 - exportExemptionRatio);
-        }
-        
-        totalDas += dasDaAtividade;
-    });
-
-    let cppFromAnnexIV = 0;
-    const cppRate = config.aliquotas_cpp_patronal.base;
-    if (hasAnnexIVActivity) {
-        cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
-    }
-    
-    const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
-    
-    const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-    const contabilizeiFee = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
-    const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
-
-    const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
-    const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
-    
-    const breakdown = [
-        { name: 'DAS', value: totalDas, rate: effectiveDasRate },
-        { name: 'CPP', value: cppFromAnnexIV, rate: cppRate },
-        { name: 'INSS s/ Pró-labore', value: totalINSSRetido || 0, rate: config.aliquota_inss_prolabore },
-        { name: 'IRRF s/ Pró-labore', value: totalIRRFRetido || 0 },
-    ].filter(item => item.value > 0.001);
-
-    const finalResult: TaxDetails = {
-        regime: "Simples Nacional",
-        annex: annexLabel,
-        totalTax,
-        totalMonthlyCost,
-        totalRevenue,
-        domesticRevenue,
-        exportRevenue: exportRevenueValue,
-        proLabore: totalProLaboreBruto,
-        fatorR: [...finalAnnexes].includes('III') || [...finalAnnexes].includes('V') ? fatorR : undefined,
-        effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
-        effectiveDasRate: effectiveDasRate,
-        contabilizeiFee: contabilizeiFee ?? 0,
-        breakdown,
-        notes: [],
-        partnerTaxes,
-    };
-    
-    if (proLaboreOverride) {
-        finalResult.regime = "Simples Nacional (Otimizado)";
-        finalResult.optimizationNote = `Para buscar o Anexo III, o pró-labore total foi ajustado para ${totalProLaboreBruto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}.`;
-    }
-
-    return finalResult;
-}
-
-export function calculateTaxes(values: TaxFormValues): CalculationResults {
-  const config = getFiscalParameters(values.year as 2025 | 2026 || 2025);
-  
-  const totalRevenue = (values.domesticActivities || []).reduce((acc, act) => acc + act.revenue, 0) + (values.exportActivities || []).reduce((acc, act) => acc + (act.revenue * (values.exchangeRate || 1)), 0);
-  
-  const lucroPresumido = calculateLucroPresumido(values, config);
-  const simplesNacionalBase = _calculateSimplesNacional(values, config);
-  let simplesNacionalOtimizado: TaxDetails | null = null;
-  
-  const hasAnnexVActivity = values.selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
-  
-  if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR < config.simples_nacional.limite_fator_r && totalRevenue > 0) {
-      
-      const proLaboresCopy: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores));
-      const totalProLaboreOriginal = proLaboresCopy.reduce((acc, p) => acc + p.value, 0);
-
-      const requiredAnnualPayroll = (values.rbt12 > 0 ? values.rbt12 : totalRevenue * 12) * config.simples_nacional.limite_fator_r;
-      const currentAnnualPayroll = (values.fp12 > 0 ? values.fp12 : (values.totalSalaryExpense + totalProLaboreOriginal) * 12);
-      const additionalAnnualPayrollNeeded = requiredAnnualPayroll - currentAnnualPayroll;
-
-      if (additionalAnnualPayrollNeeded > 0) {
-          const additionalMonthlyProLaboreNeeded = additionalAnnualPayrollNeeded / 12;
-          
-          let minProLaboreValue = Infinity;
-          let minProLaborePartnersCount = 0;
-          
-          proLaboresCopy.forEach(p => {
-            if (p.value < minProLaboreValue) {
-                minProLaboreValue = p.value;
-                minProLaborePartnersCount = 1;
-            } else if (p.value === minProLaboreValue) {
-                minProLaborePartnersCount++;
-            }
-          });
-
-          if (minProLaborePartnersCount > 0) {
-            const valueToAddPerPartner = additionalMonthlyProLaboreNeeded / minProLaborePartnersCount;
-            
-            proLaboresCopy.forEach(p => {
-                if (p.value === minProLaboreValue) {
-                    p.value += valueToAddPerPartner;
-                }
-            });
-          }
-          
-          simplesNacionalOtimizado = _calculateSimplesNacional(values, config, proLaboresCopy);
+  if (fee === undefined) {
+      const fallbackFee = Object.values(plans)[0] ?? 0;
+      if (fallbackFee === 0) {
+        console.warn('[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.', { selectedPlan, plans });
       }
-  } else if (hasAnnexVActivity && simplesNacionalBase.fatorR !== undefined && simplesNacionalBase.fatorR >= config.simples_nacional.limite_fator_r) {
-    simplesNacionalOtimizado = {...simplesNacionalBase, regime: "Simples Nacional (Otimizado)", optimizationNote: `Sua empresa já atinge o Fator R de ${formatPercent(simplesNacionalBase.fatorR)} e se beneficia do Anexo III.`};
+      return { fee: fallbackFee, planName: planToUse, isDefault: true };
+  }
+
+
+  return {
+    fee,
+    planName: planToUse,
+    isDefault,
+  };
+}
+
+function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): number {
+  const cppRate = config.aliquotas_cpp_patronal?.base ?? 0;
+  if (cppRate === 0) {
+    // This should not happen with valid fiscal config
+    console.warn("[WARN] CPP Rate is 0. CPP calculation will be skipped.");
+  }
+  return monthlyPayroll * cppRate;
+}
+
+function _calculatePartnerTaxes(
+  proLabores: ProLaboreForm[],
+  config: FiscalConfig
+): {
+  partnerTaxes: PartnerTaxDetails[];
+  totalINSSRetido: number;
+  totalIRRFRetido: number;
+} {
+  const partnerTaxes: PartnerTaxDetails[] = [];
+  let totalINSSRetido = 0;
+  let totalIRRFRetido = 0;
+
+  const inssTable = config?.tabela_inss_clt_progressiva;
+  const irrfTable = config?.reforma_tributaria?.tabela_irrf?.length
+    ? config.reforma_tributaria.tabela_irrf
+    : config?.tabela_irrf;
+
+  if (!Array.isArray(inssTable) || inssTable.length === 0) {
+    throw new Error('Tabela de INSS inválida ou ausente para cálculo do pró-labore.');
+  }
+  if (!Array.isArray(irrfTable) || irrfTable.length === 0) {
+    throw new Error('Tabela de IRRF inválida ou ausente para cálculo do pró-labore.');
+  }
+
+  for (const proLabore of proLabores) {
+    const value = proLabore.value || 0;
+    if (value <= 0) continue;
+
+    let inssValue = 0;
+    if (proLabore.hasOtherInssContribution) {
+        const otherContribution = proLabore.otherContributionSalary || 0;
+        const remainingForTeto = Math.max(0, config.teto_inss - otherContribution);
+        const inssBase = Math.min(value, remainingForTeto);
+        if (inssBase > 0) {
+            inssValue = inssBase * config.aliquota_inss_prolabore;
+        }
+    } else {
+        const inssBase = Math.min(value, config.teto_inss);
+        inssValue = inssBase * config.aliquota_inss_prolabore;
+    }
+    
+    inssValue = Math.min(inssValue, config.teto_inss * config.aliquota_inss_prolabore);
+
+    const irrfBase = value - inssValue - (config.deducao_simplificada_irrf ?? 0);
+    let irrfValue = 0;
+
+    const irrfBracket = safeFindBracket(irrfBase, irrfTable, { who: '_calculatePartnerTaxes.IRRF', year: config.ano_vigencia });
+    if (irrfBracket && irrfBracket.rate > 0) {
+      irrfValue = irrfBase * irrfBracket.rate - irrfBracket.deduction;
+    }
+
+
+    const netValue = value - inssValue - irrfValue;
+    totalINSSRetido += inssValue;
+    totalIRRFRetido += irrfValue;
+
+    partnerTaxes.push({
+      proLaboreBruto: value,
+      inss: inssValue,
+      irrf: irrfValue,
+      proLaboreLiquido: netValue,
+    });
+  }
+
+  return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
+}
+
+export function calculateSimplesNacional(
+  values: TaxFormValues,
+  config: FiscalConfig,
+  fatorR: number,
+  targetAnnex: Annex | null,
+  optimizationNote?: string
+): TaxDetails {
+  const {
+    selectedCnaes = [],
+    rbt12 = 0,
+    totalSalaryExpense = 0,
+    proLabores = [],
+  } = values;
+
+  const totalProLaboreValue = proLabores.reduce((s, p) => s + (p.value || 0), 0);
+  const monthlyPayroll = totalSalaryExpense + totalProLaboreValue;
+
+  const domesticRevenue =
+    values.domesticActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const exportRevenue =
+    values.exportActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const totalRevenue = domesticRevenue + exportRevenue;
+  const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+
+  const { partnerTaxes, totalINSSRetido, totalIRRFRetido } =
+    _calculatePartnerTaxes(proLabores, config);
+
+  let totalDas = 0;
+  const dasBreakdown: { name: string; value: number }[] = [];
+  let cppFromAnnexIV = 0;
+  let hasAnnexIVActivity = false;
+  let finalAnnex: Annex = "I"; // Default, will be overwritten
+
+  const allActivities = [
+    ...(values.domesticActivities?.map(a => ({ ...a, isExport: false })) ?? []),
+    ...(values.exportActivities?.map(a => ({ ...a, isExport: true })) ?? []),
+  ];
+
+  if (allActivities.length === 0 && totalProLaboreValue === 0) {
+     throw new Error("Cannot calculate Simples Nacional without activities or pro-labore.");
+  }
+  
+  allActivities.forEach(activity => {
+    const cnaeInfo = getCnaeData(activity.code);
+    if (!cnaeInfo) throw new Error(`CNAE data not found for ${activity.code}`);
+
+    let effectiveAnnex: Annex;
+    if (targetAnnex) {
+      effectiveAnnex = targetAnnex;
+    } else if (cnaeInfo.requiresFatorR) {
+      effectiveAnnex =
+        fatorR >= (config.simples_nacional.limite_fator_r ?? 0.28)
+          ? "III"
+          : "V";
+    } else {
+      effectiveAnnex = cnaeInfo.annex as Annex;
+    }
+    finalAnnex = effectiveAnnex; // Store the last calculated annex
+
+    if (effectiveAnnex === "IV") hasAnnexIVActivity = true;
+
+    const annexTable = config.simples_nacional[effectiveAnnex];
+    const bracket = safeFindBracket(effectiveRbt12, annexTable, {
+      who: 'calculateSimplesNacional',
+      year: 2025,
+      annex: effectiveAnnex,
+    });
+    if (!bracket) throw new Error(`Simples Nacional bracket not found for RBT12 ${effectiveRbt12} in Anexo ${effectiveAnnex}`);
+    
+    const { rate, deduction, distribution } = bracket;
+    const effectiveRate =
+      effectiveRbt12 > 0
+        ? (effectiveRbt12 * rate - deduction) / effectiveRbt12
+        : rate;
+
+    let dasForActivity = (activity.revenue || 0) * effectiveRate;
+
+    if (activity.isExport && distribution) {
+      const exportExemptionRate =
+        (distribution.PIS ?? 0) +
+        (distribution.COFINS ?? 0) +
+        (distribution.IPI ?? 0) +
+        (distribution.ICMS ?? 0) +
+        (distribution.ISS ?? 0);
+      dasForActivity -= dasForActivity * exportExemptionRate;
+    }
+
+    totalDas += dasForActivity;
+  });
+
+  if (hasAnnexIVActivity) {
+    cppFromAnnexIV = _calculateCpp(monthlyPayroll, config);
+  }
+
+  const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
+  const safeTotalRevenue =
+  Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
+  const feeBracket = findFeeBracket(
+    CONTABILIZEI_FEES_SIMPLES_NACIONAL,
+    safeTotalRevenue
+  );
+  const {
+    fee: contabilizeiFee,
+    planName,
+    isDefault,
+  } = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
+
+  const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
+
+  const regimeName = optimizationNote
+    ? "Simples Nacional (Otimizado)"
+    : "Simples Nacional";
+
+  const notes = [];
+  if (isDefault) {
+    notes.push(
+      `Para consistência da simulação, a mensalidade foi calculada com base no plano padrão '${planName}'.`
+    );
+  }
+  if (optimizationNote) {
+    notes.push(optimizationNote);
   }
 
   return {
-    simplesNacionalBase: { ...simplesNacionalBase, order: simplesNacionalOtimizado ? 2: 1 },
-    simplesNacionalOtimizado: simplesNacionalOtimizado ? { ...simplesNacionalOtimizado, order: 1 } : null,
-    lucroPresumido: { ...lucroPresumido, order: 3 },
+    regime: regimeName,
+    totalTax,
+    totalMonthlyCost,
+    totalRevenue,
+    proLabore: totalProLaboreValue,
+    fatorR,
+    effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
+    effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
+    contabilizeiFee,
+    breakdown: [
+      { name: "DAS", value: totalDas },
+      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido },
+      { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
+      ...(cppFromAnnexIV > 0
+        ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }]
+        : []),
+      { name: `Mensalidade Contabilizei (Plano: ${planName})`, value: contabilizeiFee },
+    ].filter(i => (i?.value ?? 0) > 0.001),
+    notes,
+    annex: finalAnnex,
+    partnerTaxes,
+    optimizationNote: optimizationNote || null,
+  };
+}
+
+export function calculateLucroPresumido(
+  values: TaxFormValues,
+  config: FiscalConfig
+): TaxDetails {
+  const {
+    totalSalaryExpense = 0,
+    proLabores = [],
+    issRate = 5,
+  } = values;
+
+  const totalProLaboreValue = proLabores.reduce((s, p) => s + (p.value || 0), 0);
+  const monthlyPayroll = totalSalaryExpense + totalProLaboreValue;
+
+  const domesticRevenue =
+    values.domesticActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const exportRevenue =
+    values.exportActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const totalRevenue = domesticRevenue + exportRevenue;
+
+  const { partnerTaxes, totalINSSRetido, totalIRRFRetido } =
+    _calculatePartnerTaxes(proLabores, config);
+  const inssPatronal = _calculateCpp(monthlyPayroll, config);
+
+  let presumedProfitBaseIRPJ = 0;
+  let presumedProfitBaseCSLL = 0;
+
+  values.domesticActivities?.forEach(activity => {
+      const cnaeInfo = getCnaeData(activity.code);
+      if (!cnaeInfo) throw new Error(`CNAE data not found for ${activity.code}`);
+      
+      const revenue = activity.revenue || 0;
+      presumedProfitBaseIRPJ += revenue * (cnaeInfo.presumedProfitRateIRPJ ?? 0.32);
+      presumedProfitBaseCSLL += revenue * (cnaeInfo.presumedProfitRateCSLL ?? 0.32);
+  });
+  
+  const irpjRate = config.lucro_presumido_rates.IRPJ_BASE;
+  const irpjAdicionalRate = config.lucro_presumido_rates.IRPJ_ADICIONAL_BASE;
+  const irpjIsencaoLimite = config.lucro_presumido_rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL;
+
+  const irpjValue = presumedProfitBaseIRPJ * irpjRate;
+  const irpjAdicional = Math.max(0, presumedProfitBaseIRPJ - irpjIsencaoLimite) * irpjAdicionalRate;
+  
+  const csllRate = config.lucro_presumido_rates.CSLL;
+  const csllValue = presumedProfitBaseCSLL * csllRate;
+  
+  const pisRate = config.lucro_presumido_rates.PIS;
+  const pisValue = domesticRevenue * pisRate;
+  
+  const cofinsRate = config.lucro_presumido_rates.COFINS;
+  const cofinsValue = domesticRevenue * cofinsRate;
+  
+  const issValue = domesticRevenue * (issRate / 100);
+
+  const totalTax =
+    irpjValue +
+    irpjAdicional +
+    csllValue +
+    pisValue +
+    cofinsValue +
+    issValue +
+    inssPatronal +
+    totalINSSRetido +
+    totalIRRFRetido;
+  
+  const safeTotalRevenue =
+    Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
+  const feeBracket = findFeeBracket(
+    CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
+    safeTotalRevenue
+  );
+
+  const {
+    fee: contabilizeiFee,
+    planName,
+    isDefault,
+  } = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
+
+  const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
+  
+  const notes = [];
+  if (isDefault) {
+    notes.push(
+      `Para consistência da simulação, a mensalidade foi calculada com base no plano padrão '${planName}'.`
+    );
+  }
+
+  return {
+    regime: "Lucro Presumido",
+    totalTax,
+    totalMonthlyCost,
+    totalRevenue,
+    proLabore: totalProLaboreValue,
+    effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
+    contabilizeiFee,
+    breakdown: [
+      { name: "PIS", value: pisValue },
+      { name: "COFINS", value: cofinsValue },
+      { name: "ISS", value: issValue },
+      { name: "IRPJ", value: irpjValue + irpjAdicional },
+      { name: "CSLL", value: csllValue },
+      { name: "CPP (INSS Patronal)", value: inssPatronal },
+      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido },
+      { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
+      { name: `Mensalidade Contabilizei (Plano: ${planName})`, value: contabilizeiFee },
+    ].filter(i => (i?.value ?? 0) > 0.001),
+    notes,
+    partnerTaxes,
+    fatorR: null,
+    effectiveDasRate: null,
+    annex: null,
+    optimizationNote: null,
+  };
+}
+
+/**
+ * Orchestrator function for all tax calculations based on form values.
+ * This is the primary entry point for the server-side flow.
+ */
+export function calculateTaxes(values: TaxFormValues): CalculationResults {
+  const config = getFiscalParameters(2025); // Using 2025 for current rules
+
+  const {
+    rbt12 = 0,
+    fp12 = 0,
+    selectedCnaes = [],
+    proLabores = [],
+    totalSalaryExpense = 0,
+  } = values;
+
+  const domesticRevenue = values.domesticActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const exportRevenue = values.exportActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const totalRevenue = domesticRevenue + exportRevenue;
+
+  const totalProLaboreValue = proLabores.reduce((s, p) => s + (p.value || 0), 0);
+  const totalPayroll = totalSalaryExpense + totalProLaboreValue;
+
+  const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
+  const effectiveFp12 = fp12 > 0 ? fp12 : totalPayroll * 12;
+  const fatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
+
+  const hasAnnexVActivity = selectedCnaes.some(
+    c => getCnaeData(c.code)?.requiresFatorR
+  );
+
+  const simplesNacionalBase = calculateSimplesNacional(
+    values,
+    config,
+    fatorR,
+    null
+  );
+  const lucroPresumido = calculateLucroPresumido(values, config);
+
+  let simplesNacionalOtimizado: TaxDetails | null = null;
+  const limiteFatorR = config.simples_nacional?.limite_fator_r ?? 0.28;
+
+  if (hasAnnexVActivity && fatorR < limiteFatorR && totalRevenue > 0) {
+    const requiredAnnualPayroll = effectiveRbt12 * limiteFatorR;
+    const additionalAnnualPayrollNeeded = Math.max(
+      0,
+      requiredAnnualPayroll - effectiveFp12
+    );
+
+    if (additionalAnnualPayrollNeeded > 0) {
+      const proLaboresOtimizado: ProLaboreForm[] = JSON.parse(
+        JSON.stringify(proLabores)
+      );
+      const additionalMonthlyProLabore = additionalAnnualPayrollNeeded / 12;
+
+      if (proLaboresOtimizado.length > 0) {
+        proLaboresOtimizado[0].value += additionalMonthlyProLabore;
+      } else {
+        proLaboresOtimizado.push({
+          value: additionalMonthlyProLabore,
+          hasOtherInssContribution: false,
+          otherContributionSalary: 0,
+        });
+      }
+
+      const valuesOtimizado = { ...values, proLabores: proLaboresOtimizado };
+      const fatorROtimizado =
+        (effectiveFp12 + additionalAnnualPayrollNeeded) / effectiveRbt12;
+      const newTotalProLabore = proLaboresOtimizado.reduce((s,p) => s + p.value, 0);
+
+      const note = `Pró-labore ajustado para ${formatCurrencyBRL(newTotalProLabore)} para atingir Fator R de ${formatPercent(fatorROtimizado)} e se enquadrar no Anexo III.`;
+      
+      simplesNacionalOtimizado = calculateSimplesNacional(
+        valuesOtimizado,
+        config,
+        fatorROtimizado,
+        "III",
+        note
+      );
+    }
+  }
+
+  return {
+    simplesNacionalOtimizado: simplesNacionalOtimizado,
+    simplesNacionalBase: simplesNacionalBase,
+    lucroPresumido: lucroPresumido,
   };
 }
