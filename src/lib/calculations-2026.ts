@@ -26,6 +26,26 @@ function normalizeAnnex(annex?: string | Annex | null): Annex {
   return 'III';
 }
 
+function buildSimplesRegimeLabel(
+  base: 'Tradicional' | 'Híbrido' | 'Otimizado',
+  annex: 'III' | 'V',
+  isHybrid = false
+): string {
+    const isOtimizado = base === 'Otimizado';
+
+    if (isOtimizado) {
+        return isHybrid
+          ? 'Simples Nacional (Fator R Otimizado) Híbrido'
+          : 'Simples Nacional (Fator R Otimizado)';
+    }
+    
+    if (base === 'Híbrido') {
+        return `Simples Nacional Híbrido (Anexo ${annex})`;
+    }
+    
+    return `Simples Nacional Tradicional (Anexo ${annex})`;
+}
+
 
 /**
  * Version: refactor + hardening
@@ -222,8 +242,8 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
   const companyRevenueTaxes = irpjTotal + csll + consumptionTaxes;
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
 
-  const feeBracket = findFeeBracket(totalRevenue, CONTABILIZEI_FEES_LUCRO_PRESUMIDO);
-  const fee = feeBracket?.plans?.[values.selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.['expertsEssencial'];
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
+  const fee = feeBracket?.plans[values.selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.['expertsEssencial'];
 
   const totalMonthlyCost = totalTax + (fee ?? 0);
 
@@ -285,7 +305,7 @@ function _calculateSimples2026(
 
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
-  const feeBracket = findFeeBracket(totalRevenue, CONTABILIZEI_FEES_SIMPLES_NACIONAL);
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
   const fee = feeBracket?.plans?.[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans?.[selectedPlan];
 
   let totalDas = 0;
@@ -414,17 +434,13 @@ function _calculateSimples2026(
     notes.push(`Anexo IV: CPP (${formatPercent(cppRate)}) calculada sobre a folha.`);
   }
 
-  let regimeName: TaxDetails2026['regime'] = isHybrid
-    ? `Simples Nacional Híbrido`
-    : `Simples Nacional Tradicional`;
-  
-  if (proLaboreOverride) {
-      regimeName = `Simples Nacional (Fator R Otimizado)`;
-  }
+  const baseLabel = proLaboreOverride ? 'Otimizado' : isHybrid ? 'Híbrido' : 'Tradicional';
+  const regimeName = buildSimplesRegimeLabel(baseLabel, finalAnnex, isHybrid);
 
+  const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
 
   const result: TaxDetails2026 = {
-    regime: regimeName,
+    regime: regimeName as TaxDetails2026['regime'],
     annex: finalAnnex,
     totalTax,
     totalMonthlyCost,
@@ -434,6 +450,7 @@ function _calculateSimples2026(
     proLabore: totalProLaboreBruto,
     fatorR: fatorREffective,
     effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
+    effectiveDasRate,
     contabilizeiFee: fee ?? 0,
     breakdown,
     notes,

@@ -99,6 +99,7 @@ export const TaxDetailsSchema = z.object({
       "Lucro Presumido",
       "Simples Nacional (Otimizado)",
       "Lucro Presumido (Regras Atuais)",
+      "Simples Nacional (Fator R Otimizado)"
     ]),
     totalTax: z.number(),
     totalMonthlyCost: z.number(),
@@ -133,8 +134,8 @@ export const TaxDetails2026Schema = TaxDetailsSchema.extend({
     'Lucro Presumido',
     'Lucro Presumido (Regras Atuais)',
     'Simples Nacional Tradicional (Anexo V)',
-    'Simples Nacional Híbrido (Anexo V)',
     'Simples Nacional Tradicional (Anexo III)',
+    'Simples Nacional Híbrido (Anexo V)',
     'Simples Nacional Híbrido (Anexo III)',
     'Simples Nacional (Fator R Otimizado)',
     'Simples Nacional (Fator R Otimizado) Híbrido'
