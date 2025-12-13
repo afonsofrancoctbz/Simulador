@@ -13,7 +13,7 @@ import {
   type TaxDetails,
   type ProLaboreForm,
 } from './types';
-import { formatPercent, findBracket, findFeeBracket, safeFindBracket } from './utils';
+import { formatPercent, findBracket, findFeeBracket, safeFindBracket, formatCurrencyBRL } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { getIvaReductionByCnae } from './cnae-reductions-2026';
@@ -317,8 +317,16 @@ function _calculateSimples2026(
     finalAnnex = effectiveAnnex;
 
     const annexTable = fiscalConfig.simples_nacional?.[effectiveAnnex];
-    ensureAnnexTable(annexTable, effectiveAnnex, year);
+    
+    if (!hasProcessedActivity && totalProLaboreBruto <= 0) {
+      throw new Error('Não foi possível calcular o Simples Nacional: nenhum CNAE válido foi processado.');
+    }
 
+    if (!Array.isArray(annexTable) || annexTable.length === 0) {
+      console.error('Tabela do Simples Nacional ausente/inválida', { year, effectiveAnnex, annexTable });
+      throw new Error(`Tabela do Simples Nacional não encontrada para o Anexo ${effectiveAnnex} (ano ${year}).`);
+    }
+    
     const bracket = safeFindBracket(effectiveRbt12, annexTable, { who: '_calculateSimples2026', year, annex: effectiveAnnex });
     const { rate, deduction, distribution } = bracket;
     const effectiveDasRate = effectiveRbt12 > 0 ? ((effectiveRbt12 * rate - deduction) / effectiveRbt12) : rate;
