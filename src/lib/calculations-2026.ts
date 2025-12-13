@@ -21,6 +21,10 @@ import { CNAE_LC116_RELATIONSHIP } from './cnae-data-2026';
 
 const VALID_ANNEXES: Annex[] = ['I', 'II', 'III', 'IV', 'V'];
 
+function isValidAnnex(a: unknown): a is Annex {
+  return typeof a === 'string' && VALID_ANNEXES.includes(a as Annex);
+}
+
 function normalizeAnnex(annex?: string | Annex | null): Annex {
   if (isValidAnnex(annex)) return annex as Annex;
   return 'III';
@@ -30,10 +34,8 @@ function buildSimplesRegimeLabel(
   base: 'Tradicional' | 'Híbrido' | 'Otimizado',
   annex: 'III' | 'V',
   isHybrid = false
-): string {
-    const isOtimizado = base === 'Otimizado';
-
-    if (isOtimizado) {
+): TaxDetails2026['regime'] {
+    if (base === 'Otimizado') {
         return isHybrid
           ? 'Simples Nacional (Fator R Otimizado) Híbrido'
           : 'Simples Nacional (Fator R Otimizado)';
@@ -44,21 +46,6 @@ function buildSimplesRegimeLabel(
     }
     
     return `Simples Nacional Tradicional (Anexo ${annex})`;
-}
-
-
-/**
- * Version: refactor + hardening
- * Este arquivo é uma versão segura e completa dos cálculos 2026+,
- * preservando lógica original e adicionando validações para evitar crashes no Firebase Studio.
- */
-
-/* ---------------------------
-   Helpers internos / validações
-   --------------------------- */
-
-function isValidAnnex(a: unknown): a is Annex {
-  return typeof a === 'string' && VALID_ANNEXES.includes(a as Annex);
 }
 
 
@@ -341,7 +328,7 @@ function _calculateSimples2026(
     if (!hasProcessedActivity && totalProLaboreBruto <= 0) {
       throw new Error('Não foi possível calcular o Simples Nacional: nenhum CNAE válido foi processado.');
     }
-
+    
     if (!Array.isArray(annexTable) || annexTable.length === 0) {
       console.error('Tabela do Simples Nacional ausente/inválida', { year, effectiveAnnex, annexTable });
       throw new Error(`Tabela do Simples Nacional não encontrada para o Anexo ${effectiveAnnex} (ano ${year}).`);
@@ -407,9 +394,10 @@ function _calculateSimples2026(
 
   const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
   const totalMonthlyCost = totalTax + (fee ?? 0);
+  const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
 
   const breakdown = [
-    { name: 'DAS (Simples Nacional)', value: totalDas, rate: totalRevenue > 0 ? totalDas / totalRevenue : 0 },
+    { name: 'DAS (Simples Nacional)', value: totalDas, rate: effectiveDasRate },
     { name: 'IVA (IBS/CBS pago por fora)', value: ivaTaxes },
     { name: 'CPP (INSS Patronal)', value: cppFromAnnexIV, rate: cppRate },
     { name: 'INSS s/ Pró-labore', value: totalINSSRetido, rate: fiscalConfig.aliquota_inss_prolabore },
@@ -437,10 +425,8 @@ function _calculateSimples2026(
   const baseLabel = proLaboreOverride ? 'Otimizado' : isHybrid ? 'Híbrido' : 'Tradicional';
   const regimeName = buildSimplesRegimeLabel(baseLabel, finalAnnex, isHybrid);
 
-  const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
-
   const result: TaxDetails2026 = {
-    regime: regimeName as TaxDetails2026['regime'],
+    regime: regimeName,
     annex: finalAnnex,
     totalTax,
     totalMonthlyCost,

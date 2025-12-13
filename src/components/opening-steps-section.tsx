@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, PenSquare, Building2, CheckCircle, AlertCircle, Star } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Star, AlertCircle } from "lucide-react";
 
-// Novo fluxo com atualizações pós 01/12/2025
+// Novo fluxo após 01/12/2025 (MAT integrado)
 const steps = [
   {
     icon: "📝",
@@ -18,32 +18,41 @@ const steps = [
   },
   {
     icon: "✍️",
-    title: "Formalização e Emissão do CNPJ",
+    title: "Registro na Junta Comercial",
     items: [
-      "Cadastro Ouro Prata no GOV.BR",
       "Assinatura do Contrato Social",
       "Protocolo na Junta Comercial",
+      "Geração do NIRE (Número de Registro)",
+    ],
+  },
+  {
+    icon: "📊",
+    title: "MAT – Administração Tributária",
+    items: [
+      "Acesso ao MAT com conta gov.br (Prata ou Ouro)",
+      "Escolha obrigatória do regime tributário (Simples, Presumido, Real)",
+      "Confirmação de dados e aceite digital do contador",
+      "CNPJ emitido após conclusão no MAT",
     ],
   },
   {
     icon: "🏛️",
-    title: "Prefeitura e Alvará",
+    title: "Procedimentos Pós-CNPJ",
     items: [
-      "Emissão do certificado e-CNPJ",
-      "Taxa da Prefeitura",
-      "Inscrição Municipal e expedição do Alvará de Funcionamento",
-      "AVCB (Auto de Vistoria do Corpo de Bombeiros)",
-      "Notificação de Abertura para Emissão de Nota Fiscal (cerca de 48 horas)",
+      "Inscrição Municipal (para emissão de notas)",
+      "Inscrição Estadual (quando aplicável)",
+      "Emissão do certificado digital e-CNPJ",
+      "Solicitação de alvará de funcionamento",
+      "AVCB / Vistoria quando necessário",
     ],
   },
   {
     icon: "✅",
-    title: "Finalização e Emissão de Notas Fiscais",
+    title: "Finalização e Operação",
     items: [
-      "Enquadramento tributário",
-      "Configuração do emissor de notas fiscais (sua empresa estará apta à emissão de notas após esta etapa)",
-      "Registro de Classe*",
+      "Configuração do emissor de notas fiscais (empresa apta a emitir)",
       "Apresentação da Assessoria Experts",
+      "Registro de Classe (quando aplicável)",
     ],
   },
 ];
@@ -60,7 +69,7 @@ export default function OpeningStepsSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 items-start">
         {steps.map((step, index) => (
           <Card key={index} className="h-full flex flex-col shadow-md bg-card">
             <CardHeader className="flex-row items-center gap-3">
@@ -86,7 +95,10 @@ export default function OpeningStepsSection() {
           <AlertCircle className="h-5 w-5 text-sky-600" />
           <AlertTitle className="font-bold text-sky-800">FIQUE DE OLHO:</AlertTitle>
           <AlertDescription className="text-sky-900/90">
-            Durante a abertura da sua empresa, especialistas do time vão entrar em contato com você para agilizar o processo. Mas não se preocupe, havendo qualquer dúvida, você pode falar conosco no mesmo número de WhatsApp.
+            Com o novo MAT (Módulo de Administração Tributária), a escolha do regime
+            tributário acontece antes da emissão do CNPJ — sem isso o CNPJ não será emitido.
+            Após o CNPJ liberado, mostraremos as etapas municipais para você começar a emitir
+            notas fiscais. :contentReference[oaicite:4]{index=4}
           </AlertDescription>
         </Alert>
       </div>
