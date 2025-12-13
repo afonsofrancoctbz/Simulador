@@ -13,7 +13,7 @@ import {
   type TaxDetails,
   type ProLaboreForm,
 } from './types';
-import { formatPercent, findBracket, findFeeBracket, safeFindBracket, formatCurrencyBRL } from './utils';
+import { formatPercent, findFeeBracket, safeFindBracket, formatCurrencyBRL } from './utils';
 import { getCnaeData } from './cnae-helpers';
 import { _calculatePartnerTaxes, _calculateCpp } from './calculations';
 import { getIvaReductionByCnae } from './cnae-reductions-2026';
@@ -28,6 +28,24 @@ function isValidAnnex(a: unknown): a is Annex {
 function normalizeAnnex(annex?: string | Annex | null): Annex {
   if (isValidAnnex(annex)) return annex as Annex;
   return 'III';
+}
+
+function resolveSelectedPlan(
+  plans: Record<string, number> | undefined,
+  selectedPlan: string | undefined
+): number {
+  if (!plans || typeof plans !== 'object') return 0;
+
+  if (selectedPlan && plans[selectedPlan] !== undefined) {
+    return plans[selectedPlan];
+  }
+
+  if (plans['expertsEssencial'] !== undefined) {
+    return plans['expertsEssencial'];
+  }
+
+  const firstAvailablePlan = Object.values(plans)[0];
+  return typeof firstAvailablePlan === 'number' ? firstAvailablePlan : 0;
 }
 
 function buildSimplesRegimeLabel(
@@ -230,9 +248,8 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
   const totalTax = companyRevenueTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-  const fee = feeBracket?.plans[values.selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.['expertsEssencial'];
-
-  const totalMonthlyCost = totalTax + (fee ?? 0);
+  const fee = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
+  const totalMonthlyCost = totalTax + Number(fee || 0);
 
   const regimeName: TaxDetails['regime'] | TaxDetails2026['regime'] = isCurrentRules ? 'Lucro Presumido (Regras Atuais)' : 'Lucro Presumido';
 
@@ -245,7 +262,7 @@ function calculateLucroPresumido(values: TaxFormValues, isCurrentRules: boolean)
     exportRevenue: exportRevenueBRL,
     proLabore: totalProLaboreBruto,
     effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
-    contabilizeiFee: fee,
+    contabilizeiFee: fee ?? 0,
     breakdown: breakdown.filter(i => (i?.value ?? 0) > 0.001),
     notes: [],
     partnerTaxes,
@@ -301,7 +318,7 @@ function _calculateSimples2026(
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-  const fee = feeBracket?.plans?.[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans?.[selectedPlan];
+  const fee = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
 
   let totalDas = 0;
   let cppFromAnnexIV = 0;
@@ -400,7 +417,7 @@ function _calculateSimples2026(
   }
 
   const totalTax = totalDas + ivaTaxes + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
-  const totalMonthlyCost = totalTax + (fee ?? 0);
+  const totalMonthlyCost = totalTax + Number(fee || 0);
   const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
 
   const breakdown = [

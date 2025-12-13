@@ -13,8 +13,45 @@ import {
   type PartnerTaxDetails,
   type TaxFormValues
 } from './types';
-import { findBracket, findFeeBracket, formatPercent, safeFindBracket } from './utils';
+import { findBracket, findFeeBracket, formatPercent, safeFindBracket, formatCurrencyBRL } from './utils';
 import { getFiscalParameters } from '../config/fiscal';
+
+function resolveSelectedPlan(
+  plans: Record<string, number> | undefined,
+  selectedPlan: string | undefined
+): number {
+  if (!plans || typeof plans !== 'object') {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[FeeResolver] Plans object is invalid. Falling back to 0.');
+    }
+    return 0;
+  }
+
+  if (selectedPlan && plans[selectedPlan] !== undefined) {
+    return plans[selectedPlan];
+  }
+
+  if (plans['expertsEssencial'] !== undefined) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[FeeResolver] selectedPlan '${selectedPlan}' not found. Falling back to 'expertsEssencial'.`);
+    }
+    return plans['expertsEssencial'];
+  }
+
+  const firstAvailablePlan = Object.values(plans)[0];
+  if (typeof firstAvailablePlan === 'number') {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[FeeResolver] 'expertsEssencial' not found. Falling back to first available plan.`);
+    }
+    return firstAvailablePlan;
+  }
+  
+  if (process.env.NODE_ENV === 'development') {
+      console.error(`[FeeResolver] No valid plan could be resolved. Fee is 0.`);
+  }
+  return 0;
+}
+
 
 // =================================================================================
 // 2. CORE CALCULATION LOGIC
@@ -120,8 +157,8 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-    const contabilizeiFee = feeBracket?.plans?.[values.selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.['expertsEssencial'];
-    const totalMonthlyCost = totalTax + (contabilizeiFee ?? 0);
+    const contabilizeiFee = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
+    const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
     
     return {
         regime: 'Lucro Presumido',
@@ -222,8 +259,8 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-    const contabilizeiFee = feeBracket?.plans?.[selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans?.['expertsEssencial'];
-    const totalMonthlyCost = totalTax + (contabilizeiFee ?? 0);
+    const contabilizeiFee = resolveSelectedPlan(feeBracket?.plans, values.selectedPlan);
+    const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
     const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
