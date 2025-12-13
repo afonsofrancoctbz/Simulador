@@ -148,12 +148,16 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     
     // SEMPRE usar a folha projetada quando estiver otimizando
-const annualPayroll = proLaboreOverride 
-? monthlyPayroll * 12  // Usa folha FUTURA projetada
-: (fp12 > 0 ? fp12 : monthlyPayroll * 12); // Usa histórico apenas no cenário base
+    const annualPayroll = proLaboreOverride 
+    ? monthlyPayroll * 12  // Usa folha FUTURA projetada
+    : (fp12 > 0 ? fp12 : monthlyPayroll * 12); // Usa histórico apenas no cenário base
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
-    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
+    // FIX: Ensure partnerTaxes is never empty, even with zero pro-labore.
+    const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = proLaboresToUse.length > 0 
+        ? _calculatePartnerTaxes(proLaboresToUse, config) 
+        : { partnerTaxes: [{ proLaboreBruto: 0, inss: 0, irrf: 0, proLaboreLiquido: 0 }], totalINSSRetido: 0, totalIRRFRetido: 0 };
+
 
     let totalDas = 0;
     let hasAnnexIVActivity = false;
