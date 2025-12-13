@@ -1,3 +1,4 @@
+
 import type { FiscalConfig } from '@/config/fiscal';
 import {
   CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
@@ -119,8 +120,8 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
 
     const totalTax = pis + cofins + iss + irpj + csll + cpp + totalINSSRetido + totalIRRFRetido;
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, totalRevenue);
-    const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans[selectedPlan];
-    const totalMonthlyCost = totalTax + contabilizeiFee;
+    const contabilizeiFee = feeBracket?.plans?.[values.selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_LUCRO_PRESUMIDO[0].plans?.['expertsEssencial'];
+    const totalMonthlyCost = totalTax + (contabilizeiFee ?? 0);
     
     return {
         regime: 'Lucro Presumido',
@@ -131,7 +132,7 @@ function calculateLucroPresumido(values: TaxFormValues, config: FiscalConfig): T
         exportRevenue: exportRevenueBRL,
         proLabore: totalProLaboreBruto,
         effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
-        contabilizeiFee,
+        contabilizeiFee: contabilizeiFee ?? 0,
         breakdown: [
           { name: `PIS`, value: pis, rate: pisRate },
           { name: `COFINS`, value: cofins, rate: cofinsRate },
@@ -221,8 +222,8 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
     
     const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, totalRevenue);
-    const contabilizeiFee = feeBracket?.plans[selectedPlan] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans[selectedPlan];
-    const totalMonthlyCost = totalTax + contabilizeiFee;
+    const contabilizeiFee = feeBracket?.plans?.[selectedPlan ?? 'expertsEssencial'] ?? CONTABILIZEI_FEES_SIMPLES_NACIONAL[0].plans?.['expertsEssencial'];
+    const totalMonthlyCost = totalTax + (contabilizeiFee ?? 0);
 
     const annexLabel = [...finalAnnexes].sort().map(a => `Anexo ${a}`).join(', ');
     const effectiveDasRate = totalRevenue > 0 ? totalDas / totalRevenue : 0;
@@ -246,7 +247,7 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
         fatorR: [...finalAnnexes].includes('III') || [...finalAnnexes].includes('V') ? fatorR : undefined,
         effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
         effectiveDasRate: effectiveDasRate,
-        contabilizeiFee,
+        contabilizeiFee: contabilizeiFee ?? 0,
         breakdown,
         notes: [],
         partnerTaxes,
