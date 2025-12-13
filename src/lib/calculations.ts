@@ -25,7 +25,9 @@ export function _calculatePartnerTaxes(proLabores: ProLaboreForm[], config: Fisc
     let totalIRRFRetido = 0;
     
     // Correctly reference the IRRF table, checking for the post-reform structure first.
-    const irrfTable = config.reforma_tributaria?.tabela_irrf || config.tabela_irrf;
+    const irrfTable = config.reforma_tributaria?.tabela_irrf?.length
+        ? config.reforma_tributaria.tabela_irrf
+        : config.tabela_irrf;
 
     const partnerTaxes: PartnerTaxDetails[] = proLabores.map(proLabore => {
         const proLaboreBruto = proLabore.value;
@@ -305,3 +307,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: { ...lucroPresumido, order: 3 },
   };
 }
+
+    
