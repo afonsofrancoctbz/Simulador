@@ -1,69 +1,4 @@
-// types.ts
-export interface TaxBracket {
-  min: number;
-  max: number;
-  rate: number;
-  deduction: number;
-}
-
-export interface SimplesDistribution {
-  IRPJ: number;
-  CSLL: number;
-  COFINS: number;
-  PIS: number;
-  CPP: number;
-  ICMS?: number;
-  ISS?: number; 
-  IPI?: number;
-  CBS?: number;
-  IBS?: number;
-  [key: string]: number | undefined; 
-}
-
-export interface SimplesBracket extends TaxBracket {
-  distribution: SimplesDistribution;
-}
-
-export interface FiscalConfig {
-  ano_vigencia: number;
-  salario_minimo: number;
-  teto_inss: number;
-  aliquota_inss_prolabore: number;
-  tabela_inss_clt_progressiva: TaxBracket[];
-  tabela_irrf: TaxBracket[];
-  simples_nacional: {
-    limite_fator_r: number;
-    I: SimplesBracket[];
-    II: SimplesBracket[];
-    III: SimplesBracket[];
-    IV: SimplesBracket[];
-    V: SimplesBracket[];
-  };
-  lucro_presumido_rates: {
-    PIS: number;
-    COFINS: number;
-    ISS: number;
-    IRPJ_BASE: number;
-    IRPJ_ADICIONAL_BASE: number;
-    CSLL: number;
-    LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL: number;
-  };
-  aliquotas_cpp_patronal: {
-    base: number;
-    rat: number;
-    terceiros: number;
-    total: number;
-  };
-  reforma_tributaria?: {
-      cbs_aliquota_padrao: number;
-      ibs_aliquota_padrao: number;
-      pis_cofins_multiplier: number;
-      iss_icms_multiplier: number;
-  };
-  deducao_simplificada_irrf?: number;
-  deducao_dependente_irrf?: number;
-  [key: string]: any;
-}
+import { FiscalConfig, SimplesBracket } from "@/lib/types";
 
 // --- CONFIGURAÇÕES OFICIAIS (AUDITADAS) ---
 
@@ -157,7 +92,7 @@ const FISCAL_CONFIG_2025: FiscalConfig = {
 
 const FISCAL_CONFIG_2026: FiscalConfig = {
   ...FISCAL_CONFIG_2025,
-  simples_nacional: structuredClone(FISCAL_CONFIG_2025.simples_nacional),
+  simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)), // Fallback for structureClone safety
   ano_vigencia: 2026,
   salario_minimo: 1631.00,
   teto_inss: 8565.28,
@@ -191,9 +126,9 @@ const TRANSITION_TABLE = {
 
 export function getFiscalParameters(year: 2025 | 2026): FiscalConfig {
   if (year === 2026) {
-    return structuredClone(FISCAL_CONFIG_2026);
+    return JSON.parse(JSON.stringify(FISCAL_CONFIG_2026));
   }
-  return structuredClone(FISCAL_CONFIG_2025);
+  return JSON.parse(JSON.stringify(FISCAL_CONFIG_2025));
 }
 
 export function getFiscalParametersPostReform(year: number): FiscalConfig {
@@ -221,34 +156,37 @@ export function getFiscalParametersPostReform(year: number): FiscalConfig {
     const anexos = ['I', 'II', 'III', 'IV', 'V'] as const;
 
     anexos.forEach(annexKey => {
-        newConfig.simples_nacional[annexKey] = baseConfig.simples_nacional[annexKey].map(bracket => {
-            const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
-            
-            const newPIS = PIS * transition.pis_cofins_multiplier;
-            const newCOFINS = COFINS * transition.pis_cofins_multiplier;
-            const cbsLoad = (PIS + COFINS) * (1 - transition.pis_cofins_multiplier);
+        const brackets = baseConfig.simples_nacional[annexKey];
+        if (Array.isArray(brackets)) {
+            (newConfig.simples_nacional as any)[annexKey] = brackets.map(bracket => {
+                const { PIS = 0, COFINS = 0, ISS = 0, ICMS = 0, IPI = 0 } = bracket.distribution;
+                
+                const newPIS = PIS * transition.pis_cofins_multiplier;
+                const newCOFINS = COFINS * transition.pis_cofins_multiplier;
+                const cbsLoad = (PIS + COFINS) * (1 - transition.pis_cofins_multiplier);
 
-            const newISS = ISS * transition.iss_icms_multiplier;
-            const newICMS = ICMS * transition.iss_icms_multiplier;
-            const newIPI = IPI * transition.iss_icms_multiplier;
-            const ibsLoad = (ISS + ICMS + IPI) * (1 - transition.iss_icms_multiplier);
+                const newISS = ISS * transition.iss_icms_multiplier;
+                const newICMS = ICMS * transition.iss_icms_multiplier;
+                const newIPI = IPI * transition.iss_icms_multiplier;
+                const ibsLoad = (ISS + ICMS + IPI) * (1 - transition.iss_icms_multiplier);
 
-            return {
-                ...bracket,
-                distribution: {
-                    ...bracket.distribution,
-                    PIS: Number(newPIS.toFixed(4)),
-                    COFINS: Number(newCOFINS.toFixed(4)),
-                    CBS: Number(cbsLoad.toFixed(4)),
-                    ISS: Number(newISS.toFixed(4)),
-                    ICMS: Number(newICMS.toFixed(4)),
-                    IPI: Number(newIPI.toFixed(4)),
-                    IBS: Number(ibsLoad.toFixed(4)),
-                    _original_PIS: PIS,
-                    _original_COFINS: COFINS
-                }
-            };
-        });
+                return {
+                    ...bracket,
+                    distribution: {
+                        ...bracket.distribution,
+                        PIS: Number(newPIS.toFixed(4)),
+                        COFINS: Number(newCOFINS.toFixed(4)),
+                        CBS: Number(cbsLoad.toFixed(4)),
+                        ISS: Number(newISS.toFixed(4)),
+                        ICMS: Number(newICMS.toFixed(4)),
+                        IPI: Number(newIPI.toFixed(4)),
+                        IBS: Number(ibsLoad.toFixed(4)),
+                        _original_PIS: PIS,
+                        _original_COFINS: COFINS
+                    }
+                };
+            });
+        }
     });
 
     return newConfig;

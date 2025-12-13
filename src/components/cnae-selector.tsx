@@ -271,13 +271,14 @@ function CnaeSelectorComponent({
                         {(activeView !== 'Busca' || search.length >= 2) && (
                             <>
                                 {filteredCnaes.length > 0 ? filteredCnaes.map(cnae => (
-                                    <button
-                                        type="button"
+                                    <div
                                         key={cnae.code}
                                         onMouseEnter={() => setHoveredCnae(cnae)}
                                         onMouseLeave={() => setHoveredCnae(null)}
                                         onClick={() => handleToggleCnae(cnae.code)}
                                         className={cn("w-full text-left", "p-3 border rounded-lg cursor-pointer transition-colors bg-card flex items-center justify-between hover:bg-muted/50", isCnaeSelected(cnae.code) && "border-primary ring-1 ring-primary/80")}
+                                        role="button"
+                                        tabIndex={0}
                                     >
                                         <div className="flex-grow">
                                             <p className="font-semibold text-sm">{cnae.code} - {cnae.description}</p>
@@ -289,10 +290,12 @@ function CnaeSelectorComponent({
                                                 {cnae.isRegulated && <BadgeUI variant="outline" className="text-xs border-amber-500 text-amber-600">Regulamentado</BadgeUI>}
                                             </div>
                                         </div>
-                                         <Button size="sm" variant="ghost" className="ml-4 shrink-0">
-                                            {isCnaeSelected(cnae.code) ? <Check className="h-5 w-5 text-primary"/> : <PlusCircle className="h-5 w-5 text-muted-foreground"/>}
+                                         <Button asChild size="sm" variant="ghost" className="ml-4 shrink-0">
+                                            <div>
+                                                {isCnaeSelected(cnae.code) ? <Check className="h-5 w-5 text-primary"/> : <PlusCircle className="h-5 w-5 text-muted-foreground"/>}
+                                            </div>
                                         </Button>
-                                    </button>
+                                    </div>
                                 )) : (
                                     <div className="text-center text-muted-foreground py-16">
                                         <p>Nenhum CNAE encontrado.</p>

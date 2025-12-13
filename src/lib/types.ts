@@ -324,5 +324,96 @@ export function activityToItem(activity: ActivityWithReduction): CnaeItem {
     cClassTrib: activity.cClassTrib,
   };
 }
+export interface TaxBracket {
+  min: number;
+  max: number;
+  rate: number;
+  deduction: number;
+}
 
+export interface SimplesDistribution {
+  IRPJ: number;
+  CSLL: number;
+  COFINS: number;
+  PIS: number;
+  CPP: number;
+  ICMS?: number;
+  ISS?: number; 
+  IPI?: number;
+  CBS?: number;
+  IBS?: number;
+  [key: string]: number | undefined; 
+}
+
+export interface SimplesBracket extends TaxBracket {
+  distribution: SimplesDistribution;
+}
+
+export interface FiscalConfig {
+  ano_vigencia: number;
+  salario_minimo: number;
+  teto_inss: number;
+  aliquota_inss_prolabore: number;
+  tabela_inss_clt_progressiva: TaxBracket[];
+  tabela_irrf: TaxBracket[];
+  simples_nacional: {
+    limite_fator_r: number;
+    I: SimplesBracket[];
+    II: SimplesBracket[];
+    III: SimplesBracket[];
+    IV: SimplesBracket[];
+    V: SimplesBracket[];
+    [key: string]: SimplesBracket[] | number; // Index signature compatible with specific keys
+  };
+  lucro_presumido_rates: {
+    PIS: number;
+    COFINS: number;
+    ISS: number;
+    IRPJ_BASE: number;
+    IRPJ_ADICIONAL_BASE: number;
+    CSLL: number;
+    LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL: number;
+  };
+  aliquotas_cpp_patronal: {
+    base: number;
+    rat: number;
+    terceiros: number;
+    total: number;
+  };
+  reforma_tributaria?: {
+      cbs_aliquota_padrao: number;
+      ibs_aliquota_padrao: number;
+      pis_cofins_multiplier: number;
+      iss_icms_multiplier: number;
+  };
+  deducao_simplificada_irrf?: number;
+  deducao_dependente_irrf?: number;
+  [key: string]: any;
+}
+
+// Cnae types needed for other files
+export interface CnaeData {
+  code: string;
+  description: string;
+  annex: Annex;
+  factorR: boolean;
+  obs?: string;
+  anexo_base?: Annex; // For 2026+ logic
+}
+
+export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
+
+export interface CnaeSelection {
+  code: string;
+  cClass?: string; // Classification for IBS/CBS (e.g. "padrao", "profissional", etc)
+}
+
+export interface RevenueData {
+  [key: string]: number;
+}
+
+export interface ProLaboreForm {
+    proLabore: number;
+    dependents: number;
+}
     

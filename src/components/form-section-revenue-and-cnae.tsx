@@ -1,9 +1,10 @@
 
+
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info } from 'lucide-react';
-import { cn, formatCurrencyBRL, parseBRL, formatPercent } from "@/lib/utils";
+import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X } from 'lucide-react';
+import { cn, formatBRL, parseBRL } from "@/lib/utils";
 import { getCnaeData, getCnaeOptions } from "@/lib/cnae-helpers";
 import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,9 +20,9 @@ import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
-import { CNAE_CLASSES_2026_MAP } from "@/lib/cnae-data-2026";
-import { getIvaReductionByCnae } from "@/lib/cnae-reductions-2026";
-import { Badge } from "./ui/badge";
+
+// This is the new combined component for Step 4
+// It includes CNAE selection and monthly revenue input
 
 interface FormSectionRevenueAndCnaeProps {
     year: number;
@@ -34,7 +35,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     const [exchangeRate, setExchangeRate] = useState<number|null>(null);
     const [debouncedCurrency, setDebouncedCurrency] = useState(form.watch('exportCurrency'));
 
-    // fiscalConfig pode ser usado futuramente ou removido se não usado neste componente
     const fiscalConfig = getFiscalParameters(year as 2025 | 2026);
 
     useDebounce(() => {
@@ -112,7 +112,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     if (!cnae) return null;
 
                                     const cnaeOptions = year >= 2026 ? getCnaeOptions(cnaeItem.code) : [];
-                                    const reduction = getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib);
 
                                     return (
                                         <div key={index} className="p-4 border rounded-lg bg-background/50 relative">
@@ -127,109 +126,31 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             </Button>
                                             <p className="font-bold text-primary pr-8">{cnae.code}</p>
                                             <p className="text-sm text-muted-foreground">{cnae.description}</p>
-                                            
-                                            <div className="mt-4 space-y-4">
-                                                <FormField
+                                            {year >= 2026 && cnaeOptions.length > 1 && (
+                                                 <FormField
                                                     control={form.control}
-                                                    name={`selectedCnaes.${index}.domesticRevenue`}
+                                                    name={`selectedCnaes.${index}.cClass`}
                                                     render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs">Receita Nacional (BRL)</FormLabel>
-                                                            <div className="relative">
-                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                        <FormItem className="mt-3">
+                                                            <FormLabel>Tipo de Serviço (Tributação)</FormLabel>
+                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                 <FormControl>
-                                                                    <NumericFormat
-                                                                        customInput={Input}
-                                                                        thousandSeparator="."
-                                                                        decimalSeparator=","
-                                                                        prefix=""
-                                                                        inputMode="decimal"
-                                                                        placeholder="0,00"
-                                                                        value={field.value}
-                                                                        onValueChange={(values) => field.onChange(values.floatValue)}
-                                                                        className="pl-9"
-                                                                    />
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Selecione a classificação do serviço..." />
+                                                                </SelectTrigger>
                                                                 </FormControl>
-                                                            </div>
+                                                                <SelectContent>
+                                                                {cnaeOptions.map(opt => (
+                                                                    <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
+                                                                        {opt.nbsDescription}
+                                                                    </SelectItem>
+                                                                ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
                                                         </FormItem>
                                                     )}
-                                                />
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`selectedCnaes.${index}.exportRevenue`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs">Receita Exportação</FormLabel>
-                                                            <div className="relative">
-                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{form.watch('exportCurrency') === 'USD' ? '$' : form.watch('exportCurrency') === 'EUR' ? '€' : 'R$'}</span>
-                                                                <FormControl>
-                                                                    <NumericFormat
-                                                                        customInput={Input}
-                                                                        thousandSeparator="."
-                                                                        decimalSeparator=","
-                                                                        prefix=""
-                                                                        inputMode="decimal"
-                                                                        placeholder="0,00"
-                                                                        value={field.value}
-                                                                        onValueChange={(values) => field.onChange(values.floatValue)}
-                                                                        className="pl-9"
-                                                                    />
-                                                                </FormControl>
-                                                            </div>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-
-                                            {cnae.isRegulated && (
-                                                <Badge variant="outline" className="mt-2 text-amber-600 border-amber-500">Atividade Regulamentada</Badge>
-                                            )}
-                                            
-                                            {year >= 2026 && (
-                                                <div className="mt-3 space-y-3">
-                                                    {cnaeOptions.length > 1 && (
-                                                        <FormField
-                                                            control={form.control}
-                                                            name={`selectedCnaes.${index}.cClassTrib`}
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel className="text-xs font-semibold">Classificação do Serviço (Tributação)</FormLabel>
-                                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                        <FormControl>
-                                                                        <SelectTrigger>
-                                                                            <SelectValue placeholder="Selecione a classificação..." />
-                                                                        </SelectTrigger>
-                                                                        </FormControl>
-                                                                        <SelectContent>
-                                                                        {cnaeOptions.map(opt => (
-                                                                            <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
-                                                                                {opt.nbsDescription}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    )}
-                                                     <div className="p-3 bg-primary/5 border border-dashed border-primary/20 rounded-lg text-sm">
-                                                        <p className="font-bold text-primary mb-1">Reduções de IVA (IBS/CBS)</p>
-                                                        <div className="flex justify-between">
-                                                            <span>Redução IBS:</span>
-                                                            <span className="font-semibold">{formatPercent(reduction.reducaoIBS / 100)}</span>
-                                                        </div>
-                                                        <div className="flex justify-between">
-                                                            <span>Redução CBS:</span>
-                                                            <span className="font-semibold">{formatPercent(reduction.reducaoCBS / 100)}</span>
-                                                        </div>
-                                                        <p className="text-xs text-muted-foreground mt-2">
-                                                            {cnaeItem.cClassTrib && CNAE_CLASSES_2026_MAP[cnaeItem.cClassTrib]?.description 
-                                                                ? CNAE_CLASSES_2026_MAP[cnaeItem.cClassTrib]?.description 
-                                                                : 'Tributação padrão.'}
-                                                        </p>
-                                                     </div>
-                                                </div>
+                                                 />
                                             )}
                                         </div>
                                     )
@@ -237,85 +158,138 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             </div>
                         </div>
                     )}
-                    
-                    {/* CORREÇÃO AQUI: Substituímos o render condicional manual por FormItem + FormMessage */}
-                    <FormField 
-                        control={form.control} 
-                        name="selectedCnaes" 
-                        render={({ field, fieldState }) => (
-                            <FormItem>
-                                <FormMessage className="text-center" />
-                            </FormItem>
-                        )} 
-                    />
+                    <FormField control={form.control} name="selectedCnaes" render={({ fieldState }) => (
+                        fieldState.error ? <p className="text-sm font-medium text-destructive text-center">{fieldState.error.message}</p> : null
+                    )} />
                 </CardContent>
             </Card>
 
-            {(selectedCnaes && selectedCnaes.length > 0) && (
-                 <Card className='shadow-lg overflow-hidden border bg-card'>
-                    <CardHeader className='border-b bg-muted/30'>
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
-                                <Landmark className="h-6 w-6 text-primary" />
+            {selectedCnaes && selectedCnaes.length > 0 && (
+                <>
+                    <Card className='shadow-lg overflow-hidden border bg-card'>
+                        <CardHeader className='border-b bg-muted/30'>
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                                    <FileText className="h-6 w-6 text-primary" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-xl font-bold">Faturamento Mensal</CardTitle>
+                                    <CardDescription>Informe sua receita esperada e a alíquota de ISS do seu município.</CardDescription>
+                                </div>
                             </div>
-                            <div>
-                                <CardTitle className="text-xl font-bold">Configurações Globais</CardTitle>
-                                <CardDescription>Ajustes que afetam o cálculo de todos os CNAEs.</CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className='p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6'>
-                        <div className="space-y-2">
-                            <Label htmlFor="exportCurrency">Moeda da Exportação</Label>
-                            <Select name="exportCurrency" value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="BRL">BRL (Real)</SelectItem>
-                                    <SelectItem value="USD">USD (Dólar Americano)</SelectItem>
-                                    <SelectItem value="EUR">EUR (Euro)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                             {form.watch('exportCurrency') !== 'BRL' && (
-                                <p className="text-sm text-muted-foreground">
-                                    Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? formatCurrencyBRL(exchangeRate) : 'Carregando...'}
-                                </p>
-                            )}
-                        </div>
-                         <FormField
-                            control={form.control}
-                            name="issRate"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Alíquota de ISS (%)</FormLabel>
-                                    <FormControl>
-                                            <NumericFormat
-                                            customInput={Input}
-                                            decimalSeparator=","
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            placeholder="Ex: 5,0"
-                                            value={field.value}
-                                            onValueChange={(values) => {
-                                                field.onChange(values.floatValue);
-                                            }}
+                        </CardHeader>
+                        <CardContent className='p-6 md:p-8 space-y-6'>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-grow space-y-4">
+                                    <div className="flex items-center mb-4">
+                                        <Label>Receita Nacional (em BRL)</Label>
+                                    </div>
+                                    {annexes.map(annex => (
+                                        <FormField
+                                            key={`domestic_${annex}`}
+                                            control={form.control}
+                                            name={`revenues.domestic_${annex}`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="font-normal text-muted-foreground">Anexo {annex}</FormLabel>
+                                                     <div className="relative">
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                        <FormControl>
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
+                                                        </FormControl>
+                                                    </div>
+                                                </FormItem>
+                                            )}
                                         />
-                                    </FormControl>
-                                    <FormDescription className="text-xs">
-                                        A alíquota de ISS do seu município (entre 2% e 5%).
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         {year >= 2026 && (
-                            <>
+                                    ))}
+                                </div>
+                                <div className="flex-grow space-y-4">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <Label htmlFor="exportCurrency">Receita de Exportação</Label>
+                                        <Select name="exportCurrency" value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
+                                            <SelectTrigger className="w-[120px]">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="BRL">BRL</SelectItem>
+                                                <SelectItem value="USD">USD</SelectItem>
+                                                <SelectItem value="EUR">EUR</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    {annexes.map(annex => (
+                                         <FormField
+                                            key={`export_${annex}`}
+                                            control={form.control}
+                                            name={`revenues.export_${annex}`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="font-normal text-muted-foreground">Anexo {annex}</FormLabel>
+                                                     <div className="relative">
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{form.watch('exportCurrency') === 'USD' ? '$' : form.watch('exportCurrency') === 'EUR' ? '€' : 'R$'}</span>
+                                                        <FormControl>
+                                                            <Input type="text" inputMode="decimal" placeholder="0,00" onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
+                                                        </FormControl>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
+                                     {form.watch('exportCurrency') !== 'BRL' && (
+                                        <p className="text-sm text-muted-foreground">
+                                            Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? formatBRL(exchangeRate) : 'Carregando...'}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                             <FormField
+                                control={form.control}
+                                name="issRate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Alíquota de ISS (%)</FormLabel>
+                                        <FormControl>
+                                             <NumericFormat
+                                                customInput={Input}
+                                                decimalSeparator=","
+                                                decimalScale={2}
+                                                fixedDecimalScale={false}
+                                                placeholder="Ex: 5,0"
+                                                value={field.value}
+                                                onValueChange={(values) => {
+                                                    field.onChange(values.floatValue);
+                                                }}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, use o padrão de 5%.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </CardContent>
+                    </Card>
+                    
+                    {year >= 2026 && (
+                        <Card className='shadow-lg overflow-hidden border bg-card'>
+                            <CardHeader className='border-b bg-muted/30'>
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                                        <Landmark className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-xl font-bold">Cenário Pós-Reforma (IVA)</CardTitle>
+                                        <CardDescription>Informações adicionais para simular os cenários da Reforma Tributária.</CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className='p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6'>
                                 <FormField
                                     control={form.control}
                                     name="b2bRevenuePercentage"
                                     render={({ field }) => (
-                                        <FormItem className="md:col-span-2">
+                                        <FormItem>
                                             <div className="flex justify-between items-center">
                                                 <FormLabel>Receita de Clientes PJ (B2B)</FormLabel>
                                                 <span className="text-sm font-semibold w-20 text-right bg-muted/50 px-2 py-1 rounded-md border">{field.value?.toFixed(0) ?? '0'}%</span>
@@ -329,8 +303,8 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                     className="pt-2"
                                                 />
                                             </FormControl>
-                                            <FormDescription className="text-xs">
-                                                Percentual do faturamento que vem de outras empresas.
+                                            <FormDescription>
+                                                Percentual do faturamento que vem de outras empresas. Essencial para o cenário "Híbrido".
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -341,38 +315,27 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     name="creditGeneratingExpenses"
                                     render={({ field }) => {
                                         return (
-                                            <FormItem className="md:col-span-2">
+                                            <FormItem>
                                                 <FormLabel>Despesas que Geram Crédito de IVA</FormLabel>
-                                                    <div className="relative">
+                                                 <div className="relative">
                                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
                                                     <FormControl>
-                                                         <NumericFormat
-                                                            customInput={Input}
-                                                            thousandSeparator="."
-                                                            decimalSeparator=","
-                                                            prefix=""
-                                                            inputMode="decimal"
-                                                            placeholder="0,00"
-                                                            value={field.value}
-                                                            onValueChange={(values) => field.onChange(values.floatValue)}
-                                                            className="pl-9"
-                                                        />
+                                                        <Input type="text" inputMode="decimal" placeholder="0,00" onChange={e => field.onChange(parseBRL(e.target.value))} value={formatBRL(field.value)} className="pl-9" />
                                                     </FormControl>
                                                 </div>
-                                                <FormDescription className="text-xs">
-                                                    Ex: aluguel, energia, softwares. Não inclua folha de pagamento.
+                                                <FormDescription>
+                                                    Ex: aluguel, energia, softwares, insumos. Não inclua folha de pagamento.
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         );
                                     }}
                                 />
-                            </>
-                        )}
-                    </CardContent>
-                </Card>
+                            </CardContent>
+                        </Card>
+                    )}
+                </>
             )}
         </div>
     );
 }
-    

@@ -147,11 +147,10 @@ function _calculateSimplesNacional(values: TaxFormValues, config: FiscalConfig, 
     // Se o usuário não preencheu RBT12, projeta-se o anual.
     const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
     
-    // CORREÇÃO CRÍTICA (Linha da Verdade):
-    // Se estamos no cenário otimizado (proLaboreOverride existe), DEVEMOS usar a folha projetada para o futuro.
-    // Ignorar o histórico 'fp12' se estamos simulando uma adequação ao Anexo III.
-    const annualPayroll = (fp12 > 0 && !proLaboreOverride) ? fp12 : monthlyPayroll * 12;
-    
+    // SEMPRE usar a folha projetada quando estiver otimizando
+const annualPayroll = proLaboreOverride 
+? monthlyPayroll * 12  // Usa folha FUTURA projetada
+: (fp12 > 0 ? fp12 : monthlyPayroll * 12); // Usa histórico apenas no cenário base
     const fatorR = effectiveRbt12 > 0 ? annualPayroll / effectiveRbt12 : 0;
     
     const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLaboresToUse, config);
