@@ -19,7 +19,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { Annex, CnaeSelection, Plan } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
-import { getIvaReductionByCnae, getNBSOptionsByCnae, NBSOption } from "@/lib/cnae-reductions-2026";
+import { getIvaReductionByCnae, getNBSOptionsByCnae } from "@/lib/cnae-reductions-2026";
+import type { NBSOption } from "@/lib/cnae-reductions-2026";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
@@ -65,7 +66,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
     // Derive IVA reduction directly from the selected NBS option.
     const ivaReduction = selectedNbsOption 
         ? { reducaoIBS: selectedNbsOption.reducaoIBS, reducaoCBS: selectedNbsOption.reducaoCBS }
-        : { reducaoIBS: 0, reducaoCBS: 0 };
+        : getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib);
 
     if (!cnaeData) return null;
 
@@ -136,7 +137,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
     };
 
     return (
-        <div className="p-4 border rounded-lg bg-card/60 relative space-y-2">
+        <div className="p-4 border rounded-lg bg-card/60 relative space-y-3">
             <Button
                 type="button"
                 variant="ghost"
@@ -174,7 +175,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs bg-foreground text-background">
-                    <p>IBS and CBS reductions are defined by law based on the selected NBS classification.</p>
+                    <p>As reduções de IBS e CBS são definidas por lei com base na classificação NBS do seu serviço.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -203,35 +204,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
       name: "selectedCnaes",
     });
 
-    const [exchangeRate, setExchangeRate] = useState<number|null>(null);
-    const [debouncedCurrency, setDebouncedCurrency] = useState(form.watch('exportCurrency'));
-
-    useDebounce(() => {
-        setDebouncedCurrency(form.watch('exportCurrency'));
-    }, 500, [form.watch('exportCurrency')]);
-
-    useEffect(() => {
-        async function fetchExchangeRate() {
-            if (debouncedCurrency !== 'BRL') {
-                try {
-                    const response = await fetch('/api/exchange-rate');
-                    const data = await response.json();
-                    const rate = data[debouncedCurrency];
-                    if (rate) {
-                        setExchangeRate(rate);
-                        form.setValue('exchangeRate', rate);
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch exchange rate:", error);
-                    setExchangeRate(null);
-                }
-            } else {
-                 setExchangeRate(1);
-                 form.setValue('exchangeRate', 1);
-            }
-        }
-        fetchExchangeRate();
-    }, [debouncedCurrency, form]);
+    const exchangeRate = form.watch('exchangeRate');
 
     const handleRevenueChange = (value: number, type: 'domestic' | 'export') => {
       const cnaes: CnaeSelection[] = form.getValues('selectedCnaes');
@@ -428,6 +401,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                     defaultValue={[50]}
                                                     max={100}
                                                     step={1}
+                                                    value={[field.value ?? 50]}
                                                     onValueChange={(value) => field.onChange(value[0])}
                                                     className="pt-2"
                                                 />

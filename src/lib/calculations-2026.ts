@@ -400,7 +400,7 @@ function _calculateSimples2026(
         ].filter(item => item.value > 0.001),
         notes,
         partnerTaxes,
-        optimizationNote: proLaboreOverride ? `Pró-labore ajustado para ${formatCurrencyBRL(totalProLaboreBruto)} visando Anexo III.` : null
+        optimizationNote: proLaboreOverride ? `Pró-labore ajustado para ${formatCurrencyBRL(totalProLaboreBruto)} visando Anexo III.` : ""
     };
     return result;
 }

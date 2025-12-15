@@ -13,7 +13,8 @@ import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
 import { useDebounce } from 'react-use';
-import { getNBSOptionsByCnae, type CnaeRelationship2026 } from '@/lib/cnae-reductions-2026';
+import { getNBSOptionsByCnae } from '@/lib/cnae-reductions-2026';
+import type { CnaeRelationship2026 } from '@/lib/cnae-data-2026';
 
 export function useTaxCalculator(year: number) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
@@ -51,6 +52,13 @@ export function useTaxCalculator(year: number) {
     const watchedRbt12 = watch("rbt12");
     const watchedFp12 = watch("fp12");
     const watchedCnaes = watch("selectedCnaes");
+    const watchedExportCurrency = watch('exportCurrency');
+
+    const [debouncedCurrency, setDebouncedCurrency] = useState(watchedExportCurrency);
+    useDebounce(() => {
+        setDebouncedCurrency(watchedExportCurrency);
+    }, 500, [watchedExportCurrency]);
+
 
     useEffect(() => {
         const updateNbsOptions = async () => {
@@ -58,10 +66,10 @@ export function useTaxCalculator(year: number) {
             const newNbsOptions: Record<string, CnaeRelationship2026[]> = {};
             for (const [index, cnae] of cnaes.entries()) {
                 if (cnae.code) {
-                    const options = await getNBSOptionsByCnae(cnae.code);
+                    const options = getNBSOptionsByCnae(cnae.code);
                     newNbsOptions[cnae.code] = options;
-                    if (options.length === 1) {
-                        setValue(`selectedCnaes.${index}.nbsCode`, options[0].nbs);
+                    if (options.length === 1 && cnae.cClassTrib !== options[0].cClassTrib) {
+                        setValue(`selectedCnaes.${index}.cClassTrib`, options[0].cClassTrib, { shouldValidate: true, shouldDirty: true });
                     }
                 }
             }
@@ -102,6 +110,34 @@ export function useTaxCalculator(year: number) {
     }, 500, [watchedRbt12, watchedFp12, watchedCnaes, getValues]);
 
 
+    useEffect(() => {
+        async function fetchExchangeRate() {
+            if (debouncedCurrency !== 'BRL') {
+                try {
+                    const response = await fetch('/api/exchange-rate');
+                    if (!response.ok) throw new Error('API request failed');
+                    const data = await response.json();
+                    const rate = data[debouncedCurrency];
+                    if (rate) {
+                        setValue('exchangeRate', rate);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch exchange rate:", error);
+                    setValue('exchangeRate', 1); // Fallback
+                    toast({
+                        title: "Falha ao buscar cotação",
+                        description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback. Você pode ajustar manualmente.",
+                        variant: "destructive"
+                    });
+                }
+            } else {
+                 setValue('exchangeRate', 1);
+            }
+        }
+        fetchExchangeRate();
+    }, [debouncedCurrency, setValue, toast]);
+
+
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
         const domesticActivities: CnaeItem[] = values.selectedCnaes
             .filter(cnae => cnae.domesticRevenue && cnae.domesticRevenue > 0)
@@ -109,7 +145,6 @@ export function useTaxCalculator(year: number) {
                 code: cnae.code,
                 revenue: cnae.domesticRevenue!,
                 cClassTrib: cnae.cClassTrib,
-                nbsCode: cnae.nbsCode
             }));
 
         const exportActivities: CnaeItem[] = values.selectedCnaes
@@ -118,7 +153,6 @@ export function useTaxCalculator(year: number) {
                 code: cnae.code,
                 revenue: cnae.exportRevenue!,
                 cClassTrib: cnae.cClassTrib,
-                nbsCode: cnae.nbsCode
             }));
 
 
@@ -159,17 +193,19 @@ export function useTaxCalculator(year: number) {
             return;
         }
         
-        // Validate NBS selection
-        for (const cnae of values.selectedCnaes) {
-            const options = nbsOptions[cnae.code];
-            if (options && options.length > 1 && !cnae.nbsCode) {
-                toast({
-                    title: "Seleção de NBS Pendente",
-                    description: `O CNAE ${cnae.code} requer a seleção de um NBS. Por favor, escolha uma opção para continuar.`,
-                    variant: "destructive",
-                });
-                return;
-            }
+        // Validate NBS selection for post-reform years
+        if (year >= 2026) {
+          for (const cnae of values.selectedCnaes) {
+              const options = nbsOptions[cnae.code];
+              if (options && options.length > 1 && !cnae.cClassTrib) {
+                  toast({
+                      title: "Seleção de Tributação Pendente",
+                      description: `A atividade ${cnae.code} requer que você especifique o tipo de serviço para o cálculo correto dos impostos da reforma.`,
+                      variant: "destructive",
+                  });
+                  return;
+              }
+          }
         }
 
         setIsLoading(true);
