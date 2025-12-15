@@ -1,22 +1,18 @@
-
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info, BadgeCheck } from 'lucide-react';
-import { cn, formatCurrencyBRL, parseBRL } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
-import { getFiscalParameters } from "@/config/fiscal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
 import { useDebounce } from "react-use";
 import { useEffect, useMemo, useState } from "react";
-import type { Annex, CnaeSelection, Plan } from "@/lib/types";
+import type { CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
 import { getIvaReductionByCnae, getNBSOptionsByCnae } from "@/lib/cnae-reductions-2026";
@@ -339,7 +335,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     </FormControl>
                                     {form.watch('exportCurrency') !== 'BRL' && (
                                         <p className="text-sm text-muted-foreground">
-                                            Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? formatCurrencyBRL(exchangeRate) : 'Carregando...'}
+                                            Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? (typeof exchangeRate === 'number' ? exchangeRate.toFixed(2) : 'Carregando...') : 'Carregando...'}
                                         </p>
                                     )}
                                 </FormItem>

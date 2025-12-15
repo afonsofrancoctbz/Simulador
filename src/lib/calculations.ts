@@ -39,41 +39,50 @@ export function resolveSelectedPlan(
   plans: Record<string, number> | undefined,
   selectedPlan: Plan | undefined | null
 ): ResolvedFee {
-    if (!plans || typeof plans !== 'object' || Object.keys(plans).length === 0) {
-        console.warn(`[AUDIT] Fee resolution failed: Invalid or empty fee bracket provided. Falling back to zero.`, { plans });
-        return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
-    }
+  if (!plans || typeof plans !== "object" || Object.keys(plans).length === 0) {
+    console.warn(
+      `[FeeResolver] Invalid or empty fee bracket provided. Falling back to zero.`,
+      { plans }
+    );
+    return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
+  }
 
-    let planToUse: Plan = DEFAULT_SIMULATION_PLAN;
-    let isDefault = true;
+  let planToUse: Plan = DEFAULT_SIMULATION_PLAN;
+  let isDefault = true;
 
-    // 1. Try the user's selected plan
-    if (selectedPlan && plans[selectedPlan] !== undefined) {
-        planToUse = selectedPlan;
-        isDefault = false;
+  // 1. Try the user's selected plan
+  if (selectedPlan && plans[selectedPlan] !== undefined) {
+    planToUse = selectedPlan;
+    isDefault = false;
     // 2. If selected plan is invalid, try the default simulation plan
-    } else if (plans[DEFAULT_SIMULATION_PLAN] !== undefined) {
-        planToUse = DEFAULT_SIMULATION_PLAN;
+  } else if (plans[DEFAULT_SIMULATION_PLAN] !== undefined) {
+    planToUse = DEFAULT_SIMULATION_PLAN;
     // 3. If default is also not available, grab the first available one
+  } else {
+    const firstAvailablePlan = Object.keys(plans)[0] as Plan | undefined;
+    if (firstAvailablePlan) {
+      planToUse = firstAvailablePlan;
     } else {
-        const firstAvailablePlan = Object.keys(plans)[0] as Plan | undefined;
-        if (firstAvailablePlan) {
-            planToUse = firstAvailablePlan;
-        } else {
-            // Should be unreachable if the initial check passes, but as a final safeguard:
-            console.warn(`[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.`, { selectedPlan, plans });
-            return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
-        }
+      // Should be unreachable if the initial check passes, but as a final safeguard:
+      console.warn(
+        `[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.`,
+        { selectedPlan, plans }
+      );
+      return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
     }
-    
-    const fee = plans[planToUse];
+  }
 
-    if (fee === undefined) {
-      console.warn(`[FeeResolver] Logic error: plan '${planToUse}' selected but fee is undefined. Falling back to 0.`, { selectedPlan, plans });
-      return { fee: 0, planName: planToUse, isDefault: true };
-    }
+  const fee = plans[planToUse];
 
-    return { fee, planName: planToUse, isDefault };
+  if (fee === undefined) {
+    console.warn(
+      `[FeeResolver] Logic error: plan '${planToUse}' selected but fee is undefined. Falling back to 0.`,
+      { selectedPlan, plans }
+    );
+    return { fee: 0, planName: planToUse, isDefault: true };
+  }
+
+  return { fee, planName: planToUse, isDefault };
 }
 
 function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): number {
@@ -502,5 +511,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: lucroPresumido,
   };
 }
-
-    

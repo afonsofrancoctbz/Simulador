@@ -11,7 +11,6 @@ import {
   type CalculationResults2026,
   type TaxFormValues,
   type TaxDetails2026,
-  type Annex,
   type TaxDetails,
   type ProLaboreForm,
   type PartnerTaxDetails,
@@ -33,9 +32,9 @@ export {}; // Garante que o arquivo é um módulo
 // SECTION: UTILITY & HELPER FUNCTIONS (SELF-CONTAINED)
 // ======================================================================================
 
-const VALID_ANNEXES: Annex[] = ["I", "II", "III", "IV", "V"];
-const isValidAnnex = (a: unknown): a is Annex => typeof a === "string" && VALID_ANNEXES.includes(a as Annex);
-const normalizeAnnex = (annex?: string | Annex | null): Annex => isValidAnnex(annex) ? annex as Annex : "III";
+const VALID_ANNEXES = ["I", "II", "III", "IV", "V"];
+const isValidAnnex = (a: unknown): a is Annex => typeof a === "string" && VALID_ANNEXES.includes(a as any);
+const normalizeAnnex = (annex?: string | null): Annex => isValidAnnex(annex) ? annex as Annex : "III";
 
 function _calculateCpp(monthlyPayroll: number, fiscalConfig: any): number {
   const cppRate = fiscalConfig.aliquotas_cpp_patronal?.base ?? 0;
@@ -469,7 +468,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
             if (otimizadoResult) {
                 simplesNacionalOtimizado = {
                     ...otimizadoResult,
-                    regime: buildSimplesRegimeLabel('Otimizado', otimizadoResult.annex as Annex, false) as any,
+                    regime: buildSimplesRegimeLabel('Otimizado', otimizadoResult.annex, false) as any,
                     optimizationNote: `Pró-labore ajustado para ${formatCurrencyBRL(proLaboresOtimizado.reduce((sum, p) => sum + p.value, 0))} visando Anexo III.`
                 };
             }
@@ -479,7 +478,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
                 if (otimizadoHibridoResult) {
                     simplesNacionalOtimizadoHibrido = {
                         ...otimizadoHibridoResult,
-                        regime: buildSimplesRegimeLabel('Otimizado', otimizadoHibridoResult.annex as Annex, true) as any,
+                        regime: buildSimplesRegimeLabel('Otimizado', otimizadoHibridoResult.annex, true) as any,
                         optimizationNote: `Pró-labore ajustado para ${formatCurrencyBRL(proLaboresOtimizado.reduce((sum, p) => sum + p.value, 0))} visando Anexo III.`
                     };
                 }
@@ -488,7 +487,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     }
 
 
-    const orderMap = {
+    const orderMap: Record<string, number> = {
       'Simples Nacional (Fator R Otimizado)': 1,
       'Simples Nacional Tradicional (Anexo III)': 2,
       'Simples Nacional Tradicional (Anexo V)': 2,
@@ -496,9 +495,9 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
       'Simples Nacional Híbrido (Anexo V)': 3,
     };
 
-    const assignOrder = (scenario: TaxDetails2026 | null) => {
+    const assignOrder = (scenario: TaxDetails2026 | null): (TaxDetails2026 & { order?: number }) | null => {
         if (!scenario) return null;
-        return { ...scenario, order: (orderMap[scenario.regime as keyof typeof orderMap] ?? 99) };
+        return { ...scenario, order: (orderMap[scenario.regime] ?? 99) };
     };
 
     return {
@@ -510,5 +509,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
         simplesNacionalOtimizadoHibrido: normalize(assignOrder(simplesNacionalOtimizadoHibrido)),
     };
 }
-
-    
