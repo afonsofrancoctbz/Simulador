@@ -1,3 +1,4 @@
+
 // src/lib/calculations-2026.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getFiscalParametersPostReform } from "@/config/fiscal";
@@ -249,10 +250,10 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     notes,
     partnerTaxes,
     // Fields specific to 2026
-    fatorR: null,
-    effectiveDasRate: null,
-    annex: null,
-    optimizationNote: null,
+    fatorR: 0,
+    effectiveDasRate: 0,
+    annex: "N/A",
+    optimizationNote: "",
     order: isCurrentRules ? 5 : 4,
   };
 }
@@ -509,3 +510,5 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
         simplesNacionalOtimizadoHibrido: normalize(assignOrder(simplesNacionalOtimizadoHibrido)),
     };
 }
+
+    
