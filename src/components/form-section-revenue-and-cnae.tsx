@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
@@ -306,8 +307,8 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
                                 <FormItem>
                                     <div className="flex items-center gap-4">
-                                        <Label htmlFor="exportCurrency">Receita de Exportação</Label>
-                                        <Select name="exportCurrency" value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
+                                        <FormLabel>Receita de Exportação</FormLabel>
+                                        <Select value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
                                             <SelectTrigger className="w-[120px]">
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -447,3 +448,5 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
+
+  
