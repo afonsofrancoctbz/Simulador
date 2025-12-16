@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
@@ -42,7 +43,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
     const isPostReforma = year >= 2026;
 
     // Fetch NBS options based on the CNAE code.
-    const nbsOptions: NBSOption[] = useMemo(() => 
+    const nbsOptions: CnaeRelationship2026[] = useMemo(() => 
         isPostReforma ? getNBSOptionsByCnae(cnaeItem.code) : [],
     [cnaeItem.code, isPostReforma]);
 
@@ -62,7 +63,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
 
     // Derive IVA reduction directly from the selected NBS option.
     const ivaReduction = selectedNbsOption 
-        ? { reducaoIBS: selectedNbsOption.reducaoIBS, reducaoCBS: selectedNbsOption.reducaoCBS }
+        ? getIvaReductionByCnae(cnaeItem.code, selectedNbsOption.cClassTrib)
         : getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib);
 
     if (!cnaeData) return null;
@@ -82,7 +83,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 <AlertTriangle className="h-4 w-4" />
                                 Ação Requerida: Selecione o Tipo de Serviço
                             </FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Defina a tributação deste CNAE..." />
@@ -90,8 +91,8 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 </FormControl>
                                 <SelectContent>
                                     {nbsOptions.map((opt, idx) => (
-                                        <SelectItem key={`${opt.cClassTrib}_${idx}`} value={opt.cClassTrib}>
-                                            {`(${opt.reducaoIBS}%) ${opt.nbsDescription}`}
+                                        <SelectItem key={`${opt.cClassTrib}-${idx}`} value={opt.cClassTrib}>
+                                            {`(${opt.nbsDescription})`}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

@@ -35,33 +35,30 @@ export function resolveSelectedPlan(
   plans: Record<string, number> | undefined,
   selectedPlan: Plan | undefined | null
 ): ResolvedFee {
+  const planToUse: Plan = selectedPlan ?? DEFAULT_SIMULATION_PLAN;
+  let fee: number | undefined;
+  let isDefault = false;
+
   if (!plans || typeof plans !== 'object' || Object.keys(plans).length === 0) {
     console.warn("[AUDIT] Fee resolution failed: Invalid or empty fee bracket provided. Using fallback.", { plans, selectedPlan });
     return { fee: 0, planName: 'expertsEssencial', isDefault: true };
   }
-
-  let planToUse: Plan = DEFAULT_SIMULATION_PLAN;
-  let isDefault = true;
-
+  
   if (selectedPlan && plans[selectedPlan] !== undefined) {
-    planToUse = selectedPlan;
-    isDefault = false;
+      fee = plans[selectedPlan];
   } else if (plans[DEFAULT_SIMULATION_PLAN] !== undefined) {
-    planToUse = DEFAULT_SIMULATION_PLAN;
+      fee = plans[DEFAULT_SIMULATION_PLAN];
+      isDefault = true;
   } else {
-    const firstAvailablePlan = Object.keys(plans)[0] as Plan | undefined;
-    if (firstAvailablePlan) {
-      planToUse = firstAvailablePlan;
-    } else {
-      console.warn(`[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.`, { selectedPlan, plans });
-      return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
-    }
+      const firstAvailablePlan = Object.keys(plans)[0] as Plan | undefined;
+      if (firstAvailablePlan) {
+          fee = plans[firstAvailablePlan];
+          isDefault = true;
+      }
   }
 
-  const fee = plans[planToUse];
-
   if (fee === undefined) {
-    console.warn(`[FeeResolver] Logic error: plan '${planToUse}' selected but fee is undefined. Falling back to 0.`, { selectedPlan, plans });
+    console.warn(`[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.`, { selectedPlan, plans });
     return { fee: 0, planName: planToUse, isDefault: true };
   }
 
@@ -406,6 +403,19 @@ export function calculateLucroPresumido(
   };
 }
 
+function normalizeScenario<T extends Record<string, any>>(scenario: T | null): T | null {
+  if (!scenario) return null;
+  if (Object.keys(scenario).length === 0) return null;
+
+  return {
+    ...scenario,
+    fatorR: scenario.fatorR ?? 0,
+    effectiveDasRate: scenario.effectiveDasRate ?? 0,
+    annex: scenario.annex ?? "N/A",
+    optimizationNote: scenario.optimizationNote ?? "",
+  };
+}
+
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
   const config = getFiscalParameters(2025);
 
@@ -484,8 +494,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   }
 
   return {
-    simplesNacionalOtimizado: simplesNacionalOtimizado,
-    simplesNacionalBase: simplesNacionalBase,
-    lucroPresumido: lucroPresumido,
+    simplesNacionalOtimizado: normalizeScenario(simplesNacionalOtimizado),
+    simplesNacionalBase: normalizeScenario(simplesNacionalBase) as TaxDetails,
+    lucroPresumido: normalizeScenario(lucroPresumido) as TaxDetails,
   };
 }
