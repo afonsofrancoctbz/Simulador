@@ -1,3 +1,4 @@
+
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { FeeBracket } from "./types";
@@ -111,7 +112,6 @@ export function findBracket<T extends { max: number }>(
   return result;
 }
 
-// Alias for findBracket, now hardened
 export function findFeeBracket(
   brackets: FeeBracket[],
   revenue: number
@@ -126,3 +126,5 @@ export function findFeeBracket(
     null
   );
 }
+
+    

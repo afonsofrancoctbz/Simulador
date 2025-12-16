@@ -32,6 +32,7 @@ export {}; // Garante que o arquivo é um módulo
 // SECTION: UTILITY & HELPER FUNCTIONS (SELF-CONTAINED)
 // ======================================================================================
 
+type Annex = "I" | "II" | "III" | "IV" | "V";
 const VALID_ANNEXES = ["I", "II", "III", "IV", "V"];
 const isValidAnnex = (a: unknown): a is Annex => typeof a === "string" && VALID_ANNEXES.includes(a as any);
 const normalizeAnnex = (annex?: string | null): Annex => isValidAnnex(annex) ? annex as Annex : "III";
@@ -130,15 +131,24 @@ function buildSimplesRegimeLabel(
   return `Simples Nacional Tradicional (Anexo ${annex})`;
 }
 
+function normalizeScenario<T extends Record<string, any>>(scenario: T | null): T | null {
+  if (!scenario) return null;
+  if (Object.keys(scenario).length === 0) return null;
+
+  return {
+    ...scenario,
+    fatorR: scenario.fatorR ?? 0,
+    effectiveDasRate: scenario.effectiveDasRate ?? 0,
+    annex: scenario.annex ?? "N/A",
+    optimizationNote: scenario.optimizationNote ?? "",
+  };
+}
+
 
 // ======================================================================================
-// SECTION: CALCULATION ENGINES (NO MORE `{}`)
+// SECTION: CALCULATION ENGINES
 // ======================================================================================
 
-/**
- * FULL IMPLEMENTATION for Lucro Presumido (2026+ rules)
- * Returns a complete TaxDetails2026 object or null if calculation is not possible.
- */
 function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: boolean): TaxDetails2026 | null {
   const { year = 2026, domesticActivities = [], exportActivities = [], exchangeRate = 1, totalSalaryExpense = 0, proLabores = [], selectedPlan, creditGeneratingExpenses = 0, issRate = 5 } = values;
   const fiscalConfig = getFiscalParametersPostReform(year);
@@ -148,7 +158,7 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
   const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act?.revenue || 0) * exchangeRate, 0);
   const totalRevenue = domesticRevenue + exportRevenueBRL;
 
-  if (totalRevenue === 0 && totalProLaboreBruto === 0) return null; // Cannot calculate if there is no revenue or payroll
+  if (totalRevenue === 0 && totalProLaboreBruto === 0) return null;
 
   const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = _calculatePartnerTaxes(proLabores, fiscalConfig);
@@ -215,13 +225,9 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
   }
 
   const totalTax = irpjTotal + csllValue + consumptionTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
-  const safeTotalRevenue =
-  Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
+  const safeTotalRevenue = Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
 
-  const feeBracket = findFeeBracket(
-    CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
-    safeTotalRevenue
-  );
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_LUCRO_PRESUMIDO, safeTotalRevenue);
   const { fee: contabilizeiFee, planName, isDefault } = resolveSelectedPlan(feeBracket?.plans, selectedPlan);
   const totalMonthlyCost = totalTax + Number(contabilizeiFee ?? 0);
 
@@ -244,11 +250,9 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
       { name: "INSS s/ Pró-labore", value: totalINSSRetido },
       { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
       ...breakdown,
-      { name: `Mensalidade Contabilizei (Plano: ${planName})`, value: contabilizeiFee },
     ].filter(i => i.value > 0.001),
     notes,
     partnerTaxes,
-    // Fields specific to 2026
     fatorR: 0,
     effectiveDasRate: 0,
     annex: "N/A",
@@ -257,10 +261,6 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
   };
 }
 
-/**
- * FULL IMPLEMENTATION for Simples Nacional (2026+ rules)
- * Returns a complete TaxDetails2026 object or null if calculation is not possible.
- */
 function _calculateSimples2026(
   values: TaxFormValues,
   isHybrid: boolean,
@@ -395,7 +395,6 @@ function _calculateSimples2026(
             { name: "CPP (INSS Patronal)", value: cppFromAnnexIV },
             { name: "INSS s/ Pró-labore", value: totalINSSRetido },
             { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
-            { name: `Mensalidade Contabilizei (Plano: ${planName})`, value: contabilizeiFee }
         ].filter(item => item.value > 0.001),
         notes,
         partnerTaxes,
@@ -405,19 +404,8 @@ function _calculateSimples2026(
 }
 
 // ======================================================================================
-// SECTION: ORCHESTRATOR (WITH NORMALIZATION SAFEGUARD)
+// SECTION: ORCHESTRATOR
 // ======================================================================================
-
-/**
- * Safeguard normalizer function.
- * Ensures that any empty object or falsy value is converted to null.
- */
-function normalize<T>(value: T | null | undefined): T | null {
-  if (!value || (typeof value === 'object' && Object.keys(value).length === 0)) {
-    return null;
-  }
-  return value;
-}
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
     const { year, rbt12 = 0, fp12 = 0, selectedCnaes = [], proLabores = [], totalSalaryExpense = 0 } = values;
@@ -434,7 +422,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     const fatorR_naoOtimizado = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
 
     const lucroPresumido = calculateLucroPresumido2026(values, false);
-    const lucroPresumidoAtual = calculateLucroPresumido2026(values, true) as TaxDetails | null; // Cast for compatibility
+    const lucroPresumidoAtual = calculateLucroPresumido2026(values, true) as TaxDetails | null;
     
     const simplesNacionalTradicional = values.selectedCnaes?.length
       ? _calculateSimples2026(values, false, fatorR_naoOtimizado)
@@ -501,11 +489,13 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     };
 
     return {
-        lucroPresumido: normalize(lucroPresumido),
-        lucroPresumidoAtual: normalize(lucroPresumidoAtual as any),
-        simplesNacionalTradicional: normalize(assignOrder(simplesNacionalTradicional)),
-        simplesNacionalHibrido: normalize(assignOrder(simplesNacionalHibrido)),
-        simplesNacionalOtimizado: normalize(assignOrder(simplesNacionalOtimizado)),
-        simplesNacionalOtimizadoHibrido: normalize(assignOrder(simplesNacionalOtimizadoHibrido)),
+        lucroPresumido: normalizeScenario(lucroPresumido),
+        lucroPresumidoAtual: normalizeScenario(lucroPresumidoAtual as any),
+        simplesNacionalTradicional: normalizeScenario(assignOrder(simplesNacionalTradicional)),
+        simplesNacionalHibrido: normalizeScenario(assignOrder(simplesNacionalHibrido)),
+        simplesNacionalOtimizado: normalizeScenario(assignOrder(simplesNacionalOtimizado)),
+        simplesNacionalOtimizadoHibrido: normalizeScenario(assignOrder(simplesNacionalOtimizadoHibrido)),
     };
 }
+
+    

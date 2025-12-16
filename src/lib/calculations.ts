@@ -14,6 +14,7 @@ import type {
   PartnerTaxDetails,
   TaxFormValues,
   Plan,
+  FeeBracket,
 } from "./types";
 import {
   findFeeBracket,
@@ -22,7 +23,6 @@ import {
   safeFindBracket,
 } from "./utils";
 
-// Define the single source of truth for the default plan.
 const DEFAULT_SIMULATION_PLAN: Plan = "expertsEssencial";
 
 interface ResolvedFee {
@@ -31,43 +31,29 @@ interface ResolvedFee {
   isDefault: boolean;
 }
 
-/**
- * Strict, deterministic function to resolve the Contabilizei monthly fee.
- * Throws an error if a fee cannot be determined. No silent fallbacks.
- */
 export function resolveSelectedPlan(
   plans: Record<string, number> | undefined,
   selectedPlan: Plan | undefined | null
 ): ResolvedFee {
-  if (!plans || typeof plans !== "object" || Object.keys(plans).length === 0) {
-    console.warn(
-      `[FeeResolver] Invalid or empty fee bracket provided. Falling back to zero.`,
-      { plans }
-    );
-    return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
+  if (!plans || typeof plans !== 'object' || Object.keys(plans).length === 0) {
+    console.warn("[AUDIT] Fee resolution failed: Invalid or empty fee bracket provided. Using fallback.", { plans, selectedPlan });
+    return { fee: 0, planName: 'expertsEssencial', isDefault: true };
   }
 
   let planToUse: Plan = DEFAULT_SIMULATION_PLAN;
   let isDefault = true;
 
-  // 1. Try the user's selected plan
   if (selectedPlan && plans[selectedPlan] !== undefined) {
     planToUse = selectedPlan;
     isDefault = false;
-    // 2. If selected plan is invalid, try the default simulation plan
   } else if (plans[DEFAULT_SIMULATION_PLAN] !== undefined) {
     planToUse = DEFAULT_SIMULATION_PLAN;
-    // 3. If default is also not available, grab the first available one
   } else {
     const firstAvailablePlan = Object.keys(plans)[0] as Plan | undefined;
     if (firstAvailablePlan) {
       planToUse = firstAvailablePlan;
     } else {
-      // Should be unreachable if the initial check passes, but as a final safeguard:
-      console.warn(
-        `[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.`,
-        { selectedPlan, plans }
-      );
+      console.warn(`[FeeResolver] Critical: Could not resolve any fee, defaulting to 0.`, { selectedPlan, plans });
       return { fee: 0, planName: DEFAULT_SIMULATION_PLAN, isDefault: true };
     }
   }
@@ -75,20 +61,17 @@ export function resolveSelectedPlan(
   const fee = plans[planToUse];
 
   if (fee === undefined) {
-    console.warn(
-      `[FeeResolver] Logic error: plan '${planToUse}' selected but fee is undefined. Falling back to 0.`,
-      { selectedPlan, plans }
-    );
+    console.warn(`[FeeResolver] Logic error: plan '${planToUse}' selected but fee is undefined. Falling back to 0.`, { selectedPlan, plans });
     return { fee: 0, planName: planToUse, isDefault: true };
   }
 
   return { fee, planName: planToUse, isDefault };
 }
 
+
 function _calculateCpp(monthlyPayroll: number, config: FiscalConfig): number {
   const cppRate = config.aliquotas_cpp_patronal?.base ?? 0;
   if (cppRate === 0) {
-    // This should not happen with valid fiscal config
     console.warn("[WARN] CPP Rate is 0. CPP calculation will be skipped.");
   }
   return monthlyPayroll * cppRate;
@@ -258,10 +241,8 @@ export function calculateSimplesNacional(
   const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
   const safeTotalRevenue =
   Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
-  const feeBracket = findFeeBracket(
-    CONTABILIZEI_FEES_SIMPLES_NACIONAL,
-    safeTotalRevenue
-  );
+  const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, safeTotalRevenue);
+  
   const {
     fee: contabilizeiFee,
     planName,
@@ -301,7 +282,6 @@ export function calculateSimplesNacional(
       ...(cppFromAnnexIV > 0
         ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }]
         : []),
-      { name: `Mensalidade Contabilizei (Plano: ${planName})`, value: contabilizeiFee },
     ].filter(i => (i?.value ?? 0) > 0.001),
     notes,
     annex: finalAnnex,
@@ -413,7 +393,6 @@ export function calculateLucroPresumido(
       { name: "CPP (INSS Patronal)", value: inssPatronal },
       { name: "INSS Retido (Pró-labore)", value: totalINSSRetido },
       { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
-      { name: `Mensalidade Contabilizei (Plano: ${planName})`, value: contabilizeiFee },
     ].filter(i => (i?.value ?? 0) > 0.001),
     notes,
     partnerTaxes,
@@ -424,12 +403,8 @@ export function calculateLucroPresumido(
   };
 }
 
-/**
- * Orchestrator function for all tax calculations based on form values.
- * This is the primary entry point for the server-side flow.
- */
 export function calculateTaxes(values: TaxFormValues): CalculationResults {
-  const config = getFiscalParameters(2025); // Using 2025 for current rules
+  const config = getFiscalParameters(2025);
 
   const {
     rbt12 = 0,
@@ -511,3 +486,5 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: lucroPresumido,
   };
 }
+
+    

@@ -89,8 +89,8 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    {nbsOptions.map(opt => (
-                                        <SelectItem key={opt.cClassTrib} value={opt.cClassTrib}>
+                                    {nbsOptions.map((opt, idx) => (
+                                        <SelectItem key={`${opt.cClassTrib}_${idx}`} value={opt.cClassTrib}>
                                             {`(${opt.reducaoIBS}%) ${opt.nbsDescription}`}
                                         </SelectItem>
                                     ))}
@@ -306,9 +306,9 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                 </FormItem>
 
                                 <FormItem>
-                                    <div className="flex items-center gap-4">
+                                     <div className="flex items-center gap-4">
                                         <FormLabel>Receita de Exportação</FormLabel>
-                                        <Select value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value)}>
+                                        <Select value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value, {shouldValidate: true})}>
                                             <SelectTrigger className="w-[120px]">
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -450,3 +450,5 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 }
 
   
+
+    

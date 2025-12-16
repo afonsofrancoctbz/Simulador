@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { getFiscalParameters } from '@/config/fiscal';
 import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
-import { calculateTaxes2026OnServer } from '@/ai/flows/calculate-taxes-2026-flow';
+import { calculateTaxes2026 } from '@/lib/calculations-2026';
 import { calculateFatorRProjection, type FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
@@ -230,7 +230,7 @@ export function useTaxCalculator(year: number) {
                 setResults(calculatedResults);
 
             } else { 
-                const calculatedResults = await calculateTaxes2026OnServer(finalSubmissionValues);
+                const calculatedResults = calculateTaxes2026(finalSubmissionValues);
                 if (!calculatedResults) throw new Error("A API de cálculo para 2026 não retornou resultados.");
                 setResults(calculatedResults);
             }
@@ -259,3 +259,5 @@ export function useTaxCalculator(year: number) {
         nbsOptions
     };
 }
+
+    
