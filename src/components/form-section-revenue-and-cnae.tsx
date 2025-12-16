@@ -42,10 +42,13 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
 
     const isPostReforma = year >= 2026;
 
-    // Fetch NBS options based on the CNAE code.
-    const nbsOptions: CnaeRelationship2026[] = useMemo(() => 
-        isPostReforma ? getNBSOptionsByCnae(cnaeItem.code) : [],
-    [cnaeItem.code, isPostReforma]);
+    // Fetch and Normalize NBS options to ensure unique keys for rendering.
+    const nbsOptions: CnaeRelationship2026[] = useMemo(() => {
+        if (!isPostReforma) return [];
+        const rawOptions = getNBSOptionsByCnae(cnaeItem.code);
+        // De-duplicate based on cClassTrib to prevent React key errors and present unique choices.
+        return Array.from(new Map(rawOptions.map(opt => [opt.cClassTrib, opt])).values());
+    }, [cnaeItem.code, isPostReforma]);
 
     // Auto-select NBS if there's only one option.
     useEffect(() => {
@@ -451,5 +454,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 }
 
   
+
+    
 
     
