@@ -239,8 +239,10 @@ export function calculateSimplesNacional(
   }
 
   const totalTax = totalDas + cppFromAnnexIV + totalINSSRetido + totalIRRFRetido;
+  
   const safeTotalRevenue =
-  Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
+    Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
+  
   const feeBracket = findFeeBracket(CONTABILIZEI_FEES_SIMPLES_NACIONAL, safeTotalRevenue);
   
   const {
@@ -356,6 +358,7 @@ export function calculateLucroPresumido(
   
   const safeTotalRevenue =
     Number.isFinite(totalRevenue) && totalRevenue >= 0 ? totalRevenue : 0;
+  
   const feeBracket = findFeeBracket(
     CONTABILIZEI_FEES_LUCRO_PRESUMIDO,
     safeTotalRevenue
@@ -486,5 +489,3 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     lucroPresumido: lucroPresumido,
   };
 }
-
-    
