@@ -38,21 +38,25 @@ export function getCnaeOptions(cnaeCode: string) {
 };
 
 export const CONTABILIZEI_FEES_SIMPLES_NACIONAL: FeeBracket[] = [
-    { min: 0, max: 0, plans: { expertsEssencial: 139, expertsPremium: 289 } },
-    { min: 0.01, max: 15000, plans: { expertsEssencial: 139, expertsPremium: 289 } },
-    { min: 15000.01, max: 30000, plans: { expertsEssencial: 299, expertsPremium: 449 } },
-    { min: 30000.01, max: 60000, plans: { expertsEssencial: 449, expertsPremium: 589 } },
-    { min: 60000.01, max: 100000, plans: { expertsEssencial: 589, expertsPremium: 729 } },
-    { min: 100000.01, max: 250000, plans: { expertsEssencial: 729, expertsPremium: 889 } },
-    { min: 250000.01, max: Infinity, plans: { expertsEssencial: 889, expertsPremium: 1289 } },
+    { min: 0, max: 25000, plans: { basico: 139, padrao: 195, multibeneficios: 225, expertsEssencial: 369 } },
+    { min: 25000.01, max: 50000, plans: { basico: 228, padrao: 195, multibeneficios: 225, expertsEssencial: 369 } },
+    { min: 50000.01, max: 100000, plans: { basico: 406, padrao: 344, multibeneficios: 381, expertsEssencial: 369 } },
+    { min: 100000.01, max: 150000, plans: { basico: 584, padrao: 522, multibeneficios: 568, expertsEssencial: 369 } },
+    { min: 150000.01, max: 200000, plans: { basico: 673, padrao: 522, multibeneficios: 568, expertsEssencial: 369 } },
+    { min: 200000.01, max: 300000, plans: { basico: 762, padrao: 522, multibeneficios: 568, expertsEssencial: 469 } },
+    { min: 300000.01, max: 500000, plans: { basico: 762, padrao: 522, multibeneficios: 568, expertsEssencial: 569 } },
+    { min: 500000.01, max: 1000000, plans: { basico: 762, padrao: 522, multibeneficios: 568, expertsEssencial: 669 } },
+    { min: 1000000.01, max: Infinity, plans: { basico: 762, padrao: 818, multibeneficios: 879, expertsEssencial: 869 } },
 ];
 
 export const CONTABILIZEI_FEES_LUCRO_PRESUMIDO: FeeBracket[] = [
-    { min: 0, max: 0, plans: { expertsEssencial: 489, expertsPremium: 689 } },
-    { min: 0.01, max: 15000, plans: { expertsEssencial: 489, expertsPremium: 689 } },
-    { min: 15000.01, max: 30000, plans: { expertsEssencial: 689, expertsPremium: 889 } },
-    { min: 30000.01, max: 60000, plans: { expertsEssencial: 889, expertsPremium: 1089 } },
-    { min: 60000.01, max: 100000, plans: { expertsEssencial: 1089, expertsPremium: 1289 } },
-    { min: 100000.01, max: 250000, plans: { expertsEssencial: 1289, expertsPremium: 1489 } },
-    { min: 250000.01, max: Infinity, plans: { expertsEssencial: 1489, expertsPremium: 1689 } },
+    { min: 0, max: 25000, plans: { basico: 139, padrao: 195, multibeneficios: 225, expertsEssencial: 369 } },
+    { min: 25000.01, max: 50000, plans: { basico: 228, padrao: 195, multibeneficios: 225, expertsEssencial: 369 } },
+    { min: 50000.01, max: 100000, plans: { basico: 406, padrao: 344, multibeneficios: 381, expertsEssencial: 369 } },
+    { min: 100000.01, max: 150000, plans: { basico: 584, padrao: 522, multibeneficios: 568, expertsEssencial: 369 } },
+    { min: 150000.01, max: 200000, plans: { basico: 673, padrao: 522, multibeneficios: 568, expertsEssencial: 369 } },
+    { min: 200000.01, max: 300000, plans: { basico: 762, padrao: 522, multibeneficios: 568, expertsEssencial: 469 } },
+    { min: 300000.01, max: 500000, plans: { basico: 762, padrao: 522, multibeneficios: 568, expertsEssencial: 569 } },
+    { min: 500000.01, max: 1000000, plans: { basico: 762, padrao: 522, multibeneficios: 568, expertsEssencial: 669 } },
+    { min: 1000000.01, max: Infinity, plans: { basico: 762, padrao: 818, multibeneficios: 879, expertsEssencial: 869 } },
 ];
