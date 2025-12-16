@@ -141,6 +141,9 @@ function normalizeScenario<T extends Record<string, any>>(scenario: T | null): T
     effectiveDasRate: scenario.effectiveDasRate ?? 0,
     annex: scenario.annex ?? "N/A",
     optimizationNote: scenario.optimizationNote ?? "",
+    notes: Array.isArray(scenario.notes) ? scenario.notes : [],
+    breakdown: Array.isArray(scenario.breakdown) ? scenario.breakdown : [],
+    partnerTaxes: Array.isArray(scenario.partnerTaxes) ? scenario.partnerTaxes : [],
   };
 }
 
@@ -189,7 +192,7 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     const cofinsValue = domesticRevenue * COFINS;
     const issValue = domesticRevenue * ((issRate ?? 5) / 100);
     consumptionTaxes = pisValue + cofinsValue + issValue;
-    breakdown.push({ name: "PIS", value: pisValue }, { name: "COFINS", value: cofinsValue }, { name: "ISS", value: issValue });
+    breakdown.push({ name: "PIS", value: pisValue, rate: PIS }, { name: "COFINS", value: cofinsValue, rate: COFINS }, { name: "ISS", value: issValue, rate: (issRate ?? 5) / 100 });
   } else {
     const { pis_cofins_multiplier = 1, iss_icms_multiplier = 1, cbs_aliquota_padrao = 0, ibs_aliquota_padrao = 0 } = configTransition ?? {};
     const pis = domesticRevenue * PIS * pis_cofins_multiplier;
@@ -216,10 +219,10 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     
     const oldTaxesCost = pis + cofins + iss;
     if (year === 2026) {
-        breakdown.push({ name: "CBS (Teste/Compensável)", value: cbsFinal }, { name: "IBS (Teste/Compensável)", value: ibsFinal });
+        breakdown.push({ name: "CBS (Teste/Compensável)", value: cbsFinal, rate: cbs_aliquota_padrao }, { name: "IBS (Teste/Compensável)", value: ibsFinal, rate: ibs_aliquota_padrao });
         consumptionTaxes = oldTaxesCost;
     } else {
-        breakdown.push({ name: "CBS (Líquida)", value: cbsFinal }, { name: "IBS (Líquido)", value: ibsFinal });
+        breakdown.push({ name: "CBS (Líquida)", value: cbsFinal, rate: cbs_aliquota_padrao }, { name: "IBS (Líquido)", value: ibsFinal, rate: ibs_aliquota_padrao });
         consumptionTaxes = oldTaxesCost + cbsFinal + ibsFinal;
     }
   }
@@ -244,10 +247,10 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
     contabilizeiFee,
     breakdown: [
-      { name: "IRPJ", value: irpjTotal },
-      { name: "CSLL", value: csllValue },
-      { name: "CPP (INSS Patronal)", value: inssPatronal },
-      { name: "INSS s/ Pró-labore", value: totalINSSRetido },
+      { name: "IRPJ", value: irpjTotal, rate: IRPJ_BASE },
+      { name: "CSLL", value: csllValue, rate: CSLL },
+      { name: "CPP (INSS Patronal)", value: inssPatronal, rate: fiscalConfig.aliquotas_cpp_patronal.base },
+      { name: "INSS s/ Pró-labore", value: totalINSSRetido, rate: fiscalConfig.aliquota_inss_prolabore },
       { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
       ...breakdown,
     ].filter(i => i.value > 0.001),
@@ -282,7 +285,7 @@ function _calculateSimples2026(
     const totalProLaboreBruto = proLaboresToUse.reduce((s, p) => s + (p?.value || 0), 0);
 
     const domesticRevenue = domesticActivities.reduce((s, a) => s + (a?.revenue || 0), 0);
-    const exportRevenue = exportActivities.reduce((s, a) => s + (a?.revenue || 0) * exchangeRate, 0);
+    const exportRevenue = exportActivities.reduce((s, a) => s + ((a?.revenue || 0) * exchangeRate), 0);
     const totalRevenue = domesticRevenue + exportRevenue;
 
     if (totalRevenue === 0 && totalProLaboreBruto === 0) return null;
@@ -392,8 +395,8 @@ function _calculateSimples2026(
         breakdown: [
             { name: "DAS (Simples Nacional)", value: totalDas, rate: effectiveDasRate },
             { name: "IVA (IBS/CBS pago por fora)", value: ivaTaxes },
-            { name: "CPP (INSS Patronal)", value: cppFromAnnexIV },
-            { name: "INSS s/ Pró-labore", value: totalINSSRetido },
+            { name: "CPP (INSS Patronal)", value: cppFromAnnexIV, rate: fiscalConfig.aliquotas_cpp_patronal.base },
+            { name: "INSS s/ Pró-labore", value: totalINSSRetido, rate: fiscalConfig.aliquota_inss_prolabore },
             { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
         ].filter(item => item.value > 0.001),
         notes,
@@ -477,6 +480,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
     const orderMap: Record<string, number> = {
       'Simples Nacional (Fator R Otimizado)': 1,
+      'Simples Nacional (Fator R Otimizado) Híbrido': 1.5,
       'Simples Nacional Tradicional (Anexo III)': 2,
       'Simples Nacional Tradicional (Anexo V)': 2,
       'Simples Nacional Híbrido (Anexo III)': 3,
@@ -497,5 +501,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
         simplesNacionalOtimizadoHibrido: normalizeScenario(assignOrder(simplesNacionalOtimizadoHibrido)),
     };
 }
-
-    

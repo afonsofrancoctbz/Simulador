@@ -173,11 +173,10 @@ export interface CnaeData {
 }
 
 export interface FeeBracket {
-    label: string;
     min: number;
     max: number;
     plans: {
-        [key in Plan]: number;
+        [key in Plan]?: number;
     }
 }
 

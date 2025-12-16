@@ -40,8 +40,8 @@ export function resolveSelectedPlan(
   let isDefault = false;
 
   if (!plans || typeof plans !== 'object' || Object.keys(plans).length === 0) {
-    console.warn("[AUDIT] Fee resolution failed: Invalid or empty fee bracket provided. Using fallback.", { plans, selectedPlan });
-    return { fee: 0, planName: 'expertsEssencial', isDefault: true };
+    console.warn("[AUDIT] Empty fee table, applying fallback", { plans, selectedPlan });
+    return { fee: 0, planName: planToUse, isDefault: true };
   }
   
   if (selectedPlan && plans[selectedPlan] !== undefined) {
@@ -161,7 +161,7 @@ export function calculateSimplesNacional(
   const domesticRevenue =
     values.domesticActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
   const exportRevenue =
-    values.exportActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+    values.exportActivities?.reduce((s, a) => s + (a.revenue || 0) * (values.exchangeRate ?? 1), 0) ?? 0;
   const totalRevenue = domesticRevenue + exportRevenue;
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRevenue * 12;
 
@@ -176,13 +176,15 @@ export function calculateSimplesNacional(
 
   const allActivities = [
     ...(values.domesticActivities?.map(a => ({ ...a, isExport: false })) ?? []),
-    ...(values.exportActivities?.map(a => ({ ...a, isExport: true })) ?? []),
+    ...(values.exportActivities?.map(a => ({ ...a, isExport: true, revenue: a.revenue * (values.exchangeRate ?? 1)})) ?? []),
   ];
 
   if (allActivities.length === 0 && totalProLaboreValue === 0) {
      throw new Error("Cannot calculate Simples Nacional without activities or pro-labore.");
   }
   
+  let effectiveRate = 0;
+
   allActivities.forEach(activity => {
     const cnaeInfo = getCnaeData(activity.code);
     if (!cnaeInfo) throw new Error(`CNAE data not found for ${activity.code}`);
@@ -211,7 +213,7 @@ export function calculateSimplesNacional(
     if (!bracket) throw new Error(`Simples Nacional bracket not found for RBT12 ${effectiveRbt12} in Anexo ${effectiveAnnex}`);
     
     const { rate, deduction, distribution } = bracket;
-    const effectiveRate =
+    effectiveRate =
       effectiveRbt12 > 0
         ? (effectiveRbt12 * rate - deduction) / effectiveRbt12
         : rate;
@@ -260,9 +262,6 @@ export function calculateSimplesNacional(
       `Para consistência da simulação, a mensalidade foi calculada com base no plano padrão '${planName}'.`
     );
   }
-  if (optimizationNote) {
-    notes.push(optimizationNote);
-  }
 
   return {
     regime: regimeName,
@@ -275,11 +274,11 @@ export function calculateSimplesNacional(
     effectiveDasRate: totalRevenue > 0 ? totalDas / totalRevenue : 0,
     contabilizeiFee,
     breakdown: [
-      { name: "DAS", value: totalDas },
-      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido },
+      { name: "DAS", value: totalDas, rate: effectiveRate },
+      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
       { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
       ...(cppFromAnnexIV > 0
-        ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV }]
+        ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV, rate: config.aliquotas_cpp_patronal.base }]
         : []),
     ].filter(i => (i?.value ?? 0) > 0.001),
     notes,
@@ -305,7 +304,7 @@ export function calculateLucroPresumido(
   const domesticRevenue =
     values.domesticActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
   const exportRevenue =
-    values.exportActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+    values.exportActivities?.reduce((s, a) => s + (a.revenue || 0) * (values.exchangeRate ?? 1), 0) ?? 0;
   const totalRevenue = domesticRevenue + exportRevenue;
 
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } =
@@ -385,13 +384,13 @@ export function calculateLucroPresumido(
     effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
     contabilizeiFee,
     breakdown: [
-      { name: "PIS", value: pisValue },
-      { name: "COFINS", value: cofinsValue },
-      { name: "ISS", value: issValue },
-      { name: "IRPJ", value: irpjValue + irpjAdicional },
-      { name: "CSLL", value: csllValue },
-      { name: "CPP (INSS Patronal)", value: inssPatronal },
-      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido },
+      { name: "PIS", value: pisValue, rate: pisRate },
+      { name: "COFINS", value: cofinsValue, rate: cofinsRate },
+      { name: "ISS", value: issValue, rate: issRate / 100 },
+      { name: "IRPJ", value: irpjValue + irpjAdicional, rate: irpjRate },
+      { name: "CSLL", value: csllValue, rate: csllRate },
+      { name: "CPP (INSS Patronal)", value: inssPatronal, rate: config.aliquotas_cpp_patronal.base },
+      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
       { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
     ].filter(i => (i?.value ?? 0) > 0.001),
     notes,
@@ -413,6 +412,9 @@ function normalizeScenario<T extends Record<string, any>>(scenario: T | null): T
     effectiveDasRate: scenario.effectiveDasRate ?? 0,
     annex: scenario.annex ?? "N/A",
     optimizationNote: scenario.optimizationNote ?? "",
+    notes: Array.isArray(scenario.notes) ? scenario.notes : [],
+    breakdown: Array.isArray(scenario.breakdown) ? scenario.breakdown : [],
+    partnerTaxes: Array.isArray(scenario.partnerTaxes) ? scenario.partnerTaxes : [],
   };
 }
 
@@ -428,7 +430,7 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
   } = values;
 
   const domesticRevenue = values.domesticActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
-  const exportRevenue = values.exportActivities?.reduce((s, a) => s + (a.revenue || 0), 0) ?? 0;
+  const exportRevenue = values.exportActivities?.reduce((s, a) => s + (a.revenue || 0) * (values.exchangeRate ?? 1), 0) ?? 0;
   const totalRevenue = domesticRevenue + exportRevenue;
 
   const totalProLaboreValue = proLabores.reduce((s, p) => s + (p.value || 0), 0);
