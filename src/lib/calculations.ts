@@ -39,7 +39,7 @@ export function resolveSelectedPlan(
   let fee: number | undefined;
   let isDefault = false;
 
-  if (!plans || typeof plans !== 'object' || Object.keys(plans).length === 0) {
+  if (!plans || Object.keys(plans).length === 0) {
     console.warn("[AUDIT] Empty fee table, applying fallback", { plans, selectedPlan });
     return { fee: 0, planName: planToUse, isDefault: true };
   }

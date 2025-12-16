@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -58,6 +59,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
        scenarios = [
           // 1. Simples Nacional "Atual" (adaptado para o ano selecionado)
           results.simplesNacionalOtimizado, 
+          results.simplesNacionalOtimizadoHibrido,
           
           // 2. Simples Nacional Tradicional (Novo Regime)
           results.simplesNacionalTradicional,
