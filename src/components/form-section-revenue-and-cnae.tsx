@@ -162,12 +162,21 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant={ivaReduction.reducaoIBS > 0 ? "default" : "secondary"} className={cn(ivaReduction.reducaoIBS > 0 && "bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80")}>
-                          Redução IBS: {ivaReduction.reducaoIBS}%
-                      </Badge>
-                      <Badge variant={ivaReduction.reducaoCBS > 0 ? "default" : "secondary"} className={cn(ivaReduction.reducaoCBS > 0 && "bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80")}>
-                          Redução CBS: {ivaReduction.reducaoCBS}%
-                      </Badge>
+                      {ivaReduction.reducaoIBS > 0 && (
+                          <Badge variant="default" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80">
+                              Redução IBS: {ivaReduction.reducaoIBS}%
+                          </Badge>
+                      )}
+                      {ivaReduction.reducaoCBS > 0 && (
+                          <Badge variant="default" className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100/80">
+                              Redução CBS: {ivaReduction.reducaoCBS}%
+                          </Badge>
+                      )}
+                      {ivaReduction.reducaoIBS === 0 && ivaReduction.reducaoCBS === 0 && (
+                           <Badge variant="secondary">
+                              Sem redução de IBS/CBS
+                          </Badge>
+                      )}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs bg-foreground text-background">
@@ -300,6 +309,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             onValueChange={(values) => {
                                                 handleRevenueChange(values.floatValue || 0, 'domestic');
                                             }}
+                                            onFocus={(e) => e.target.select()}
                                         />
                                     </FormControl>
                                 </FormItem>
@@ -453,3 +463,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     
 
     
+

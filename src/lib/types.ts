@@ -114,7 +114,7 @@ export const TaxDetailsSchema = z.object({
     breakdown: z.array(TaxBreakdownItemSchema),
     notes: z.array(z.string()),
     annex: z.string().optional(),
-    optimizationNote: z.string().optional(),
+    optimizationNote: z.string().optional().nullable(),
     partnerTaxes: z.array(PartnerTaxDetailsSchema),
     order: z.number().optional(),
 });

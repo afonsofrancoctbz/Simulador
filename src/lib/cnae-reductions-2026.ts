@@ -87,21 +87,31 @@ export function getIvaReductionByCnae(
   cnaeCode: string,
   nbsCode?: string | null
 ): { reducaoIBS: number; reducaoCBS: number } {
-  const specificNbsData = getSpecificNbsReduction(cnaeCode, nbsCode);
+  const numericCnae = String(cnaeCode || '').replace(/\D/g, '');
+  const cnaeData = CNAE_REDUCTIONS_DATABASE[numericCnae];
 
-  if (specificNbsData) {
-    return {
-      reducaoIBS: specificNbsData.reducaoIBS,
-      reducaoCBS: specificNbsData.reducaoCBS,
-    };
+  if (!cnaeData) {
+    console.warn(`[AUDIT] getIvaReductionByCnae: CNAE code '${numericCnae}' not found in reductions database. Returning zero reduction.`);
+    return { reducaoIBS: 0, reducaoCBS: 0 };
   }
 
-  // Audit and return zero if no specific reduction is found.
-  const numericCnae = String(cnaeCode || '').replace(/\D/g, '');
-  if (cnaeCode && !CNAE_REDUCTIONS_DATABASE[numericCnae]) {
-      console.warn(`[AUDIT] getIvaReductionByCnae: CNAE code '${numericCnae}' not found in reductions database. Returning zero reduction.`);
-  } else if (cnaeCode && nbsCode) {
-      console.warn(`[AUDIT] getIvaReductionByCnae: NBS code '${nbsCode}' not found for CNAE '${numericCnae}'. Returning zero reduction.`);
+  if (nbsCode) {
+    const specificReduction = cnaeData.reducoes.find(r => r.cClassTrib === nbsCode);
+    if (specificReduction) {
+        return {
+            reducaoIBS: specificReduction.reducaoIBS,
+            reducaoCBS: specificReduction.reducaoCBS,
+        };
+    }
+     console.warn(`[AUDIT] getIvaReductionByCnae: NBS class '${nbsCode}' not found for CNAE '${numericCnae}'. Returning zero reduction.`);
+  }
+
+  // If there's only one option, it's safe to use it as the default
+  if (cnaeData.reducoes.length === 1) {
+    return {
+      reducaoIBS: cnaeData.reducoes[0].reducaoIBS,
+      reducaoCBS: cnaeData.reducoes[0].reducaoCBS,
+    };
   }
 
   return { reducaoIBS: 0, reducaoCBS: 0 };
