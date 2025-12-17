@@ -76,50 +76,43 @@ export function getSpecificNbsReduction(
 }
 
 /**
- * REFINED: Gets the IVA reduction percentages strictly based on CNAE and a selected NBS code.
- * This function is optimized for the calculation engine, returning only the final numbers.
+ * FINAL CORRECTED VERSION: Gets IVA reduction by performing a direct lookup.
+ * This function is the single source of truth for tax reduction calculation.
  * @param cnaeCode The CNAE code for the activity.
  * @param nbsCode The explicitly selected NBS code.
- * @returns An object with IBS and CBS reduction percentages. Returns {0, 0} if criteria are not met, with audit logs.
+ * @returns An object with IBS and CBS reduction percentages. Returns {0, 0} ONLY if the lookup fails.
  */
 export function getIvaReductionByCnae(
   cnaeCode: string,
   nbsCode?: string | null
 ): { reducaoIBS: number; reducaoCBS: number } {
-  const numericCnae = String(cnaeCode || '').replace(/\D/g, '');
-  const cnaeData = CNAE_REDUCTIONS_DATABASE[numericCnae];
-
-  if (!cnaeData) {
-    console.warn(`[AUDIT] getIvaReductionByCnae: CNAE code '${numericCnae}' not found in reductions database. Returning zero reduction.`);
+  if (!cnaeCode || !nbsCode) {
     return { reducaoIBS: 0, reducaoCBS: 0 };
   }
+
+  const numericCnae = String(cnaeCode).replace(/\D/g, '');
+
+  // Direct lookup in the authoritative data source
+  const relationship = CNAE_LC116_RELATIONSHIP.find(
+    rel => rel.cnae === numericCnae && rel.nbs === nbsCode
+  );
   
-  if (nbsCode) {
-    const specificReduction = cnaeData.reducoes.find(r => r.nbs === nbsCode);
-    if (specificReduction) {
-        return {
-            reducaoIBS: specificReduction.reducaoIBS,
-            reducaoCBS: specificReduction.reducaoCBS,
-        };
-    }
-     console.warn(`[AUDIT] getIvaReductionByCnae: NBS code '${nbsCode}' not found for CNAE '${numericCnae}'. Returning zero reduction.`);
-     return { reducaoIBS: 0, reducaoCBS: 0 };
+  if (!relationship) {
+    console.warn(`[AUDIT] getIvaReductionByCnae: No relationship found for CNAE '${numericCnae}' and NBS '${nbsCode}'.`);
+    return { reducaoIBS: 0, reducaoCBS: 0 };
   }
 
-  // If there's only one option and no NBS code is provided, it's safe to use it.
-  if (cnaeData.reducoes.length === 1) {
-    return {
-      reducaoIBS: cnaeData.reducoes[0].reducaoIBS,
-      reducaoCBS: cnaeData.reducoes[0].reducaoCBS,
-    };
-  }
-  
-  // If ambiguous and no selection, return zero.
-  if (cnaeData.reducoes.length > 1) {
-    console.warn(`[AUDIT] getIvaReductionByCnae: Ambiguous call for CNAE '${numericCnae}' with ${cnaeData.reducoes.length} options and no nbsCode provided. Returning zero reduction.`);
+  const cClassInfo = CNAE_CLASSES_2026_MAP[relationship.cClassTrib];
+
+  if (!cClassInfo) {
+    console.warn(`[AUDIT] getIvaReductionByCnae: cClass '${relationship.cClassTrib}' not found in map for CNAE/NBS.`);
+    return { reducaoIBS: 0, reducaoCBS: 0 };
   }
 
-  return { reducaoIBS: 0, reducaoCBS: 0 };
+  return {
+    reducaoIBS: cClassInfo.ibsReduction,
+    reducaoCBS: cClassInfo.cbsReduction,
+  };
 }
 
 
@@ -145,4 +138,3 @@ export function getNBSOptionsByCnae(cnaeCode: string): CnaeRelationship2026[] {
 
   return uniqueOptions;
 }
-
