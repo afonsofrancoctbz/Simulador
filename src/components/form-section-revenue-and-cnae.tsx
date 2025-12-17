@@ -468,3 +468,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
     
 
+

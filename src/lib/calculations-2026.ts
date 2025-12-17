@@ -104,15 +104,6 @@ function _calculatePartnerTaxes(
     return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
 }
 
-function getIvaReduction(cnaeCode: string, cClassTrib?: string) {
-  const cnaeNumeric = typeof cnaeCode === "string" ? cnaeCode.replace(/\D/g, "") : "";
-  if (cClassTrib) {
-    const specificRel = CNAE_LC116_RELATIONSHIP.find(r => r.cnae === cnaeNumeric && r.cClassTrib === cClassTrib);
-    if (specificRel) return getIvaReductionByCnae(cnaeCode, cClassTrib);
-  }
-  return getIvaReductionByCnae(cnaeCode);
-}
-
 function buildSimplesRegimeLabel(
   base: 'Tradicional' | 'Híbrido' | 'Otimizado',
   annex: 'III' | 'V' | 'I' | 'II' | 'IV',
@@ -202,14 +193,14 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     
     let totalIbsDebit = 0, totalCbsDebit = 0, totalIbsCredit = 0, totalCbsCredit = 0;
     domesticActivities.forEach(activity => {
-        const reduction = getIvaReduction(activity.code, activity.cClassTrib);
+        const reduction = getIvaReductionByCnae(activity.code, activity.nbsCode);
         totalCbsDebit += (activity.revenue || 0) * (cbs_aliquota_padrao * (1 - ((reduction?.reducaoCBS ?? 0) / 100)));
         totalIbsDebit += (activity.revenue || 0) * (ibs_aliquota_padrao * (1 - ((reduction?.reducaoIBS ?? 0) / 100)));
     });
 
     if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
         const firstActivity = domesticActivities[0];
-        const reduction = getIvaReduction(firstActivity.code, firstActivity.cClassTrib);
+        const reduction = getIvaReductionByCnae(firstActivity.code, firstActivity.nbsCode);
         totalCbsCredit = creditGeneratingExpenses * (cbs_aliquota_padrao * (1 - ((reduction?.reducaoCBS ?? 0) / 100)));
         totalIbsCredit = creditGeneratingExpenses * (ibs_aliquota_padrao * (1 - ((reduction?.reducaoIBS ?? 0) / 100)));
     }
@@ -351,7 +342,7 @@ function _calculateSimples2026(
         const rev = Number(activity.revenue || 0);
         if (rev <= 0) return;
         
-        const reduction = getIvaReduction(activity.code, activity.cClassTrib);
+        const reduction = getIvaReductionByCnae(activity.code, activity.nbsCode);
         const reducaoIBS = (reduction?.reducaoIBS ?? 0) / 100;
         const reducaoCBS = (reduction?.reducaoCBS ?? 0) / 100;
 
@@ -362,7 +353,7 @@ function _calculateSimples2026(
 
       if (creditGeneratingExpenses > 0 && domesticActivities.length > 0) {
         const first = domesticActivities[0];
-        const reduction = getIvaReduction(first.code, first.cClassTrib);
+        const reduction = getIvaReductionByCnae(first.code, first.nbsCode);
         const reducaoIBS = (reduction?.reducaoIBS ?? 0) / 100;
         const reducaoCBS = (reduction?.reducaoCBS ?? 0) / 100;
 
