@@ -20,7 +20,7 @@ import { NumericFormat } from "react-number-format";
 import { getIvaReductionByCnae, getNBSOptionsByCnae } from "@/lib/cnae-reductions-2026";
 import type { CnaeRelationship2026 } from "@/lib/cnae-data-2026";
 import { Badge } from "./ui/badge";
-import { Tooltip, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 
 // ======================================================================================
@@ -51,23 +51,23 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
 
     // Auto-select NBS if there's only one option.
     useEffect(() => {
-        if (isPostReforma && nbsOptions.length === 1 && cnaeItem.cClassTrib !== nbsOptions[0].cClassTrib) {
-            form.setValue(`selectedCnaes.${index}.cClassTrib`, nbsOptions[0].cClassTrib, {
+        if (isPostReforma && nbsOptions.length === 1 && cnaeItem.nbsCode !== nbsOptions[0].nbs) {
+            form.setValue(`selectedCnaes.${index}.nbsCode`, nbsOptions[0].nbs, {
                 shouldValidate: true,
                 shouldDirty: true,
             });
         }
-    }, [isPostReforma, nbsOptions, cnaeItem.cClassTrib, form, index]);
+    }, [isPostReforma, nbsOptions, cnaeItem.nbsCode, form, index]);
 
     // Proactively determine the correct cClassTrib for this render cycle.
-    const definitiveCClassTrib = nbsOptions.length === 1 ? nbsOptions[0].cClassTrib : cnaeItem.cClassTrib;
+    const definitiveNbsCode = nbsOptions.length === 1 ? nbsOptions[0].nbs : cnaeItem.nbsCode;
 
     // Derive IVA reduction directly from the definitive cClassTrib.
-    const ivaReduction = getIvaReductionByCnae(cnaeItem.code, definitiveCClassTrib);
+    const ivaReduction = getIvaReductionByCnae(cnaeItem.code, definitiveNbsCode);
 
     const selectedNbsOption = useMemo(() =>
-        nbsOptions.find(opt => opt.cClassTrib === definitiveCClassTrib),
-    [nbsOptions, definitiveCClassTrib]);
+        nbsOptions.find(opt => opt.nbs === definitiveNbsCode),
+    [nbsOptions, definitiveNbsCode]);
 
 
     if (!cnaeData) return null;
@@ -80,7 +80,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
             return (
                 <FormField
                     control={form.control}
-                    name={`selectedCnaes.${index}.cClassTrib`}
+                    name={`selectedCnaes.${index}.nbsCode`}
                     render={({ field }) => (
                         <FormItem className="mt-4 p-3 rounded-md bg-amber-50 border border-amber-200">
                             <FormLabel className="flex items-center gap-2 text-amber-900 font-semibold">
@@ -95,7 +95,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 </FormControl>
                                 <SelectContent>
                                     {nbsOptions.map((opt, idx) => (
-                                        <SelectItem key={`${opt.cnae}-${opt.nbs}-${idx}`} value={opt.cClassTrib}>
+                                        <SelectItem key={`${opt.cnae}-${opt.nbs}`} value={opt.nbs}>
                                             {`${opt.nbsDescription} (${opt.cClassTrib})`}
                                         </SelectItem>
                                     ))}
