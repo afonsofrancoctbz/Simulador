@@ -20,7 +20,7 @@ import { NumericFormat } from "react-number-format";
 import { getIvaReductionByCnae, getNBSOptionsByCnae } from "@/lib/cnae-reductions-2026";
 import type { CnaeRelationship2026 } from "@/lib/cnae-data-2026";
 import { Badge } from "./ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 
 // ======================================================================================
@@ -95,7 +95,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 </FormControl>
                                 <SelectContent>
                                     {nbsOptions.map((opt, idx) => (
-                                        <SelectItem key={`${opt.cClassTrib}-${opt.nbs}-${idx}`} value={opt.cClassTrib}>
+                                        <SelectItem key={`${opt.cnae}-${opt.nbs}-${idx}`} value={opt.cClassTrib}>
                                             {`${opt.nbsDescription} (${opt.cClassTrib})`}
                                         </SelectItem>
                                     ))}
@@ -473,5 +473,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
 
 
+
+    
 
     
