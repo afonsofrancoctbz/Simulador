@@ -275,14 +275,14 @@ export function calculateSimplesNacional(
     contabilizeiFee,
     breakdown: [
       { name: "DAS", value: totalDas, rate: effectiveRate },
-      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
+      { name: "INSS s/ Pró-labore", value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
       { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
       ...(cppFromAnnexIV > 0
         ? [{ name: "CPP (Anexo IV)", value: cppFromAnnexIV, rate: config.aliquotas_cpp_patronal.base }]
         : []),
     ].filter(i => (i?.value ?? 0) > 0.001),
     notes,
-    annex: finalAnnex,
+    annex: `Anexo ${finalAnnex}`,
     partnerTaxes,
     optimizationNote: optimizationNote || null,
   };

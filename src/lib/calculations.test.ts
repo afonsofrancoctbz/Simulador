@@ -78,7 +78,7 @@ describe('Tax Calculation Engine (2025)', () => {
     expect(baseScenario.breakdown.find(b => b.name.startsWith('DAS'))?.value).toBeCloseTo(1460);
     
     // Cenário otimizado não deve ser gerado, pois já está ótimo
-    expect(result.simplesNacionalOtimizado?.optimizationNote).toBeDefined();
+    expect(result.simplesNacionalOtimizado).toBeNull();
   });
 
 
