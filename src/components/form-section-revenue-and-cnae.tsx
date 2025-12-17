@@ -60,14 +60,18 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
         }
     }, [isPostReforma, nbsOptions, cnaeItem.cClassTrib, form, index]);
 
-    const selectedNbsOption = useMemo(() =>
-        nbsOptions.find(opt => opt.cClassTrib === cnaeItem.cClassTrib),
-    [nbsOptions, cnaeItem.cClassTrib]);
+    // Proactively determine the correct cClassTrib for this render cycle.
+    // If there is only one NBS option, we use it directly for calculation,
+    // avoiding a race condition with the useEffect that formally sets the form state.
+    const definitiveCClassTrib = nbsOptions.length === 1 ? nbsOptions[0].cClassTrib : cnaeItem.cClassTrib;
 
-    // Derive IVA reduction directly from the selected NBS option.
-    const ivaReduction = selectedNbsOption 
-        ? getIvaReductionByCnae(cnaeItem.code, selectedNbsOption.cClassTrib)
-        : getIvaReductionByCnae(cnaeItem.code, cnaeItem.cClassTrib);
+    // Derive IVA reduction directly from the definitive cClassTrib.
+    const ivaReduction = getIvaReductionByCnae(cnaeItem.code, definitiveCClassTrib);
+
+    const selectedNbsOption = useMemo(() =>
+        nbsOptions.find(opt => opt.cClassTrib === definitiveCClassTrib),
+    [nbsOptions, definitiveCClassTrib]);
+
 
     if (!cnaeData) return null;
 
@@ -158,21 +162,12 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-2 flex-wrap">
-                      {ivaReduction.reducaoIBS > 0 && (
-                          <Badge variant="default" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80">
-                              Redução IBS: {ivaReduction.reducaoIBS}%
-                          </Badge>
-                      )}
-                      {ivaReduction.reducaoCBS > 0 && (
-                          <Badge variant="default" className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100/80">
-                              Redução CBS: {ivaReduction.reducaoCBS}%
-                          </Badge>
-                      )}
-                      {ivaReduction.reducaoIBS === 0 && ivaReduction.reducaoCBS === 0 && (
-                           <Badge variant="secondary">
-                              Sem redução de IBS/CBS
-                          </Badge>
-                      )}
+                      <Badge variant={ivaReduction.reducaoIBS > 0 ? "default" : "secondary"} className={cn(ivaReduction.reducaoIBS > 0 && "bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80")}>
+                          Redução IBS: {ivaReduction.reducaoIBS}%
+                      </Badge>
+                      <Badge variant={ivaReduction.reducaoCBS > 0 ? "default" : "secondary"} className={cn(ivaReduction.reducaoCBS > 0 && "bg-green-100 text-green-800 border-green-200 hover:bg-green-100/80")}>
+                          Redução CBS: {ivaReduction.reducaoCBS}%
+                      </Badge>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs bg-foreground text-background">

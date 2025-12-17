@@ -390,7 +390,7 @@ export function calculateLucroPresumido(
       { name: "IRPJ", value: irpjValue + irpjAdicional, rate: irpjRate },
       { name: "CSLL", value: csllValue, rate: csllRate },
       { name: "CPP (INSS Patronal)", value: inssPatronal, rate: config.aliquotas_cpp_patronal.base },
-      { name: "INSS Retido (Pró-labore)", value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
+      { name: "INSS s/ Pró-labore", value: totalINSSRetido, rate: config.aliquota_inss_prolabore },
       { name: "IRRF Retido (Pró-labore)", value: totalIRRFRetido },
     ].filter(i => (i?.value ?? 0) > 0.001),
     notes,
