@@ -48,7 +48,6 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
         return getNBSOptionsByCnae(cnaeItem.code);
     }, [cnaeItem.code, isPostReforma]);
 
-
     // Auto-select NBS if there's only one option.
     useEffect(() => {
         if (isPostReforma && nbsOptions.length === 1 && cnaeItem.nbsCode !== nbsOptions[0].nbs) {
@@ -58,16 +57,10 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
             });
         }
     }, [isPostReforma, nbsOptions, cnaeItem.nbsCode, form, index]);
-
-    // Proactively determine the correct cClassTrib for this render cycle.
+    
     const definitiveNbsCode = nbsOptions.length === 1 ? nbsOptions[0].nbs : cnaeItem.nbsCode;
-
-    // Derive IVA reduction directly from the definitive cClassTrib.
     const ivaReduction = getIvaReductionByCnae(cnaeItem.code, definitiveNbsCode);
-
-    const selectedNbsOption = useMemo(() =>
-        nbsOptions.find(opt => opt.nbs === definitiveNbsCode),
-    [nbsOptions, definitiveNbsCode]);
+    const selectedNbsOption = useMemo(() => nbsOptions.find(opt => opt.nbs === definitiveNbsCode), [nbsOptions, definitiveNbsCode]);
 
 
     if (!cnaeData) return null;
@@ -75,7 +68,6 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
     const renderNbsContent = () => {
         if (!isPostReforma) return null;
 
-        // Case 1: Multiple NBS options require mandatory user selection.
         if (nbsOptions.length > 1) {
             return (
                 <FormField
@@ -96,7 +88,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 <SelectContent>
                                     {nbsOptions.map((opt, idx) => (
                                         <SelectItem key={`${opt.cnae}-${opt.nbs}`} value={opt.nbs}>
-                                            {`${opt.nbsDescription} (${opt.cClassTrib})`}
+                                            {`${opt.nbsDescription}`}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -111,7 +103,6 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
             );
         }
         
-        // Case 2: Single NBS option is auto-applied and displayed as read-only.
         if (selectedNbsOption) {
             return (
                 <div className="mt-4">
@@ -153,7 +144,6 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
             <p className="font-bold text-primary pr-8">{cnaeData.code}</p>
             <p className="text-sm text-muted-foreground">{cnaeData.description}</p>
             
-            {/* Always display the resulting IVA reduction */}
             {isPostReforma && (
               <TooltipProvider>
                 <Tooltip>
@@ -477,3 +467,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     
 
     
+

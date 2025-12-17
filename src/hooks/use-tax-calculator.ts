@@ -69,8 +69,8 @@ export function useTaxCalculator(year: number) {
                 if (cnae.code) {
                     const options = getNBSOptionsByCnae(cnae.code);
                     newNbsOptions[cnae.code] = options;
-                    if (options.length === 1 && cnae.cClassTrib !== options[0].cClassTrib) {
-                        setValue(`selectedCnaes.${index}.cClassTrib`, options[0].cClassTrib, { shouldValidate: true, shouldDirty: true });
+                    if (options.length === 1 && cnae.nbsCode !== options[0].nbs) {
+                        setValue(`selectedCnaes.${index}.nbsCode`, options[0].nbs, { shouldValidate: true, shouldDirty: true });
                     }
                 }
             }
@@ -127,7 +127,7 @@ export function useTaxCalculator(year: number) {
                     setValue('exchangeRate', 1); // Fallback
                     toast({
                         title: "Falha ao buscar cotação",
-                        description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback. Você pode ajustar manualmente.",
+                        description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback. Você pode ajustar manually.",
                         variant: "destructive"
                     });
                 }
@@ -146,6 +146,7 @@ export function useTaxCalculator(year: number) {
                 code: cnae.code,
                 revenue: cnae.domesticRevenue!,
                 cClassTrib: cnae.cClassTrib,
+                nbsCode: cnae.nbsCode,
             }));
 
         const exportActivities: CnaeItem[] = values.selectedCnaes
@@ -154,6 +155,7 @@ export function useTaxCalculator(year: number) {
                 code: cnae.code,
                 revenue: cnae.exportRevenue!,
                 cClassTrib: cnae.cClassTrib,
+                 nbsCode: cnae.nbsCode,
             }));
 
 
@@ -198,7 +200,7 @@ export function useTaxCalculator(year: number) {
         if (year >= 2026) {
           for (const cnae of values.selectedCnaes) {
               const options = nbsOptions[cnae.code];
-              if (options && options.length > 1 && !cnae.cClassTrib) {
+              if (options && options.length > 1 && !cnae.nbsCode) {
                   toast({
                       title: "Seleção de Tributação Pendente",
                       description: `A atividade ${cnae.code} requer que você especifique o tipo de serviço para o cálculo correto dos impostos da reforma.`,
@@ -262,5 +264,6 @@ export function useTaxCalculator(year: number) {
 }
 
     
+
 
 

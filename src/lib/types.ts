@@ -10,6 +10,7 @@ import { z } from "zod";
 export const CnaeSelectionSchema = z.object({
   code: z.string(),
   cClassTrib: z.string().optional(),
+  nbsCode: z.string().optional(),
   domesticRevenue: z.coerce.number().min(0, "O faturamento deve ser positivo.").optional(),
   exportRevenue: z.coerce.number().min(0, "O faturamento deve ser positivo.").optional(),
 });
@@ -20,6 +21,7 @@ export const CnaeItemSchema = z.object({
   code: z.string(),
   revenue: z.coerce.number().min(0, "O faturamento deve ser maior que zero.").or(z.literal(0)),
   cClassTrib: z.string().optional(),
+  nbsCode: z.string().optional(),
 });
 export type CnaeItem = z.infer<typeof CnaeItemSchema>;
 
@@ -323,6 +325,7 @@ export function activityToItem(activity: ActivityWithReduction): CnaeItem {
     code: activity.code,
     revenue: activity.revenue,
     cClassTrib: activity.cClassTrib,
+    nbsCode: activity.nbsCode,
   };
 }
 export interface TaxBracket {
