@@ -42,13 +42,12 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
 
     const isPostReforma = year >= 2026;
 
-    // Fetch and Normalize NBS options to ensure unique keys for rendering.
+    // Fetch all NBS options for the CNAE without de-duplication
     const nbsOptions: CnaeRelationship2026[] = useMemo(() => {
         if (!isPostReforma) return [];
-        const rawOptions = getNBSOptionsByCnae(cnaeItem.code);
-        // De-duplicate based on cClassTrib to prevent React key errors and present unique choices.
-        return Array.from(new Map(rawOptions.map(opt => [opt.cClassTrib, opt])).values());
+        return getNBSOptionsByCnae(cnaeItem.code);
     }, [cnaeItem.code, isPostReforma]);
+
 
     // Auto-select NBS if there's only one option.
     useEffect(() => {
@@ -61,8 +60,6 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
     }, [isPostReforma, nbsOptions, cnaeItem.cClassTrib, form, index]);
 
     // Proactively determine the correct cClassTrib for this render cycle.
-    // If there is only one NBS option, we use it directly for calculation,
-    // avoiding a race condition with the useEffect that formally sets the form state.
     const definitiveCClassTrib = nbsOptions.length === 1 ? nbsOptions[0].cClassTrib : cnaeItem.cClassTrib;
 
     // Derive IVA reduction directly from the definitive cClassTrib.
@@ -98,8 +95,8 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 </FormControl>
                                 <SelectContent>
                                     {nbsOptions.map((opt, idx) => (
-                                        <SelectItem key={`${opt.cClassTrib}-${idx}`} value={opt.cClassTrib}>
-                                            {`(${opt.nbsDescription})`}
+                                        <SelectItem key={`${opt.cClassTrib}-${opt.nbs}-${idx}`} value={opt.cClassTrib}>
+                                            {`${opt.nbsDescription} (${opt.cClassTrib})`}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -475,3 +472,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     
 
 
+
+
+    
