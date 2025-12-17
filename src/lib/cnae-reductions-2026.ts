@@ -85,7 +85,7 @@ export function getSpecificNbsReduction(
  */
 export function getIvaReductionByCnae(
   cnaeCode: string,
-  nbsCode?: string | null
+  cClassTribCode?: string | null
 ): { reducaoIBS: number; reducaoCBS: number } {
   const numericCnae = String(cnaeCode || '').replace(/\D/g, '');
   const cnaeData = CNAE_REDUCTIONS_DATABASE[numericCnae];
@@ -95,15 +95,15 @@ export function getIvaReductionByCnae(
     return { reducaoIBS: 0, reducaoCBS: 0 };
   }
 
-  if (nbsCode) {
-    const specificReduction = cnaeData.reducoes.find(r => r.cClassTrib === nbsCode);
+  if (cClassTribCode) {
+    const specificReduction = cnaeData.reducoes.find(r => r.cClassTrib === cClassTribCode);
     if (specificReduction) {
         return {
             reducaoIBS: specificReduction.reducaoIBS,
             reducaoCBS: specificReduction.reducaoCBS,
         };
     }
-     console.warn(`[AUDIT] getIvaReductionByCnae: NBS class '${nbsCode}' not found for CNAE '${numericCnae}'. Returning zero reduction.`);
+     console.warn(`[AUDIT] getIvaReductionByCnae: NBS class '${cClassTribCode}' not found for CNAE '${numericCnae}'. Returning zero reduction.`);
   }
 
   // If there's only one option, it's safe to use it as the default
@@ -113,7 +113,8 @@ export function getIvaReductionByCnae(
       reducaoCBS: cnaeData.reducoes[0].reducaoCBS,
     };
   }
-
+  
+  console.warn(`[AUDIT] getIvaReductionByCnae: Ambiguous call for CNAE '${numericCnae}' with ${cnaeData.reducoes.length} options and no cClassTrib provided. Returning zero reduction.`);
   return { reducaoIBS: 0, reducaoCBS: 0 };
 }
 

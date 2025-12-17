@@ -13,7 +13,7 @@ import { Button } from "./ui/button";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDebounce } from "react-use";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import type { CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
 import { NumericFormat } from "react-number-format";
@@ -211,6 +211,10 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
     const exchangeRate = form.watch('exchangeRate');
 
+    const domesticRevenueInputRef = useRef<HTMLInputElement>(null);
+    const exportRevenueInputRef = useRef<HTMLInputElement>(null);
+
+
     const handleRevenueChange = (value: number, type: 'domestic' | 'export') => {
       const cnaes: CnaeSelection[] = form.getValues('selectedCnaes');
       if (cnaes.length === 0) return;
@@ -299,6 +303,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     <FormControl>
                                         <NumericFormat
                                             customInput={Input}
+                                            getInputRef={domesticRevenueInputRef}
                                             thousandSeparator="."
                                             decimalSeparator=","
                                             prefix="R$ "
@@ -309,7 +314,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             onValueChange={(values) => {
                                                 handleRevenueChange(values.floatValue || 0, 'domestic');
                                             }}
-                                            onFocus={(e) => e.target.select()}
+                                            onFocus={() => domesticRevenueInputRef.current?.select()}
                                         />
                                     </FormControl>
                                 </FormItem>
@@ -331,6 +336,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     <FormControl>
                                         <NumericFormat
                                             customInput={Input}
+                                            getInputRef={exportRevenueInputRef}
                                             thousandSeparator="."
                                             decimalSeparator=","
                                             prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '}
@@ -341,6 +347,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             onValueChange={(values) => {
                                                 handleRevenueChange(values.floatValue || 0, 'export');
                                             }}
+                                            onFocus={() => exportRevenueInputRef.current?.select()}
                                         />
                                     </FormControl>
                                     {form.watch('exportCurrency') !== 'BRL' && (
@@ -423,12 +430,14 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                     control={form.control}
                                     name="creditGeneratingExpenses"
                                     render={({ field }) => {
+                                        const inputRef = useRef<HTMLInputElement>(null);
                                         return (
                                             <FormItem>
                                                 <FormLabel>Despesas que Geram Crédito de IVA</FormLabel>
                                                  <FormControl>
                                                     <NumericFormat
                                                         customInput={Input}
+                                                        getInputRef={inputRef}
                                                         thousandSeparator="."
                                                         decimalSeparator=","
                                                         prefix="R$ "
@@ -439,6 +448,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                                         onValueChange={(values) => {
                                                             field.onChange(values.floatValue || 0);
                                                         }}
+                                                        onFocus={() => inputRef.current?.select()}
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
@@ -463,4 +473,5 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     
 
     
+
 
