@@ -113,6 +113,7 @@ export function useTaxCalculator(year: number) {
 
     useEffect(() => {
         async function fetchExchangeRate() {
+            // Absolute guard clause as required.
             if (debouncedCurrency === 'BRL') {
                 setValue('exchangeRate', 1);
                 return;
@@ -125,10 +126,12 @@ export function useTaxCalculator(year: number) {
                 const rate = data[debouncedCurrency];
                 if (rate) {
                     setValue('exchangeRate', rate);
+                } else {
+                    setValue('exchangeRate', 1); // Fallback if currency not found in API response
                 }
             } catch (error) {
                 console.error("Failed to fetch exchange rate:", error);
-                setValue('exchangeRate', 1); // Fallback
+                setValue('exchangeRate', 1); // Fallback on fetch error
                 toast({
                     title: "Falha ao buscar cotação",
                     description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback.",
@@ -265,6 +268,7 @@ export function useTaxCalculator(year: number) {
 }
 
     
+
 
 
 
