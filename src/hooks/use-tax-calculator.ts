@@ -113,7 +113,11 @@ export function useTaxCalculator(year: number) {
 
     useEffect(() => {
         async function fetchExchangeRate() {
-            if (!debouncedCurrency || debouncedCurrency === 'BRL') {
+            console.log('[DEBUG] fetchExchangeRate called with:', debouncedCurrency);
+            const normalizedCurrency = String(debouncedCurrency || '').trim().toUpperCase();
+
+            if (!normalizedCurrency || normalizedCurrency === 'BRL') {
+                console.log('[DEBUG] Skipping exchange rate fetch');
                 setValue('exchangeRate', 1);
                 return;
             }
