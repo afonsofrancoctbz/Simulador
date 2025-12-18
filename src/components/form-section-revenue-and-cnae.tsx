@@ -84,7 +84,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                                 <AlertTriangle className="h-4 w-4" />
                                 Ação Requerida: Selecione o Tipo de Serviço
                             </FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <Select onValueChange={(value) => form.setValue(`selectedCnaes.${index}.nbsCode`, value)} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Defina a tributação deste CNAE..." />
@@ -207,15 +207,17 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     const exportRevenueInputRef = useRef<HTMLInputElement>(null);
 
 
-    const handleRevenueChange = (value: number, type: 'domestic' | 'export') => {
+    const handleRevenueChange = (value: number | undefined, type: 'domestic' | 'export') => {
       const cnaes: CnaeSelection[] = form.getValues('selectedCnaes');
       if (cnaes.length === 0) return;
-
-      const revenuePerCnae = cnaes.length > 0 ? value / cnaes.length : 0;
+      
+      const numericValue = value ?? 0;
+      const revenuePerCnae = cnaes.length > 0 ? numericValue / cnaes.length : 0;
       
       const updatedCnaes = cnaes.map(cnae => {
         const fieldToUpdate = type === 'domestic' ? 'domesticRevenue' : 'exportRevenue';
-        return { ...cnae, [fieldToUpdate]: revenuePerCnae };
+        const otherField = type === 'domestic' ? 'exportRevenue' : 'domesticRevenue';
+        return { ...cnae, [fieldToUpdate]: revenuePerCnae, [otherField]: cnae[otherField] ?? 0 };
       });
       
       form.setValue('selectedCnaes', updatedCnaes, { shouldValidate: true, shouldDirty: true });
@@ -223,11 +225,13 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
     const totalDomesticRevenue = useMemo(() => {
         const cnaes: CnaeSelection[] = form.watch('selectedCnaes');
+        if (!cnaes) return 0;
         return cnaes.reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
     }, [form.watch('selectedCnaes')]);
 
     const totalExportRevenue = useMemo(() => {
         const cnaes: CnaeSelection[] = form.watch('selectedCnaes');
+        if (!cnaes) return 0;
         return cnaes.reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
     }, [form.watch('selectedCnaes')]);
 
@@ -306,7 +310,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             placeholder="R$ 10.000,00"
                                             value={totalDomesticRevenue}
                                             onValueChange={(values) => {
-                                                handleRevenueChange(values.floatValue || 0, 'domestic');
+                                                handleRevenueChange(values.floatValue, 'domestic');
                                             }}
                                             onFocus={() => domesticRevenueInputRef.current?.select()}
                                         />
@@ -341,7 +345,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             placeholder="0,00"
                                             value={totalExportRevenue}
                                             onValueChange={(values) => {
-                                                handleRevenueChange(values.floatValue || 0, 'export');
+                                                handleRevenueChange(values.floatValue, 'export');
                                             }}
                                             onFocus={() => exportRevenueInputRef.current?.select()}
                                         />
@@ -481,3 +485,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
 
     
+
