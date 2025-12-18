@@ -113,8 +113,7 @@ export function useTaxCalculator(year: number) {
 
     useEffect(() => {
         async function fetchExchangeRate() {
-            // Absolute guard clause as required.
-            if (debouncedCurrency === 'BRL') {
+            if (!debouncedCurrency || debouncedCurrency === 'BRL') {
                 setValue('exchangeRate', 1);
                 return;
             }
@@ -266,11 +265,3 @@ export function useTaxCalculator(year: number) {
         nbsOptions
     };
 }
-
-    
-
-
-
-
-
-
