@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { z } from "zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Loader2, DollarSign, Wallet, Gift } from "lucide-react";
-import { formatBRL } from "@/lib/utils";
 import { calculateEmployeeCost, EmployeeCostResult } from "@/lib/employee-cost-calculations";
 import EmployeeCostResults from "./employee-cost-results";
+import { NumericFormat } from "react-number-format";
 
 const EmployeeCostFormSchema = z.object({
     regime: z.enum(["simples", "presumido", "mei"]),
@@ -73,30 +73,25 @@ export default function EmployeeCostCalculator() {
                                 control={form.control}
                                 name="salarioBase"
                                 render={({ field }) => {
-                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                        const { value } = e.target;
-                                        const digitsOnly = value.replace(/\D/g, '');
-                                        field.onChange(Number(digitsOnly) / 100);
-                                    };
+                                    const inputRef = useRef<HTMLInputElement>(null);
                                     return (
                                         <FormItem>
                                             <FormLabel>Salário Base Mensal</FormLabel>
-                                            <div className="relative">
-                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                                <FormControl>
-                                                    <Input
-                                                        type="text"
-                                                        inputMode="decimal"
-                                                        placeholder="1.518,00"
-                                                        onChange={handleChange}
-                                                        onBlur={field.onBlur}
-                                                        value={field.value ? formatBRL(field.value) : ''}
-                                                        name={field.name}
-                                                        ref={field.ref}
-                                                        className="pl-9"
-                                                    />
-                                                </FormControl>
-                                            </div>
+                                            <FormControl>
+                                                <NumericFormat
+                                                    customInput={Input}
+                                                    getInputRef={inputRef}
+                                                    thousandSeparator="."
+                                                    decimalSeparator=","
+                                                    prefix="R$ "
+                                                    decimalScale={2}
+                                                    allowNegative={false}
+                                                    value={field.value}
+                                                    onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                                    onFocus={() => inputRef.current?.select()}
+                                                    placeholder="R$ 1.518,00"
+                                                />
+                                            </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     );
@@ -151,29 +146,25 @@ export default function EmployeeCostCalculator() {
                                     control={form.control}
                                     name={item.name as keyof EmployeeCostFormValues}
                                     render={({ field }) => {
-                                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                            const { value } = e.target;
-                                            const digitsOnly = value.replace(/\D/g, '');
-                                            field.onChange(Number(digitsOnly) / 100);
-                                        };
+                                        const inputRef = useRef<HTMLInputElement>(null);
                                         return (
                                             <FormItem>
                                                 <FormLabel>{item.label}</FormLabel>
-                                                <div className="relative">
-                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="text"
-                                                            inputMode="decimal"
-                                                            placeholder="0,00"
-                                                            onChange={handleChange}
-                                                            onBlur={field.onBlur}
-                                                            value={field.value ? formatBRL(field.value as number) : ''}
-                                                            name={field.name}
-                                                            className="pl-9"
-                                                        />
-                                                    </FormControl>
-                                                </div>
+                                                <FormControl>
+                                                    <NumericFormat
+                                                        customInput={Input}
+                                                        getInputRef={inputRef}
+                                                        thousandSeparator="."
+                                                        decimalSeparator=","
+                                                        prefix="R$ "
+                                                        decimalScale={2}
+                                                        allowNegative={false}
+                                                        value={field.value as number}
+                                                        onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                                        onFocus={() => inputRef.current?.select()}
+                                                        placeholder="R$ 0,00"
+                                                    />
+                                                </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         );

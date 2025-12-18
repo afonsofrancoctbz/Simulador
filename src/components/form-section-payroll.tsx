@@ -2,11 +2,11 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Users, Wallet, Plus, Minus } from 'lucide-react';
 import { getFiscalParameters } from '@/config/fiscal';
-import { cn, formatCurrencyBRL } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,8 @@ import { Switch } from './ui/switch';
 import type { CalculatorFormValues } from './tax-calculator-form';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
+import { NumericFormat } from 'react-number-format';
+
 
 export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
     const form = useFormContext<CalculatorFormValues>();
@@ -55,35 +57,30 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
             </CardHeader>
             <CardContent className='p-6 md:p-8 space-y-8'>
                 <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => {
-                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                        const { value } = e.target;
-                        const digitsOnly = value.replace(/\D/g, '');
-                        field.onChange(Number(digitsOnly) / 100);
-                    };
+                    const inputRef = useRef<HTMLInputElement>(null);
                     return (
-                    <FormItem>
-                        <FormLabel>Despesa com Salários (CLT)</FormLabel>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                        <FormItem>
+                            <FormLabel>Despesa com Salários (CLT)</FormLabel>
                             <FormControl>
-                                <Input 
-                                    type="text" 
-                                    inputMode="decimal"
-                                    placeholder="0,00"
-                                    onChange={handleChange}
-                                    onBlur={field.onBlur}
-                                    value={field.value ? formatCurrencyBRL(field.value) : ''}
-                                    name={field.name}
-                                    ref={field.ref}
-                                    className="pl-9"
+                                <NumericFormat
+                                    customInput={Input}
+                                    getInputRef={inputRef}
+                                    thousandSeparator="."
+                                    decimalSeparator=","
+                                    prefix="R$ "
+                                    decimalScale={2}
+                                    allowNegative={false}
+                                    value={field.value}
+                                    onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                    onFocus={() => inputRef.current?.select()}
+                                    placeholder="R$ 0,00"
                                 />
                             </FormControl>
-                        </div>
                             <FormDescription>
-                            Custo total mensal com funcionários.
-                        </FormDescription>
-                        <FormMessage />
-                    </FormItem>
+                                Custo total mensal com funcionários.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
                     );
                 }} />
 
@@ -126,31 +123,26 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                         control={form.control}
                                         name={`proLabores.${index}.value`}
                                         render={({ field }) => {
-                                            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                const { value } = e.target;
-                                                const digitsOnly = value.replace(/\D/g, '');
-                                                field.onChange(Number(digitsOnly) / 100);
-                                            };
+                                             const inputRef = useRef<HTMLInputElement>(null);
                                             return (
                                                 <FormItem>
-                                                <FormLabel>Pró-labore Mensal</FormLabel>
-                                                <div className="relative">
-                                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                                                    <FormLabel>Pró-labore Mensal</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                        type="text"
-                                                        inputMode="decimal"
-                                                        placeholder={formatCurrencyBRL(MINIMUM_WAGE)}
-                                                        onChange={handleChange}
-                                                        onBlur={field.onBlur}
-                                                        value={field.value ? formatCurrencyBRL(field.value) : ''}
-                                                        name={field.name}
-                                                        ref={field.ref}
-                                                        className="pl-9"
+                                                        <NumericFormat
+                                                            customInput={Input}
+                                                            getInputRef={inputRef}
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            prefix="R$ "
+                                                            decimalScale={2}
+                                                            allowNegative={false}
+                                                            value={field.value}
+                                                            onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                                            onFocus={() => inputRef.current?.select()}
+                                                            placeholder={`R$ ${MINIMUM_WAGE.toFixed(2).replace('.', ',')}`}
                                                         />
                                                     </FormControl>
-                                                </div>
-                                                <FormMessage />
+                                                    <FormMessage />
                                                 </FormItem>
                                             );
                                         }}
@@ -182,32 +174,27 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                 control={form.control}
                                                 name={`proLabores.${index}.otherContributionSalary`}
                                                 render={({ field }) => {
-                                                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                        const { value } = e.target;
-                                                        const digitsOnly = value.replace(/\D/g, '');
-                                                        field.onChange(Number(digitsOnly) / 100);
-                                                    };
+                                                    const inputRef = useRef<HTMLInputElement>(null);
                                                     return(
                                                     <FormItem>
                                                         <FormLabel>Salário de Contribuição no outro vínculo</FormLabel>
-                                                        <div className="relative">
-                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="text"
-                                                                    inputMode="decimal"
-                                                                    placeholder="0,00"
-                                                                    onChange={handleChange}
-                                                                    onBlur={field.onBlur}
-                                                                    value={field.value ? formatCurrencyBRL(field.value) : ''}
-                                                                    name={field.name}
-                                                                    ref={field.ref}
-                                                                    className="pl-9"
-                                                                />
-                                                            </FormControl>
-                                                        </div>
+                                                         <FormControl>
+                                                            <NumericFormat
+                                                                customInput={Input}
+                                                                getInputRef={inputRef}
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                prefix="R$ "
+                                                                decimalScale={2}
+                                                                allowNegative={false}
+                                                                value={field.value}
+                                                                onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                                                onFocus={() => inputRef.current?.select()}
+                                                                placeholder="R$ 0,00"
+                                                            />
+                                                        </FormControl>
                                                         <FormDescription className="text-xs">
-                                                            Salário base no outro vínculo (teto {formatCurrencyBRL(fiscalConfig.teto_inss)}).
+                                                            Salário base no outro vínculo (teto {MINIMUM_WAGE.toFixed(2).replace('.', ',')}).
                                                         </FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
@@ -225,7 +212,3 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
         </Card>
     );
 }
-
-    
-
-    
