@@ -87,6 +87,10 @@ export function getIvaReductionByCnae(
   nbsCode?: string | null
 ): { reducaoIBS: number; reducaoCBS: number } {
   if (!cnaeCode || !nbsCode) {
+    // Add defensive logging as requested
+    if (process.env.NODE_ENV !== 'production' && cnaeCode) {
+      console.warn(`[AUDIT] getIvaReductionByCnae called for CNAE '${cnaeCode}' without a valid nbsCode. Returning 0% reduction.`);
+    }
     return { reducaoIBS: 0, reducaoCBS: 0 };
   }
 
@@ -138,3 +142,6 @@ export function getNBSOptionsByCnae(cnaeCode: string): CnaeRelationship2026[] {
 
   return uniqueOptions;
 }
+
+
+    
