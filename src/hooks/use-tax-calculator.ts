@@ -112,39 +112,33 @@ export function useTaxCalculator(year: number) {
 
 
     useEffect(() => {
-        const fetchExchangeRate = async () => {
+        async function fetchExchangeRate() {
             const normalizedCurrency = String(debouncedCurrency || '').trim().toUpperCase();
 
-            // Absolute guard clause
+            // 🔒 BRL nunca chama API
             if (!normalizedCurrency || normalizedCurrency === 'BRL') {
                 setValue('exchangeRate', 1);
                 return;
             }
 
             try {
-                const response = await fetch('/api/exchange-rate');
-                if (!response.ok) {
-                    throw new Error('API request failed');
-                }
-                const data = await response.json();
-                const rate = data[normalizedCurrency];
+                const response = await fetch(
+                    `https://api.exchangerate.host/latest?base=BRL&symbols=${normalizedCurrency}`
+                );
 
-                if (rate) {
-                    setValue('exchangeRate', rate);
-                } else {
-                    console.warn(`[FX] Currency ${normalizedCurrency} not found in API response, using 1.0 as fallback.`);
-                    setValue('exchangeRate', 1);
+                if (!response.ok) {
+                    throw new Error('External exchange rate API failed');
                 }
+
+                const data = await response.json();
+                const rate = data?.rates?.[normalizedCurrency];
+
+                setValue('exchangeRate', rate || 1);
             } catch (error) {
-                console.error("Failed to fetch exchange rate:", error);
-                setValue('exchangeRate', 1); // Secure fallback
-                toast({
-                    title: "Falha ao buscar cotação",
-                    description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback.",
-                    variant: "destructive"
-                });
+                console.error('Failed to fetch exchange rate:', error);
+                setValue('exchangeRate', 1);
             }
-        };
+        }
 
         fetchExchangeRate();
     }, [debouncedCurrency, setValue, toast]);
