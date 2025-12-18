@@ -113,26 +113,27 @@ export function useTaxCalculator(year: number) {
 
     useEffect(() => {
         async function fetchExchangeRate() {
-            if (debouncedCurrency !== 'BRL') {
-                try {
-                    const response = await fetch('/api/exchange-rate');
-                    if (!response.ok) throw new Error('API request failed');
-                    const data = await response.json();
-                    const rate = data[debouncedCurrency];
-                    if (rate) {
-                        setValue('exchangeRate', rate);
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch exchange rate:", error);
-                    setValue('exchangeRate', 1); // Fallback
-                    toast({
-                        title: "Falha ao buscar cotação",
-                        description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback. Você pode ajustar manually.",
-                        variant: "destructive"
-                    });
+            if (debouncedCurrency === 'BRL') {
+                setValue('exchangeRate', 1);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/exchange-rate');
+                if (!response.ok) throw new Error('API request failed');
+                const data = await response.json();
+                const rate = data[debouncedCurrency];
+                if (rate) {
+                    setValue('exchangeRate', rate);
                 }
-            } else {
-                 setValue('exchangeRate', 1);
+            } catch (error) {
+                console.error("Failed to fetch exchange rate:", error);
+                setValue('exchangeRate', 1); // Fallback
+                toast({
+                    title: "Falha ao buscar cotação",
+                    description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback.",
+                    variant: "destructive"
+                });
             }
         }
         fetchExchangeRate();
@@ -264,6 +265,7 @@ export function useTaxCalculator(year: number) {
 }
 
     
+
 
 
 

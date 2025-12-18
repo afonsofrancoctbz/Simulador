@@ -63,7 +63,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
         }
     }, [isPostReforma, nbsOptions, cnaeItem.nbsCode, form, index]);
     
-    const definitiveNbsCode = nbsOptions.length === 1 ? nbsOptions[0].nbs : cnaeItem.nbsCode;
+    const definitiveNbsCode = form.watch(`selectedCnaes.${index}.nbsCode`);
     const ivaReduction = getIvaReductionByCnae(cnaeItem.code, definitiveNbsCode);
     const selectedNbsOption = useMemo(() => nbsOptions.find(opt => opt.nbs === definitiveNbsCode), [nbsOptions, definitiveNbsCode]);
 
@@ -300,7 +300,9 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             decimalSeparator=","
                                             prefix="R$ "
                                             decimalScale={2}
-                                            fixedDecimalScale
+                                            fixedDecimalScale={false}
+                                            allowNegative={false}
+                                            inputMode="decimal"
                                             placeholder="R$ 10.000,00"
                                             value={totalDomesticRevenue}
                                             onValueChange={(values) => {
@@ -333,7 +335,9 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             decimalSeparator=","
                                             prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '}
                                             decimalScale={2}
-                                            fixedDecimalScale
+                                            fixedDecimalScale={false}
+                                            allowNegative={false}
+                                            inputMode="decimal"
                                             placeholder="0,00"
                                             value={totalExportRevenue}
                                             onValueChange={(values) => {
