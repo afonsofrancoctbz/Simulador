@@ -123,7 +123,7 @@ export function useTaxCalculator(year: number) {
 
             try {
                 const response = await fetch(
-                    `https://api.exchangerate.host/latest?base=BRL&symbols=${normalizedCurrency}`
+                    `https://api.frankfurter.app/latest?from=BRL&to=${normalizedCurrency}`
                 );
 
                 if (!response.ok) {
@@ -133,10 +133,14 @@ export function useTaxCalculator(year: number) {
                 const data = await response.json();
                 const rate = data?.rates?.[normalizedCurrency];
 
-                setValue('exchangeRate', rate || 1);
+                if (rate) {
+                    setValue('exchangeRate', rate);
+                } else {
+                     setValue('exchangeRate', 1);
+                }
             } catch (error) {
                 console.error('Failed to fetch exchange rate:', error);
-                setValue('exchangeRate', 1);
+                setValue('exchangeRate', 1); // fallback seguro
             }
         }
 
