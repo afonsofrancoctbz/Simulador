@@ -113,11 +113,9 @@ export function useTaxCalculator(year: number) {
 
     useEffect(() => {
         async function fetchExchangeRate() {
-            console.log('[DEBUG] fetchExchangeRate called with:', debouncedCurrency);
             const normalizedCurrency = String(debouncedCurrency || '').trim().toUpperCase();
 
             if (!normalizedCurrency || normalizedCurrency === 'BRL') {
-                console.log('[DEBUG] Skipping exchange rate fetch');
                 setValue('exchangeRate', 1);
                 return;
             }
@@ -126,7 +124,7 @@ export function useTaxCalculator(year: number) {
                 const response = await fetch('/api/exchange-rate');
                 if (!response.ok) throw new Error('API request failed');
                 const data = await response.json();
-                const rate = data[debouncedCurrency];
+                const rate = data[normalizedCurrency];
                 if (rate) {
                     setValue('exchangeRate', rate);
                 } else {
