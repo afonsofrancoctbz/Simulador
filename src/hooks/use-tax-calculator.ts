@@ -115,7 +115,6 @@ export function useTaxCalculator(year: number) {
         async function fetchExchangeRate() {
             const normalizedCurrency = String(debouncedCurrency || '').trim().toUpperCase();
 
-            // 🔒 BRL nunca chama API
             if (!normalizedCurrency || normalizedCurrency === 'BRL') {
                 setValue('exchangeRate', 1);
                 return;
@@ -123,7 +122,7 @@ export function useTaxCalculator(year: number) {
 
             try {
                 const response = await fetch(
-                    `https://api.frankfurter.app/latest?from=BRL&to=${normalizedCurrency}`
+                    `https://api.frankfurter.app/latest?from=${normalizedCurrency}&to=BRL`
                 );
 
                 if (!response.ok) {
@@ -131,12 +130,12 @@ export function useTaxCalculator(year: number) {
                 }
 
                 const data = await response.json();
-                const rate = data?.rates?.[normalizedCurrency];
+                const rate = data?.rates?.BRL;
 
                 if (rate) {
                     setValue('exchangeRate', rate);
                 } else {
-                     setValue('exchangeRate', 1);
+                    setValue('exchangeRate', 1);
                 }
             } catch (error) {
                 console.error('Failed to fetch exchange rate:', error);
@@ -145,7 +144,7 @@ export function useTaxCalculator(year: number) {
         }
 
         fetchExchangeRate();
-    }, [debouncedCurrency, setValue, toast]);
+    }, [debouncedCurrency, setValue]);
 
 
     const transformFormToSubmission = (values: CalculatorFormValues): TaxFormValues => {
