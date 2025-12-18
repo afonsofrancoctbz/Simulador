@@ -112,34 +112,40 @@ export function useTaxCalculator(year: number) {
 
 
     useEffect(() => {
-        async function fetchExchangeRate() {
+        const fetchExchangeRate = async () => {
             const normalizedCurrency = String(debouncedCurrency || '').trim().toUpperCase();
 
+            // Absolute guard clause
             if (!normalizedCurrency || normalizedCurrency === 'BRL') {
                 setValue('exchangeRate', 1);
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/exchange-rate');
-                if (!response.ok) throw new Error('API request failed');
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
                 const data = await response.json();
                 const rate = data[normalizedCurrency];
+
                 if (rate) {
                     setValue('exchangeRate', rate);
                 } else {
-                    setValue('exchangeRate', 1); // Fallback if currency not found in API response
+                    console.warn(`[FX] Currency ${normalizedCurrency} not found in API response, using 1.0 as fallback.`);
+                    setValue('exchangeRate', 1);
                 }
             } catch (error) {
                 console.error("Failed to fetch exchange rate:", error);
-                setValue('exchangeRate', 1); // Fallback on fetch error
+                setValue('exchangeRate', 1); // Secure fallback
                 toast({
                     title: "Falha ao buscar cotação",
                     description: "Não foi possível obter a cotação da moeda. Usando 1.0 como fallback.",
                     variant: "destructive"
                 });
             }
-        }
+        };
+
         fetchExchangeRate();
     }, [debouncedCurrency, setValue, toast]);
 

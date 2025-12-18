@@ -2,24 +2,30 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL', {
-      next: { revalidate: 3600 } // Revalida a cada hora
+    const response = await fetch('https://api.exchangerate.host/latest?base=BRL', {
+      next: { revalidate: 3600 } // Revalidate every hour
     });
 
     if (!response.ok) {
-      throw new Error('Falha ao buscar as taxas de câmbio');
+      throw new Error('Failed to fetch from exchangerate.host');
     }
 
     const data = await response.json();
 
-    const rates = {
-      USD: parseFloat(data.USDBRL.bid),
-      EUR: parseFloat(data.EURBRL.bid),
-    };
+    if (!data.rates) {
+      throw new Error('Rates not found in external API response');
+    }
 
-    return NextResponse.json(rates);
+    // Return only the rates object, which contains USD, EUR, etc.
+    return NextResponse.json(data.rates);
+
   } catch (error) {
-    console.error('Erro na API de câmbio:', error);
-    return NextResponse.json({ error: 'Não foi possível buscar as taxas de câmbio' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[API /api/exchange-rate] Error: ${errorMessage}`);
+    
+    return NextResponse.json(
+      { error: 'Internal server error while fetching exchange rates.' },
+      { status: 500 }
+    );
   }
 }
