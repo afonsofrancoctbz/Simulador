@@ -285,7 +285,6 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
 
     if (year === 2026) {
       // In 2026, IBS/CBS are "test" taxes (deductible/compensable), usually not added to final burden in same way
-      // But for total cost simulation, we often display them. 
       // *Logic adjustment*: The reform specs say 2026 is merely for system testing (0.9% CBS, 0.1% IBS), 
       // deductible from PIS/COFINS. For simplicity here, we assume they are "extra" but labeled as test.
       breakdown.push(
@@ -397,7 +396,7 @@ function _calculateSimples2026(
       const threshold = fiscalConfig.simples_nacional?.limite_fator_r ?? 0.28;
       currentAnnex = fatorREffective >= threshold ? "III" : "V";
     }
-    finalAnnex = currentAnnex; // Last one wins for display purposes (usually uniform per company)
+    finalAnnex = currentAnnex;
 
     const annexTable = fiscalConfig.simples_nacional?.[currentAnnex];
     const bracket = safeFindBracket(effectiveRbt12, annexTable, { who: 'SimplesCalc', year: values.year });
@@ -406,22 +405,24 @@ function _calculateSimples2026(
       const nominalRate = bracket.rate;
       const deduction = bracket.deduction;
       
-      // Formula: (RBT12 * AliquotaNominal - Deducao) / RBT12
       let effectiveDasRate = effectiveRbt12 > 0 
         ? ((effectiveRbt12 * nominalRate) - deduction) / effectiveRbt12 
         : nominalRate;
 
-      // Distribution adjustments (PIS, COFINS, ISS, ICMS, etc.)
+      // START OF FIX: Correctly adjust DAS rate for Hybrid and Export scenarios
       const dist = bracket.distribution || {};
-      const taxesInDas = (dist.PIS||0) + (dist.COFINS||0) + (dist.ISS||0) + (dist.ICMS||0) + (dist.IPI||0) + (dist.CBS||0) + (dist.IBS||0);
+      const newIvaShare = (dist.CBS || 0) + (dist.IBS || 0);
+      const allConsumptionShare = (dist.PIS || 0) + (dist.COFINS || 0) + (dist.ISS || 0) + (dist.ICMS || 0) + (dist.IPI || 0) + newIvaShare;
 
       if (activity.isExport) {
-        // Exports are immune to consumption taxes inside DAS
-        effectiveDasRate *= (1 - taxesInDas);
+        // Export is immune to ALL consumption taxes inside DAS
+        effectiveDasRate *= (1 - allConsumptionShare);
       } else if (isHybrid && values.year >= 2027) {
-        // In Hybrid, we remove the IVA portion from DAS and pay outside
-        effectiveDasRate *= (1 - taxesInDas);
+        // Hybrid: Only remove the NEW taxes (CBS/IBS) from DAS.
+        // ICMS and ISS remain inside DAS (subject to their own transition reduction in the table).
+        effectiveDasRate *= (1 - newIvaShare);
       }
+      // END OF FIX
 
       totalDas += activity.revenue * effectiveDasRate;
     }
@@ -437,17 +438,33 @@ function _calculateSimples2026(
     const reformParams = fiscalConfig.reforma_tributaria;
     const b2bFactor = (b2bRevenuePercentage ?? 100) / 100;
 
-    // Calculate B2B Revenue share only for domestic
     const b2bDomesticActivities = domesticActivities.map(a => ({
       ...a,
       revenue: (a.revenue || 0) * b2bFactor
     }));
+    
+    // START OF FIX: Determine IBS Rate based on Transition Year
+    let ibsEffectiveRate = 0;
+    const stdIbs = reformParams.ibs_aliquota_padrao ?? 0;
 
-    // If B2B is less than 100%, we strictly only tax the B2B portion for the Hybrid simulation 
-    // (Assuming Hybrid is chosen *because* of credit transfer needs for B2B clients)
+    if (values.year === 2027 || values.year === 2028) {
+        ibsEffectiveRate = 0.001; // Fixed 0.1%
+    } else if (values.year === 2029) {
+        ibsEffectiveRate = stdIbs * 0.10;
+    } else if (values.year === 2030) {
+        ibsEffectiveRate = stdIbs * 0.20;
+    } else if (values.year === 2031) {
+        ibsEffectiveRate = stdIbs * 0.30;
+    } else if (values.year === 2032) {
+        ibsEffectiveRate = stdIbs * 0.40;
+    } else {
+        ibsEffectiveRate = stdIbs; // 2033+
+    }
+    // END OF FIX
     
     const cbsCalc = calculateIvaLiability(b2bDomesticActivities, creditGeneratingExpenses, reformParams.cbs_aliquota_padrao, 'CBS');
-    const ibsCalc = calculateIvaLiability(b2bDomesticActivities, creditGeneratingExpenses, reformParams.ibs_aliquota_padrao, 'IBS');
+    // Use the calculated effective rate
+    const ibsCalc = calculateIvaLiability(b2bDomesticActivities, creditGeneratingExpenses, ibsEffectiveRate, 'IBS');
     
     ivaTaxes = cbsCalc.payable + ibsCalc.payable;
   }
@@ -462,8 +479,8 @@ function _calculateSimples2026(
   let regimeName = '';
   if (baseLabel === 'Otimizado') {
     regimeName = isHybrid 
-      ? 'Simples Nacional Anexo III (Fator R Otimizado) Híbrido' 
-      : 'Simples Nacional Anexo III (Fator R Otimizado)';
+      ? 'Simples Nacional (Fator R Otimizado) Híbrido' 
+      : 'Simples Nacional (Fator R Otimizado)';
   } else {
     regimeName = `Simples Nacional ${baseLabel} (Anexo ${finalAnnex})`;
   }
