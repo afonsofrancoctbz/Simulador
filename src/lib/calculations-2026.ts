@@ -362,7 +362,7 @@ function _calculateSimples2026(
   const totalProLaboreBruto = activeProLabores.reduce((s, p) => s + (p?.value || 0), 0);
   
   const domesticRev = domesticActivities.reduce((s, a) => s + (a?.revenue || 0), 0);
-  const exportRev = exportActivities.reduce((s, a) => s + ((a?.revenue || 0) * exchangeRate), 0);
+  const exportRev = exportActivities.reduce((s, a) => s + ((a?.revenue || 0) * (values.exchangeRate || 1)), 0);
   const totalRev = domesticRev + exportRev;
 
   if (totalRev === 0 && totalProLaboreBruto === 0) return null;
@@ -380,7 +380,7 @@ function _calculateSimples2026(
   // Combine activities for processing
   const processableActivities = [
     ...domesticActivities.map(a => ({ ...a, isExport: false, revenue: a.revenue || 0 })),
-    ...exportActivities.map(a => ({ ...a, isExport: true, revenue: (a.revenue || 0) * exchangeRate }))
+    ...exportActivities.map(a => ({ ...a, isExport: true, revenue: (a.revenue || 0) * (values.exchangeRate || 1)}))
   ];
 
   // 3. Process Activities for DAS
@@ -409,7 +409,7 @@ function _calculateSimples2026(
         ? ((effectiveRbt12 * nominalRate) - deduction) / effectiveRbt12 
         : nominalRate;
 
-      // START OF FIX: Correctly adjust DAS rate for Hybrid and Export scenarios
+      // START OF FIX 1: Correct DAS Reduction
       const dist = bracket.distribution || {};
       const newIvaShare = (dist.CBS || 0) + (dist.IBS || 0);
       const allConsumptionShare = (dist.PIS || 0) + (dist.COFINS || 0) + (dist.ISS || 0) + (dist.ICMS || 0) + (dist.IPI || 0) + newIvaShare;
@@ -418,11 +418,12 @@ function _calculateSimples2026(
         // Export is immune to ALL consumption taxes inside DAS
         effectiveDasRate *= (1 - allConsumptionShare);
       } else if (isHybrid && values.year >= 2027) {
-        // Hybrid: Only remove the NEW taxes (CBS/IBS) from DAS.
-        // ICMS and ISS remain inside DAS (subject to their own transition reduction in the table).
+        // Hybrid Regime (2027+):
+        // We REMOVE the new IVA (CBS/IBS) from the DAS because it is paid outside.
+        // We KEEP the legacy taxes (ISS/ICMS) inside the DAS (they fade out via the table distribution, not here).
         effectiveDasRate *= (1 - newIvaShare);
       }
-      // END OF FIX
+      // END OF FIX 1
 
       totalDas += activity.revenue * effectiveDasRate;
     }
@@ -436,38 +437,38 @@ function _calculateSimples2026(
   let ivaTaxes = 0;
   if (isHybrid && values.year >= 2027) {
     const reformParams = fiscalConfig.reforma_tributaria;
-    const b2bFactor = (b2bRevenuePercentage ?? 100) / 100;
-
-    const b2bDomesticActivities = domesticActivities.map(a => ({
-      ...a,
-      revenue: (a.revenue || 0) * b2bFactor
-    }));
     
-    // START OF FIX: Determine IBS Rate based on Transition Year
+    // START OF FIX 2 & 3:
+    // 1. We calculate liability on 100% of Domestic Revenue (domesticActivities).
+    //    We do NOT apply the B2B factor here. The seller pays tax on everything.
+    // 2. We apply the correct IBS Transition Rates.
+
     let ibsEffectiveRate = 0;
     const stdIbs = reformParams.ibs_aliquota_padrao ?? 0;
 
     if (values.year === 2027 || values.year === 2028) {
-        ibsEffectiveRate = 0.001; // Fixed 0.1%
+        ibsEffectiveRate = 0.001; // Fixed 0.1% for 2027/2028
     } else if (values.year === 2029) {
-        ibsEffectiveRate = stdIbs * 0.10;
+        ibsEffectiveRate = stdIbs * 0.10; // 10% of full rate
     } else if (values.year === 2030) {
-        ibsEffectiveRate = stdIbs * 0.20;
+        ibsEffectiveRate = stdIbs * 0.20; // 20% of full rate
     } else if (values.year === 2031) {
-        ibsEffectiveRate = stdIbs * 0.30;
+        ibsEffectiveRate = stdIbs * 0.30; // 30% of full rate
     } else if (values.year === 2032) {
-        ibsEffectiveRate = stdIbs * 0.40;
+        ibsEffectiveRate = stdIbs * 0.40; // 40% of full rate
     } else {
-        ibsEffectiveRate = stdIbs; // 2033+
+        ibsEffectiveRate = stdIbs; // 2033+ Full Rate
     }
-    // END OF FIX
     
-    const cbsCalc = calculateIvaLiability(b2bDomesticActivities, creditGeneratingExpenses, reformParams.cbs_aliquota_padrao, 'CBS');
-    // Use the calculated effective rate
-    const ibsCalc = calculateIvaLiability(b2bDomesticActivities, creditGeneratingExpenses, ibsEffectiveRate, 'IBS');
+    // Calculate CBS on FULL revenue (domesticActivities)
+    const cbsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, reformParams.cbs_aliquota_padrao, 'CBS');
+    
+    // Calculate IBS on FULL revenue using effective transition rate
+    const ibsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, ibsEffectiveRate, 'IBS');
     
     ivaTaxes = cbsCalc.payable + ibsCalc.payable;
   }
+  // END OF FIX 2 & 3
 
   // 5. Costs & Fees
   const totalTax = totalDas + ivaTaxes + cppAnnexIV + totalINSSRetido + totalIRRFRetido;
@@ -629,3 +630,5 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: normalize(simplesOptHyb, 1.5),
   };
 }
+
+    
