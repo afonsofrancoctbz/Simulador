@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -20,8 +21,6 @@ import FloatingNav from '@/components/floating-nav';
 
 export default function Home() {
   const [showExportInfo, setShowExportInfo] = useState(false);
-  // Nota: showResults está declarado mas não está sendo usado no JSX abaixo. 
-  // Mantive o estado caso você pretenda usá-lo futuramente.
   const [showResults, setShowResults] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(2026);
 
@@ -41,12 +40,12 @@ export default function Home() {
           </section>
       </div>
       
-      <Tabs defaultValue="2025" className="w-full">
+      <Tabs defaultValue="2026" className="w-full">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
               <div className="w-full flex justify-center">
                   <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
-                      <TabsTrigger value="2025">Cenário Atual (2025)</TabsTrigger>
-                      <TabsTrigger value="2026">Pós-Reforma (2026-2033)</TabsTrigger>
+                      <TabsTrigger value="2025">Regras Antigas (2025)</TabsTrigger>
+                      <TabsTrigger value="2026">Reforma Tributária (2026-2033)</TabsTrigger>
                   </TabsList>
               </div>
                 
@@ -63,9 +62,6 @@ export default function Home() {
 
                 <TabsContent value="2026" className="animate-in fade-in zoom-in-95 duration-300">
                       <div className="py-4">
-                        {/* Aqui passamos o selectedYear controlado pelo estado da página.
-                            Se o usuário mudar o ano lá dentro do formulário, o onYearChange atualiza aqui.
-                        */}
                         <TaxCalculator 
                             key="2026-plus"
                             year={selectedYear} 
