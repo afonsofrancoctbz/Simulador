@@ -1,3 +1,4 @@
+
 // src/lib/calculations-2026.ts
 import { getFiscalParametersPostReform } from "@/config/fiscal";
 import {
@@ -630,5 +631,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: normalize(simplesOptHyb, 1.5),
   };
 }
+
+    
 
     
