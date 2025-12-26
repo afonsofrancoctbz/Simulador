@@ -1,14 +1,14 @@
-
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { FileText, AlertTriangle, UploadCloud, Loader2, List, Edit } from 'lucide-react';
+import { FileText, AlertTriangle, UploadCloud, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { NumericFormat } from "react-number-format"; // Importação da biblioteca
 
-import { formatCurrencyBRL, parseBRL } from "@/lib/utils";
+import { formatCurrencyBRL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -18,9 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { extractDataFromPgdas } from "@/ai/flows/extract-pgdas-flow";
 import type { PgdasData, MonthlyData } from "@/lib/types";
 import type { CalculatorFormValues } from './tax-calculator-form';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "./ui/table";
-import { Button } from "./ui/button";
 
 function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -35,7 +33,7 @@ function generateLast12Months(): MonthlyData[] {
     const months: MonthlyData[] = [];
     const today = new Date();
     for (let i = 11; i >= 0; i--) {
-        const date = subMonths(today, i + 1); // +1 to get past months, not including current
+        const date = subMonths(today, i + 1);
         months.push({
             mes: format(date, 'MM/yyyy', { locale: ptBR }),
             receita: 0,
@@ -170,21 +168,24 @@ export function FormSectionAnnualRevenue() {
                         <TabsTrigger value="import">⚡ Importar Extrato PGDAS</TabsTrigger>
                     </TabsList>
                     <TabsContent value="manual" className="mt-6 space-y-6">
+                         {/* Campos de Resumo (Topo) - Agora usando NumericFormat para consistência visual */}
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start p-4 border rounded-lg bg-muted/40">
                              <FormField control={control} name="rbt12" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Faturamento Total (RBT12)</FormLabel>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                readOnly
-                                                value={formatCurrencyBRL(field.value)}
-                                                className="pl-9 font-bold text-base bg-background/50"
-                                            />
-                                        </FormControl>
-                                    </div>
+                                    <FormControl>
+                                        <NumericFormat
+                                            customInput={Input}
+                                            thousandSeparator="."
+                                            decimalSeparator=","
+                                            prefix="R$ "
+                                            decimalScale={2}
+                                            fixedDecimalScale={false} // Match Step 4 logic
+                                            readOnly
+                                            value={field.value}
+                                            className="font-bold text-base bg-background/50"
+                                        />
+                                    </FormControl>
                                     <FormDescription>Soma da receita dos 12 meses anteriores ao período de apuração.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -192,23 +193,26 @@ export function FormSectionAnnualRevenue() {
                             <FormField control={control} name="fp12" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Folha de Pagamento (FP12)</FormLabel>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-                                        <FormControl>
-                                             <Input
-                                                type="text"
-                                                readOnly
-                                                value={formatCurrencyBRL(field.value)}
-                                                className="pl-9 font-bold text-base bg-background/50"
-                                            />
-                                        </FormControl>
-                                    </div>
+                                    <FormControl>
+                                        <NumericFormat
+                                            customInput={Input}
+                                            thousandSeparator="."
+                                            decimalSeparator=","
+                                            prefix="R$ "
+                                            decimalScale={2}
+                                            fixedDecimalScale={false} // Match Step 4 logic
+                                            readOnly
+                                            value={field.value}
+                                            className="font-bold text-base bg-background/50"
+                                        />
+                                    </FormControl>
                                     <FormDescription>Soma da folha de pagamento dos 12 meses anteriores.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
                         </div>
                         
+                        {/* Tabela de Preenchimento Mensal */}
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
@@ -223,10 +227,42 @@ export function FormSectionAnnualRevenue() {
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{data.mes}</TableCell>
                                             <TableCell>
-                                                <Input type="text" value={formatCurrencyBRL(data.receita)} onChange={(e) => handleMonthlyDataChange(index, 'receita', parseBRL(e.target.value))} className="h-9"/>
+                                                <NumericFormat
+                                                    customInput={Input}
+                                                    thousandSeparator="."
+                                                    decimalSeparator=","
+                                                    prefix="R$ "
+                                                    decimalScale={2}
+                                                    fixedDecimalScale={false}
+                                                    allowNegative={false}
+                                                    inputMode="decimal"
+                                                    placeholder="R$ 0,00"
+                                                    value={data.receita}
+                                                    onValueChange={(values) => {
+                                                        handleMonthlyDataChange(index, 'receita', values.floatValue || 0);
+                                                    }}
+                                                    onFocus={(e) => e.target.select()} // UX: Seleciona tudo ao clicar
+                                                    className="h-9"
+                                                />
                                             </TableCell>
-                                                <TableCell>
-                                                <Input type="text" value={formatCurrencyBRL(data.folha)} onChange={(e) => handleMonthlyDataChange(index, 'folha', parseBRL(e.target.value))} className="h-9"/>
+                                            <TableCell>
+                                                <NumericFormat
+                                                    customInput={Input}
+                                                    thousandSeparator="."
+                                                    decimalSeparator=","
+                                                    prefix="R$ "
+                                                    decimalScale={2}
+                                                    fixedDecimalScale={false}
+                                                    allowNegative={false}
+                                                    inputMode="decimal"
+                                                    placeholder="R$ 0,00"
+                                                    value={data.folha}
+                                                    onValueChange={(values) => {
+                                                        handleMonthlyDataChange(index, 'folha', values.floatValue || 0);
+                                                    }}
+                                                    onFocus={(e) => e.target.select()} // UX: Seleciona tudo ao clicar
+                                                    className="h-9"
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -280,7 +316,3 @@ export function FormSectionAnnualRevenue() {
         </Card>
     );
 }
-    
-    
-
-    

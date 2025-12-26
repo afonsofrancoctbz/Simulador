@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
@@ -29,9 +27,7 @@ import {
 
 
 // ======================================================================================
-// 1. CnaeActivityCard: A new, dedicated component for handling all CNAE-NBS logic
-// This component encapsulates the complexity of NBS selection, ensuring a
-// deterministic and transparent UX, as required by the system architecture.
+// 1. CnaeActivityCard: Componente para gerenciar CNAE e seleção de NBS
 // ======================================================================================
 
 interface CnaeActivityCardProps {
@@ -47,13 +43,13 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
 
     const isPostReforma = year >= 2026;
 
-    // Fetch all NBS options for the CNAE without de-duplication
+    // Busca opções de NBS para o CNAE
     const nbsOptions: CnaeRelationship2026[] = useMemo(() => {
         if (!isPostReforma) return [];
         return getNBSOptionsByCnae(cnaeItem.code);
     }, [cnaeItem.code, isPostReforma]);
 
-    // Auto-select NBS if there's only one option.
+    // Auto-seleciona NBS se houver apenas uma opção
     useEffect(() => {
         if (isPostReforma && nbsOptions.length === 1 && cnaeItem.nbsCode !== nbsOptions[0].nbs) {
             form.setValue(`selectedCnaes.${index}.nbsCode`, nbsOptions[0].nbs, {
@@ -185,8 +181,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
 
 
 // ======================================================================================
-// 2. FormSectionRevenueAndCnae: The main component, now refactored to use
-// the new CnaeActivityCard for a cleaner and more maintainable structure.
+// 2. FormSectionRevenueAndCnae: Componente Principal
 // ======================================================================================
 
 interface FormSectionRevenueAndCnaeProps {
@@ -202,9 +197,30 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
     });
 
     const exchangeRate = form.watch('exchangeRate');
+    const selectedCnaes = form.watch('selectedCnaes') as CnaeSelection[];
 
     const domesticRevenueInputRef = useRef<HTMLInputElement>(null);
     const exportRevenueInputRef = useRef<HTMLInputElement>(null);
+
+    // Lógica para determinar o Anexo predominante para exibição
+    const predominantAnnex = useMemo(() => {
+        if (!selectedCnaes || selectedCnaes.length === 0) return null;
+        
+        // Pega o primeiro CNAE como referência principal
+        const firstCnae = getCnaeData(selectedCnaes[0].code);
+        if (!firstCnae) return null;
+
+        // Se houver múltiplos CNAEs com anexos diferentes, poderíamos mostrar "Múltiplos"
+        // Mas para simplificar a UX, mostramos o do primeiro ou "Anexo V" se houver Fator R envolvido
+        
+        const hasFatorR = selectedCnaes.some(c => {
+            const data = getCnaeData(c.code);
+            return data?.requiresFatorR;
+        });
+
+        if (hasFatorR) return "Anexo V (Sujeito ao Fator R)";
+        return `Anexo ${firstCnae.annex}`;
+    }, [selectedCnaes]);
 
 
     const handleRevenueChange = (value: number | undefined, type: 'domestic' | 'export') => {
@@ -260,7 +276,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                         <div className="space-y-4 pt-4">
                             <h4 className="font-semibold text-center text-muted-foreground">Atividades Selecionadas ({fields.length}/20):</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Refactored to use the new CnaeActivityCard component */}
                                 {fields.map((cnaeItem, index) => (
                                     <CnaeActivityCard
                                         key={cnaeItem.id}
@@ -296,6 +311,10 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <FormItem>
                                     <FormLabel>Receita Nacional (em BRL)</FormLabel>
+                                    {/* EXIBIÇÃO DO ANEXO RESTAURADA */}
+                                    {predominantAnnex && (
+                                        <p className="text-sm text-muted-foreground font-medium mb-1.5">{predominantAnnex}</p>
+                                    )}
                                     <FormControl>
                                         <NumericFormat
                                             customInput={Input}
@@ -331,6 +350,10 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             </SelectContent>
                                         </Select>
                                     </div>
+                                    {/* EXIBIÇÃO DO ANEXO RESTAURADA */}
+                                    {predominantAnnex && (
+                                        <p className="text-sm text-muted-foreground font-medium mb-1.5">{predominantAnnex}</p>
+                                    )}
                                     <FormControl>
                                         <NumericFormat
                                             customInput={Input}
@@ -467,22 +490,3 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
-
-  
-
-    
-
-    
-
-
-
-
-    
-
-    
-
-
-
-
-    
-

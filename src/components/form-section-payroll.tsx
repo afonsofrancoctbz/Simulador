@@ -15,12 +15,14 @@ import type { CalculatorFormValues } from './tax-calculator-form';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { NumericFormat } from 'react-number-format';
+import { formatCurrencyBRL } from '@/lib/utils';
 
 
 export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
     const form = useFormContext<CalculatorFormValues>();
     const fiscalConfig = getFiscalParameters(year);
     const MINIMUM_WAGE = fiscalConfig.salario_minimo;
+    const TETO_INSS = fiscalConfig.teto_inss;
 
     const { fields, replace } = useFieldArray({
         control: form.control,
@@ -69,6 +71,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                     decimalSeparator=","
                                     prefix="R$ "
                                     decimalScale={2}
+                                    fixedDecimalScale
                                     allowNegative={false}
                                     value={field.value}
                                     onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
@@ -135,11 +138,12 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                             decimalSeparator=","
                                                             prefix="R$ "
                                                             decimalScale={2}
+                                                            fixedDecimalScale
                                                             allowNegative={false}
                                                             value={field.value}
                                                             onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
                                                             onFocus={() => inputRef.current?.select()}
-                                                            placeholder={`R$ ${MINIMUM_WAGE.toFixed(2).replace('.', ',')}`}
+                                                            placeholder={formatCurrencyBRL(MINIMUM_WAGE)}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -186,6 +190,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                                 decimalSeparator=","
                                                                 prefix="R$ "
                                                                 decimalScale={2}
+                                                                fixedDecimalScale
                                                                 allowNegative={false}
                                                                 value={field.value}
                                                                 onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
@@ -194,7 +199,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                             />
                                                         </FormControl>
                                                         <FormDescription className="text-xs">
-                                                            Salário base no outro vínculo (teto {MINIMUM_WAGE.toFixed(2).replace('.', ',')}).
+                                                            Salário base no outro vínculo (teto {formatCurrencyBRL(TETO_INSS)}).
                                                         </FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
