@@ -467,8 +467,8 @@ function _calculateSimples2026(
     const ibsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, ibsEffectiveRate, 'IBS');
     
     ivaTaxes = cbsCalc.payable + ibsCalc.payable;
+    // END OF FIX 2 & 3
   }
-  // END OF FIX 2 & 3
 
   // 5. Costs & Fees
   const totalTax = totalDas + ivaTaxes + cppAnnexIV + totalINSSRetido + totalIRRFRetido;
