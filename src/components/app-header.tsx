@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './ui/button';
@@ -22,7 +24,7 @@ export default function AppHeader() {
                 <Link href="/">Calculadora de Impostos</Link>
             </Button>
             <Button variant="ghost" asChild className="text-[#002855] hover:text-[#00d3b3] hover:bg-transparent font-semibold text-sm">
-                <Link href="/A Vida Com CNPJ">A Vida Com CNPJ</Link>
+                <Link href="/a-vida-com-cnpj">A Vida Com CNPJ</Link>
             </Button>
             <Button variant="ghost" asChild className="text-[#002855] hover:text-[#00d3b3] hover:bg-transparent font-semibold text-sm">
                 <Link href="/fator-r">Análise Fator R</Link>

@@ -10,83 +10,67 @@ import {
     Briefcase,
     TrendingUp,
     Landmark,
-    ArrowRight,
-    ListChecks,
-    LayoutDashboard,
-    FileSpreadsheet,
-    Users
+    ArrowRight
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-
-// Tópicos extraídos do material de referência 
-const topics = [
-    { icon: LayoutDashboard, title: "Conhecendo a plataforma" },
-    { icon: ListChecks, title: "Principais rotinas" },
-    { icon: FileText, title: "Emissão de Notas Fiscais" },
-    { icon: Users, title: "Cadastro de Pró-labore" },
-    { icon: DollarSign, title: "Cálculo de Impostos" },
-    { icon: Briefcase, title: "Contratação de Serviços" },
-    { icon: Landmark, title: "Envio de Extratos" },
-    { icon: FileSpreadsheet, title: "Documentos Complementares" },
-];
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const calendarDates = [
     {
         day: "01-05",
         title: "Notas Fiscais",
-        desc: "Limite para comunicar cancelamento e substituição de NFs[cite: 56].",
+        desc: "Limite para comunicar cancelamento e substituição de NFs.",
         icon: FileText
     },
     {
         day: "10",
         title: "Funcionários",
-        desc: "Envio de exames e laudos de funcionários (se houver)[cite: 72].",
+        desc: "Envio de exames e laudos de funcionários (se houver).",
         icon: Briefcase
     },
     {
         day: "15",
         title: "Extratos & Honorários",
-        desc: "Envio dos extratos bancários PJ [cite: 74] e vencimento da mensalidade[cite: 69].",
+        desc: "Envio dos extratos bancários PJ e vencimento da Contabilizei.",
         icon: Landmark
     },
     {
         day: "20",
         title: "Pagamento de Impostos",
-        desc: "Vencimento do DAS, INSS, IRRF e FGTS[cite: 59].",
+        desc: "Vencimento do DAS, INSS, IRRF e FGTS.",
         icon: DollarSign
     },
     {
         day: "30",
         title: "Fechamento",
-        desc: "Data limite para emissão de NFs e envio de notas de fornecedores[cite: 65].",
+        desc: "Data limite para emissão de NFs e envio de notas de fornecedores.",
         icon: Clock
     }
 ];
 
 const financialSteps = [
-    { step: 1, text: "Pagamento dos seus impostos [cite: 167]" },
-    { step: 2, text: "Pagamento da mensalidade Contabilizei [cite: 169]" },
-    { step: 3, text: "Pagamento de despesas da empresa [cite: 176]" },
-    { step: 4, text: "Transferência do Pró-labore (líquido) [cite: 171]" },
-    { step: 5, text: "Transferência do Lucro (isento de impostos) [cite: 173]" },
+    { step: 1, text: "Pagamento dos impostos" },
+    { step: 2, text: "Pagamento da mensalidade Contabilizei" },
+    { step: 3, text: "Pagamento de despesas (aluguel, internet, etc)" },
+    { step: 4, text: "Transferência do Pró-labore (líquido)" },
+    { step: 5, text: "Transferência do Lucro (isento)" },
 ];
 
 export default function LifeWithCNPJSection() {
     return (
-        <div className="w-full font-sans max-w-7xl mx-auto py-12 px-4 space-y-16">
+        <div className="w-full font-sans max-w-7xl mx-auto py-16 px-4 space-y-16">
             
             {/* --- HERO HEADER --- */}
             <div className="text-center max-w-4xl mx-auto space-y-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#002855] text-sm font-semibold mb-2">
                     <TrendingUp className="h-4 w-4" />
-                    Jornada do Empreendedor Experts [cite: 2]
+                    Jornada do Empreendedor
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-[#002855]">
                     A vida com CNPJ: <span className="text-[#00d3b3]">Sua nova rotina</span>
                 </h2>
                 <p className="text-slate-600 text-lg">
-                    Agora que sua empresa está aberta, confira o guia completo para manter sua contabilidade em dia e evitar problemas com o fisco .
+                    Agora que sua empresa está aberta, confira os passos essenciais para manter sua contabilidade em dia e evitar multas.
                 </p>
             </div>
 
@@ -95,9 +79,9 @@ export default function LifeWithCNPJSection() {
                 <div className="absolute top-0 left-0 w-2 h-full bg-[#00d3b3] md:w-full md:h-2 md:top-0 md:left-0"></div>
                 <div className="grid md:grid-cols-3 gap-8 relative z-10">
                     {[
-                        "Cadastro inicial e conclusão da abertura [cite: 16]",
-                        "Liberação de emissão de NFs e Enquadramento [cite: 17]",
-                        "Início das rotinas contábeis (Você está aqui) [cite: 18]"
+                        "Cadastro inicial e conclusão da abertura",
+                        "Liberação de emissão de NFs e Enquadramento",
+                        "Início das rotinas contábeis (Você está aqui)"
                     ].map((step, idx) => (
                         <div key={idx} className="flex flex-col md:items-center md:text-center gap-4 group">
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shadow-sm border-4 border-white ${idx === 2 ? 'bg-[#002855] text-white' : 'bg-[#00d3b3] text-[#002855]'}`}>
@@ -109,30 +93,11 @@ export default function LifeWithCNPJSection() {
                 </div>
             </div>
 
-            {/* --- SELEÇÃO DE TÓPICOS (O QUE VAMOS VER) --- */}
-            <div>
-                <h3 className="text-2xl font-bold text-[#002855] mb-8 text-center md:text-left">
-                    O que você vai aprender 
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {topics.map((item, idx) => (
-                        <Card key={idx} className="border-slate-200 hover:border-[#00d3b3] hover:shadow-md transition-all cursor-default group">
-                            <CardContent className="p-4 flex flex-col items-center text-center h-full justify-center gap-3">
-                                <div className="bg-blue-50 p-3 rounded-full text-[#002855] group-hover:bg-[#002855] group-hover:text-[#00d3b3] transition-colors">
-                                    <item.icon className="h-6 w-6" />
-                                </div>
-                                <span className="text-sm font-semibold text-slate-700">{item.title}</span>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            </div>
-
             {/* --- CALENDÁRIO --- */}
             <div>
                 <div className="flex items-center gap-3 mb-8">
                     <Calendar className="h-8 w-8 text-[#00d3b3]" />
-                    <h3 className="text-2xl font-bold text-[#002855]">Calendário das Obrigações [cite: 53]</h3>
+                    <h3 className="text-2xl font-bold text-[#002855]">Calendário Mensal</h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     {calendarDates.map((item, idx) => (
@@ -155,10 +120,10 @@ export default function LifeWithCNPJSection() {
                 <div className="lg:col-span-7 space-y-6">
                     <Tabs defaultValue="mensal" className="w-full">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                            <h3 className="text-2xl font-bold text-[#002855]">Lista de Tarefas</h3>
+                            <h3 className="text-2xl font-bold text-[#002855]">Lista de Obrigações</h3>
                             <TabsList className="bg-slate-100 p-1">
-                                <TabsTrigger value="mensal" className="data-[state=active]:bg-white data-[state=active]:text-[#002855] data-[state=active]:shadow-sm">Mensalmente [cite: 40]</TabsTrigger>
-                                <TabsTrigger value="anual" className="data-[state=active]:bg-white data-[state=active]:text-[#002855] data-[state=active]:shadow-sm">Anualmente [cite: 47]</TabsTrigger>
+                                <TabsTrigger value="mensal" className="data-[state=active]:bg-white data-[state=active]:text-[#002855] data-[state=active]:shadow-sm">Mensalmente</TabsTrigger>
+                                <TabsTrigger value="anual" className="data-[state=active]:bg-white data-[state=active]:text-[#002855] data-[state=active]:shadow-sm">Anualmente</TabsTrigger>
                             </TabsList>
                         </div>
                         
@@ -166,11 +131,11 @@ export default function LifeWithCNPJSection() {
                             <Card className="border-0 shadow-lg bg-white">
                                 <CardContent className="p-6 space-y-4">
                                     {[
-                                        "Emissão de Notas Fiscais (Prestação de Serviços)[cite: 41].",
-                                        "Envio de Notas Fiscais recebidas (Fornecedores)[cite: 42].",
-                                        "Pagamento das guias (DAS, INSS, IRRF)[cite: 43].",
-                                        "Envio de extratos bancários PJ e investimentos[cite: 44].",
-                                        "Classificação financeira na plataforma[cite: 265]."
+                                        "Emissão de Notas Fiscais (Prestação de Serviços).",
+                                        "Envio de Notas Fiscais recebidas (Fornecedores).",
+                                        "Pagamento das guias (DAS, INSS, IRRF).",
+                                        "Envio de extratos bancários PJ e investimentos.",
+                                        "Classificação financeira na plataforma."
                                     ].map((item, i) => (
                                         <div key={i} className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 transition-colors">
                                             <div className="bg-blue-100 p-2 rounded-full text-[#002855] shrink-0 mt-0.5">
@@ -187,11 +152,11 @@ export default function LifeWithCNPJSection() {
                             <Card className="border-0 shadow-lg bg-white">
                                 <CardContent className="p-6 space-y-4">
                                     {[
-                                        "Renovação do Alvará de Funcionamento[cite: 48].",
-                                        "Renovação do Certificado Digital e-CNPJ[cite: 49].",
-                                        "Pagamento da TFF/TFE (Taxa municipal)[cite: 52].",
-                                        "Renovação no Conselho de Classe (CRM, CREA, etc)[cite: 50].",
-                                        "Revisão do enquadramento tributário (Janeiro)[cite: 51]."
+                                        "Renovação do Alvará de Funcionamento.",
+                                        "Renovação do Certificado Digital e-CNPJ.",
+                                        "Pagamento da TFF/TFE (Taxa municipal).",
+                                        "Renovação no Conselho de Classe (CRM, CREA, etc).",
+                                        "Revisão do enquadramento tributário (Janeiro)."
                                     ].map((item, i) => (
                                         <div key={i} className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 transition-colors">
                                             <div className="bg-amber-100 p-2 rounded-full text-amber-700 shrink-0 mt-0.5">
@@ -208,7 +173,7 @@ export default function LifeWithCNPJSection() {
                     {/* Card de Fluxo Financeiro */}
                     <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
                         <h4 className="font-bold text-[#002855] mb-4 flex items-center gap-2">
-                            <ArrowRight className="h-5 w-5 text-[#00d3b3]" /> Fluxo Financeiro Ideal [cite: 165]
+                            <ArrowRight className="h-5 w-5 text-[#00d3b3]" /> Fluxo Ideal do Dinheiro
                         </h4>
                         <div className="space-y-3">
                             {financialSteps.map((step) => (
@@ -234,30 +199,30 @@ export default function LifeWithCNPJSection() {
                                 <div className="bg-white/10 p-2 rounded-lg">
                                     <DollarSign className="h-6 w-6 text-[#00d3b3]" />
                                 </div>
-                                <h3 className="text-xl font-bold">Entenda o Pró-labore [cite: 138]</h3>
+                                <h3 className="text-xl font-bold">Entenda o Pró-labore</h3>
                             </div>
                             
                             <p className="text-white/80 text-sm leading-relaxed mb-6">
-                                É o salário do sócio. Sobre ele incide INSS (11%) para aposentadoria[cite: 137]. É diferente da distribuição de lucros (que é isenta).
+                                É o salário do sócio. Sobre ele incide INSS (11%) para aposentadoria. É diferente da distribuição de lucros (que é isenta).
                             </p>
                             
                             <div className="bg-white text-[#002855] rounded-xl p-5 shadow-lg">
-                                <h4 className="font-bold text-sm mb-3 border-b border-slate-100 pb-2">Exemplo (Salário Mínimo) [cite: 145]</h4>
+                                <h4 className="font-bold text-sm mb-3 border-b border-slate-100 pb-2">Exemplo (Salário Mínimo)</h4>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Valor Bruto:</span>
-                                        <span className="font-semibold">R$ 1.518,00</span>
+                                        <span className="font-semibold">R$ 1.412,00</span>
                                     </div>
                                     <div className="flex justify-between text-red-500">
                                         <span>INSS (11%):</span>
-                                        <span>- R$ 166,98</span>
+                                        <span>- R$ 155,32</span>
                                     </div>
                                     <div className="flex justify-between font-bold text-lg pt-2 border-t border-slate-100 mt-2">
                                         <span>Líquido:</span>
-                                        <span className="text-green-600">R$ 1.351,02</span>
+                                        <span className="text-green-600">R$ 1.256,68</span>
                                     </div>
                                 </div>
-                                <p className="text-[10px] text-slate-400 mt-3 text-center">*Valores de referência[cite: 145]. O IRRF incide se o valor for maior[cite: 161].</p>
+                                <p className="text-[10px] text-slate-400 mt-3 text-center">*Valores de referência. O IRRF incide se o valor for maior.</p>
                             </div>
                         </div>
                     </div>
@@ -267,9 +232,9 @@ export default function LifeWithCNPJSection() {
                         <div className="flex items-start gap-3">
                             <AlertCircle className="h-6 w-6 text-amber-600 shrink-0 mt-0.5" />
                             <div>
-                                <h4 className="font-bold text-amber-900 mb-1">Atenção: Princípio da Entidade [cite: 314]</h4>
+                                <h4 className="font-bold text-amber-900 mb-1">Atenção: Princípio da Entidade</h4>
                                 <p className="text-amber-800 text-sm leading-relaxed">
-                                    <strong>Nunca misture as contas!</strong> Use a conta PJ exclusivamente para a empresa[cite: 313]. Pagar contas pessoais com dinheiro da empresa gera riscos fiscais (Confusão Patrimonial). Transfira o lucro para sua PF antes de usar.
+                                    <strong>Nunca misture as contas!</strong> Use a conta PJ exclusivamente para a empresa. Pagar contas pessoais com dinheiro da empresa gera riscos fiscais (Confusão Patrimonial). Transfira o lucro para sua PF antes de usar.
                                 </p>
                             </div>
                         </div>
@@ -279,3 +244,4 @@ export default function LifeWithCNPJSection() {
         </div>
     );
 }
+    
