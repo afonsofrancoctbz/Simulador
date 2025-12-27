@@ -359,6 +359,7 @@ export default function FatorRPage() {
                                                                 decimalSeparator=","
                                                                 prefix="R$ "
                                                                 decimalScale={2}
+                                                                fixedDecimalScale={true}
                                                                 value={field.value}
                                                                 onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
                                                                 onFocus={() => inputRef.current?.select()}
@@ -382,6 +383,7 @@ export default function FatorRPage() {
                                                                 decimalSeparator=","
                                                                 prefix="R$ "
                                                                 decimalScale={2}
+                                                                fixedDecimalScale={true}
                                                                 value={field.value}
                                                                 onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
                                                                 onFocus={() => inputRef.current?.select()}
@@ -427,7 +429,7 @@ export default function FatorRPage() {
                                 <AlertTriangle className="h-4 w-4" />
                                 <AlertTitle>Onde encontrar o extrato?</AlertTitle>
                                 <AlertDescription>
-                                    Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" &gt; "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
+                                    Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" > "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
                                 </AlertDescription>
                             </Alert>
                         </CardContent>
@@ -480,4 +482,8 @@ function calcularAliquotaEfetivaAnexoIII(rbt12: number): number {
    if(rbt12 <= 0) return faixas[0].aliquota;
   const faixa = faixas.find(f => rbt12 <= f.ate) || faixas[faixas.length - 1];
   return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
+}
+
+function formatPercent(value: number): string {
+    return new Intl.NumberFormat('pt-BR', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -180,7 +181,7 @@ export function FormSectionAnnualRevenue() {
                                             decimalSeparator=","
                                             prefix="R$ "
                                             decimalScale={2}
-                                            fixedDecimalScale={false} // Match Step 4 logic
+                                            fixedDecimalScale={true}
                                             readOnly
                                             value={field.value}
                                             className="font-bold text-base bg-background/50"
@@ -200,7 +201,7 @@ export function FormSectionAnnualRevenue() {
                                             decimalSeparator=","
                                             prefix="R$ "
                                             decimalScale={2}
-                                            fixedDecimalScale={false} // Match Step 4 logic
+                                            fixedDecimalScale={true}
                                             readOnly
                                             value={field.value}
                                             className="font-bold text-base bg-background/50"
@@ -233,7 +234,7 @@ export function FormSectionAnnualRevenue() {
                                                     decimalSeparator=","
                                                     prefix="R$ "
                                                     decimalScale={2}
-                                                    fixedDecimalScale={false}
+                                                    fixedDecimalScale={true}
                                                     allowNegative={false}
                                                     inputMode="decimal"
                                                     placeholder="R$ 0,00"
@@ -252,7 +253,7 @@ export function FormSectionAnnualRevenue() {
                                                     decimalSeparator=","
                                                     prefix="R$ "
                                                     decimalScale={2}
-                                                    fixedDecimalScale={false}
+                                                    fixedDecimalScale={true}
                                                     allowNegative={false}
                                                     inputMode="decimal"
                                                     placeholder="R$ 0,00"
@@ -296,7 +297,7 @@ export function FormSectionAnnualRevenue() {
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Onde encontrar o extrato?</AlertTitle>
                             <AlertDescription>
-                                Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" &gt; "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
+                                Faça login no portal do Simples Nacional, vá para "PGDAS-D e DEFIS" {'>'} "Consulta de Declaração" e baixe o "Extrato" em PDF do período desejado.
                             </AlertDescription>
                         </Alert>
                     </TabsContent>
@@ -316,3 +317,4 @@ export function FormSectionAnnualRevenue() {
         </Card>
     );
 }
+    
