@@ -323,15 +323,15 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             decimalSeparator=","
                                             prefix="R$ "
                                             decimalScale={2}
-                                            fixedDecimalScale={false}
+                                            fixedDecimalScale={true}
                                             allowNegative={false}
                                             inputMode="decimal"
-                                            placeholder="R$ 10.000,00"
-                                            value={totalDomesticRevenue}
+                                            placeholder="R$ 0,00"
+                                            value={totalDomesticRevenue === 0 ? "" : totalDomesticRevenue}
                                             onValueChange={(values) => {
-                                                handleRevenueChange(values.floatValue, 'domestic');
+                                                handleRevenueChange(values.floatValue ?? 0, 'domestic');
                                             }}
-                                            onFocus={() => domesticRevenueInputRef.current?.select()}
+                                            onFocus={(e) => e.target.select()}
                                         />
                                     </FormControl>
                                 </FormItem>
@@ -362,15 +362,15 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             decimalSeparator=","
                                             prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '}
                                             decimalScale={2}
-                                            fixedDecimalScale={false}
+                                            fixedDecimalScale={true}
                                             allowNegative={false}
                                             inputMode="decimal"
                                             placeholder="0,00"
-                                            value={totalExportRevenue}
+                                            value={totalExportRevenue === 0 ? "" : totalExportRevenue}
                                             onValueChange={(values) => {
-                                                handleRevenueChange(values.floatValue, 'export');
+                                                handleRevenueChange(values.floatValue ?? 0, 'export');
                                             }}
-                                            onFocus={() => exportRevenueInputRef.current?.select()}
+                                            onFocus={(e) => e.target.select()}
                                         />
                                     </FormControl>
                                     {form.watch('exportCurrency') !== 'BRL' && (
@@ -490,3 +490,4 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
+    
