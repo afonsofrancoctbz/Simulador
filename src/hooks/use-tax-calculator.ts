@@ -112,38 +112,44 @@ export function useTaxCalculator(year: number) {
 
 
     useEffect(() => {
-        async function fetchExchangeRate() {
-            const normalizedCurrency = String(debouncedCurrency || '').trim().toUpperCase();
+        const fetchBCBRate = async (date: Date): Promise<number | null> => {
+            const currency = debouncedCurrency;
+            if (!currency || currency === 'BRL') {
+                return 1;
+            }
 
-            if (!normalizedCurrency || normalizedCurrency === 'BRL') {
+            const formattedDate = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;
+            const url = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='${currency}'&@dataCotacao='${formattedDate}'&$top=1&$format=json`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) return null;
+                const data = await response.json();
+                const rate = data?.value?.[0]?.cotacaoCompra;
+                return rate ?? null;
+            } catch (error) {
+                console.error('BCB API fetch failed for date:', formattedDate, error);
+                return null;
+            }
+        };
+
+        const getRate = async () => {
+            if (!debouncedCurrency || debouncedCurrency === 'BRL') {
                 setValue('exchangeRate', 1);
                 return;
             }
 
-            try {
-                const response = await fetch(
-                    `https://api.frankfurter.app/latest?from=${normalizedCurrency}&to=BRL`
-                );
-
-                if (!response.ok) {
-                    throw new Error('External exchange rate API failed');
-                }
-
-                const data = await response.json();
-                const rate = data?.rates?.BRL;
-
-                if (rate) {
-                    setValue('exchangeRate', rate);
-                } else {
-                    setValue('exchangeRate', 1);
-                }
-            } catch (error) {
-                console.error('Failed to fetch exchange rate:', error);
-                setValue('exchangeRate', 1); // fallback seguro
+            let rate = await fetchBCBRate(new Date());
+            if (rate === null) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                rate = await fetchBCBRate(yesterday);
             }
-        }
 
-        fetchExchangeRate();
+            setValue('exchangeRate', rate ?? 1); // Fallback to 1 if all attempts fail
+        };
+
+        getRate();
     }, [debouncedCurrency, setValue]);
 
 
