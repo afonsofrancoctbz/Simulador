@@ -252,7 +252,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 title = 'Lucro Presumido';
                 subtitle = scenario.regime.replace('Lucro Presumido', '').trim() || '(Regras da Reforma)';
             } else if (scenario.regime.includes('Otimizado')) {
-                subtitle = '(Anexo III c/ Fator R)';
+                subtitle = '(Anexo III)';
             } else if (scenario.annex) {
                 subtitle = `(${scenario.annex})`;
             }
@@ -449,3 +449,5 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
+
+    
