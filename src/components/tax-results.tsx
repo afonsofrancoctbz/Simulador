@@ -245,24 +245,23 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / scenario.totalRevenue : 0;
 
             // Formatação do Título do Card
-            let title = scenario.regime.replace(/ \(.+\)/, ''); 
-            let subtitle = scenario.regime.match(/\((.+)\)/)?.[1] || '';
+            let title = "Simples Nacional";
+            let subtitle = "";
+
+            if (scenario.regime.includes('Lucro Presumido')) {
+                title = 'Lucro Presumido';
+                subtitle = scenario.regime.replace('Lucro Presumido', '').trim() || '(Regras da Reforma)';
+            } else if (scenario.regime.includes('Otimizado')) {
+                subtitle = '(Anexo III c/ Fator R)';
+            } else if (scenario.annex) {
+                subtitle = `(${scenario.annex})`;
+            }
 
             if (year >= 2026) {
-                if(scenario.regime.includes('Lucro Presumido')) {
-                  title = 'Lucro Presumido';
-                  subtitle = scenario.regime.replace('Lucro Presumido', '').trim();
-                } else if (scenario.regime.includes('Simples Nacional')) {
-                  title = 'Simples Nacional';
-                  subtitle = scenario.regime.replace('Simples Nacional', '').trim();
-                }
-            } else { 
-                if (scenario.regime === 'Simples Nacional (Otimizado)') {
-                    title = 'Simples Nacional';
-                    subtitle = 'Com Fator R Otimizado (Anexo III)';
-                } else if (scenario.regime === 'Simples Nacional') {
-                      title = 'Simples Nacional';
-                      subtitle = `Padrão (${scenario.annex || 'Anexo V'})`;
+                if (scenario.regime.includes('Híbrido')) {
+                  subtitle += ' Híbrido';
+                } else if (scenario.regime.includes('Tradicional')) {
+                  subtitle += ' Tradicional';
                 }
             }
             
