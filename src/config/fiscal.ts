@@ -1,3 +1,4 @@
+
 import { FiscalConfig, SimplesBracket, FiscalTransitionTable } from "@/lib/types"; // Ajuste o caminho conforme seu projeto
 
 // --- CONSTANTES ---
@@ -120,7 +121,6 @@ const FISCAL_CONFIG_2026: FiscalConfig = {
   teto_inss: 8537.55,
   
   simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)),
-  tabela_irrf: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.tabela_irrf)),
   
   tabela_inss_clt_progressiva: [
       { min: 0, max: 1631.00, rate: 0.075, deduction: 0 },
@@ -136,11 +136,11 @@ const FISCAL_CONFIG_2026: FiscalConfig = {
       pis_cofins_multiplier: 1,
       iss_icms_multiplier: 1,
       tabela_irrf: [
-          { min: 0, max: 5000.00, rate: 0, deduction: 0 },
-          { min: 5000.01, max: 5500.00, rate: 0.075, deduction: 375 },
-          { min: 5500.01, max: 6000.00, rate: 0.15, deduction: 787.5 },
-          { min: 6000.01, max: 6500.00, rate: 0.225, deduction: 1237.5 },
-          { min: 6500.01, max: Infinity, rate: 0.275, deduction: 1562.5 },
+          { min: 0, max: 2428.80, rate: 0, deduction: 0 },
+          { min: 2428.81, max: 2826.65, rate: 0.075, deduction: 182.16 },
+          { min: 2826.66, max: 3751.05, rate: 0.15, deduction: 394.16 },
+          { min: 3751.06, max: 4664.68, rate: 0.225, deduction: 675.49 },
+          { min: 4664.69, max: Infinity, rate: 0.275, deduction: 908.73 },
       ]
   }
 };
@@ -221,3 +221,4 @@ export function getFiscalParametersPostReform(year: number): FiscalConfig {
 
   return newConfig;
 }
+

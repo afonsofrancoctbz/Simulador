@@ -92,62 +92,72 @@ function calculatePartnerTaxes(
   let totalIRRFRetido = 0;
 
   const inssTable = fiscalConfig?.tabela_inss_clt_progressiva;
-  
-  // FIX: Use the standard IRRF table for calculations, not the simplified reform one.
-  const irrfTable = fiscalConfig?.tabela_irrf;
+  const irrfTable = fiscalConfig?.reforma_tributaria?.tabela_irrf;
 
   if (!inssTable || !irrfTable) {
     throw new Error("Tabelas de impostos (INSS/IRRF) não encontradas na configuração fiscal.");
   }
+  
+  // 2026 Reform Constants
+  const SIMPLIFIED_DISCOUNT_VALUE = 607.20;
+  const REDUCTION_LIMIT_LOW = 5000.00;
+  const REDUCTION_LIMIT_HIGH = 7350.00;
+  const REDUCTION_BASE = 978.62;
+  const REDUCTION_FACTOR = 0.133145;
+
 
   for (const proLabore of proLabores) {
     const grossIncome = proLabore.value || 0;
     if (grossIncome <= 0) continue;
 
     // 1. Calculate INSS
-    let inssBase = grossIncome;
+    let inssValue = 0;
     if (proLabore.hasOtherInssContribution) {
       const otherContribution = proLabore.otherContributionSalary || 0;
       const remainingSpace = Math.max(0, fiscalConfig.teto_inss - otherContribution);
-      inssBase = Math.min(grossIncome, remainingSpace);
+      const inssBase = Math.min(grossIncome, remainingSpace);
+      if (inssBase > 0) {
+          inssValue = inssBase * fiscalConfig.aliquota_inss_prolabore;
+      }
     } else {
-      inssBase = Math.min(grossIncome, fiscalConfig.teto_inss);
+        const inssBase = Math.min(grossIncome, fiscalConfig.teto_inss);
+        inssValue = inssBase * fiscalConfig.aliquota_inss_prolabore;
     }
-    
-    let inssValue = inssBase > 0 ? inssBase * fiscalConfig.aliquota_inss_prolabore : 0;
     const maxContribution = fiscalConfig.teto_inss * fiscalConfig.aliquota_inss_prolabore;
     inssValue = Math.min(inssValue, maxContribution);
 
-    // 2. Calculate Standard IRRF Tax (using the standard progressive table)
-    // The "simplified discount" for 2026 is higher than the INSS contribution for many, so we use it.
-    const irrfSimplifiedDiscount = 607.20; 
-    const irrfDeduction = Math.max(inssValue, irrfSimplifiedDiscount);
-    const irrfBase = grossIncome - irrfDeduction;
-    let standardIrrfValue = 0;
+    // Step A: Determine the Best Deduction
+    const effectiveDeduction = Math.max(inssValue, SIMPLIFIED_DISCOUNT_VALUE);
 
-    const irrfBracket = safeFindBracket(irrfBase, irrfTable, { 
-      who: 'PartnerTaxes.Standard', 
-      year: fiscalConfig.ano_vigencia 
-    });
+    // Step B: Calculate the Tax Base
+    const irrfBase = grossIncome - effectiveDeduction;
     
-    if (irrfBracket && irrfBracket.rate > 0) {
-      standardIrrfValue = irrfBase * irrfBracket.rate - irrfBracket.deduction;
+    // Step C: Calculate Standard Tax ("Full" Tax)
+    let standardTax = 0;
+    if (irrfBase > 0) {
+      const irrfBracket = safeFindBracket(irrfBase, irrfTable, { 
+        who: 'PartnerTaxes.Standard', 
+        year: fiscalConfig.ano_vigencia 
+      });
+      if (irrfBracket && irrfBracket.rate > 0) {
+        standardTax = (irrfBase * irrfBracket.rate) - irrfBracket.deduction;
+      }
     }
-    
-    // 3. Calculate the Reduction ("Redutor") based on Gross Income
-    let reduction = 0;
-    if (grossIncome <= 5000) {
-      // Case A: Full reduction
-      reduction = standardIrrfValue;
-    } else if (grossIncome > 5000 && grossIncome <= 7350) {
-      // Case B: Proportional reduction
-      const reductionValue = 978.62 - (0.133145 * grossIncome);
-      reduction = Math.max(0, reductionValue);
-    }
-    // Case C (Gross > 7350): Reduction remains 0
+    standardTax = Math.max(0, standardTax);
 
-    // 4. Calculate Final Tax
-    const finalIrrfValue = Math.max(0, standardIrrfValue - reduction);
+    // Step D: Calculate the Law 15.270 Reduction ("Redutor")
+    let reductionValue = 0;
+    if (grossIncome <= REDUCTION_LIMIT_LOW) {
+      reductionValue = standardTax;
+    } else if (grossIncome > REDUCTION_LIMIT_LOW && grossIncome <= REDUCTION_LIMIT_HIGH) {
+      const calculatedReduction = REDUCTION_BASE - (REDUCTION_FACTOR * grossIncome);
+      reductionValue = Math.max(0, calculatedReduction);
+    } else { // grossIncome > REDUCTION_LIMIT_HIGH
+      reductionValue = 0;
+    }
+
+    // Step E: Final Result
+    const finalIrrfValue = Math.max(0, standardTax - reductionValue);
 
     totalINSSRetido += inssValue;
     totalIRRFRetido += finalIrrfValue;
@@ -649,3 +659,4 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     
 
     
+
