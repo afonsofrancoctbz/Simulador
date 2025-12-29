@@ -254,7 +254,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             } else if (isOtimizado) {
                 subtitle = "Anexo III (Fator R)";
             } else if (scenario.annex) {
-                subtitle = `${scenario.annex.replace('Anexo ', 'Anexo ')} (Padrão)`;
+                subtitle = `Anexo V (Padrão)`;
             }
 
             if (year >= 2026) {
