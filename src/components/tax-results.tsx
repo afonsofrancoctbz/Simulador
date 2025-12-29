@@ -251,17 +251,17 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             if (scenario.regime.includes('Lucro Presumido')) {
                 title = 'Lucro Presumido';
                 subtitle = scenario.regime.replace('Lucro Presumido', '').trim() || '(Regras da Reforma)';
-            } else if (scenario.regime.includes('Otimizado')) {
-                subtitle = '(Anexo III)';
+            } else if (isOtimizado) {
+                subtitle = "Anexo III (Fator R)";
             } else if (scenario.annex) {
-                subtitle = `(${scenario.annex})`;
+                subtitle = `${scenario.annex.replace('Anexo ', 'Anexo ')} (Padrão)`;
             }
 
             if (year >= 2026) {
                 if (scenario.regime.includes('Híbrido')) {
-                  subtitle += ' Híbrido';
+                    subtitle = `${subtitle.replace(' (Padrão)', '').replace(' (Fator R)', '')} Híbrido`;
                 } else if (scenario.regime.includes('Tradicional')) {
-                  subtitle += ' Tradicional';
+                    subtitle = `${subtitle.replace(' (Padrão)', '').replace(' (Fator R)', '')} Tradicional`;
                 }
             }
             
@@ -449,5 +449,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
+
+    
 
     
