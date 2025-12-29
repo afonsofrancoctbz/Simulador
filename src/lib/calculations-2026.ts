@@ -92,57 +92,71 @@ function calculatePartnerTaxes(
   let totalIRRFRetido = 0;
 
   const inssTable = fiscalConfig?.tabela_inss_clt_progressiva;
-  // Fallback logic for IRRF table based on reform status
-  const irrfTable = fiscalConfig?.reforma_tributaria?.tabela_irrf?.length
-    ? fiscalConfig.reforma_tributaria.tabela_irrf
-    : fiscalConfig?.tabela_irrf;
+  
+  // FIX: Use the standard IRRF table for calculations, not the simplified reform one.
+  const irrfTable = fiscalConfig?.tabela_irrf;
 
   if (!inssTable || !irrfTable) {
     throw new Error("Tabelas de impostos (INSS/IRRF) não encontradas na configuração fiscal.");
   }
 
   for (const proLabore of proLabores) {
-    const value = proLabore.value || 0;
-    if (value <= 0) continue;
+    const grossIncome = proLabore.value || 0;
+    if (grossIncome <= 0) continue;
 
     // 1. Calculate INSS
-    let inssBase = value;
+    let inssBase = grossIncome;
     if (proLabore.hasOtherInssContribution) {
       const otherContribution = proLabore.otherContributionSalary || 0;
       const remainingSpace = Math.max(0, fiscalConfig.teto_inss - otherContribution);
-      inssBase = Math.min(value, remainingSpace);
+      inssBase = Math.min(grossIncome, remainingSpace);
     } else {
-      inssBase = Math.min(value, fiscalConfig.teto_inss);
+      inssBase = Math.min(grossIncome, fiscalConfig.teto_inss);
     }
     
-    // Ensure we don't exceed the absolute cap calculation
     let inssValue = inssBase > 0 ? inssBase * fiscalConfig.aliquota_inss_prolabore : 0;
-    // Safety cap check against the max possible contribution
     const maxContribution = fiscalConfig.teto_inss * fiscalConfig.aliquota_inss_prolabore;
     inssValue = Math.min(inssValue, maxContribution);
 
-    // 2. Calculate IRRF
-    const irrfDeduction = fiscalConfig.deducao_simplificada_irrf ?? 0;
-    const irrfBase = value - inssValue - irrfDeduction;
-    let irrfValue = 0;
+    // 2. Calculate Standard IRRF Tax (using the standard progressive table)
+    // The "simplified discount" for 2026 is higher than the INSS contribution for many, so we use it.
+    const irrfSimplifiedDiscount = 607.20; 
+    const irrfDeduction = Math.max(inssValue, irrfSimplifiedDiscount);
+    const irrfBase = grossIncome - irrfDeduction;
+    let standardIrrfValue = 0;
 
     const irrfBracket = safeFindBracket(irrfBase, irrfTable, { 
-      who: 'PartnerTaxes', 
+      who: 'PartnerTaxes.Standard', 
       year: fiscalConfig.ano_vigencia 
     });
     
     if (irrfBracket && irrfBracket.rate > 0) {
-      irrfValue = irrfBase * irrfBracket.rate - irrfBracket.deduction;
+      standardIrrfValue = irrfBase * irrfBracket.rate - irrfBracket.deduction;
     }
+    
+    // 3. Calculate the Reduction ("Redutor") based on Gross Income
+    let reduction = 0;
+    if (grossIncome <= 5000) {
+      // Case A: Full reduction
+      reduction = standardIrrfValue;
+    } else if (grossIncome > 5000 && grossIncome <= 7350) {
+      // Case B: Proportional reduction
+      const reductionValue = 978.62 - (0.133145 * grossIncome);
+      reduction = Math.max(0, reductionValue);
+    }
+    // Case C (Gross > 7350): Reduction remains 0
+
+    // 4. Calculate Final Tax
+    const finalIrrfValue = Math.max(0, standardIrrfValue - reduction);
 
     totalINSSRetido += inssValue;
-    totalIRRFRetido += irrfValue;
+    totalIRRFRetido += finalIrrfValue;
 
     partnerTaxes.push({
-      proLaboreBruto: value,
+      proLaboreBruto: grossIncome,
       inss: inssValue,
-      irrf: irrfValue,
-      proLaboreLiquido: value - inssValue - irrfValue,
+      irrf: finalIrrfValue,
+      proLaboreLiquido: grossIncome - inssValue - finalIrrfValue,
     });
   }
 
@@ -376,7 +390,7 @@ function _calculateSimples2026(
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRev * 12;
   let totalDas = 0;
   let cppAnnexIV = 0;
-  let finalAnnex: Annex = "I";
+  let finalAnnex: Annex = "I"; // Default, will be overwritten
   
   // Combine activities for processing
   const processableActivities = [
