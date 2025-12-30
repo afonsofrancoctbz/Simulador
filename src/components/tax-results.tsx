@@ -449,7 +449,3 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
-
-    
-
-    

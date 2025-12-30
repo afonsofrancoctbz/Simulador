@@ -78,12 +78,38 @@ export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     { itemLC116: '01.05', descriptionLC116: 'Licenciamento', nationalCode: '000000', cnae: '6203100', nbs: '1.1103.29.00', nbsDescription: 'Licenciamento de direitos sobre programas de computador', cClassTrib: '000_PADRAO' },
 
     // CNAE 6204000 (Consultoria TI) - Atenção: Contém itens com 60%
-    { itemLC116: '01.01', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto e desenvolvimento de aplicativos e programas', cClassTrib: '000_PADRAO' },
-    { itemLC116: '01.06', descriptionLC116: 'Gerenciamento TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.10.00', nbsDescription: 'Serviços de gerenciamento de redes em tecnologia da informação', cClassTrib: '000_PADRAO' },
-    { itemLC116: '01.06', descriptionLC116: 'Gerenciamento TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.20.00', nbsDescription: 'Serviços de gerenciamento de sistemas computacionais', cClassTrib: '000_PADRAO' },
-    { itemLC116: '01.01', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.90.05', nbsDescription: 'Serviços de TI especializados', cClassTrib: '060_SAUDE' }, // REDUÇÃO 60%
-    { itemLC116: '01.06', descriptionLC116: 'Gerenciamento TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.90.00', nbsDescription: 'Serviços de gerenciamento n.e.', cClassTrib: '000_PADRAO' },
-    { itemLC116: '01.01', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1510.00.00', nbsDescription: 'Outros serviços de TI', cClassTrib: '060_SAUDE' }, // REDUÇÃO 60%
+
+    // --- 01.01 - Análise e Desenvolvimento de Sistemas ---
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos não personalizados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.20.00', nbsDescription: 'Serviços de projeto, desenvolvimento e instalação de aplicativos personalizados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.40.00', nbsDescription: 'Serviços de projeto e desenvolvimento de bancos de dados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.50.00', nbsDescription: 'Serviços de integração de sistemas em TI', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1503.00.00', nbsDescription: 'Serviços de projeto e desenvolvimento de redes em TI', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1504.00.00', nbsDescription: 'Serviços de projeto e desenvolvimento de topografias de circuitos', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1505.00.00', nbsDescription: 'Serviços de projeto de circuitos integrados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.10.00', nbsDescription: 'Serviços de gerenciamento de redes em TI', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.20.00', nbsDescription: 'Serviços de gerenciamento de sistemas computacionais', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.01', descriptionLC116: 'Análise de Sistemas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.90.00', nbsDescription: 'Serviços de segurança cibernética (Sócio BR)', cClassTrib: '060_SAUDE' }, // REDUÇÃO 60%
+
+    // --- 01.02 - Programação ---
+    { itemLC116: '01.02', descriptionLC116: 'Programação', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto e instalação de aplicativos não personalizados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.02', descriptionLC116: 'Programação', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.20.00', nbsDescription: 'Serviços de projeto e instalação de aplicativos personalizados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.02', descriptionLC116: 'Programação', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.90.05', nbsDescription: 'Serviços de segurança cibernética n.e (Sócio BR)', cClassTrib: '060_SAUDE' }, // REDUÇÃO 60%
+
+    // --- 01.04 - Elaboração de Programas de Computadores ---
+    { itemLC116: '01.04', descriptionLC116: 'Elaboração de Programas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.10.00', nbsDescription: 'Serviços de projeto e instalação de aplicativos não personalizados', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.04', descriptionLC116: 'Elaboração de Programas', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.90.00', nbsDescription: 'Serviços de segurança cibernética (Sócio BR)', cClassTrib: '060_SAUDE' }, // REDUÇÃO 60%
+
+    // --- 01.06 - Assessoria e Consultoria em Informática ---
+    { itemLC116: '01.06', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1501.10.00', nbsDescription: 'Serviços de consultoria em tecnologia da informação (TI)', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.06', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1501.20.00', nbsDescription: 'Serviços de segurança em tecnologia da informação (TI)', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.06', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.10.00', nbsDescription: 'Serviços de gerenciamento de redes em TI', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.06', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.20.00', nbsDescription: 'Serviços de gerenciamento de sistemas computacionais', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.06', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1507.90.00', nbsDescription: 'Serviços de gerenciamento de infraestrutura TI n.e.', cClassTrib: '000_PADRAO' },
+    { itemLC116: '01.06', descriptionLC116: 'Consultoria TI', nationalCode: '000000', cnae: '6204000', nbs: '1.1510.00.00', nbsDescription: 'Serviços de TI (Soberania/Adm Pública)', cClassTrib: '060_SAUDE' }, // REDUÇÃO 60%
+
+    // --- 01.08 - Planejamento e Manutenção de Páginas Eletrônicas ---
+    { itemLC116: '01.08', descriptionLC116: 'Web Design', nationalCode: '000000', cnae: '6204000', nbs: '1.1502.30.00', nbsDescription: 'Serviços de projeto e desenvolvimento de páginas eletrônicas', cClassTrib: '000_PADRAO' },
 
     { itemLC116: '01.05', descriptionLC116: 'Licenciamento', nationalCode: '000000', cnae: '6311900', nbs: '1.1103.23.00', nbsDescription: 'Licenciamento de direitos sobre bancos de dados', cClassTrib: '000_PADRAO' },
     { itemLC116: '01.05', descriptionLC116: 'Licenciamento', nationalCode: '000000', cnae: '6311900', nbs: '1.1103.29.00', nbsDescription: 'Licenciamento de direitos sobre programas de computador', cClassTrib: '000_PADRAO' },
@@ -324,10 +350,20 @@ export const CNAE_LC116_RELATIONSHIP: CnaeRelationship2026[] = [
     // ENGENHARIA, CONSULTORIA, PESQUISA
     // ==========================================
     // CNAE 7020400 (Consultoria)
-    { itemLC116: '17.06', descriptionLC116: 'Assessoria', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.31.00', nbsDescription: 'Serviços de assessoria de imprensa', cClassTrib: '000_PADRAO' },
-    { itemLC116: '17.06', descriptionLC116: 'Assessoria', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.31.00', nbsDescription: 'Serviços de assessoria de imprensa (Regime 60%)', cClassTrib: '060_SAUDE' },
-    { itemLC116: '17.06', descriptionLC116: 'Relações Públicas', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.32.00', nbsDescription: 'Serviços de relações públicas', cClassTrib: '030_INTEL' },
-    { itemLC116: '17.06', descriptionLC116: 'Relações Públicas', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.32.00', nbsDescription: 'Serviços de relações públicas (Regime 60%)', cClassTrib: '060_SAUDE' },
+    { itemLC116: '17.06', descriptionLC116: 'Assessoria', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.31.00', nbsDescription: '-Serviços de assessoria de imprensa', cClassTrib: '000_PADRAO' },
+    { itemLC116: '17.06', descriptionLC116: 'Assessoria', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.31.01', nbsDescription: 'Serviços de assessoria de imprensa (Regime 60%)', cClassTrib: '060_SAUDE' },
+    { itemLC116: '17.06', descriptionLC116: 'Relações Públicas', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.32.00', nbsDescription: '-Serviços de relações públicas', cClassTrib: '030_INTEL' },
+    { itemLC116: '17.06', descriptionLC116: 'Relações Públicas', nationalCode: '000000', cnae: '7020400', nbs: '1.1401.32.01', nbsDescription: 'Serviços de relações públicas (Regime 60%)', cClassTrib: '060_SAUDE' },
+
+    // CNAE 7111100 (Arquitetura)
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.11.00', nbsDescription: 'Serviços de consultoria em arquitetura', cClassTrib: '030_INTEL' },
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.12.00', nbsDescription: 'Serviços de arquitetura para projetos de construções residenciais', cClassTrib: '030_INTEL' },
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.13.00', nbsDescription: 'Serviços de arquitetura para projetos de construções não residenciais', cClassTrib: '030_INTEL' },
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.14.00', nbsDescription: 'Serviços de arquitetura para restauração de prédios históricos', cClassTrib: '030_INTEL' },
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.21.00', nbsDescription: 'Serviços de planejamento urbano', cClassTrib: '030_INTEL' },
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.22.00', nbsDescription: 'Serviços de planejamento de áreas rurais', cClassTrib: '030_INTEL' },
+    { itemLC116: '07.01', descriptionLC116: 'Arquitetura', nationalCode: '070104', cnae: '7111100', nbs: '1.1402.90.00', nbsDescription: 'Serviços de arquitetura, de planejamento urbano e de áreas rurais e de paisagismo não classificados em subposições anteriores', cClassTrib: '030_INTEL' },
+
 
     // CNAE 7112000 (Engenharia)
     { itemLC116: '07.01', descriptionLC116: 'Engenharia', nationalCode: '000000', cnae: '7112000', nbs: '1.1403.27.00', nbsDescription: 'Serviços de engenharia para projetos de distribuição de água e rede de esgoto', cClassTrib: '030_INTEL' },
