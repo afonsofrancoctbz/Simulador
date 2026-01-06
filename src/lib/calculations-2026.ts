@@ -599,36 +599,38 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const lpFuture = calculateLucroPresumido2026(values, false);
   const lpCurrent = calculateLucroPresumido2026(values, true); // For comparison
 
-  let simplesTrad = null;
-  let simplesHyb = null;
-  let simplesOpt = null;
-  let simplesOptHyb = null;
+  let simplesTrad: TaxDetails2026 | null = null;
+  let simplesHyb: TaxDetails2026 | null = null;
+  let simplesOpt: TaxDetails2026 | null = null;
+  let simplesOptHyb: TaxDetails2026 | null = null;
+
+  const hasFatorRActivity = selectedCnaes.some(c => getCnaeData(c.code)?.requiresFatorR);
 
   if (selectedCnaes.length > 0) {
-    // A. Traditional Simples
+    // A. Traditional Simples (Base Calculation)
     simplesTrad = _calculateSimples2026(values, false, currentFatorR);
 
-    // B. Hybrid Simples (Only 2027+)
+    // B. Hybrid Simples (Only for 2027 and beyond)
     if (year >= 2027) {
       simplesHyb = _calculateSimples2026(values, true, currentFatorR);
     }
-
-    // C. Optimized Simples (if Annex V involved)
-    const hasAnnexV = selectedCnaes.some(c => getCnaeData(c.code)?.requiresFatorR);
     
-    if (hasAnnexV && totalRev > 0) {
+    // C. Optimized Scenarios (Only if a Fator R activity is present and optimization is possible)
+    if (hasFatorRActivity) {
       const optimization = findOptimizedProLabore(values, currentFatorR, effectiveRbt12, effectiveFp12, config);
       
       if (optimization) {
         const valuesOpt = { ...values, proLabores: optimization.proLabores };
+        // Optimized Traditional
         simplesOpt = _calculateSimples2026(valuesOpt, false, optimization.factor, optimization.proLabores);
-
+        // Optimized Hybrid (2027+)
         if (year >= 2027) {
           simplesOptHyb = _calculateSimples2026(valuesOpt, true, optimization.factor, optimization.proLabores);
         }
       }
     }
   }
+
 
   // 3. Normalization & Ordering
   const normalize = (res: TaxDetails2026 | null, order: number) => {
@@ -655,8 +657,3 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: normalize(simplesOptHyb, 1.5),
   };
 }
-
-    
-
-    
-

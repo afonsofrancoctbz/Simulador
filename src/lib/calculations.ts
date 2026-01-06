@@ -253,7 +253,7 @@ export function calculateSimplesNacional(
   const totalMonthlyCost = totalTax + Number(contabilizeiFee || 0);
 
   const regimeName = optimizationNote
-    ? "Simples Nacional (Otimizado)"
+    ? "Simples Nacional (Fator R Otimizado)"
     : "Simples Nacional";
 
   const notes = [];
@@ -466,7 +466,8 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
     values,
     config,
     fatorR,
-    'V' // Força o cálculo como Anexo V para o cenário base
+    fatorR >= (config.simples_nacional.limite_fator_r ?? 0.28) ? 'III' : 'V',
+    null
   );
 
   let simplesNacionalOtimizado: TaxDetails | null = null;
@@ -510,14 +511,6 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
         note
       );
     }
-  } else if (fatorR >= limiteFatorR) {
-      // Se já está no Anexo III, o 'base' já é o otimizado. Não precisa de um segundo card.
-      const simplesAnexoIII = calculateSimplesNacional(values, config, fatorR, 'III');
-      return {
-          simplesNacionalOtimizado: null,
-          simplesNacionalBase: normalizeScenario(simplesAnexoIII) as TaxDetails,
-          lucroPresumido: normalizeScenario(lucroPresumido) as TaxDetails,
-      };
   }
 
   return {
