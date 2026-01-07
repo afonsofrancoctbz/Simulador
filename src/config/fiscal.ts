@@ -2,17 +2,42 @@
 import { FiscalConfig, SimplesBracket, FiscalTransitionTable } from "@/lib/types"; // Ajuste o caminho conforme seu projeto
 
 // --- CONSTANTES ---
-const IVA_FULL_RATE = { cbs: 0.09, ibs: 0.18 };
+// AUDITORIA: Alíquotas ajustadas conforme imagem (CBS 8.5% + IBS 18.5% = 27% Total)
+const IVA_FULL_RATE = { cbs: 0.085, ibs: 0.185 }; 
+const IBS_TEST_RATE = 0.001; // 0.1% Fixo na fase de teste
 
 // --- TABELA DE TRANSIÇÃO (EC 132) ---
+// Esta tabela dita o comportamento exato de cada ano até 2033
 const TRANSITION_TABLE: FiscalTransitionTable = {
+  // 2026: Fase de testes apenas (não impacta carga real se compensado)
   2026: { cbs: 0.009, ibs: 0.001, pis_cofins_multiplier: 1, iss_icms_multiplier: 1 },
-  2027: { cbs: IVA_FULL_RATE.cbs, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
-  2028: { cbs: IVA_FULL_RATE.cbs, ibs: 0.001, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
+  
+  // 2027: Extinção PIS/COFINS. CBS Cheia (compensando IBS teste). IBS fixo em 0.1%.
+  // CBS = 8.5% - 0.1% = 8.4%
+  2027: { cbs: IVA_FULL_RATE.cbs - IBS_TEST_RATE, ibs: IBS_TEST_RATE, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
+  
+  // 2028: Repete 2027.
+  // CBS = 8.4% | IBS = 0.1%
+  2028: { cbs: IVA_FULL_RATE.cbs - IBS_TEST_RATE, ibs: IBS_TEST_RATE, pis_cofins_multiplier: 0, iss_icms_multiplier: 1 },
+  
+  // 2029: Início da Escada (10% do IBS). CBS volta ao normal (8.5%).
+  // IBS = 18.5% * 10% = 1.85%
   2029: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.1, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.9 },
+  
+  // 2030: IBS a 20%
+  // IBS = 18.5% * 20% = 3.7%
   2030: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.2, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.8 },
+  
+  // 2031: IBS a 30%
+  // IBS = 18.5% * 30% = 5.55%
   2031: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.3, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.7 },
+  
+  // 2032: IBS a 40%
+  // IBS = 18.5% * 40% = 7.4%
   2032: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs * 0.4, pis_cofins_multiplier: 0, iss_icms_multiplier: 0.6 },
+  
+  // 2033: Vigência Plena
+  // IBS = 18.5% | CBS = 8.5%
   2033: { cbs: IVA_FULL_RATE.cbs, ibs: IVA_FULL_RATE.ibs,       pis_cofins_multiplier: 0, iss_icms_multiplier: 0 },
 };
 
@@ -222,3 +247,5 @@ export function getFiscalParametersPostReform(year: number): FiscalConfig {
   return newConfig;
 }
 
+
+    

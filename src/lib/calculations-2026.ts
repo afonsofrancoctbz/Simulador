@@ -463,36 +463,29 @@ function _calculateSimples2026(
   if (isHybrid && values.year >= 2027) {
     const reformParams = fiscalConfig.reforma_tributaria;
     
-    // START OF FIX 2 & 3:
-    // 1. We calculate liability on 100% of Domestic Revenue (domesticActivities).
-    //    We do NOT apply the B2B factor here. The seller pays tax on everything.
-    // 2. We apply the correct IBS Transition Rates.
-
-    let ibsEffectiveRate = 0;
-    const stdIbs = reformParams.ibs_aliquota_padrao ?? 0;
-
-    if (values.year === 2027 || values.year === 2028) {
-        ibsEffectiveRate = 0.001; // Fixed 0.1% for 2027/2028
-    } else if (values.year === 2029) {
-        ibsEffectiveRate = stdIbs * 0.10; // 10% of full rate
-    } else if (values.year === 2030) {
-        ibsEffectiveRate = stdIbs * 0.20; // 20% of full rate
-    } else if (values.year === 2031) {
-        ibsEffectiveRate = stdIbs * 0.30; // 30% of full rate
-    } else if (values.year === 2032) {
-        ibsEffectiveRate = stdIbs * 0.40; // 40% of full rate
-    } else {
-        ibsEffectiveRate = stdIbs; // 2033+ Full Rate
-    }
+    // AUDITORIA DE CÓDIGO: Lógica Simplificada
+    // Removemos os 'ifs' manuais de ano. Agora usamos as taxas que já vêm 
+    // calculadas corretamente do 'fiscalConfig' (baseado na TRANSITION_TABLE).
     
-    // Calculate CBS on FULL revenue (domesticActivities)
-    const cbsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, reformParams.cbs_aliquota_padrao, 'CBS');
+    // CBS (Federal)
+    // Em 2027/28 virá 8.4%. De 2029 em diante virá 8.5%.
+    const cbsCalc = calculateIvaLiability(
+        domesticActivities, 
+        creditGeneratingExpenses, 
+        reformParams.cbs_aliquota_padrao, 
+        'CBS'
+    );
     
-    // Calculate IBS on FULL revenue using effective transition rate
-    const ibsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, ibsEffectiveRate, 'IBS');
+    // IBS (Subnacional)
+    // Em 2027/28 virá 0.1%. Em 2029 virá 1.85%. Em 2033 virá 18.5%.
+    const ibsCalc = calculateIvaLiability(
+        domesticActivities, 
+        creditGeneratingExpenses, 
+        reformParams.ibs_aliquota_padrao, 
+        'IBS'
+    );
     
     ivaTaxes = cbsCalc.payable + ibsCalc.payable;
-    // END OF FIX 2 & 3
   }
 
   // 5. Costs & Fees
@@ -657,3 +650,6 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
     simplesNacionalOtimizadoHibrido: normalize(simplesOptHyb, 1.5),
   };
 }
+
+
+    
