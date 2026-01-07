@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -254,7 +253,8 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             } else if (isOtimizado) {
                 subtitle = "Anexo III (Fator R)";
             } else if (scenario.annex) {
-                subtitle = `Anexo V (Padrão)`;
+                const annexLabel = scenario.annex.replace('Anexo ', ''); // Remove duplicidade se houver
+                subtitle = `Anexo ${annexLabel} (Padrão)`;
             }
 
             if (year >= 2026) {
@@ -359,7 +359,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                                 <span className={cn('text-primary/90', {
                                      'text-green-900': projectionStatus === 'success',
                                      'text-amber-900': projectionStatus === 'warning' || projectionStatus === 'error',
-                                })} dangerouslySetInnerHTML={{ __html: projectionNote.replace(/\n/g, '<br/>') }}></span>
+                                })} dangerouslySetInnerHTML={{ __html: projectionNote.replace(/\\n/g, '<br/>') }}></span>
                             </AlertDescription>
                         </Alert>
                       )}
