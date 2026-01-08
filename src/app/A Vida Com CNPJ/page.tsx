@@ -70,7 +70,7 @@ export default function LifeWithCNPJSection() {
                         A vida com CNPJ: <span className="text-[#00d3b3]">Sua nova rotina</span>
                     </h2>
                     <p className="text-slate-600 text-lg">
-                        [cite_start]Guia completo para manter sua contabilidade em dia, evitar multas e aproveitar os benefícios da sua empresa[cite: 1, 3].
+                        Guia completo para manter sua contabilidade em dia, evitar multas e aproveitar os benefícios da sua empresa.
                     </p>
                 </div>
 
@@ -86,7 +86,7 @@ export default function LifeWithCNPJSection() {
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shadow-sm border-4 border-white ${idx === 2 ? 'bg-[#002855] text-white' : 'bg-[#00d3b3] text-[#002855]'}`}>
                                     {idx === 2 ? <Briefcase className="h-6 w-6"/> : <CheckCircle2 className="h-6 w-6" />}
                                 </div>
-                                <p className={`font-medium ${idx === 2 ? [cite_start]'text-[#002855] font-bold' : 'text-slate-500'}`}>{step} [cite: 15-18]</p>
+                                <p className={`font-medium ${idx === 2 ? 'text-[#002855] font-bold' : 'text-slate-500'}`}>{step} </p>
                             </div>
                         ))}
                     </div>
@@ -95,7 +95,7 @@ export default function LifeWithCNPJSection() {
 
             {/* --- 2. O QUE VAMOS VER (TÓPICOS) --- */}
             <div>
-                [cite_start]<h3 className="text-2xl font-bold text-[#002855] mb-8">O que vamos ver [cite: 19]</h3>
+                <h3 className="text-2xl font-bold text-[#002855] mb-8">O que vamos ver </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {topics.map((item, idx) => (
                         <Card key={idx} className="border-slate-200 hover:border-[#00d3b3] hover:shadow-md transition-all cursor-default group bg-white">
@@ -114,7 +114,7 @@ export default function LifeWithCNPJSection() {
             <div>
                 <div className="flex items-center gap-3 mb-8">
                     <Calendar className="h-8 w-8 text-[#00d3b3]" />
-                    [cite_start]<h3 className="text-2xl font-bold text-[#002855]">Calendário das Obrigações [cite: 53]</h3>
+                    <h3 className="text-2xl font-bold text-[#002855]">Calendário das Obrigações </h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     {calendarDates.map((item, idx) => (
@@ -128,7 +128,7 @@ export default function LifeWithCNPJSection() {
                         </Card>
                     ))}
                 </div>
-                [cite_start]<p className="mt-4 text-xs text-slate-500">* Datas podem ser antecipadas ou postergadas em caso de fins de semana/feriados[cite: 54].</p>
+                <p className="mt-4 text-xs text-slate-500">* Datas podem ser antecipadas ou postergadas em caso de fins de semana/feriados.</p>
             </div>
 
             {/* --- 4. ROTINAS (TABS) --- */}
@@ -138,8 +138,8 @@ export default function LifeWithCNPJSection() {
                         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
                             <span className="font-bold text-[#002855] ml-2 flex items-center gap-2"><ListChecks className="h-5 w-5"/> Visualize suas rotinas:</span>
                             <TabsList className="bg-slate-100">
-                                [cite_start]<TabsTrigger value="mensal" className="data-[state=active]:bg-[#002855] data-[state=active]:text-[#00d3b3]">Mensalmente [cite: 40]</TabsTrigger>
-                                [cite_start]<TabsTrigger value="anual" className="data-[state=active]:bg-[#002855] data-[state=active]:text-[#00d3b3]">Anualmente [cite: 47]</TabsTrigger>
+                                <TabsTrigger value="mensal" className="data-[state=active]:bg-[#002855] data-[state=active]:text-[#00d3b3]">Mensalmente </TabsTrigger>
+                                <TabsTrigger value="anual" className="data-[state=active]:bg-[#002855] data-[state=active]:text-[#00d3b3]">Anualmente </TabsTrigger>
                             </TabsList>
                         </div>
                         
@@ -164,7 +164,7 @@ export default function LifeWithCNPJSection() {
                                         "Extratos de investimentos e aplicações.",
                                         "Contratos de câmbio (para exportadores).",
                                         "Documentos de compra/venda de bens."
-                                    [cite_start]].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600"><FileText className="w-4 h-4 text-[#002855] shrink-0"/>{t} [cite: 285-291]</li>)}
+                                    ].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600"><FileText className="w-4 h-4 text-[#002855] shrink-0"/>{t} </li>)}
                                 </CardContent>
                             </Card>
                         </TabsContent>
@@ -179,7 +179,7 @@ export default function LifeWithCNPJSection() {
                                         "Renovação do Registro em Conselho Profissional.",
                                         "Enquadramento no Simples Nacional (Janeiro).",
                                         "Pagamento da TFF/TFE municipal."
-                                    [cite_start]].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600"><Clock className="w-4 h-4 text-amber-500 shrink-0"/>{t} [cite: 48-52]</li>)}
+                                    ].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600"><Clock className="w-4 h-4 text-amber-500 shrink-0"/>{t} </li>)}
                                 </CardContent>
                             </Card>
                         </TabsContent>
@@ -189,36 +189,36 @@ export default function LifeWithCNPJSection() {
 
             {/* --- 5. EMISSÃO DE NOTAS --- */}
             <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-                [cite_start]<h3 className="text-2xl font-bold text-[#002855] mb-6">Como emitir ou solicitar notas fiscais? [cite: 84]</h3>
+                <h3 className="text-2xl font-bold text-[#002855] mb-6">Como emitir ou solicitar notas fiscais? </h3>
                 <div className="grid md:grid-cols-3 gap-6">
                     <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                         <div className="flex items-center gap-2 mb-3">
                             <MessageCircle className="h-6 w-6 text-green-600"/>
                             <h4 className="font-bold text-green-800">Via WhatsApp</h4>
                         </div>
-                        [cite_start]<p className="text-sm text-green-700">Mande um "Oi", escolha <strong>"1 - Quero emitir nota fiscal"</strong> e envie os dados. [cite: 86]</p>
-                        [cite_start]<p className="mt-2 font-bold text-green-800">(41) 4101-0021 [cite: 4]</p>
+                        <p className="text-sm text-green-700">Mande um "Oi", escolha <strong>"1 - Quero emitir nota fiscal"</strong> e envie os dados. </p>
+                        <p className="mt-2 font-bold text-green-800">(41) 4101-0021 </p>
                     </div>
                     <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
                         <div className="flex items-center gap-2 mb-3">
                             <Mail className="h-6 w-6 text-blue-600"/>
                             <h4 className="font-bold text-blue-800">Via E-mail</h4>
                         </div>
-                        [cite_start]<p className="text-sm text-blue-700">Envie os dados para: <br/><strong className="break-all">atendimento.experts@contabilizei.com.br</strong> [cite: 89]</p>
+                        <p className="text-sm text-blue-700">Envie os dados para: <br/><strong className="break-all">atendimento.experts@contabilizei.com.br</strong> </p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
                         <div className="flex items-center gap-2 mb-3">
                             <Monitor className="h-6 w-6 text-slate-600"/>
                             <h4 className="font-bold text-slate-800">Via Plataforma</h4>
                         </div>
-                        [cite_start]<p className="text-sm text-slate-700">Acesse a plataforma Contabilizei e siga o passo a passo para emissão. [cite: 91]</p>
+                        <p className="text-sm text-slate-700">Acesse a plataforma Contabilizei e siga o passo a passo para emissão. </p>
                     </div>
                 </div>
                 <div className="mt-6 p-4 bg-slate-100 rounded-lg text-xs text-slate-600 flex gap-2 items-start">
                     <AlertCircle className="h-4 w-4 shrink-0 mt-0.5"/>
                     <p>
-                        [cite_start]<strong>Tenha em mãos:</strong> CNPJ/CPF do cliente, Razão Social/Nome, Valor, CNAE e descrição do serviço [cite: 92-97]. <br/>
-                        [cite_start]*No plano Experts Essencial, você tem até 35 notas gratuitas pela assessoria. [cite: 99]
+                        <strong>Tenha em mãos:</strong> CNPJ/CPF do cliente, Razão Social/Nome, Valor, CNAE e descrição do serviço. <br/>
+                        *No plano Experts Essencial, você tem até 35 notas gratuitas pela assessoria. 
                     </p>
                 </div>
             </div>
@@ -229,21 +229,21 @@ export default function LifeWithCNPJSection() {
                     <div>
                         <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
                             <DollarSign className="h-8 w-8 text-[#00d3b3]" />
-                            [cite_start]Entenda o Pró-labore [cite: 138]
+                            Entenda o Pró-labore 
                         </h3>
                         <p className="text-white/90 text-lg leading-relaxed mb-6">
-                            É o salário mensal do sócio. Sobre ele incidem tributos como INSS (11%) e IRRF. [cite_start]É obrigatório para o cálculo correto da previdência e aposentadoria. [cite: 137, 141]
+                            É o salário mensal do sócio. Sobre ele incidem tributos como INSS (11%) e IRRF. É obrigatório para o cálculo correto da previdência e aposentadoria. 
                         </p>
                         <div className="bg-white/10 p-4 rounded-xl border border-white/20">
                             <h4 className="font-bold text-[#00d3b3] mb-2 flex items-center gap-2"><AlertCircle className="h-4 w-4"/> Importante: Duplo Vínculo</h4>
-                            [cite_start]<p className="text-sm text-white/80">Se você já contribui para o INSS (CLT ou outra empresa), envie seu holerite para evitar pagamentos duplicados. [cite: 162]</p>
+                            <p className="text-sm text-white/80">Se você já contribui para o INSS (CLT ou outra empresa), envie seu holerite para evitar pagamentos duplicados. </p>
                         </div>
                     </div>
 
                     <div className="space-y-6">
                         {/* Exemplo 1 - Mínimo */}
                         <div className="bg-white text-[#002855] rounded-xl p-5 shadow-lg">
-                            [cite_start]<h4 className="font-bold text-sm mb-3 border-b border-slate-100 pb-2">Exemplo 1: Salário Mínimo (2025) [cite: 143]</h4>
+                            <h4 className="font-bold text-sm mb-3 border-b border-slate-100 pb-2">Exemplo 1: Salário Mínimo (2025) </h4>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Pró-labore Bruto:</span>
@@ -258,12 +258,12 @@ export default function LifeWithCNPJSection() {
                                     <span className="text-green-700">R$ 1.351,02</span>
                                 </div>
                             </div>
-                            [cite_start]<div className="mt-2 text-xs text-slate-500 text-right">Guia DARF Unificado: R$ 166,98 [cite: 155]</div>
+                            <div className="mt-2 text-xs text-slate-500 text-right">Guia DARF Unificado: R$ 166,98 </div>
                         </div>
 
                         {/* Exemplo 2 - Teto */}
                         <div className="bg-white/5 border border-white/20 text-white rounded-xl p-5">
-                            [cite_start]<h4 className="font-bold text-sm mb-3 border-b border-white/10 pb-2">Exemplo 2: Pelo Teto do INSS [cite: 144]</h4>
+                            <h4 className="font-bold text-sm mb-3 border-b border-white/10 pb-2">Exemplo 2: Pelo Teto do INSS </h4>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="opacity-80">Pró-labore Bruto:</span>
@@ -289,7 +289,7 @@ export default function LifeWithCNPJSection() {
 
             {/* --- 7. CÁLCULO DE IMPOSTOS --- */}
             <div>
-                <h3 className="text-2xl font-bold text-[#002855] mb-6">Como os impostos são calculados? (Simples Nacional) [cite_start][cite: 189]</h3>
+                <h3 className="text-2xl font-bold text-[#002855] mb-6">Como os impostos são calculados? (Simples Nacional) </h3>
                 <div className="grid md:grid-cols-4 gap-4">
                     {[
                         { step: 1, title: "Identificação", text: "Enquadramento no Anexo 3, 4 ou 5." },
@@ -311,7 +311,7 @@ export default function LifeWithCNPJSection() {
                 <div className="grid md:grid-cols-2 gap-6 mt-6">
                     <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
                         <h4 className="font-bold text-[#002855] flex items-center gap-2 mb-2">
-                            [cite_start]<Calculator className="h-5 w-5"/> Fator R (Folha ÷ Faturamento) [cite: 202]
+                            <Calculator className="h-5 w-5"/> Fator R (Folha ÷ Faturamento) 
                         </h4>
                         <ul className="text-sm space-y-1 mt-3">
                             <li className="flex items-center gap-2 mb-2"><span className="w-2 h-2 bg-green-500 rounded-full"></span> <strong>Resultado ≥ 28%:</strong> A empresa vai para o Anexo 3 (Alíquota menor).</li>
@@ -320,7 +320,7 @@ export default function LifeWithCNPJSection() {
                     </div>
                     <div className="bg-amber-50 p-6 rounded-xl border border-amber-100">
                         <h4 className="font-bold text-amber-800 flex items-center gap-2 mb-2">
-                            [cite_start]<AlertCircle className="h-5 w-5"/> Especificidade do Anexo 4 [cite: 199]
+                            <AlertCircle className="h-5 w-5"/> Especificidade do Anexo 4 
                         </h4>
                         <p className="text-sm text-amber-900 leading-relaxed">
                             Empresas do Anexo 4 recolhem o <strong>INSS Patronal (20%) separadamente</strong>, fora da guia DAS. Essa contribuição não está incluída no boleto único do Simples.
@@ -332,19 +332,19 @@ export default function LifeWithCNPJSection() {
             {/* --- 8. SERVIÇOS & EXPORTAÇÃO --- */}
             <div className="grid lg:grid-cols-2 gap-8">
                 <Card>
-                    [cite_start]<CardHeader><CardTitle className="text-[#002855] flex items-center gap-2"><Briefcase className="h-5 w-5"/> Contratação de Serviços [cite: 226]</CardTitle></CardHeader>
+                    <CardHeader><CardTitle className="text-[#002855] flex items-center gap-2"><Briefcase className="h-5 w-5"/> Contratação de Serviços </CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="pj">
                                 <AccordionTrigger className="font-bold text-slate-700">Prestador PJ (CNPJ)</AccordionTrigger>
                                 <AccordionContent className="text-slate-600 text-sm bg-slate-50 p-3 rounded">
-                                    Valor pago = Total da nota - retenções (se houver). Atenção ao regime tributário do fornecedor. [cite_start]Pode haver retenção de IRRF e ISS que sua empresa deve recolher. [cite: 228-232]
+                                    Valor pago = Total da nota - retenções (se houver). Atenção ao regime tributário do fornecedor. Pode haver retenção de IRRF e ISS que sua empresa deve recolher. 
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="rpa">
                                 <AccordionTrigger className="font-bold text-slate-700">Autônomo (RPA - Pessoa Física)</AccordionTrigger>
                                 <AccordionContent className="text-slate-600 text-sm bg-slate-50 p-3 rounded">
-                                    Antes de pagar, deve-se descontar INSS (11%), IRRF e ISS. A empresa pode ter que pagar +20% de INSS Patronal (se Anexo 4). [cite_start]<strong>O RPA é obrigatório.</strong> [cite: 234-237]
+                                    Antes de pagar, deve-se descontar INSS (11%), IRRF e ISS. A empresa pode ter que pagar +20% de INSS Patronal (se Anexo 4). <strong>O RPA é obrigatório.</strong> 
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
@@ -352,27 +352,94 @@ export default function LifeWithCNPJSection() {
                 </Card>
 
                 <Card className="bg-white border-slate-200">
-                    [cite_start]<CardHeader><CardTitle className="text-[#002855] flex items-center gap-2"><Globe className="h-5 w-5 text-[#00d3b3]"/> Exportação de Serviços [cite: 101]</CardTitle></CardHeader>
+                    <CardHeader><CardTitle className="text-[#002855] flex items-center gap-2"><Globe className="h-5 w-5 text-[#00d3b3]"/> Exportação de Serviços </CardTitle></CardHeader>
                     <CardContent className="space-y-3 text-sm">
                         <div className="bg-green-50 text-green-800 p-2 rounded text-center font-semibold">
-                            [cite_start]Benefício: Isenção de PIS, COFINS e ISS [cite: 102]
+                            Benefício: Isenção de PIS, COFINS e ISS 
                         </div>
                         <p className="font-semibold text-[#002855] mt-2">Requisitos Obrigatórios:</p>
                         <ul className="list-disc pl-5 text-slate-600 space-y-1">
-                            [cite_start]<li>Cliente domiciliado no exterior[cite: 104].</li>
-                            [cite_start]<li>Resultado do serviço ocorre fora do Brasil[cite: 105].</li>
-                            [cite_start]<li>Pagamento em moeda estrangeira conversível[cite: 106].</li>
+                            <li>Cliente domiciliado no exterior.</li>
+                            <li>Resultado do serviço ocorre fora do Brasil.</li>
+                            <li>Pagamento em moeda estrangeira conversível.</li>
                         </ul>
-                        <div className="text-xs text-slate-500 mt-4 pt-4 border-t border-slate-100">
-                            <strong>Atenção Contábil:</strong> Necessário apurar variação cambial (Diferença entre valor da Invoice e Recebimento). [cite_start]Positiva = Receita / Negativa = Despesa [cite: 293-301].
-                        </div>
                     </CardContent>
                 </Card>
             </div>
+            
+            {/* INÍCIO: NOVA SEÇÃO - VARIAÇÃO CAMBIAL */}
+            <div className="bg-blue-50/70 border border-blue-100 rounded-2xl p-8 shadow-sm">
+                <h3 className="text-2xl font-bold text-[#002855] mb-6 flex items-center gap-3"><Repeat className="text-blue-600"/> Apuração da Variação Cambial</h3>
+                <p className="text-slate-600 mb-8 max-w-3xl">Para exportadores, é obrigatório registrar a diferença entre o valor da <strong className="text-[#002855]">emissão da Invoice</strong> e o valor do <strong className="text-[#002855]">recebimento efetivo</strong>, decorrente da flutuação da taxa de câmbio.</p>
+
+                {/* Diagrama Visual */}
+                <div className="bg-white p-6 rounded-xl border-dashed border-2 border-blue-200 mb-8">
+                    <h4 className="font-bold text-center text-[#002855] mb-6">Exemplo Prático: Empresa Exportadora de Serviços</h4>
+                    <div className="grid md:grid-cols-3 gap-4 items-center text-center relative mb-8">
+                        {/* Linha de conexão */}
+                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-blue-200 hidden md:block"></div>
+
+                        {/* Etapa 1: Invoice */}
+                        <div className="flex flex-col items-center relative z-10">
+                            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-md text-blue-600 mb-3">
+                                <FileText />
+                            </div>
+                            <div className="bg-blue-50 border-2 border-dashed border-blue-200 p-3 rounded-lg text-sm">
+                                <p className="font-bold">Invoice Emitida</p>
+                                <p>Data: 30/08/2025</p>
+                                <p>Valor: US$ 10.000,00</p>
+                                <p>Câmbio: R$ 5,00</p>
+                            </div>
+                        </div>
+                        {/* Etapa 2: Câmbio */}
+                        <div className="flex flex-col items-center relative z-10">
+                           <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-md text-blue-600 mb-3">
+                                <Repeat />
+                            </div>
+                             <div className="bg-blue-50 border-2 border-dashed border-blue-200 p-3 rounded-lg text-sm">
+                                <p className="font-bold">Recebimento</p>
+                                <p>Data: 15/09/2025</p>
+                                <p>Valor: US$ 10.000,00</p>
+                                <p>Câmbio: R$ 5,20</p>
+                            </div>
+                        </div>
+                        {/* Etapa 3: Resultado */}
+                        <div className="flex flex-col items-center relative z-10">
+                           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center border-4 border-white shadow-md text-green-600 mb-3">
+                                <TrendingUp />
+                            </div>
+                           <div className="bg-green-50 border-2 border-dashed border-green-200 p-3 rounded-lg text-sm text-left">
+                                <p>Nota fiscal: <span className="font-mono">R$ 50.000,00</span></p>
+                                <p>Recebimento: <span className="font-mono">R$ 52.000,00</span></p>
+                                <hr className="my-1 border-green-200"/>
+                                <p className="font-bold text-green-700">Variação Positiva: <span className="font-mono">R$ 2.000,00</span></p>
+                            </div>
+                        </div>
+                    </div>
+                     <p className="text-center text-xs font-semibold text-slate-500 bg-slate-100 p-2 rounded-md">Essas informações garantem que a contabilidade seja registrada de forma correta e transparente.</p>
+                </div>
+                
+                {/* Implicações Fiscais */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-white p-6 rounded-xl border shadow-sm">
+                        <h4 className="font-bold text-blue-800 mb-3">Lucro Presumido</h4>
+                        <ul className="space-y-2 text-sm text-slate-600">
+                            <li className="flex gap-2 items-start"><span className="text-green-500 mt-1">▲</span> <strong>Variação Positiva:</strong> É considerada receita financeira e deve ser somada à base de cálculo dos impostos (IRPJ, CSLL, PIS, COFINS).</li>
+                            <li className="flex gap-2 items-start"><span className="text-red-500 mt-1">▼</span> <strong>Variação Negativa:</strong> É registrada como despesa financeira, mas não reduz o valor dos impostos a pagar.</li>
+                        </ul>
+                    </div>
+                    <div className="bg-white p-6 rounded-xl border shadow-sm">
+                        <h4 className="font-bold text-green-800 mb-3">Simples Nacional</h4>
+                        <p className="text-sm text-slate-600">No Simples Nacional, a variação cambial (positiva ou negativa) deve ser registrada na contabilidade, mas **não entra na base de cálculo do imposto (DAS)**. É um controle financeiro, não tributário.</p>
+                    </div>
+                </div>
+            </div>
+            {/* FIM: NOVA SEÇÃO */}
+
 
             {/* --- 9. FLUXO FINANCEIRO --- */}
             <div className="space-y-6">
-                [cite_start]<h3 className="text-2xl font-bold text-[#002855]">Fluxo Financeiro Ideal [cite: 164]</h3>
+                <h3 className="text-2xl font-bold text-[#002855]">Fluxo Financeiro Ideal </h3>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                     {financialSteps.map((step, i) => (
                         <div key={i} className="flex items-center gap-2 bg-white border rounded-lg p-3 shadow-sm min-w-[200px] hover:border-[#00d3b3] transition-colors">
@@ -390,9 +457,9 @@ export default function LifeWithCNPJSection() {
                     <div className="flex items-start gap-3">
                         <AlertCircle className="h-6 w-6 text-amber-600 shrink-0 mt-0.5" />
                         <div>
-                            [cite_start]<h4 className="font-bold text-amber-900 mb-1">Princípio da Entidade (Não misture as contas!) [cite: 313]</h4>
+                            <h4 className="font-bold text-amber-900 mb-1">Princípio da Entidade (Não misture as contas!) </h4>
                             <p className="text-amber-800 text-sm leading-relaxed">
-                                Use a conta PJ exclusivamente para movimentações da empresa. Receber na conta PF ou pagar contas pessoais pela PJ gera "Confusão Patrimonial" e riscos fiscais. [cite_start]Transfira o lucro para sua PF antes de gastar. [cite: 314]
+                                Use a conta PJ exclusivamente para movimentações da empresa. Receber na conta PF ou pagar contas pessoais pela PJ gera "Confusão Patrimonial" e riscos fiscais. Transfira o lucro para sua PF antes de gastar. 
                             </p>
                         </div>
                     </div>
@@ -407,14 +474,14 @@ export default function LifeWithCNPJSection() {
                     </h3>
                     <p className="text-white/80">Evite multas e atrasos. A conta PJ integrada com a contabilidade.</p>
                     <ul className="space-y-2 text-sm">
-                        [cite_start]<li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#00d3b3]"/> Débito automático de impostos[cite: 256].</li>
-                        [cite_start]<li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#00d3b3]"/> Extratos integrados (sem envio manual)[cite: 254].</li>
-                        [cite_start]<li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#00d3b3]"/> Recebimento do exterior (FX)[cite: 258].</li>
+                        <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#00d3b3]"/> Débito automático de impostos.</li>
+                        <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#00d3b3]"/> Extratos integrados (sem envio manual).</li>
+                        <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#00d3b3]"/> Recebimento do exterior (FX).</li>
                     </ul>
                 </div>
                 <div className="bg-white/10 p-6 rounded-xl border border-white/20 md:w-1/3">
                     <p className="text-sm font-bold text-[#00d3b3] mb-2">Dica de Ouro</p>
-                    [cite_start]<p className="text-xs text-white">Ative o débito automático da sua mensalidade e impostos diretamente no App para garantir que sua empresa esteja sempre em dia[cite: 271].</p>
+                    <p className="text-xs text-white">Ative o débito automático da sua mensalidade e impostos diretamente no App para garantir que sua empresa esteja sempre em dia.</p>
                 </div>
             </div>
 
