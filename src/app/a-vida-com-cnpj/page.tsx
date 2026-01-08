@@ -203,7 +203,7 @@ export default function LifeWithCNPJSection() {
                                     <MessageCircle className="h-6 w-6 text-green-600"/>
                                     <h4 className="font-bold text-green-800">Via WhatsApp</h4>
                                 </div>
-                                <p className="text-sm text-green-700">Mande um "Oi", escolha <strong>"1 - Quero emitir nota fiscal"</strong> e envie os dados. </p>
+                                <p className="text-sm text-green-700">Mande um "Oi", escolha <strong>"Contabilidade - Quero emitir nota fiscal"</strong> e envie os dados. </p>
                                 <p className="mt-2 font-bold text-green-800">(41) 4101-0021 </p>
                             </div>
                             <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
@@ -250,43 +250,43 @@ export default function LifeWithCNPJSection() {
                             <div className="space-y-6">
                                 {/* Exemplo 1 - Mínimo */}
                                 <div className="bg-white text-[#002855] rounded-xl p-5 shadow-lg">
-                                    <h4 className="font-bold text-sm mb-3 border-b border-slate-100 pb-2">Exemplo 1: Salário Mínimo (2025) </h4>
+                                    <h4 className="font-bold text-sm mb-3 border-b border-slate-100 pb-2">Exemplo 1: Salário Mínimo (2026) </h4>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-slate-500">Pró-labore Bruto:</span>
-                                            <span className="font-bold">R$ 1.518,00</span>
+                                            <span className="font-bold">R$ 1.621,00</span>
                                         </div>
                                         <div className="flex justify-between text-red-600">
                                             <span>INSS (11%):</span>
-                                            <span>- R$ 166,98</span>
+                                            <span>- R$ 178,31</span>
                                         </div>
                                         <div className="flex justify-between font-bold text-lg pt-2 border-t border-slate-100 bg-green-50 p-2 rounded">
                                             <span>Líquido a receber:</span>
-                                            <span className="text-green-700">R$ 1.351,02</span>
+                                            <span className="text-green-700">R$ 1.442,69</span>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-xs text-slate-500 text-right">Guia DARF Unificado: R$ 166,98 </div>
+                                    <div className="mt-2 text-xs text-slate-500 text-right">Guia DARF Unificado: R$ 178,31 </div>
                                 </div>
 
                                 {/* Exemplo 2 - Teto */}
                                 <div className="bg-white/5 border border-white/20 text-white rounded-xl p-5">
-                                    <h4 className="font-bold text-sm mb-3 border-b border-white/10 pb-2">Exemplo 2: Pelo Teto do INSS </h4>
+                                    <h4 className="font-bold text-sm mb-3 border-b border-white/10 pb-2">Exemplo 2: Pelo Teto do INSS (2026)</h4>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="opacity-80">Pró-labore Bruto:</span>
-                                            <span className="font-bold">R$ 8.157,41</span>
+                                            <span className="font-bold">R$ 8.565,28</span>
                                         </div>
                                         <div className="flex justify-between text-[#00d3b3]">
                                             <span>INSS (11% Teto):</span>
-                                            <span>- R$ 897,32</span>
+                                            <span>- R$ 942,18</span>
                                         </div>
                                         <div className="flex justify-between text-[#00d3b3]">
                                             <span>IRRF:</span>
-                                            <span>- R$ 1.087,80</span>
+                                            <span>- R$ 1.157,69</span>
                                         </div>
                                         <div className="flex justify-between font-bold text-lg pt-2 border-t border-white/10 mt-2">
                                             <span>Líquido a receber:</span>
-                                            <span>R$ 6.172,29</span>
+                                            <span>R$ 6.465,41</span>
                                         </div>
                                     </div>
                                 </div>
@@ -498,4 +498,3 @@ export default function LifeWithCNPJSection() {
         </>
     );
 }
-
