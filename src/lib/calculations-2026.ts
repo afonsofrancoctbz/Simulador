@@ -558,8 +558,13 @@ function findOptimizedProLabore(
   const missingMonthly = missingAnnual / 12;
   const newProLabores: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores || []));
 
+  // NOVA LÓGICA: Distribuição Igualitária do Aumento
   if (newProLabores.length > 0) {
-    newProLabores[0].value += missingMonthly;
+    const increasePerPartner = missingMonthly / newProLabores.length;
+    
+    newProLabores.forEach(partner => {
+        partner.value += increasePerPartner;
+    });
   } else {
     newProLabores.push({
       value: missingMonthly,

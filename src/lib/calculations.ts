@@ -484,13 +484,20 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
       const proLaboresOtimizado: ProLaboreForm[] = JSON.parse(
         JSON.stringify(proLabores)
       );
-      const additionalMonthlyProLabore = additionalAnnualPayrollNeeded / 12;
-
+      
+      const additionalMonthlyTotal = additionalAnnualPayrollNeeded / 12;
+      
+      // NOVA LÓGICA: Divisão Igualitária
       if (proLaboresOtimizado.length > 0) {
-        proLaboresOtimizado[0].value += additionalMonthlyProLabore;
+          const increasePerPartner = additionalMonthlyTotal / proLaboresOtimizado.length;
+          
+          proLaboresOtimizado.forEach(partner => {
+              partner.value += increasePerPartner;
+          });
       } else {
+        // Fallback caso não haja sócios (raro), cria um fictício
         proLaboresOtimizado.push({
-          value: additionalMonthlyProLabore,
+          value: additionalMonthlyTotal,
           hasOtherInssContribution: false,
           otherContributionSalary: 0,
         });
