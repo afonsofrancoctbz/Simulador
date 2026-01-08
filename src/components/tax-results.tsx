@@ -11,13 +11,12 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
 import type { FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
-import type { AnaliseCompleta, DadosMensais } from '@/lib/fator-r-migration-logic';
-import { gerarAnaliseCompleta } from '@/lib/fator-r-migration-logic';
-import { format } from 'date-fns';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 // Importação da tabela atualizada
 import { ComparisonTable }  from './comparison-table';
 import { YearSelector } from './year-selector';
+
+
 
 interface TaxResultsProps {
   year: number;
@@ -113,37 +112,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     return scenariosToShow.find(s => s.regime === selectedScenarioId.regime && (s.optimizationNote ?? null) === selectedScenarioId.optimizationNote) ?? null;
   }, [selectedScenarioId, scenariosToShow]);
 
-  // Lógica de Análise de Fator R (apenas para Simples Nacional)
-  const fatorRAnalysisData: AnaliseCompleta | null = useMemo(() => {
-    if (!results || !('simplesNacionalBase' in results) || !results.simplesNacionalBase || results.simplesNacionalOtimizado) {
-        return null;
-    }
-
-    const { rbt12, fp12 } = formValues;
-
-    if (!rbt12 || rbt12 <= 0) return null;
-    
-    const dadosMensais: DadosMensais[] = formValues.monthlyData && formValues.monthlyData.length === 12
-      ? formValues.monthlyData
-      : Array.from({ length: 12 }, (_, i) => {
-          const date = new Date();
-          date.setMonth(date.getMonth() - (11 - i));
-          return {
-              mes: format(date, 'MM/yyyy'),
-              receita: rbt12 / 12,
-              folha: fp12 / 12
-          };
-      });
-    
-    try {
-        const analysis = gerarAnaliseCompleta(dadosMensais, 4);
-        if(analysis.jaOtimizado) return null;
-        return analysis;
-    } catch (e) {
-        return null;
-    }
-  }, [results, formValues]);
-
 
   if (isLoading) {
     return (
@@ -221,9 +189,11 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
         )}
 
         {/* --- QUADRO COMPARATIVO ESTRATÉGICO --- */}
-        {/* Passamos o 'currentYear' para que a tabela saiba qual ano está sendo mostrado nos títulos */}
         <div className="max-w-7xl mx-auto px-1 sm:px-4 mb-16">
-          <ComparisonTable scenarios={scenariosToShow} currentYear={year} />
+          {year >= 2026 && <ComparisonTable 
+            currentYear={year} 
+            formValues={formValues} 
+          />}
         </div>
 
         {/* --- CARDS DE DETALHES (Grid) --- */}
@@ -241,7 +211,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
 
             const groupedTaxes = groupTaxes(scenario);
-            const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / scenario.totalRevenue : 0;
+            const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / totalRevenue : 0;
 
             // Formatação do Título do Card
             let title = "Simples Nacional";
@@ -419,20 +389,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
         </div>
       </div>
       
-      {fatorRAnalysisData && (
-        <div className="mt-12 border-t pt-8 animate-in slide-in-from-bottom-4">
-              <div className="text-center mb-8">
-                <span className="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">
-                    OPORTUNIDADE IDENTIFICADA
-                </span>
-                <h2 className="text-2xl font-bold text-foreground mt-4">
-                    Plano de Redução Tributária Inteligente
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto mt-2">Sua empresa pode economizar migrando do Anexo V para o Anexo III. Veja abaixo o plano de ação e a projeção de resultados.</p>
-            </div>
-        </div>
-      )}
-
       {selectedDetails && (
         <>
             <Separator className="my-16 separator-print" />
@@ -449,3 +405,5 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
+
+    

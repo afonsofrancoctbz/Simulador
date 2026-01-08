@@ -1,201 +1,215 @@
+"use client";
 
-import React from 'react';
-import { TaxDetails } from '@/lib/types';
+import React, { useMemo, useState, useEffect } from 'react';
+import { TaxDetails, TaxFormValues } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { TrendingUp, Trophy, AlertCircle } from 'lucide-react';
+import { TrendingUp, Trophy, AlertCircle, CalendarRange, ArrowRight } from 'lucide-react';
+import { calculateTaxes2026 } from '@/lib/calculations-2026';
 
 interface ComparisonTableProps {
-  scenarios: TaxDetails[];
   currentYear: number;
+  formValues: TaxFormValues;
 }
 
-export function ComparisonTable({ scenarios, currentYear }: ComparisonTableProps) {
-  if (!scenarios || scenarios.length === 0) return null;
+interface ColumnData {
+  year: number;
+  type: 'SN' | 'LP'; // Simples Nacional ou Lucro Presumido
+  label: string;
+  details: TaxDetails;
+  isBestOfYear: boolean;
+  isCurrentYear: boolean;
+}
 
-  // 1. FILTRAGEM ESTRATÉGICA
-  const visibleScenarios = scenarios.filter(s => {
-    // Remove regra redundante do LP
-    if (s.regime === 'Lucro Presumido (Regras Atuais)') return false;
-    // Remove "Simples Nacional" genérico se não tiver estratégia definida
-    if (s.regime === 'Simples Nacional' && scenarios.some(o => o.regime.includes('Otimizado'))) return false;
-    return true;
-  });
+export function ComparisonTable({ currentYear, formValues }: ComparisonTableProps) {
+  const [columns, setColumns] = useState<ColumnData[]>([]);
 
-  // 2. ORDENAÇÃO PERSONALIZADA
-  const sortOrder = [
-    'Otimizado', // 1º
-    'Tradicional', // 2º
-    'Híbrido', // 3º
-    'Lucro Presumido' // 4º
-  ];
+  useEffect(() => {
+    if (!formValues || !formValues.year || currentYear < 2026) {
+        setColumns([]);
+        return;
+    };
 
-  const sortedScenarios = [...visibleScenarios].sort((a, b) => {
-    const indexA = sortOrder.findIndex(key => a.regime.includes(key));
-    const indexB = sortOrder.findIndex(key => b.regime.includes(key));
-    return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
-  });
+    // Define os 3 anos: Atual, +1, +2 (Limitado a 2033)
+    const yearsToProject = [currentYear, currentYear + 1, currentYear + 2].filter(y => y <= 2033);
+    const newColumns: ColumnData[] = [];
 
-  // Encontra o vencedor (Menor Custo) para destacar
-  const bestScenario = [...sortedScenarios].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
+    yearsToProject.forEach(year => {
+      const yearValues = { ...formValues, year };
+      const results = calculateTaxes2026(yearValues); // Roda o motor para o ano específico
+      
+      if (!results || !results.lucroPresumido) return;
 
-  // 3. TÍTULOS DINÂMICOS (CORREÇÃO DO ANO)
-  const getCustomTitle = (regime: string) => {
-    // Simples Otimizado geralmente é a base de comparação (Regras Atuais/Fator R)
-    if (regime.includes('Otimizado') || regime.includes('Fator R')) {
-        return 'Simples Nacional (Fator R Otimizado)';
-    }
+      // 1. Encontra o MELHOR Simples Nacional deste ano (Menor Imposto Puro)
+      const simplesOptions = [
+        results.simplesNacionalTradicional,
+        results.simplesNacionalHibrido,
+        results.simplesNacionalOtimizado,
+        results.simplesNacionalOtimizadoHibrido
+      ].filter((s): s is NonNullable<typeof s> => s !== null);
 
-    // Para os demais, usamos o currentYear dinamicamente para evitar o erro "2027/28" em 2033
-    const yearLabel = currentYear >= 2027 ? currentYear : '2027/28'; // Fallback ou ano exato
+      // Ordena pelo totalTax (Carga Tributária) para pegar o mais barato
+      const bestSimples = simplesOptions.sort((a, b) => a.totalTax - b.totalTax)[0];
+      const lucroPresumido = results.lucroPresumido;
 
-    if (regime.includes('Tradicional')) return `Simples Nacional Tradicional ${currentYear}`;
-    if (regime.includes('Híbrido')) return `Simples Nacional Híbrido ${currentYear}`;
-    if (regime.includes('Lucro Presumido')) return `Lucro Presumido ${currentYear}`;
-    
-    return regime;
-  };
+      if (!bestSimples) return;
 
-  // Configuração do Grid: 1 coluna fixa (200px) + Colunas dinâmicas iguais
-  const gridStyle = {
-    gridTemplateColumns: `200px repeat(${sortedScenarios.length}, minmax(0, 1fr))`
-  };
+      // Define quem ganha neste ano
+      const winner = bestSimples.totalTax < lucroPresumido.totalTax ? 'SN' : 'LP';
+
+      // Formata nome curto do Simples
+      let simplesName = 'Simples Nac.';
+      if (bestSimples.regime.includes('Otimizado')) simplesName = 'SN (Fator R)';
+      else if (bestSimples.regime.includes('Híbrido')) simplesName = 'SN (Híbrido)';
+      else if (bestSimples.regime.includes('Tradicional')) simplesName = 'SN (Tradicional)';
+
+      // Adiciona Coluna Simples
+      newColumns.push({
+        year,
+        type: 'SN',
+        label: simplesName,
+        details: bestSimples,
+        isBestOfYear: winner === 'SN',
+        isCurrentYear: year === currentYear
+      });
+
+      // Adiciona Coluna Lucro Presumido
+      newColumns.push({
+        year,
+        type: 'LP',
+        label: 'Lucro Presumido',
+        details: lucroPresumido,
+        isBestOfYear: winner === 'LP',
+        isCurrentYear: year === currentYear
+      });
+    });
+
+    setColumns(newColumns);
+  }, [formValues, currentYear]);
+
+  if (columns.length === 0) return null;
+
+  // Configuração do Grid: 1 Coluna fixa (Rótulos) + N Colunas de dados
+  // Ex: 200px + 6 colunas iguais
+  const gridStyle = { gridTemplateColumns: `200px repeat(${columns.length}, minmax(0, 1fr))` };
+  
+  // Agrupamento para o Header de Anos (Super Header)
+  // Cada ano ocupa 2 colunas no grid
+  const yearsHeader = Array.from(new Set(columns.map(c => c.year)));
 
   return (
     <div className="w-full space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
       
-      {/* Cabeçalho da Seção */}
+      {/* Título da Seção */}
       <div className="text-center space-y-2 mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 uppercase tracking-wide">
            <TrendingUp className="w-3 h-3" />
-           Quadro Comparativo
+           Análise Progressiva
         </div>
-        <h3 className="text-2xl font-bold text-slate-900">Resultado da Simulação</h3>
+        <h3 className="text-2xl font-bold text-slate-900">Evolução: {yearsHeader[0]} a {yearsHeader[yearsHeader.length - 1]}</h3>
         <p className="text-slate-500 text-sm max-w-2xl mx-auto">
-            Compare o cenário atual com as projeções para o ano de <strong>{currentYear}</strong>.
+            Comparativo ano a ano entre a melhor opção do Simples Nacional e o Lucro Presumido.
         </p>
       </div>
 
-      <div className="overflow-x-auto pb-6 px-1">
-        <div className="min-w-[900px] bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden ring-1 ring-slate-900/5">
+      <div className="overflow-x-auto pb-4 px-1">
+        <div className="min-w-[1000px] bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden ring-1 ring-slate-900/5">
           
-          {/* --- CABEÇALHO DA TABELA --- */}
-          <div className="grid divide-x divide-slate-100 border-b border-slate-200 bg-slate-50/50" style={gridStyle}>
-            {/* Célula Vazia do Canto */}
-            <div className="p-4 flex items-center justify-center font-bold text-xs text-slate-400 uppercase tracking-widest bg-slate-50">
-               Indicadores
-            </div>
-
-            {/* Colunas dos Cenários */}
-            {sortedScenarios.map((scenario, idx) => {
-              const isBest = bestScenario && scenario.regime === bestScenario.regime;
-              const title = getCustomTitle(scenario.regime);
-
-              return (
-                <div key={idx} className={cn(
-                  "relative flex flex-col items-center justify-start pt-6 pb-4 px-2 text-center group transition-colors",
-                  isBest ? "bg-blue-600" : "bg-white hover:bg-slate-50"
+          {/* --- SUPER HEADER (ANOS) --- */}
+          <div className="grid divide-x divide-slate-200 border-b border-slate-200 bg-slate-100/80" 
+               style={{ gridTemplateColumns: `200px repeat(${yearsHeader.length}, 1fr)` }}>
+             <div className="p-3 flex items-center justify-center font-bold text-xs text-slate-400 uppercase tracking-widest">
+                Ano Base
+             </div>
+             {yearsHeader.map(year => (
+                <div key={year} className={cn(
+                    "p-2 text-center font-bold text-lg flex items-center justify-center gap-2",
+                    year === currentYear ? "text-blue-700 bg-blue-50/50" : "text-slate-600"
                 )}>
-                  {/* Badge de Melhor Opção */}
-                  <div className="h-6 mb-2 w-full flex justify-center items-center">
-                    {isBest && (
-                        <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide shadow-sm border border-white/20">
-                            <Trophy className="w-3 h-3 text-yellow-300" />
-                            Melhor Opção
-                        </span>
-                    )}
-                  </div>
-
-                  <span className={cn(
-                    "font-bold text-sm leading-snug max-w-[160px]",
-                    isBest ? "text-white" : "text-slate-700"
-                  )}>
-                    {title}
-                  </span>
+                    <CalendarRange className="w-4 h-4 opacity-50" /> {year}
                 </div>
-              );
-            })}
+             ))}
           </div>
 
-          {/* --- LINHAS DE DADOS --- */}
+          {/* --- HEADER (REGIMES) --- */}
+          <div className="grid divide-x divide-slate-100 border-b border-slate-200 bg-slate-50/30" style={gridStyle}>
+            <div className="p-3 flex items-center justify-center font-bold text-xs text-slate-400 uppercase tracking-widest">
+               Indicadores
+            </div>
+            {columns.map((col, idx) => (
+              <div key={idx} className={cn(
+                  "relative flex flex-col items-center justify-start pt-4 pb-3 px-1 text-center group transition-colors",
+                  col.isBestOfYear ? (col.isCurrentYear ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-900") : "bg-white text-slate-500"
+              )}>
+                {col.isBestOfYear && (
+                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                        <Trophy className="w-2.5 h-2.5" /> VENCEDOR
+                     </div>
+                )}
+                <span className={cn("font-bold text-xs leading-snug", col.isBestOfYear && col.isCurrentYear ? "text-white" : "text-slate-700")}>
+                  {col.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* --- DADOS --- */}
           <div className="divide-y divide-slate-100 text-sm">
             
             {/* Linha 1: Faturamento */}
-            <div className="grid divide-x divide-slate-100 hover:bg-slate-50/50 transition-colors" style={gridStyle}>
-              <div className="p-4 flex items-center justify-start pl-6 text-slate-600 font-semibold bg-slate-50/30">
-                Faturamento Mensal
+            <div className="grid divide-x divide-slate-100 hover:bg-slate-50/30 transition-colors" style={gridStyle}>
+              <div className="p-3 flex items-center justify-start pl-6 text-slate-600 font-semibold bg-slate-50/30 text-xs uppercase tracking-wide">
+                Faturamento
               </div>
-              {sortedScenarios.map((scenario, idx) => (
-                <div key={idx} className="p-4 flex items-center justify-center font-medium text-slate-700">
-                  {formatCurrencyBRL(scenario.totalRevenue)}
+              {columns.map((col, idx) => (
+                <div key={idx} className="p-3 flex items-center justify-center font-medium text-slate-600">
+                  {formatCurrencyBRL(col.details.totalRevenue)}
                 </div>
               ))}
             </div>
 
-            {/* Linha 2: Imposto Total */}
-            <div className="grid divide-x divide-slate-100 hover:bg-slate-50/50 transition-colors" style={gridStyle}>
-              <div className="p-4 flex flex-col justify-center pl-6 bg-slate-50/30">
-                <span className="text-slate-600 font-semibold">Imposto Total</span>
-                <span className="text-[10px] text-slate-400">DAS + Folha + Outros</span>
+            {/* Linha 2: Imposto Total (SEM MENSALIDADE) */}
+            <div className="grid divide-x divide-slate-100 hover:bg-slate-50/30 transition-colors" style={gridStyle}>
+              <div className="p-3 flex flex-col justify-center pl-6 bg-slate-50/30">
+                <span className="text-slate-700 font-bold text-xs uppercase tracking-wide">Imposto Total</span>
+                <span className="text-[9px] text-slate-400 font-normal">Só Tributos</span>
               </div>
-              {sortedScenarios.map((scenario, idx) => {
-                 const isBest = bestScenario && scenario.regime === bestScenario.regime;
+              {columns.map((col, idx) => (
+                <div key={idx} className={cn("p-3 flex items-center justify-center font-bold", col.isBestOfYear ? "text-red-600 bg-red-50/10" : "text-slate-400")}>
+                    {formatCurrencyBRL(col.details.totalTax)}
+                </div>
+              ))}
+            </div>
+
+            {/* Linha 3: Carga Real */}
+            <div className="grid divide-x divide-slate-100 hover:bg-slate-50/30 transition-colors" style={gridStyle}>
+               <div className="p-3 flex items-center justify-start pl-6 text-slate-600 font-semibold bg-slate-50/30 text-xs uppercase tracking-wide">
+                Alíquota Real
+              </div>
+              {columns.map((col, idx) => {
+                 const rate = col.details.totalRevenue > 0 ? col.details.totalTax / col.details.totalRevenue : 0;
                  return (
-                    <div key={idx} className={cn(
-                        "p-4 flex items-center justify-center font-bold",
-                        isBest ? "text-red-100 bg-blue-600/5" : "text-slate-700"
-                    )}>
-                        <span className={cn(isBest ? "text-red-600" : "text-slate-700")}>
-                            {formatCurrencyBRL(scenario.totalMonthlyCost)}
-                        </span>
+                    <div key={idx} className={cn("p-3 flex items-center justify-center font-medium", col.isBestOfYear ? "text-blue-700" : "text-slate-400")}>
+                        {formatPercent(rate)}
                     </div>
                  )
               })}
             </div>
 
-            {/* Linha 3: Alíquota Efetiva */}
-            <div className="grid divide-x divide-slate-100 hover:bg-slate-50/50 transition-colors" style={gridStyle}>
-               <div className="p-4 flex items-center justify-start pl-6 text-slate-600 font-semibold bg-slate-50/30">
-                Alíquota Efetiva
-              </div>
-              {sortedScenarios.map((scenario, idx) => {
-                 const effectiveRate = scenario.totalRevenue > 0 ? (scenario.totalMonthlyCost / scenario.totalRevenue) : 0;
-                 const isBest = bestScenario && scenario.regime === bestScenario.regime;
-                 return (
-                    <div key={idx} className={cn(
-                        "p-4 flex items-center justify-center font-medium",
-                        isBest ? "text-blue-700 bg-blue-50/30 font-bold" : "text-slate-600"
-                    )}>
-                        {formatPercent(effectiveRate)}
-                    </div>
-                 )
-              })}
-            </div>
-
-            {/* Linha 4: RECEITA LÍQUIDA */}
+            {/* Linha 4: Receita Líquida */}
             <div className="grid divide-x divide-slate-100 bg-white" style={gridStyle}>
-               <div className="p-5 flex flex-col justify-center pl-6 border-t border-slate-200 bg-white">
-                <span className="text-slate-800 font-bold text-base">Receita Líquida</span>
-                <span className="text-[10px] text-slate-400">Disponível em caixa</span>
+               <div className="p-4 flex flex-col justify-center pl-6 border-t border-slate-200 bg-white">
+                <span className="text-slate-800 font-bold text-xs uppercase tracking-wide">Receita Líquida</span>
+                <span className="text-[9px] text-slate-400 font-normal">Em Caixa</span>
               </div>
-              {sortedScenarios.map((scenario, idx) => {
-                 const netIncome = scenario.totalRevenue - scenario.totalMonthlyCost;
-                 const isBest = bestScenario && scenario.regime === bestScenario.regime;
-
+              {columns.map((col, idx) => {
+                 // Receita Líquida = Faturamento - Imposto - Mensalidade
+                 const net = col.details.totalRevenue - col.details.totalMonthlyCost;
                  return (
-                    <div key={idx} className={cn(
-                        "p-5 flex flex-col items-center justify-center border-t relative transition-all",
-                        isBest ? "bg-blue-50 border-blue-200" : "border-slate-200 bg-white"
-                    )}>
-                         {isBest && <div className="absolute inset-x-0 top-0 h-[2px] bg-blue-500"></div>}
-                        
-                         <span className={cn(
-                            "text-lg font-extrabold tracking-tight",
-                            isBest ? "text-green-600" : "text-slate-500"
-                         )}>
-                            {formatCurrencyBRL(netIncome)}
+                    <div key={idx} className={cn("p-4 flex flex-col items-center justify-center border-t relative", col.isBestOfYear ? "bg-green-50/30" : "bg-white")}>
+                         {col.isBestOfYear && <div className="absolute inset-x-0 top-0 h-[2px] bg-green-500"></div>}
+                         <span className={cn("text-sm font-extrabold tracking-tight", col.isBestOfYear ? "text-green-700" : "text-slate-400")}>
+                            {formatCurrencyBRL(net)}
                          </span>
-                         
-                         {/* REMOVIDO: A palavra "Vencedor" foi retirada conforme solicitado */}
                     </div>
                  )
               })}
@@ -203,13 +217,13 @@ export function ComparisonTable({ scenarios, currentYear }: ComparisonTableProps
 
           </div>
         </div>
-        
-        {/* Legenda Rodapé */}
+
         <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
-            <AlertCircle className="w-3 h-3" />
-            <span>Valores estimados com base nas regras de transição vigentes no ano selecionado.</span>
+            <ArrowRight className="w-3 h-3" />
+            <span>A tabela exibe automaticamente o <strong>Melhor Cenário do Simples Nacional</strong> contra o <strong>Lucro Presumido</strong> para cada ano.</span>
         </div>
       </div>
     </div>
   );
 }
+    
