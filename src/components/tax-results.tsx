@@ -12,7 +12,6 @@ import { PartnerDetailsCard } from './partner-details-card';
 import { ProfitStatementCard } from './profit-statement-card';
 import type { FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-// Importação da tabela atualizada
 import { ComparisonTable }  from './comparison-table';
 import { YearSelector } from './year-selector';
 
@@ -211,7 +210,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
             const projectionStatus = isOtimizado && fatorRProjection ? fatorRProjection.statusMensagem : null;
 
             const groupedTaxes = groupTaxes(scenario);
-            const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / totalRevenue : 0;
+            const effectiveRate = scenario.totalRevenue > 0 ? scenario.totalMonthlyCost / scenario.totalRevenue : 0;
 
             // Formatação do Título do Card
             let title = "Simples Nacional";
@@ -405,5 +404,3 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
     </div>
   );
 };
-
-    
