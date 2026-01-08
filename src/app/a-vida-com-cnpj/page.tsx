@@ -87,7 +87,7 @@ export default function LifeWithCNPJSection() {
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shadow-sm border-4 border-white ${idx === 2 ? 'bg-[#002855] text-white' : 'bg-[#00d3b3] text-[#002855]'}`}>
                                     {idx === 2 ? <Briefcase className="h-6 w-6"/> : <CheckCircle2 className="h-6 w-6" />}
                                 </div>
-                                <p className={`font-medium ${idx === 2 ? [cite_start]'text-[#002855] font-bold' : 'text-slate-500'}`}>{step} [cite: 15-18]</p>
+                                <p className={`font-medium ${idx === 2 ? 'text-[#002855] font-bold' : 'text-slate-500'}`}>[cite_start]{step} [cite: 15-18]</p>
                             </div>
                         ))}
                     </div>
@@ -165,7 +165,7 @@ export default function LifeWithCNPJSection() {
                                         "Extratos de investimentos e aplicações.",
                                         "Contratos de câmbio (para exportadores).",
                                         "Documentos de compra/venda de bens."
-                                    [cite_start]].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600"><FileText className="w-4 h-4 text-[#002855] shrink-0"/>{t} [cite: 285-291]</li>)}
+                                    ].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600">[cite_start]<FileText className="w-4 h-4 text-[#002855] shrink-0"/>{t} [cite: 285-291]</li>)}
                                 </CardContent>
                             </Card>
                         </TabsContent>
@@ -180,7 +180,7 @@ export default function LifeWithCNPJSection() {
                                         "Renovação do Registro em Conselho Profissional.",
                                         "Enquadramento no Simples Nacional (Janeiro).",
                                         "Pagamento da TFF/TFE municipal."
-                                    [cite_start]].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600"><Clock className="w-4 h-4 text-amber-500 shrink-0"/>{t} [cite: 48-52]</li>)}
+                                    ].map((t, i) => <li key={i} className="flex gap-2 text-sm text-slate-600">[cite_start]<Clock className="w-4 h-4 text-amber-500 shrink-0"/>{t} [cite: 48-52]</li>)}
                                 </CardContent>
                             </Card>
                         </TabsContent>
