@@ -1,19 +1,20 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { TaxDetails, TaxFormValues } from '@/lib/types';
+import React, { useState, useEffect } from 'react';
+import { TaxDetails, TaxFormValues, CnaeItem } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { TrendingUp, Trophy, AlertCircle, CalendarRange, ArrowRight } from 'lucide-react';
+import { TrendingUp, Trophy, CalendarRange } from 'lucide-react';
 import { calculateTaxes2026 } from '@/lib/calculations-2026';
 
 interface ComparisonTableProps {
+  scenarios?: TaxDetails[]; 
   currentYear: number;
   formValues: TaxFormValues;
 }
 
 interface ColumnData {
   year: number;
-  type: 'SN' | 'LP'; // Simples Nacional ou Lucro Presumido
+  type: 'SN' | 'LP';
   label: string;
   details: TaxDetails;
   isBestOfYear: boolean;
@@ -24,17 +25,43 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
   const [columns, setColumns] = useState<ColumnData[]>([]);
 
   useEffect(() => {
-    if (!formValues || !formValues.year || currentYear < 2026) {
-        setColumns([]);
-        return;
-    };
+    if (!formValues || !formValues.year || currentYear < 2026) return;
 
     // Define os 3 anos: Atual, +1, +2 (Limitado a 2033)
     const yearsToProject = [currentYear, currentYear + 1, currentYear + 2].filter(y => y <= 2033);
     const newColumns: ColumnData[] = [];
 
+    // --- CORREÇÃO DE DADOS ---
+    // O motor de cálculo espera 'domesticActivities' e 'exportActivities', 
+    // mas o formValues cru tem apenas 'selectedCnaes'. Precisamos transformar.
+    const domesticActivities: CnaeItem[] = (formValues.selectedCnaes || [])
+        .filter(c => (c.domesticRevenue || 0) > 0)
+        .map(c => ({
+            code: c.code,
+            revenue: c.domesticRevenue || 0,
+            cClassTrib: c.cClassTrib,
+            nbsCode: c.nbsCode
+        }));
+
+    const exportActivities: CnaeItem[] = (formValues.selectedCnaes || [])
+        .filter(c => (c.exportRevenue || 0) > 0)
+        .map(c => ({
+            code: c.code,
+            revenue: c.exportRevenue || 0,
+            cClassTrib: c.cClassTrib,
+            nbsCode: c.nbsCode
+        }));
+    // -------------------------
+
     yearsToProject.forEach(year => {
-      const yearValues = { ...formValues, year };
+      // Clona e injeta os dados transformados para o motor ler corretamente
+      const yearValues: TaxFormValues = { 
+          ...formValues, 
+          year,
+          domesticActivities,
+          exportActivities
+      };
+
       const results = calculateTaxes2026(yearValues); // Roda o motor para o ano específico
       
       if (!results || !results.lucroPresumido) return;
@@ -56,13 +83,13 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
       // Define quem ganha neste ano
       const winner = bestSimples.totalTax < lucroPresumido.totalTax ? 'SN' : 'LP';
 
-      // Formata nome curto do Simples
+      // Formata nome curto do Simples para caber no card
       let simplesName = 'Simples Nac.';
       if (bestSimples.regime.includes('Otimizado')) simplesName = 'SN (Fator R)';
       else if (bestSimples.regime.includes('Híbrido')) simplesName = 'SN (Híbrido)';
       else if (bestSimples.regime.includes('Tradicional')) simplesName = 'SN (Tradicional)';
 
-      // Adiciona Coluna Simples
+      // Adiciona Coluna Simples (Sempre à esquerda no par)
       newColumns.push({
         year,
         type: 'SN',
@@ -72,7 +99,7 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
         isCurrentYear: year === currentYear
       });
 
-      // Adiciona Coluna Lucro Presumido
+      // Adiciona Coluna Lucro Presumido (Sempre à direita no par)
       newColumns.push({
         year,
         type: 'LP',
@@ -89,11 +116,9 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
   if (columns.length === 0) return null;
 
   // Configuração do Grid: 1 Coluna fixa (Rótulos) + N Colunas de dados
-  // Ex: 200px + 6 colunas iguais
   const gridStyle = { gridTemplateColumns: `200px repeat(${columns.length}, minmax(0, 1fr))` };
   
-  // Agrupamento para o Header de Anos (Super Header)
-  // Cada ano ocupa 2 colunas no grid
+  // Agrupamento para o Header de Anos
   const yearsHeader = Array.from(new Set(columns.map(c => c.year)));
 
   return (
@@ -142,7 +167,7 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
               )}>
                 {col.isBestOfYear && (
                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
-                        <Trophy className="w-2.5 h-2.5" /> VENCEDOR
+                        <Trophy className="w-2.5 h-2.5" /> Recomendado
                      </div>
                 )}
                 <span className={cn("font-bold text-xs leading-snug", col.isBestOfYear && col.isCurrentYear ? "text-white" : "text-slate-700")}>
@@ -216,11 +241,6 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
             </div>
 
           </div>
-        </div>
-
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
-            <ArrowRight className="w-3 h-3" />
-            <span>A tabela exibe automaticamente o <strong>Melhor Cenário do Simples Nacional</strong> contra o <strong>Lucro Presumido</strong> para cada ano.</span>
         </div>
       </div>
     </div>
