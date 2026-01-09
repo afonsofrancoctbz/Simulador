@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info, BadgeCheck } from 'lucide-react';
+import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info, BadgeCheck, DollarSign } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useDebounce } from "react-use";
 import { useEffect, useMemo, useState, useRef } from "react";
 import type { CnaeSelection } from "@/lib/types";
 import { Slider } from "./ui/slider";
@@ -131,7 +131,7 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
     };
 
     return (
-        <div className="p-4 border rounded-lg bg-card/60 relative space-y-3">
+        <div className="p-4 border rounded-lg bg-card/60 relative space-y-4">
             <Button
                 type="button"
                 variant="ghost"
@@ -142,8 +142,10 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                 <X className="h-4 w-4" />
             </Button>
             
-            <p className="font-bold text-primary pr-8">{cnaeData.code}</p>
-            <p className="text-sm text-muted-foreground">{cnaeData.description}</p>
+            <div>
+              <p className="font-bold text-primary pr-8">{cnaeData.code}</p>
+              <p className="text-sm text-muted-foreground">{cnaeData.description}</p>
+            </div>
             
             {isPostReforma && (
               <TooltipProvider>
@@ -175,6 +177,53 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
             )}
 
             {renderNbsContent()}
+
+            <div className="grid grid-cols-2 gap-4 pt-2">
+                <FormField
+                    control={form.control}
+                    name={`selectedCnaes.${index}.domesticRevenue`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Receita Nacional</FormLabel>
+                            <FormControl>
+                                <NumericFormat
+                                    customInput={Input}
+                                    thousandSeparator="."
+                                    decimalSeparator=","
+                                    prefix="R$ "
+                                    decimalScale={2}
+                                    fixedDecimalScale
+                                    value={field.value || ''}
+                                    onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                    placeholder="R$ 0,00"
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name={`selectedCnaes.${index}.exportRevenue`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Receita Exportação</FormLabel>
+                            <FormControl>
+                                 <NumericFormat
+                                    customInput={Input}
+                                    thousandSeparator="."
+                                    decimalSeparator=","
+                                    prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '}
+                                    decimalScale={2}
+                                    fixedDecimalScale
+                                    value={field.value || ''}
+                                    onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                    placeholder="0,00"
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+            </div>
         </div>
     );
 }
@@ -196,60 +245,16 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
       name: "selectedCnaes",
     });
 
-    const exchangeRate = form.watch('exchangeRate');
     const selectedCnaes = form.watch('selectedCnaes') as CnaeSelection[];
 
-    const domesticRevenueInputRef = useRef<HTMLInputElement>(null);
-    const exportRevenueInputRef = useRef<HTMLInputElement>(null);
-
-    // Lógica para determinar o Anexo predominante para exibição
-    const predominantAnnex = useMemo(() => {
-        if (!selectedCnaes || selectedCnaes.length === 0) return null;
+    const { totalDomesticRevenue, totalExportRevenue } = useMemo(() => {
+        if (!selectedCnaes) return { totalDomesticRevenue: 0, totalExportRevenue: 0 };
         
-        // Pega o primeiro CNAE como referência principal
-        const firstCnae = getCnaeData(selectedCnaes[0].code);
-        if (!firstCnae) return null;
-
-        // Se houver múltiplos CNAEs com anexos diferentes, poderíamos mostrar "Múltiplos"
-        // Mas para simplificar a UX, mostramos o do primeiro ou "Anexo V" se houver Fator R envolvido
+        const domestic = selectedCnaes.reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
+        const exportRev = selectedCnaes.reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
         
-        const hasFatorR = selectedCnaes.some(c => {
-            const data = getCnaeData(c.code);
-            return data?.requiresFatorR;
-        });
-
-        if (hasFatorR) return "Anexo V (Sujeito ao Fator R)";
-        return `Anexo ${firstCnae.annex}`;
+        return { totalDomesticRevenue: domestic, totalExportRevenue: exportRev };
     }, [selectedCnaes]);
-
-
-    const handleRevenueChange = (value: number | undefined, type: 'domestic' | 'export') => {
-      const cnaes: CnaeSelection[] = form.getValues('selectedCnaes');
-      if (cnaes.length === 0) return;
-      
-      const numericValue = value ?? 0;
-      const revenuePerCnae = cnaes.length > 0 ? numericValue / cnaes.length : 0;
-      
-      const updatedCnaes = cnaes.map(cnae => {
-        const fieldToUpdate = type === 'domestic' ? 'domesticRevenue' : 'exportRevenue';
-        const otherField = type === 'domestic' ? 'exportRevenue' : 'domesticRevenue';
-        return { ...cnae, [fieldToUpdate]: revenuePerCnae, [otherField]: cnae[otherField] ?? 0 };
-      });
-      
-      form.setValue('selectedCnaes', updatedCnaes, { shouldValidate: true, shouldDirty: true });
-    };
-
-    const totalDomesticRevenue = useMemo(() => {
-        const cnaes: CnaeSelection[] = form.watch('selectedCnaes');
-        if (!cnaes) return 0;
-        return cnaes.reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
-    }, [form.watch('selectedCnaes')]);
-
-    const totalExportRevenue = useMemo(() => {
-        const cnaes: CnaeSelection[] = form.watch('selectedCnaes');
-        if (!cnaes) return 0;
-        return cnaes.reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
-    }, [form.watch('selectedCnaes')]);
 
     return (
         <div className="space-y-8">
@@ -260,8 +265,8 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             <BarChart className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                            <CardTitle className="text-xl font-bold">Atividades da Empresa (CNAE)</CardTitle>
-                            <CardDescription>Selecione as atividades que sua empresa irá exercer. Isso definirá seus impostos.</CardDescription>
+                            <CardTitle className="text-xl font-bold">Atividades e Faturamento Mensal</CardTitle>
+                            <CardDescription>Selecione as atividades e informe a receita correspondente a cada uma.</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
@@ -274,7 +279,6 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                     </div>
                     {fields && fields.length > 0 && (
                         <div className="space-y-4 pt-4">
-                            <h4 className="font-semibold text-center text-muted-foreground">Atividades Selecionadas ({fields.length}/20):</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {fields.map((cnaeItem, index) => (
                                     <CnaeActivityCard
@@ -290,57 +294,31 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                     <FormField control={form.control} name="selectedCnaes" render={({ fieldState }) => (
                         fieldState.error ? <p className="text-sm font-medium text-destructive text-center">{fieldState.error.message}</p> : null
                     )} />
-                </CardContent>
-            </Card>
 
-            {fields && fields.length > 0 && (
-                <>
-                    <Card className='shadow-lg overflow-hidden border bg-card'>
-                        <CardHeader className='border-b bg-muted/30'>
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
-                                    <FileText className="h-6 w-6 text-primary" />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-xl font-bold">Faturamento Mensal</CardTitle>
-                                    <CardDescription>Informe sua receita esperada e a alíquota de ISS do seu município.</CardDescription>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className='p-6 md:p-8 space-y-6'>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                                <FormItem>
-                                    <FormLabel>Receita Nacional (em BRL)</FormLabel>
-                                    {/* EXIBIÇÃO DO ANEXO RESTAURADA */}
-                                    {predominantAnnex && (
-                                        <p className="text-sm text-muted-foreground font-medium mb-1.5">{predominantAnnex}</p>
-                                    )}
-                                    <FormControl>
-                                        <NumericFormat
-                                            customInput={Input}
-                                            getInputRef={domesticRevenueInputRef}
-                                            thousandSeparator="."
-                                            decimalSeparator=","
-                                            prefix="R$ "
-                                            decimalScale={2}
-                                            fixedDecimalScale={true}
-                                            allowNegative={false}
-                                            inputMode="decimal"
-                                            placeholder="R$ 0,00"
-                                            value={totalDomesticRevenue === 0 ? "" : totalDomesticRevenue}
-                                            onValueChange={(values) => {
-                                                handleRevenueChange(values.floatValue ?? 0, 'domestic');
-                                            }}
-                                            onFocus={(e) => e.target.select()}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-
-                                <FormItem>
-                                     <div className="flex items-center gap-4">
-                                        <FormLabel>Receita de Exportação</FormLabel>
+                    {fields.length > 0 && (
+                        <>
+                         <div className="!mt-8">
+                            <Card>
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-base flex items-center gap-2 text-muted-foreground"><DollarSign className="h-5 w-5"/>Resumo do Faturamento Mensal</CardTitle>
+                                </CardHeader>
+                                <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div className="p-3 rounded-lg bg-muted/50 border">
+                                        <p className="text-xs font-semibold text-muted-foreground">Receita Nacional</p>
+                                        <p className="text-lg font-bold text-foreground">
+                                             <NumericFormat value={totalDomesticRevenue} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " decimalScale={2} fixedDecimalScale />
+                                        </p>
+                                    </div>
+                                     <div className="p-3 rounded-lg bg-muted/50 border">
+                                        <p className="text-xs font-semibold text-muted-foreground">Receita Exportação</p>
+                                        <p className="text-lg font-bold text-foreground">
+                                             <NumericFormat value={totalExportRevenue} displayType="text" thousandSeparator="." decimalSeparator="," prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '} decimalScale={2} fixedDecimalScale />
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-muted/50 border">
+                                        <FormLabel>Moeda Exportação</FormLabel>
                                         <Select value={form.watch('exportCurrency')} onValueChange={(value) => form.setValue('exportCurrency', value, {shouldValidate: true})}>
-                                            <SelectTrigger className="w-[120px]">
+                                            <SelectTrigger className="h-9 mt-1">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -350,144 +328,119 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    {/* EXIBIÇÃO DO ANEXO RESTAURADA */}
-                                    {predominantAnnex && (
-                                        <p className="text-sm text-muted-foreground font-medium mb-1.5">{predominantAnnex}</p>
-                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="issRate"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Alíquota de ISS (%)</FormLabel>
                                     <FormControl>
-                                        <NumericFormat
+                                            <NumericFormat
                                             customInput={Input}
-                                            getInputRef={exportRevenueInputRef}
-                                            thousandSeparator="."
                                             decimalSeparator=","
-                                            prefix={form.watch('exportCurrency') === 'USD' ? '$ ' : form.watch('exportCurrency') === 'EUR' ? '€ ' : 'R$ '}
                                             decimalScale={2}
-                                            fixedDecimalScale={true}
-                                            allowNegative={false}
-                                            inputMode="decimal"
-                                            placeholder="0,00"
-                                            value={totalExportRevenue === 0 ? "" : totalExportRevenue}
+                                            fixedDecimalScale={false}
+                                            suffix="%"
+                                            placeholder="Ex: 5,0"
+                                            value={field.value}
                                             onValueChange={(values) => {
-                                                handleRevenueChange(values.floatValue ?? 0, 'export');
+                                                field.onChange(values.floatValue);
                                             }}
-                                            onFocus={(e) => e.target.select()}
                                         />
                                     </FormControl>
-                                    {form.watch('exportCurrency') !== 'BRL' && (
-                                        <p className="text-sm text-muted-foreground">
-                                            Cotação ({form.watch('exportCurrency')}/BRL): {exchangeRate ? (typeof exchangeRate === 'number' ? exchangeRate.toFixed(2) : 'Carregando...') : 'Carregando...'}
-                                        </p>
-                                    )}
+                                    <FormDescription>
+                                        Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, use o padrão de 5%.
+                                    </FormDescription>
+                                    <FormMessage />
                                 </FormItem>
+                            )}/>
+                        </>
+                    )}
+                </CardContent>
+            </Card>
+            
+            {fields && fields.length > 0 && year >= 2026 && (
+                <Card className='shadow-lg overflow-hidden border bg-card'>
+                    <CardHeader className='border-b bg-muted/30'>
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                                <Landmark className="h-6 w-6 text-primary" />
                             </div>
-                             <FormField
-                                control={form.control}
-                                name="issRate"
-                                render={({ field }) => (
+                            <div>
+                                <CardTitle className="text-xl font-bold">Cenário Pós-Reforma (IVA)</CardTitle>
+                                <CardDescription>Informações adicionais para simular os cenários da Reforma Tributária.</CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className='p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6'>
+                        <FormField
+                            control={form.control}
+                            name="b2bRevenuePercentage"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <div className="flex justify-between items-center">
+                                        <FormLabel>Receita de Clientes PJ (B2B)</FormLabel>
+                                        <span className="text-sm font-semibold w-20 text-right bg-muted/50 px-2 py-1 rounded-md border">{field.value?.toFixed(0) ?? '0'}%</span>
+                                    </div>
+                                    <FormControl>
+                                        <Slider
+                                            defaultValue={[50]}
+                                            max={100}
+                                            step={1}
+                                            value={[field.value ?? 50]}
+                                            onValueChange={(value) => field.onChange(value[0])}
+                                            className="pt-2"
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Percentual do faturamento que vem de outras empresas. Essencial para o cenário "Híbrido".
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="creditGeneratingExpenses"
+                            render={({ field }) => {
+                                const inputRef = useRef<HTMLInputElement>(null);
+                                return (
                                     <FormItem>
-                                        <FormLabel>Alíquota de ISS (%)</FormLabel>
-                                        <FormControl>
-                                             <NumericFormat
+                                        <FormLabel>Despesas que Geram Crédito de IVA</FormLabel>
+                                            <FormControl>
+                                            <NumericFormat
                                                 customInput={Input}
+                                                getInputRef={inputRef}
+                                                thousandSeparator="."
                                                 decimalSeparator=","
+                                                prefix="R$ "
                                                 decimalScale={2}
-                                                fixedDecimalScale={false}
-                                                suffix="%"
-                                                placeholder="Ex: 5,0"
+                                                fixedDecimalScale
+                                                placeholder="R$ 0,00"
                                                 value={field.value}
                                                 onValueChange={(values) => {
-                                                    field.onChange(values.floatValue);
+                                                    field.onChange(values.floatValue || 0);
                                                 }}
+                                                onFocus={() => inputRef.current?.select()}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, use o padrão de 5%.
+                                            Ex: aluguel, energia, softwares, insumos. Não inclua folha de pagamento.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )}/>
-                        </CardContent>
-                    </Card>
-                    
-                    {year >= 2026 && (
-                        <Card className='shadow-lg overflow-hidden border bg-card'>
-                            <CardHeader className='border-b bg-muted/30'>
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
-                                        <Landmark className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-xl font-bold">Cenário Pós-Reforma (IVA)</CardTitle>
-                                        <CardDescription>Informações adicionais para simular os cenários da Reforma Tributária.</CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className='p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6'>
-                                <FormField
-                                    control={form.control}
-                                    name="b2bRevenuePercentage"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <div className="flex justify-between items-center">
-                                                <FormLabel>Receita de Clientes PJ (B2B)</FormLabel>
-                                                <span className="text-sm font-semibold w-20 text-right bg-muted/50 px-2 py-1 rounded-md border">{field.value?.toFixed(0) ?? '0'}%</span>
-                                            </div>
-                                            <FormControl>
-                                                <Slider
-                                                    defaultValue={[50]}
-                                                    max={100}
-                                                    step={1}
-                                                    value={[field.value ?? 50]}
-                                                    onValueChange={(value) => field.onChange(value[0])}
-                                                    className="pt-2"
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Percentual do faturamento que vem de outras empresas. Essencial para o cenário "Híbrido".
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="creditGeneratingExpenses"
-                                    render={({ field }) => {
-                                        const inputRef = useRef<HTMLInputElement>(null);
-                                        return (
-                                            <FormItem>
-                                                <FormLabel>Despesas que Geram Crédito de IVA</FormLabel>
-                                                 <FormControl>
-                                                    <NumericFormat
-                                                        customInput={Input}
-                                                        getInputRef={inputRef}
-                                                        thousandSeparator="."
-                                                        decimalSeparator=","
-                                                        prefix="R$ "
-                                                        decimalScale={2}
-                                                        fixedDecimalScale
-                                                        placeholder="R$ 0,00"
-                                                        value={field.value}
-                                                        onValueChange={(values) => {
-                                                            field.onChange(values.floatValue || 0);
-                                                        }}
-                                                        onFocus={() => inputRef.current?.select()}
-                                                    />
-                                                </FormControl>
-                                                <FormDescription>
-                                                    Ex: aluguel, energia, softwares, insumos. Não inclua folha de pagamento.
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        );
-                                    }}
-                                />
-                            </CardContent>
-                        </Card>
-                    )}
-                </>
+                                );
+                            }}
+                        />
+                    </CardContent>
+                </Card>
             )}
         </div>
     );
 }
+    
+
     
