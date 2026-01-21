@@ -16,7 +16,6 @@ import PjAccountSection from '@/components/pj-account-section';
 import RocSection from '@/components/roc-section';
 import SociiLawSection from '@/components/socii-law-section';
 import TaxCalculator from '@/components/tax-calculator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FloatingNav from '@/components/floating-nav';
 
 export default function Home() {
@@ -32,49 +31,27 @@ export default function Home() {
       <div className='print-hidden'>
           <section id="tax-calculator" className="bg-slate-50/70 border-b">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simule Seus Impostos</h1>
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Simulador da Reforma Tributária</h1>
                 <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto pb-12">
-                  Descubra o regime tributário ideal para sua empresa de serviços, detalhado de forma clara e transparente.
+                  Descubra o impacto da Reforma Tributária no seu negócio e o regime tributário ideal para sua empresa de 2026 a 2033.
                 </p>
               </div>
           </section>
       </div>
       
-      <Tabs defaultValue="2026" className="w-full">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 print-hidden">
-              <div className="w-full flex justify-center">
-                  <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
-                      <TabsTrigger value="2025">Regras Antigas (2025)</TabsTrigger>
-                      <TabsTrigger value="2026">Reforma Tributária (2026-2033)</TabsTrigger>
-                  </TabsList>
-              </div>
-                
-                <TabsContent value="2025" className="animate-in fade-in zoom-in-95 duration-300">
-                    <div className="py-4">
-                        <TaxCalculator 
-                            key="2025" 
-                            year={2025} 
-                            onExportRevenueChange={setShowExportInfo} 
-                            onResultsChange={setShowResults}
-                        />
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="2026" className="animate-in fade-in zoom-in-95 duration-300">
-                      <div className="py-4">
-                        <TaxCalculator 
-                            key="2026-plus"
-                            year={selectedYear} 
-                            onExportRevenueChange={setShowExportInfo} 
-                            onResultsChange={(hasResults) => {
-                                setShowResults(hasResults);
-                            }}
-                            onYearChange={setSelectedYear} 
-                        />
-                    </div>
-                </TabsContent>
-          </div>
-      </Tabs>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+          <div className="py-4">
+            <TaxCalculator 
+                key="2026-plus"
+                year={selectedYear} 
+                onExportRevenueChange={setShowExportInfo} 
+                onResultsChange={(hasResults) => {
+                    setShowResults(hasResults);
+                }}
+                onYearChange={setSelectedYear} 
+            />
+        </div>
+      </div>
         
         {/* Espaço reservado para impressão */}
         <div id="results-print-only" className='hidden print:block'></div>
