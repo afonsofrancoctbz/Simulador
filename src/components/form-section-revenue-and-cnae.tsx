@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
@@ -247,14 +246,8 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 
     const selectedCnaes = form.watch('selectedCnaes') as CnaeSelection[];
 
-    const { totalDomesticRevenue, totalExportRevenue } = useMemo(() => {
-        if (!selectedCnaes) return { totalDomesticRevenue: 0, totalExportRevenue: 0 };
-        
-        const domestic = selectedCnaes.reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
-        const exportRev = selectedCnaes.reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
-        
-        return { totalDomesticRevenue: domestic, totalExportRevenue: exportRev };
-    }, [selectedCnaes]);
+    const totalDomesticRevenue = (selectedCnaes || []).reduce((sum, cnae) => sum + (cnae.domesticRevenue || 0), 0);
+    const totalExportRevenue = (selectedCnaes || []).reduce((sum, cnae) => sum + (cnae.exportRevenue || 0), 0);
 
     return (
         <div className="space-y-8">
@@ -443,4 +436,5 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
 }
     
 
+    
     

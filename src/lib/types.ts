@@ -1,6 +1,5 @@
-
-
 import { z } from "zod";
+import { CIDADES_ATENDIDAS } from "./cities";
 
 // =================================================================================
 // CNAE AND ACTIVITY SCHEMAS
@@ -70,6 +69,42 @@ export const TaxFormValuesSchema = z.object({
   selectedPlan: PlanEnumSchema.default('expertsEssencial'),
 });
 export type TaxFormValues = z.infer<typeof TaxFormValuesSchema>;
+
+export const CalculatorFormSchema = z.object({
+  city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
+    message: "Por favor, selecione uma cidade válida da lista."
+  }),
+  selectedCnaes: z.array(CnaeSelectionSchema).min(1, "Selecione ao menos uma atividade (CNAE)."),
+  rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
+  fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
+
+  exportCurrency: z.string(),
+  exchangeRate: z.coerce.number().optional(),
+  issRate: z.coerce.number({invalid_type_error: "A alíquota de ISS deve ser um número."})
+              .min(2, "A alíquota de ISS deve ser no mínimo 2%.")
+              .max(5, "A alíquota de ISS não pode ser maior que 5%.").optional().default(5),
+  totalSalaryExpense: z.coerce.number({ required_error: "Informe o custo com salários." }).min(0, "O valor não pode ser negativo."),
+  proLabores: z.array(ProLaboreFormSchema).min(1),
+  numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive().int(),
+  b2bRevenuePercentage: z.coerce.number().min(0, "O percentual deve ser no mínimo 0.").max(100, "O percentual não pode ser maior que 100.").optional().default(50),
+  creditGeneratingExpenses: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
+  selectedPlan: PlanEnumSchema.default('expertsEssencial'),
+  year: z.number().optional(),
+}).refine(data => {
+    const totalRevenue = data.selectedCnaes.reduce((acc, cnae) => acc + (cnae.domesticRevenue || 0) + (cnae.exportRevenue || 0), 0);
+    const totalProLabore = data.proLabores.reduce((acc, pl) => acc + (pl.value || 0), 0);
+    
+    if ((data.rbt12 ?? 0) > 0 || totalProLabore > 0) {
+        return true;
+    }
+
+    return totalRevenue > 0;
+}, {
+    message: "Informe ao menos um valor de faturamento, pró-labore ou receita bruta (RBT12) para calcular.",
+    path: ["selectedCnaes"],
+});
+
+export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
 
 
 // =================================================================================
@@ -394,3 +429,5 @@ export interface FiscalConfig {
   deducao_dependente_irrf?: number;
   [key: string]: any;
 }
+
+    

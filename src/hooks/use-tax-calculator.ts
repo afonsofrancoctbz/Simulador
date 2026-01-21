@@ -12,7 +12,7 @@ import { calculateTaxes2026 } from '@/lib/calculations-2026';
 import { calculateFatorRProjection, type FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
 import { getCnaeData } from '@/lib/cnae-helpers';
 import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
-import { CalculatorFormSchema, type CalculatorFormValues } from '@/components/tax-calculator-form';
+import { CalculatorFormSchema, type CalculatorFormValues } from '@/lib/types';
 import { useDebounce } from 'react-use';
 import { getNBSOptionsByCnae } from '@/lib/cnae-reductions-2026';
 import type { CnaeRelationship2026 } from '@/lib/cnae-data-2026';

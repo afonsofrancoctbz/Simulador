@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -7,7 +6,7 @@ import { FileText, AlertTriangle, UploadCloud, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { NumericFormat } from "react-number-format"; // Importação da biblioteca
+import { NumericFormat } from "react-number-format";
 
 import { formatCurrencyBRL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -17,9 +16,9 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { extractDataFromPgdas } from "@/ai/flows/extract-pgdas-flow";
-import type { PgdasData, MonthlyData } from "@/lib/types";
-import type { CalculatorFormValues } from './tax-calculator-form';
+import type { PgdasData, MonthlyData, CalculatorFormValues } from "@/lib/types"; 
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "./ui/table";
+
 
 function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -90,7 +89,6 @@ export function FormSectionAnnualRevenue() {
             const extractedData: PgdasData = await extractDataFromPgdas({ pdfDataUri });
             
             if (extractedData.competencias && extractedData.competencias.length > 0) {
-                // Merge extracted data with existing grid to preserve order
                 const newGrid = generateLast12Months();
                 extractedData.competencias.forEach(extractedItem => {
                     const index = newGrid.findIndex(gridItem => gridItem.mes === extractedItem.mes);
@@ -169,7 +167,6 @@ export function FormSectionAnnualRevenue() {
                         <TabsTrigger value="import">⚡ Importar Extrato PGDAS</TabsTrigger>
                     </TabsList>
                     <TabsContent value="manual" className="mt-6 space-y-6">
-                         {/* Campos de Resumo (Topo) - Agora usando NumericFormat para consistência visual */}
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start p-4 border rounded-lg bg-muted/40">
                              <FormField control={control} name="rbt12" render={({ field }) => (
                                 <FormItem>
@@ -213,7 +210,6 @@ export function FormSectionAnnualRevenue() {
                             )} />
                         </div>
                         
-                        {/* Tabela de Preenchimento Mensal */}
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
@@ -242,7 +238,7 @@ export function FormSectionAnnualRevenue() {
                                                     onValueChange={(values) => {
                                                         handleMonthlyDataChange(index, 'receita', values.floatValue || 0);
                                                     }}
-                                                    onFocus={(e) => e.target.select()} // UX: Seleciona tudo ao clicar
+                                                    onFocus={(e) => e.target.select()}
                                                     className="h-9"
                                                 />
                                             </TableCell>
@@ -261,7 +257,7 @@ export function FormSectionAnnualRevenue() {
                                                     onValueChange={(values) => {
                                                         handleMonthlyDataChange(index, 'folha', values.floatValue || 0);
                                                     }}
-                                                    onFocus={(e) => e.target.select()} // UX: Seleciona tudo ao clicar
+                                                    onFocus={(e) => e.target.select()}
                                                     className="h-9"
                                                 />
                                             </TableCell>
@@ -283,7 +279,7 @@ export function FormSectionAnnualRevenue() {
                                 <div className="flex flex-col items-center gap-4 text-primary">
                                     <Loader2 className="h-10 w-10 animate-spin" />
                                     <p className="font-semibold">Analisando o extrato...</p>
-                                    <p className="text-sm text-muted-foreground">Aguarde, a IA está extraindo os dados.</p>
+                                    <p className="text-sm text-muted-foreground">Aguarde, estamos extraindo os dados.</p>
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-4 text-muted-foreground">

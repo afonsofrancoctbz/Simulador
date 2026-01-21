@@ -21,18 +21,19 @@ const PgdasInputSchema = z.object({
     ),
 });
 
-/**
- * Prompt otimizado para extração precisa e granular dos dados do PGDAS-D
- */
+// extract-pgdas-flow.ts
+
 const extractPgdasPrompt = ai.definePrompt({
   name: 'extractPgdasPrompt',
   input: { schema: PgdasInputSchema },
   output: { schema: PgdasDataSchema },
-  model: 'googleai/gemini-1.5-flash',
+  // ALTERAÇÃO AQUI: Atualize de 'gemini-1.5-flash' para 'gemini-2.5-flash'
+  model: 'googleai/gemini-2.5-flash', 
   config: {
     temperature: 0.1,
   },
   prompt: `Você é um especialista em análise de documentos fiscais brasileiros. Sua tarefa é extrair dados do PGDAS-D (Extrato do Simples Nacional) com PRECISÃO ABSOLUTA, focando nas tabelas mensais.
+});
 
 📄 DOCUMENTO PARA ANÁLISE:
 {{media url=pdfDataUri}}

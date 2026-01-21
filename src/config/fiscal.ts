@@ -143,7 +143,7 @@ const FISCAL_CONFIG_2026: FiscalConfig = {
   ...FISCAL_CONFIG_2025,
   ano_vigencia: 2026,
   salario_minimo: 1621.00,
-  teto_inss: 8537.55,
+  teto_inss: 8475.55,
   
   simples_nacional: JSON.parse(JSON.stringify(FISCAL_CONFIG_2025.simples_nacional)),
   
