@@ -67,8 +67,6 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
           // 4. Lucro Presumido (Com Reforma)
           results.lucroPresumido,
           
-          // 5. Lucro Presumido (Sem Reforma - Comparativo)
-          results.lucroPresumidoAtual,
       ] as (TaxDetails | null)[];
     }
 
@@ -85,13 +83,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
   // Lógica de Recomendação (Menor Custo)
   const cheapestScenario = useMemo(() => {
     if (scenariosToShow.length === 0) return null;
-    // Removemos o "Regras Atuais" da competição pois ele é hipotético em 2026+
-    const scenariosForRecommendation = scenariosToShow.filter(s => s.regime !== 'Lucro Presumido (Regras Atuais)');
-    
-    if (scenariosForRecommendation.length > 0) {
-      return [...scenariosForRecommendation].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
-    }
-    return scenariosToShow[0];
+    return [...scenariosToShow].sort((a, b) => a.totalMonthlyCost - b.totalMonthlyCost)[0];
   }, [scenariosToShow]);
   
   // Seleciona automaticamente o melhor cenário ao carregar
@@ -189,10 +181,10 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
 
         {/* --- QUADRO COMPARATIVO ESTRATÉGICO --- */}
         <div className="max-w-7xl mx-auto px-1 sm:px-4 mb-16">
-          {year >= 2026 && <ComparisonTable 
+           <ComparisonTable 
             currentYear={year} 
             formValues={formValues} 
-          />}
+          />
         </div>
 
         {/* --- CARDS DE DETALHES (Grid) --- */}
@@ -200,8 +192,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
           {scenariosToShow.map((scenario) => {
             if (!scenario || (scenario.totalRevenue <= 0 && (scenario.proLabore ?? 0) <= 0)) return null;
             
-            const isCurrentLpFor2026 = year >= 2026 && scenario.regime === 'Lucro Presumido (Regras Atuais)';
-            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && (scenario.optimizationNote ?? null) === (cheapestScenario.optimizationNote ?? null) && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0 && !isCurrentLpFor2026;
+            const isRecommended = cheapestScenario !== null && scenario.regime === cheapestScenario.regime && (scenario.optimizationNote ?? null) === (cheapestScenario.optimizationNote ?? null) && scenariosToShow.length > 1 && cheapestScenario.totalMonthlyCost > 0;
             const isSelected = selectedDetails !== null && scenario.regime === selectedDetails.regime && (scenario.optimizationNote ?? null) === (selectedDetails.optimizationNote ?? null);
 
             const isOtimizado = scenario.regime.includes('Otimizado');
@@ -240,8 +231,7 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                 className={cn(
                   "border rounded-xl w-full flex flex-col h-full transition-all duration-300 shadow-sm hover:shadow-xl relative cursor-pointer printable-card",
                   isRecommended ? "border-primary shadow-lg" : "border-border bg-card",
-                  isSelected && !isRecommended && "ring-2 ring-primary",
-                  isCurrentLpFor2026 && "bg-slate-50 opacity-80"
+                  isSelected && !isRecommended && "ring-2 ring-primary"
                 )}
               >
                   {isRecommended && (
@@ -351,16 +341,8 @@ export default function TaxResults({ year, isLoading, results, error, fatorRProj
                         </Alert>
                       )}
                       
-                      {isCurrentLpFor2026 && (
-                            <Alert variant="default" className="bg-sky-100/80 border-sky-200/80 text-sky-900 p-3">
-                                <AlertDescription className="text-xs font-medium flex items-start gap-2">
-                                    <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                                    <span>Este card mostra como seria o Lucro Presumido sem a Reforma Tributária, servindo como linha de base para comparação.</span>
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
-                      {scenario.notes.length > 0 && !isCurrentLpFor2026 && (
+                      
+                      {scenario.notes.length > 0 && (
                          <Alert variant="default" className="bg-primary/10 border-primary/20 text-primary-foreground p-3">
                             <AlertDescription className="text-xs text-primary/90 font-medium flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0"/>

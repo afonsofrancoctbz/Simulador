@@ -1,4 +1,3 @@
-
 // src/lib/calculations-2026.ts
 import { getFiscalParametersPostReform } from "@/config/fiscal";
 import {
@@ -595,8 +594,7 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   // 2. Standard Calculations
   const lpFuture = calculateLucroPresumido2026(values, false);
-  const lpCurrent = calculateLucroPresumido2026(values, true); // For comparison
-
+  
   let simplesTrad: TaxDetails2026 | null = null;
   let simplesHyb: TaxDetails2026 | null = null;
   let simplesOpt: TaxDetails2026 | null = null;
@@ -648,13 +646,9 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
 
   return {
     lucroPresumido: normalize(lpFuture, 4),
-    lucroPresumidoAtual: normalize(lpCurrent as any, 5),
     simplesNacionalTradicional: normalize(simplesTrad, 2),
     simplesNacionalHibrido: normalize(simplesHyb, 3),
     simplesNacionalOtimizado: normalize(simplesOpt, 1),
     simplesNacionalOtimizadoHibrido: normalize(simplesOptHyb, 1.5),
   };
 }
-
-
-    

@@ -61,7 +61,7 @@ export const TaxFormValuesSchema = z.object({
   exportCurrency: z.string(),
   exchangeRate: z.coerce.number().optional(),
   issRate: z.coerce.number().min(0).max(5).optional(),
-  totalSalaryExpense: z.coerce.number().min(0, "O valor deve ser positivo."),
+  totalSalaryExpense: z.coerce.number().min(0, "O valor não pode ser negativo."),
   proLabores: z.array(ProLaboreFormSchema),
   numberOfPartners: z.coerce.number().min(1, "O número de sócios deve ser no mínimo 1.").positive(),
   b2bRevenuePercentage: z.coerce.number().min(0).max(100).optional(),
@@ -182,7 +182,6 @@ export type TaxDetails2026 = z.infer<typeof TaxDetails2026Schema>;
 
 export const CalculationResults2026Schema = z.object({
   lucroPresumido: TaxDetails2026Schema.nullable(),
-  lucroPresumidoAtual: TaxDetailsSchema.nullable(),
   simplesNacionalTradicional: TaxDetails2026Schema.nullable(),
   simplesNacionalHibrido: TaxDetails2026Schema.nullable(),
   simplesNacionalOtimizado: TaxDetails2026Schema.nullable(),
@@ -429,5 +428,3 @@ export interface FiscalConfig {
   deducao_dependente_irrf?: number;
   [key: string]: any;
 }
-
-    
