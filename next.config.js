@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Necessário para exportação estática no GitHub Pages
-  basePath: '/Simulator-reforma-tributaria', // Nome do repositório no GitHub
   images: {
-    unoptimized: true, // GitHub Pages não suporta o servidor de otimização de imagem do Next.js
+    unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'www.contabilizei.com.br' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -18,7 +16,7 @@ const nextConfig = {
     ],
   },
   typescript: {
-    ignoreBuildErrors: true, // Garante que o deploy não pare por avisos de tipos
+    ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,

@@ -136,7 +136,6 @@ export function PrintableReport({ year, results, formValues, scenariosToShow, ch
 
                             <div className="p-4 space-y-1 bg-white">
                                 {scenario.breakdown.map(item => (
-                                    // AQUI ESTÁ A CORREÇÃO: flex-1 no texto e shrink-0 no valor para alinhamento perfeito
                                     <div key={item.name} className="flex justify-between items-start py-1.5 border-b border-slate-100 last:border-0 gap-4">
                                         <p className="text-xs text-slate-600 font-medium leading-tight flex-1">{item.name}</p>
                                         <p className="text-xs font-mono font-semibold text-slate-900 whitespace-nowrap shrink-0">{formatCurrencyBRL(item.value)}</p>
