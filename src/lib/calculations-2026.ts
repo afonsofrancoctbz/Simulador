@@ -155,8 +155,13 @@ function calculatePartnerTaxes(
       reductionValue = 0;
     }
 
-    // Step E: Final Result
-    const finalIrrfValue = Math.max(0, standardTax - reductionValue);
+    // Step E: Final Result [MODIFICADO]
+    // Lei 9.430/1996, Art. 67: Dispensa de recolhimento para valor inferior a R$ 10,00
+    let finalIrrfValue = Math.max(0, standardTax - reductionValue);
+
+    if (finalIrrfValue < 10) {
+        finalIrrfValue = 0;
+    }
 
     totalINSSRetido += inssValue;
     totalIRRFRetido += finalIrrfValue;
@@ -260,6 +265,33 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     baseCSLL += rev * rateCSLL;
   });
 
+  // [INICIO ALTERAÇÃO - IN 2.306/2026]
+  // Aplicação da majoração de 10% na presunção sobre o excedente de R$ 1.250.000,00/trimestre
+  // Proporcional mensal: R$ 416.666,66...
+  const LIMIT_MAJORATION_MENSAL = 1250000 / 3; 
+  const validationNotes: string[] = [];
+
+  if (totalRevenue > LIMIT_MAJORATION_MENSAL) {
+    // Calcula o excedente
+    const excessRevenue = totalRevenue - LIMIT_MAJORATION_MENSAL;
+
+    // Como pode haver mix de atividades (ex: 8% e 32%), calculamos a presunção média ponderada atual
+    const avgPresumptionIRPJ = totalRevenue > 0 ? baseIRPJ / totalRevenue : 0;
+    const avgPresumptionCSLL = totalRevenue > 0 ? baseCSLL / totalRevenue : 0;
+
+    // O acréscimo é de 10% sobre o PERCENTUAL de presunção (ex: 32% vira 35.2%)
+    // Matematicamente, isso equivale a adicionar 10% à BASE calculada sobre o excedente.
+    // Lógica: Excedente * TaxaPresuncao * 0.10
+    const addedBaseIRPJ = excessRevenue * avgPresumptionIRPJ * 0.10;
+    const addedBaseCSLL = excessRevenue * avgPresumptionCSLL * 0.10;
+
+    baseIRPJ += addedBaseIRPJ;
+    baseCSLL += addedBaseCSLL;
+
+    validationNotes.push("Faturamento superior a R$ 416.666,66/mês (R$ 5.000.000,00/ano). Tributação calculada com as adequações da LC 224/2025 e IN 2306/2025.");
+  }
+  // [FIM ALTERAÇÃO]
+
   const rates = fiscalConfig.lucro_presumido_rates;
   const irpjNormal = baseIRPJ * (rates.IRPJ_BASE ?? 0.15);
   const irpjAdicional = Math.max(0, baseIRPJ - (rates.LIMITE_ISENCAO_IRPJ_ADICIONAL_MENSAL || 20000)) * (rates.IRPJ_ADICIONAL_BASE ?? 0.10);
@@ -334,6 +366,11 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
   const effectiveIrpjRate = totalRevenue > 0 ? irpjTotal / totalRevenue : 0;
   const effectiveCsllRate = totalRevenue > 0 ? csllTotal / totalRevenue : 0;
 
+  // Merge default notes with validation notes
+  const finalNotes = isDefault 
+    ? [`Plano '${planName}' usado para cálculo.`, ...validationNotes]
+    : validationNotes;
+
   return {
     regime: isCurrentRules ? "Lucro Presumido (Regras Atuais)" : "Lucro Presumido",
     totalTax,
@@ -352,7 +389,7 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
       { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
       ...breakdown,
     ].filter(i => i.value > 0.001),
-    notes: isDefault ? [`Plano '${planName}' usado para cálculo.`] : [],
+    notes: finalNotes,
     partnerTaxes,
     fatorR: 0,
     effectiveDasRate: 0,
@@ -522,7 +559,7 @@ function _calculateSimples2026(
       { name: formatTaxLabel("DAS (Simples Nacional)", totalDas, totalRev, effectiveDasRateTotal), value: totalDas },
       { name: formatTaxLabel("IVA Externo (IBS/CBS)", ivaTaxes, totalRev), value: ivaTaxes },
       { name: formatTaxLabel("CPP (Anexo IV)", cppAnnexIV, totalPayroll), value: cppAnnexIV },
-      { name: formatTaxLabel("INSS Pró-labore", totalINSSRetido, totalProLaboreBruto), value: totalINSSRetido },
+      { name: formatTaxLabel("INSS s/ Pró-labore", totalINSSRetido, totalProLaboreBruto), value: totalINSSRetido },
       { name: "IRRF Pró-labore", value: totalIRRFRetido },
     ].filter(x => x.value > 0.001),
     notes: isDefault ? [`Plano '${planName}' usado.`] : [],
@@ -557,16 +594,30 @@ function findOptimizedProLabore(
   const missingMonthly = missingAnnual / 12;
   const newProLabores: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores || []));
 
-  // NOVA LÓGICA: Distribuição Igualitária do Aumento
+  // NOVA LÓGICA: Distribuição Proporcional com correção exata de centavos
   if (newProLabores.length > 0) {
-    const increasePerPartner = missingMonthly / newProLabores.length;
+    const totalInitialPL = newProLabores.reduce((s, p) => s + p.value, 0);
+    let distributedExtra = 0;
     
-    newProLabores.forEach(partner => {
-        partner.value += increasePerPartner;
+    newProLabores.forEach((partner, index) => {
+        const isLast = index === newProLabores.length - 1;
+
+        if (isLast) {
+            // O último sócio recebe exatamente o resto para não faltar nem sobrar 1 centavo
+            const remainingToDistribute = missingMonthly - distributedExtra;
+            partner.value = Math.round((partner.value + remainingToDistribute) * 100) / 100;
+        } else {
+            // Os demais recebem a proporção normal arredondada para 2 casas
+            const proportion = totalInitialPL > 0 ? (partner.value / totalInitialPL) : (1 / newProLabores.length);
+            const extraForPartner = Math.round((missingMonthly * proportion) * 100) / 100;
+            
+            distributedExtra += extraForPartner;
+            partner.value = Math.round((partner.value + extraForPartner) * 100) / 100;
+        }
     });
   } else {
     newProLabores.push({
-      value: missingMonthly,
+      value: Math.round(missingMonthly * 100) / 100,
       hasOtherInssContribution: false,
       otherContributionSalary: 0
     });

@@ -52,50 +52,15 @@
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 0; /* Remove margens do navegador */
+  }
+
   body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
     background-color: white;
-    color: black;
-  }
-  
-  .print-hidden {
-    display: none !important;
-  }
-  
-  #results-section,
-  .printable-section {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    border: none !important;
   }
 
-  .printable-card {
-    box-shadow: none !important;
-    border: 1px solid #ccc !important;
-    page-break-inside: avoid !important;
-    margin-top: 2rem;
-  }
-
-  .results-grid {
-    display: block !important;
-  }
-  
-  .results-grid .printable-card {
-    width: 100%;
-    max-width: 100%;
-    margin-bottom: 2rem;
-  }
-
-  /* Garante que os cards de detalhamento e demonstrativo também não sejam divididos */
-  .details-card, .profit-card {
-    page-break-inside: avoid !important;
-    margin-top: 2rem;
-  }
-
-  .separator-print {
-    display: none;
-  }
 }

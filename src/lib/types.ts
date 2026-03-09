@@ -48,10 +48,15 @@ export type ProLaboreForm = z.infer<typeof ProLaboreFormSchema>;
 export const PlanEnumSchema = z.enum(['basico', 'padrao', 'multibeneficios', 'expertsEssencial']);
 export type Plan = z.infer<typeof PlanEnumSchema>;
 
+export const CompanyStageSchema = z.enum(['new', 'existing']);
+export type CompanyStage = z.infer<typeof CompanyStageSchema>;
+
 
 // Schema for the main form input passed from the frontend to the Genkit flow
 export const TaxFormValuesSchema = z.object({
   year: z.number().optional(),
+  companyStage: CompanyStageSchema.optional(),
+  cnpjStartDate: z.string().optional(), // NOVA DATA
   selectedCnaes: z.array(CnaeSelectionSchema),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo."),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo."),
@@ -74,6 +79,8 @@ export const CalculatorFormSchema = z.object({
   city: z.string().optional().refine(val => !val || CIDADES_ATENDIDAS.includes(val), {
     message: "Por favor, selecione uma cidade válida da lista."
   }),
+  companyStage: CompanyStageSchema.default('existing'),
+  cnpjStartDate: z.string().optional(), // NOVA DATA (Formato YYYY-MM)
   selectedCnaes: z.array(CnaeSelectionSchema).min(1, "Selecione ao menos uma atividade (CNAE)."),
   rbt12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
   fp12: z.coerce.number().min(0, "O valor deve ser positivo.").optional().default(0),
@@ -105,13 +112,8 @@ export const CalculatorFormSchema = z.object({
 });
 
 export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
-
-
-// =================================================================================
-// CALCULATION RESULT SCHEMAS
-// =================================================================================
-
-// Schema for the breakdown of taxes in the results
+// ... restante do arquivo (schemas de output) permanece igual
+// (Mantenha o restante do arquivo types.ts como estava)
 export const TaxBreakdownItemSchema = z.object({
     name: z.string(),
     value: z.number(),
@@ -119,7 +121,6 @@ export const TaxBreakdownItemSchema = z.object({
 });
 export type TaxBreakdownItem = z.infer<typeof TaxBreakdownItemSchema>;
 
-// Schema for individual partner tax details in results
 export const PartnerTaxDetailsSchema = z.object({
     proLaboreBruto: z.number(),
     inss: z.number(),
@@ -128,8 +129,6 @@ export const PartnerTaxDetailsSchema = z.object({
 });
 export type PartnerTaxDetails = z.infer<typeof PartnerTaxDetailsSchema>;
 
-
-// Schema for the details of a single tax scenario (2025)
 export const TaxDetailsSchema = z.object({
     regime: z.enum([
       "Simples Nacional", 
@@ -164,8 +163,6 @@ export const CalculationResultsSchema = z.object({
 });
 export type CalculationResults = z.infer<typeof CalculationResultsSchema>;
 
-
-// Schemas for 2026 and beyond (Post-Reform)
 export const TaxDetails2026Schema = TaxDetailsSchema.extend({
   regime: z.enum([
     'Lucro Presumido',
@@ -189,11 +186,6 @@ export const CalculationResults2026Schema = z.object({
 });
 export type CalculationResults2026 = z.infer<typeof CalculationResults2026Schema>;
 
-
-// =================================================================================
-// DATA AND CONFIGURATION INTERFACES/TYPES
-// =================================================================================
-
 export type Annex = 'I' | 'II' | 'III' | 'IV' | 'V';
 
 export interface CnaeData {
@@ -215,11 +207,6 @@ export interface FeeBracket {
         [key in Plan]?: number;
     }
 }
-
-
-// =================================================================================
-// PGDAS and Fator R ANALYSIS SCHEMAS
-// =================================================================================
 
 export const MonthlyDataSchema = z.object({
   mes: z.string().describe("Formato MM/AAAA"),

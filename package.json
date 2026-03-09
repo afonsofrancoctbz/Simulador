@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "deploy": "next build && touch out/.nojekyll"
   },
   "dependencies": {
     "@genkit-ai/googleai": "1.8.0",

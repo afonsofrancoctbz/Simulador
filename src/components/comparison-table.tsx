@@ -1,11 +1,11 @@
-
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { TaxDetails, TaxFormValues, CnaeItem } from '@/lib/types';
 import { cn, formatCurrencyBRL, formatPercent } from "@/lib/utils";
-import { TrendingUp, Trophy, CalendarRange } from 'lucide-react';
+import { TrendingUp, Trophy, CalendarRange, Plus, Minus, ChevronDown, ChevronRight } from 'lucide-react';
 import { calculateTaxes2026 } from '@/lib/calculations-2026';
+import { Button } from './ui/button';
 
 interface ComparisonTableProps {
   currentYear: number;
@@ -23,6 +23,8 @@ interface ColumnData {
 
 export function ComparisonTable({ currentYear, formValues }: ComparisonTableProps) {
   const [columns, setColumns] = useState<ColumnData[]>([]);
+  // Estado para controlar a expansão dos detalhes de impostos
+  const [expandedTaxDetails, setExpandedTaxDetails] = useState(false);
 
   useEffect(() => {
     if (!formValues || !formValues.year || currentYear < 2026) return;
@@ -80,7 +82,6 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
       if (!bestSimples) return;
 
       // 5. Comparação Final (Vencedor do Ano)
-      // CORREÇÃO CRÍTICA: Garantir que 'Menor é Melhor'
       const winnerType = bestSimples.totalTax < lucroPresumido.totalTax ? 'SN' : 'LP';
 
       // Nomes amigáveis
@@ -112,9 +113,34 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
     setColumns(newColumns);
   }, [formValues, currentYear]);
 
+  // Extrai e agrupa os nomes dos impostos (Folha vs Faturamento)
+  const groupedTaxNames = useMemo(() => {
+    const groups: Record<string, Set<string>> = {
+      'Impostos s/ Faturamento': new Set(),
+      'Encargos s/ Folha': new Set()
+    };
+
+    columns.forEach(col => {
+      col.details.breakdown.forEach(item => {
+        const nameLower = item.name.toLowerCase();
+        // Identifica se é encargo de folha/sócio
+        if (nameLower.includes('inss') || nameLower.includes('cpp') || nameLower.includes('irrf')) {
+          groups['Encargos s/ Folha'].add(item.name);
+        } else {
+          groups['Impostos s/ Faturamento'].add(item.name);
+        }
+      });
+    });
+
+    return [
+      { category: 'Impostos s/ Faturamento', items: Array.from(groups['Impostos s/ Faturamento']).sort() },
+      { category: 'Encargos s/ Folha', items: Array.from(groups['Encargos s/ Folha']).sort() }
+    ].filter(g => g.items.length > 0);
+  }, [columns]);
+
   if (columns.length === 0) return null;
 
-  const gridStyle = { gridTemplateColumns: `200px repeat(${columns.length}, minmax(0, 1fr))` };
+  const gridStyle = { gridTemplateColumns: `minmax(120px, 1.5fr) repeat(${columns.length}, minmax(0, 1fr))` };
   const yearsHeader = Array.from(new Set(columns.map(c => c.year)));
   const lastYear = yearsHeader[yearsHeader.length - 1];
 
@@ -132,12 +158,12 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
         </p>
       </div>
 
-      <div className="overflow-x-auto pb-4 px-1">
-        <div className="min-w-[1000px] bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden ring-1 ring-slate-900/5">
+      <div className="overflow-x-auto pb-4 px-1 print-remove-overflow print:overflow-visible print:px-0">
+        <div className="min-w-[1000px] md:min-w-full print:min-w-0 print:w-full bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden ring-1 ring-slate-900/5 print-safe-table print:shadow-none print:ring-0 print:text-[10px]">
           
           {/* SUPER HEADER (ANOS) */}
           <div className="grid divide-x divide-slate-200 border-b border-slate-200 bg-slate-100/80" 
-               style={{ gridTemplateColumns: `200px repeat(${yearsHeader.length}, 1fr)` }}>
+               style={{ gridTemplateColumns: `minmax(120px, 1.5fr) repeat(${yearsHeader.length}, 1fr)` }}>
              <div className="p-3 flex items-center justify-center font-bold text-xs text-slate-400 uppercase tracking-widest bg-slate-100/50">
                 ANO BASE
              </div>
@@ -182,18 +208,59 @@ export function ComparisonTable({ currentYear, formValues }: ComparisonTableProp
             ))}
           </div>
 
-          {/* IMPOSTO TOTAL */}
-          <div className="grid divide-x divide-slate-100 hover:bg-slate-50/30 transition-colors border-b border-slate-100" style={gridStyle}>
-            <div className="p-3 flex flex-col justify-center pl-6 bg-slate-50/20">
-              <span className="text-slate-700 font-bold text-xs uppercase tracking-wide">Imposto Total</span>
-              <span className="text-[9px] text-slate-400 font-normal">Só Tributos</span>
+          {/* IMPOSTO TOTAL (COM TOGGLE) */}
+          <div className={cn(
+              "grid divide-x divide-slate-100 transition-colors border-b border-slate-100 relative group",
+              expandedTaxDetails ? "bg-slate-50" : "hover:bg-slate-50/30"
+            )} style={gridStyle}>
+            
+            <div className="p-2 flex items-center justify-between pl-4 bg-slate-50/20 cursor-pointer hover:bg-slate-100/50 transition-colors"
+                 onClick={() => setExpandedTaxDetails(!expandedTaxDetails)}>
+              <div className="flex flex-col justify-center">
+                <span className="text-slate-700 font-bold text-xs uppercase tracking-wide">Imposto Total</span>
+                <span className="text-[9px] text-slate-400 font-normal">Só Tributos</span>
+              </div>
+              <Button size="icon" variant="ghost" className="h-6 w-6 text-slate-400">
+                  {expandedTaxDetails ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+              </Button>
             </div>
+
             {columns.map((col, idx) => (
               <div key={idx} className={cn("p-3 flex items-center justify-center font-bold", col.isBestOfYear ? "text-red-600" : "text-slate-400")}>
                   {formatCurrencyBRL(col.details.totalTax)}
               </div>
             ))}
           </div>
+
+          {/* --- DETALHAMENTO EXPANDIDO (AGORA AGRUPADO) --- */}
+          {expandedTaxDetails && (
+            <div className="bg-slate-50/50 shadow-inner border-b border-slate-200 animate-in slide-in-from-top-2 duration-300 pb-2">
+                {groupedTaxNames.map((group, groupIdx) => (
+                    <React.Fragment key={groupIdx}>
+                        {/* Cabçalho do Grupo (ex: IMPOSTOS S/ FATURAMENTO) */}
+                        <div className="bg-slate-100/60 border-y border-slate-200/50 p-2 pl-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2 first:mt-0">
+                            {group.category}
+                        </div>
+                        {/* Itens do Grupo */}
+                        {group.items.map((taxName, rowIndex) => (
+                            <div key={rowIndex} className="grid divide-x divide-slate-100/50 border-b border-slate-100 last:border-0 hover:bg-slate-100/50" style={gridStyle}>
+                                <div className="p-2 pl-8 flex items-center text-[10px] font-medium text-slate-500 uppercase tracking-wide">
+                                    {taxName}
+                                </div>
+                                {columns.map((col, colIndex) => {
+                                    const taxItem = col.details.breakdown.find(b => b.name === taxName);
+                                    return (
+                                        <div key={colIndex} className="p-2 flex items-center justify-center text-xs text-slate-600">
+                                            {taxItem ? formatCurrencyBRL(taxItem.value) : '-'}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ))}
+                    </React.Fragment>
+                ))}
+            </div>
+          )}
 
           {/* ALÍQUOTA REAL */}
           <div className="grid divide-x divide-slate-100 hover:bg-slate-50/30 transition-colors border-b border-slate-100" style={gridStyle}>

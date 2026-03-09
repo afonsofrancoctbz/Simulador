@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,11 +5,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { getFiscalParameters } from '@/config/fiscal';
-import { calculateTaxesOnServer } from '@/ai/flows/calculate-taxes-flow';
+import { calculateTaxes } from '@/lib/calculations';
 import { calculateTaxes2026 } from '@/lib/calculations-2026';
-import { calculateFatorRProjection, type FatorRResponse } from '@/ai/flows/fator-r-projection-flow';
+import { calculateFatorRProjectionLocal } from '@/lib/fator-r-projection-logic';
 import { getCnaeData } from '@/lib/cnae-helpers';
-import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem, Annex } from '@/lib/types';
+import type { CalculationResults, CalculationResults2026, TaxFormValues, CnaeItem } from '@/lib/types';
 import { CalculatorFormSchema, type CalculatorFormValues } from '@/lib/types';
 import { useDebounce } from 'react-use';
 import { getNBSOptionsByCnae } from '@/lib/cnae-reductions-2026';
@@ -19,7 +17,7 @@ import type { CnaeRelationship2026 } from '@/lib/cnae-data-2026';
 
 export function useTaxCalculator(year: number) {
     const [results, setResults] = useState<CalculationResults | CalculationResults2026 | null>(null);
-    const [fatorRProjection, setFatorRProjection] = useState<FatorRResponse | null>(null);
+    const [fatorRProjection, setFatorRProjection] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
     const [error, setError] = useState<string | null>(null);
@@ -32,6 +30,7 @@ export function useTaxCalculator(year: number) {
         resolver: zodResolver(CalculatorFormSchema),
         defaultValues: {
             city: undefined,
+            companyStage: 'new', // Valor padrão forçado para evitar erros de renderização
             selectedCnaes: [],
             rbt12: 0,
             fp12: 0,
@@ -80,7 +79,7 @@ export function useTaxCalculator(year: number) {
     }, [watchedCnaes, getValues, setValue]);
 
     useDebounce(() => {
-        const fetchFatorRProjection = async () => {
+        const fetchFatorRProjection = () => {
             const { rbt12, fp12, selectedCnaes, exportCurrency, exchangeRate, proLabores, totalSalaryExpense } = getValues();
             const RBT12_atual = rbt12 ?? 0;
             
@@ -96,13 +95,8 @@ export function useTaxCalculator(year: number) {
             const hasAnnexVActivity = selectedCnaes.some(item => getCnaeData(item.code)?.requiresFatorR);
 
             if (hasAnnexVActivity && RBT12_atual > 0 && receitaMensalProjetada > 0) {
-                try {
-                    const projection = await calculateFatorRProjection({ RBT12_atual, FS12_atual, receitaMensalProjetada });
-                    setFatorRProjection(projection);
-                } catch (e) {
-                    console.error("Erro ao calcular projeção do Fator R:", e);
-                    setFatorRProjection(null);
-                }
+                const projection = calculateFatorRProjectionLocal({ RBT12_atual, FS12_atual, receitaMensalProjetada });
+                setFatorRProjection(projection);
             } else {
                 setFatorRProjection(null);
             }
@@ -114,9 +108,7 @@ export function useTaxCalculator(year: number) {
     useEffect(() => {
         const fetchBCBRate = async (date: Date): Promise<number | null> => {
             const currency = debouncedCurrency;
-            if (!currency || currency === 'BRL') {
-                return 1;
-            }
+            if (!currency || currency === 'BRL') return 1;
 
             const formattedDate = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;
             const url = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='${currency}'&@dataCotacao='${formattedDate}'&$top=1&$format=json`;
@@ -128,7 +120,6 @@ export function useTaxCalculator(year: number) {
                 const rate = data?.value?.[0]?.cotacaoCompra;
                 return rate ?? null;
             } catch (error) {
-                console.error('BCB API fetch failed for date:', formattedDate, error);
                 return null;
             }
         };
@@ -146,7 +137,7 @@ export function useTaxCalculator(year: number) {
                 rate = await fetchBCBRate(yesterday);
             }
 
-            setValue('exchangeRate', rate ?? 1); // Fallback to 1 if all attempts fail
+            setValue('exchangeRate', rate ?? 1);
         };
 
         getRate();
@@ -199,25 +190,16 @@ export function useTaxCalculator(year: number) {
     };
 
     async function onSubmit(values: CalculatorFormValues) {
-        
         const isValid = await form.trigger();
-        if (!isValid) {
-            toast({
-                title: "Formulário Inválido",
-                description: "Por favor, corrija os erros antes de continuar.",
-                variant: "destructive",
-            });
-            return;
-        }
+        if (!isValid) return;
         
-        // Validate NBS selection for post-reform years
         if (year >= 2026) {
           for (const cnae of values.selectedCnaes) {
               const options = nbsOptions[cnae.code];
               if (options && options.length > 1 && !cnae.nbsCode) {
                   toast({
-                      title: "Seleção de Tributação Pendente",
-                      description: `A atividade ${cnae.code} requer que você especifique o tipo de serviço para o cálculo correto dos impostos da reforma.`,
+                      title: "Seleção Pendente",
+                      description: `Defina o tipo de serviço para ${cnae.code}.`,
                       variant: "destructive",
                   });
                   return;
@@ -231,35 +213,19 @@ export function useTaxCalculator(year: number) {
         setSelectedCity(values.city);
 
         const calculationYear = values.year ?? year;
-
-        setTimeout(() => {
-            document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-
         const submissionValues = transformFormToSubmission(values);
 
         try {
-            const finalSubmissionValues = submissionValues;
-
             if (calculationYear <= 2025) {
-                const calculatedResults = await calculateTaxesOnServer(finalSubmissionValues);
-                if (!calculatedResults) throw new Error("A API de cálculo não retornou resultados.");
+                // Cálculo 2025 movido para local (Client-side)
+                const calculatedResults = calculateTaxes(submissionValues);
                 setResults(calculatedResults);
-
             } else { 
-                const calculatedResults = calculateTaxes2026(finalSubmissionValues);
-                if (!calculatedResults) throw new Error("A API de cálculo para 2026 não retornou resultados.");
+                const calculatedResults = calculateTaxes2026(submissionValues);
                 setResults(calculatedResults);
             }
         } catch (e) {
-            console.error(`Erro ao calcular impostos (${calculationYear}):`, e);
-            const errorMessage = e instanceof Error ? e.message : "Ocorreu um inesperado.";
-            setError(`Falha no cálculo. Por favor, verifique os dados e tente novamente. Detalhe: ${errorMessage}`);
-            toast({
-                title: `Erro no Cálculo (${calculationYear})`,
-                description: "Não foi possível completar o cálculo. Tente novamente mais tarde.",
-                variant: "destructive",
-            });
+            setError(`Falha no cálculo local.`);
         } finally {
             setIsLoading(false);
         }

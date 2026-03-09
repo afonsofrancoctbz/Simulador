@@ -1,4 +1,4 @@
-# **App Name**: TributaSimples
+# **App Name**: Simulador Tributario - Afonso Franco
 
 ## Core Features:
 

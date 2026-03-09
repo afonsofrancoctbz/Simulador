@@ -1,0 +1,64 @@
+@media screen {
+  /* Esconde o relatório na tela do PC */
+  .print-only {
+      display: none !important;
+  }
+}
+
+@media print {
+  @page {
+      size: A4 portrait;
+      margin: 12mm; /* Margem segura e bonita */
+  }
+
+  body {
+      background-color: white !important;
+      color: #0f172a !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+  }
+
+  /* Esconde o site inteiro (formulários, botões) na impressão */
+  .screen-only, .print-hidden {
+      display: none !important;
+  }
+
+  /* Exibe o relatório */
+  .print-only {
+      display: block !important;
+  }
+
+  /* === A MÁGICA QUE IMPEDE A TABELA DE SUMIR === */
+  /* Remove regras de rolagem e ocultaçāo de excessos que quebram o PDF */
+  * {
+      overflow: visible !important;
+  }
+  
+  .print-remove-overflow {
+      overflow: visible !important;
+      padding: 0 !important;
+  }
+
+  .print-safe-table {
+      min-width: 0 !important;
+      width: 100% !important;
+      box-shadow: none !important;
+  }
+
+  /* Reduz ligeiramente a fonte da tabela para ela caber na folha A4 */
+  .print-safe-table * {
+      font-size: 10px !important;
+      padding: 4px !important;
+  }
+
+  /* === PROTEÇÃO CONTRA CORTES NO MEIO DO TEXTO === */
+  .break-inside-avoid {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+  }
+}

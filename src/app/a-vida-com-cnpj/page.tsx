@@ -274,19 +274,19 @@ export default function LifeWithCNPJSection() {
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="opacity-80">Pró-labore Bruto:</span>
-                                            <span className="font-bold">R$ 8.565,28</span>
+                                            <span className="font-bold">R$ 8.475,55</span>
                                         </div>
                                         <div className="flex justify-between text-[#00d3b3]">
                                             <span>INSS (11% Teto):</span>
-                                            <span>- R$ 942,18</span>
+                                            <span>- R$ 932,31</span>
                                         </div>
                                         <div className="flex justify-between text-[#00d3b3]">
                                             <span>IRRF:</span>
-                                            <span>- R$ 1.157,69</span>
+                                            <span>- R$ 1.165,66</span>
                                         </div>
                                         <div className="flex justify-between font-bold text-lg pt-2 border-t border-white/10 mt-2">
                                             <span>Líquido a receber:</span>
-                                            <span>R$ 6.465,41</span>
+                                            <span>R$ 6.377,58</span>
                                         </div>
                                     </div>
                                 </div>
