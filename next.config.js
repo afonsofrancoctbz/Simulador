@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // output: 'export', // Descomente para GitHub Pages
+  // basePath: '/Simulator-reforma-tributaria', // Descomente para GitHub Pages
   images: {
     unoptimized: true,
     remotePatterns: [

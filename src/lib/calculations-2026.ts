@@ -52,23 +52,12 @@ function calculateCpp(monthlyPayroll: number, fiscalConfig: any): number {
   return monthlyPayroll * cppRate;
 }
 
-/**
- * Helper para formatar o nome do imposto com a alíquota
- * Ex: PIS -> PIS - 0,65%
- * Se manualRate for fornecido, usa ele. Caso contrário, calcula value/base.
- */
 function formatTaxLabel(name: string, value: number, base: number, manualRate?: number): string {
     if (value <= 0 || base <= 0) return name;
-    
     const rate = manualRate !== undefined ? manualRate : (value / base);
-    
-    // Formata para porcentagem (ex: 0.048 -> 4,80%)
     return `${name} - ${formatPercent(rate)}`;
 }
 
-/**
- * Calculates standard Contribution Fee based on Revenue and Regime Tables
- */
 function resolveContabilizeiFee(
   totalRevenue: number,
   selectedPlan: string | undefined,
@@ -79,9 +68,6 @@ function resolveContabilizeiFee(
   return resolveSelectedPlan(feeBracket?.plans, selectedPlan);
 }
 
-/**
- * Calculates INSS and IRRF for partners
- */
 function calculatePartnerTaxes(
   proLabores: ProLaboreForm[],
   fiscalConfig: any
@@ -97,19 +83,16 @@ function calculatePartnerTaxes(
     throw new Error("Tabelas de impostos (INSS/IRRF) não encontradas na configuração fiscal.");
   }
   
-  // 2026 Reform Constants
   const SIMPLIFIED_DISCOUNT_VALUE = 607.20;
   const REDUCTION_LIMIT_LOW = 5000.00;
   const REDUCTION_LIMIT_HIGH = 7350.00;
   const REDUCTION_BASE = 978.62;
   const REDUCTION_FACTOR = 0.133145;
 
-
   for (const proLabore of proLabores) {
     const grossIncome = proLabore.value || 0;
     if (grossIncome <= 0) continue;
 
-    // 1. Calculate INSS
     let inssValue = 0;
     if (proLabore.hasOtherInssContribution) {
       const otherContribution = proLabore.otherContributionSalary || 0;
@@ -125,13 +108,9 @@ function calculatePartnerTaxes(
     const maxContribution = fiscalConfig.teto_inss * fiscalConfig.aliquota_inss_prolabore;
     inssValue = Math.min(inssValue, maxContribution);
 
-    // Step A: Determine the Best Deduction
     const effectiveDeduction = Math.max(inssValue, SIMPLIFIED_DISCOUNT_VALUE);
-
-    // Step B: Calculate the Tax Base
     const irrfBase = grossIncome - effectiveDeduction;
     
-    // Step C: Calculate Standard Tax ("Full" Tax)
     let standardTax = 0;
     if (irrfBase > 0) {
       const irrfBracket = safeFindBracket(irrfBase, irrfTable, { 
@@ -144,24 +123,18 @@ function calculatePartnerTaxes(
     }
     standardTax = Math.max(0, standardTax);
 
-    // Step D: Calculate the Law 15.270 Reduction ("Redutor")
     let reductionValue = 0;
     if (grossIncome <= REDUCTION_LIMIT_LOW) {
       reductionValue = standardTax;
     } else if (grossIncome > REDUCTION_LIMIT_LOW && grossIncome <= REDUCTION_LIMIT_HIGH) {
       const calculatedReduction = REDUCTION_BASE - (REDUCTION_FACTOR * grossIncome);
       reductionValue = Math.max(0, calculatedReduction);
-    } else { // grossIncome > REDUCTION_LIMIT_HIGH
+    } else {
       reductionValue = 0;
     }
 
-    // Step E: Final Result [MODIFICADO]
-    // Lei 9.430/1996, Art. 67: Dispensa de recolhimento para valor inferior a R$ 10,00
     let finalIrrfValue = Math.max(0, standardTax - reductionValue);
-
-    if (finalIrrfValue < 10) {
-        finalIrrfValue = 0;
-    }
+    if (finalIrrfValue < 10) finalIrrfValue = 0;
 
     totalINSSRetido += inssValue;
     totalIRRFRetido += finalIrrfValue;
@@ -177,9 +150,6 @@ function calculatePartnerTaxes(
   return { partnerTaxes, totalINSSRetido, totalIRRFRetido };
 }
 
-/**
- * Helper to calculate IBS/CBS credits and debits
- */
 function calculateIvaLiability(
   activities: any[],
   creditExpenses: number,
@@ -187,20 +157,15 @@ function calculateIvaLiability(
   taxType: 'IBS' | 'CBS'
 ): IvaCalculationResult {
   let debit = 0;
-  
-  // Calculate Debits
   activities.forEach((act) => {
     const reductionData = getIvaReductionByCnae(act.code, act.nbsCode);
     const reductionPercent = taxType === 'CBS' 
       ? (reductionData?.reducaoCBS ?? 0) 
       : (reductionData?.reducaoIBS ?? 0);
-    
     const effectiveRate = stdRate * (1 - (reductionPercent / 100));
     debit += (act.revenue || 0) * effectiveRate;
   });
 
-  // Calculate Credits (using the first activity's reduction profile as a baseline heuristic 
-  // if mixed activities exist, or 0 reduction if strict).
   let credit = 0;
   if (creditExpenses > 0 && activities.length > 0) {
     const firstAct = activities[0];
@@ -208,21 +173,12 @@ function calculateIvaLiability(
     const reductionPercent = taxType === 'CBS' 
       ? (reductionData?.reducaoCBS ?? 0) 
       : (reductionData?.reducaoIBS ?? 0);
-    
     const effectiveCreditRate = stdRate * (1 - (reductionPercent / 100));
     credit = creditExpenses * effectiveCreditRate;
   }
 
-  return {
-    debit,
-    credit,
-    payable: Math.max(0, debit - credit)
-  };
+  return { debit, credit, payable: Math.max(0, debit - credit) };
 }
-
-// ======================================================================================
-// SECTION: LUCRO PRESUMIDO ENGINE
-// ======================================================================================
 
 function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: boolean): TaxDetails2026 | null {
   const { 
@@ -232,8 +188,6 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
   } = values;
 
   const fiscalConfig = getFiscalParametersPostReform(year);
-
-  // 1. Revenue Aggregation
   const domesticRevenue = domesticActivities.reduce((sum, act) => sum + (act?.revenue || 0), 0);
   const exportRevenueBRL = exportActivities.reduce((sum, act) => sum + (act?.revenue || 0) * exchangeRate, 0);
   const totalRevenue = domesticRevenue + exportRevenueBRL;
@@ -241,13 +195,10 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
 
   if (totalRevenue === 0 && totalProLaboreBruto === 0) return null;
 
-  // 2. Payroll Taxes
   const monthlyPayroll = totalSalaryExpense + totalProLaboreBruto;
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = calculatePartnerTaxes(proLabores, fiscalConfig);
   const inssPatronal = calculateCpp(monthlyPayroll, fiscalConfig);
 
-  // 3. IRPJ & CSLL (Corporate Income Tax)
-  // Combine all activities, converting export revenue to BRL
   const allActivities = [
     ...domesticActivities,
     ...exportActivities.map(a => ({ ...a, revenue: (a.revenue || 0) * exchangeRate }))
@@ -265,32 +216,17 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     baseCSLL += rev * rateCSLL;
   });
 
-  // [INICIO ALTERAÇÃO - IN 2.306/2026]
-  // Aplicação da majoração de 10% na presunção sobre o excedente de R$ 1.250.000,00/trimestre
-  // Proporcional mensal: R$ 416.666,66...
   const LIMIT_MAJORATION_MENSAL = 1250000 / 3; 
   const validationNotes: string[] = [];
 
   if (totalRevenue > LIMIT_MAJORATION_MENSAL) {
-    // Calcula o excedente
     const excessRevenue = totalRevenue - LIMIT_MAJORATION_MENSAL;
-
-    // Como pode haver mix de atividades (ex: 8% e 32%), calculamos a presunção média ponderada atual
     const avgPresumptionIRPJ = totalRevenue > 0 ? baseIRPJ / totalRevenue : 0;
     const avgPresumptionCSLL = totalRevenue > 0 ? baseCSLL / totalRevenue : 0;
-
-    // O acréscimo é de 10% sobre o PERCENTUAL de presunção (ex: 32% vira 35.2%)
-    // Matematicamente, isso equivale a adicionar 10% à BASE calculada sobre o excedente.
-    // Lógica: Excedente * TaxaPresuncao * 0.10
-    const addedBaseIRPJ = excessRevenue * avgPresumptionIRPJ * 0.10;
-    const addedBaseCSLL = excessRevenue * avgPresumptionCSLL * 0.10;
-
-    baseIRPJ += addedBaseIRPJ;
-    baseCSLL += addedBaseCSLL;
-
-    validationNotes.push("Faturamento superior a R$ 416.666,66/mês (R$ 5.000.000,00/ano). Tributação calculada com as adequações da LC 224/2025 e IN 2306/2025.");
+    baseIRPJ += excessRevenue * avgPresumptionIRPJ * 0.10;
+    baseCSLL += excessRevenue * avgPresumptionCSLL * 0.10;
+    validationNotes.push("Faturamento superior a R$ 416.666,66/mês. Tributação calculada com adequações da LC 224/2025.");
   }
-  // [FIM ALTERAÇÃO]
 
   const rates = fiscalConfig.lucro_presumido_rates;
   const irpjNormal = baseIRPJ * (rates.IRPJ_BASE ?? 0.15);
@@ -298,7 +234,6 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
   const irpjTotal = irpjNormal + irpjAdicional;
   const csllTotal = baseCSLL * (rates.CSLL ?? 0.09);
 
-  // 4. Consumption Taxes (The complex part: Current Rules vs Transition)
   const breakdown: any[] = [];
   let consumptionTaxes = 0;
 
@@ -306,7 +241,6 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     const pis = domesticRevenue * (rates.PIS ?? 0);
     const cofins = domesticRevenue * (rates.COFINS ?? 0);
     const iss = domesticRevenue * ((issRate ?? 5) / 100);
-    
     consumptionTaxes = pis + cofins + iss;
     breakdown.push(
       { name: formatTaxLabel("PIS", pis, domesticRevenue, rates.PIS), value: pis, rate: rates.PIS },
@@ -314,40 +248,27 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
       { name: formatTaxLabel("ISS", iss, domesticRevenue, (issRate ?? 5) / 100), value: iss, rate: (issRate ?? 5) / 100 }
     );
   } else {
-    // Transition Rules (2026+)
     const trans = fiscalConfig.reforma_tributaria;
-    
-    // Legacy Taxes with multipliers (usually shrinking over time)
     const pisTrans = domesticRevenue * (rates.PIS ?? 0) * (trans?.pis_cofins_multiplier ?? 1);
     const cofinsTrans = domesticRevenue * (rates.COFINS ?? 0) * (trans?.pis_cofins_multiplier ?? 1);
     const issTrans = domesticRevenue * ((issRate ?? 5) / 100) * (trans?.iss_icms_multiplier ?? 1);
-    
     const legacyTotal = pisTrans + cofinsTrans + issTrans;
 
-    // Alíquotas efetivas de transição para exibição
-    const pisRateTrans = (rates.PIS ?? 0) * (trans?.pis_cofins_multiplier ?? 1);
-    const cofinsRateTrans = (rates.COFINS ?? 0) * (trans?.pis_cofins_multiplier ?? 1);
-    const issRateTrans = ((issRate ?? 5) / 100) * (trans?.iss_icms_multiplier ?? 1);
-
     breakdown.push(
-      { name: formatTaxLabel("PIS (Transição)", pisTrans, domesticRevenue, pisRateTrans), value: pisTrans },
-      { name: formatTaxLabel("COFINS (Transição)", cofinsTrans, domesticRevenue, cofinsRateTrans), value: cofinsTrans },
-      { name: formatTaxLabel("ISS (Transição)", issTrans, domesticRevenue, issRateTrans), value: issTrans }
+      { name: formatTaxLabel("PIS (Transição)", pisTrans, domesticRevenue), value: pisTrans },
+      { name: formatTaxLabel("COFINS (Transição)", cofinsTrans, domesticRevenue), value: cofinsTrans },
+      { name: formatTaxLabel("ISS (Transição)", issTrans, domesticRevenue), value: issTrans }
     );
 
-    // New Taxes (IBS/CBS)
     const cbsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, trans?.cbs_aliquota_padrao ?? 0, 'CBS');
     const ibsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, trans?.ibs_aliquota_padrao ?? 0, 'IBS');
 
     if (year === 2026) {
-      // In 2026, IBS/CBS are "test" taxes (deductible/compensable), usually not added to final burden in same way
-      // *Logic adjustment*: The reform specs say 2026 is merely for system testing (0.9% CBS, 0.1% IBS), 
-      // deductible from PIS/COFINS. For simplicity here, we assume they are "extra" but labeled as test.
       breakdown.push(
-        { name: formatTaxLabel("CBS (Teste/Compensável)", cbsCalc.payable, domesticRevenue), value: cbsCalc.payable },
-        { name: formatTaxLabel("IBS (Teste/Compensável)", ibsCalc.payable, domesticRevenue), value: ibsCalc.payable }
+        { name: formatTaxLabel("CBS (Teste)", cbsCalc.payable, domesticRevenue), value: cbsCalc.payable },
+        { name: formatTaxLabel("IBS (Teste)", ibsCalc.payable, domesticRevenue), value: ibsCalc.payable }
       );
-      consumptionTaxes = legacyTotal; // Keeping conservative for 2026
+      consumptionTaxes = legacyTotal;
     } else {
       breakdown.push(
         { name: formatTaxLabel("CBS (Líquida)", cbsCalc.payable, domesticRevenue), value: cbsCalc.payable },
@@ -357,19 +278,9 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     }
   }
 
-  // 5. Final Assembly
   const totalTax = irpjTotal + csllTotal + consumptionTaxes + inssPatronal + totalINSSRetido + totalIRRFRetido;
   const { fee: contabilizeiFee, planName, isDefault } = resolveContabilizeiFee(totalRevenue, selectedPlan, CONTABILIZEI_FEES_LUCRO_PRESUMIDO);
   const totalMonthlyCost = totalTax + Number(contabilizeiFee ?? 0);
-
-  // Calcula alíquota efetiva do IRPJ e CSLL sobre o faturamento total para exibição
-  const effectiveIrpjRate = totalRevenue > 0 ? irpjTotal / totalRevenue : 0;
-  const effectiveCsllRate = totalRevenue > 0 ? csllTotal / totalRevenue : 0;
-
-  // Merge default notes with validation notes
-  const finalNotes = isDefault 
-    ? [`Plano '${planName}' usado para cálculo.`, ...validationNotes]
-    : validationNotes;
 
   return {
     regime: isCurrentRules ? "Lucro Presumido (Regras Atuais)" : "Lucro Presumido",
@@ -382,27 +293,22 @@ function calculateLucroPresumido2026(values: TaxFormValues, isCurrentRules: bool
     effectiveRate: totalRevenue > 0 ? totalMonthlyCost / totalRevenue : 0,
     contabilizeiFee,
     breakdown: [
-      { name: formatTaxLabel("IRPJ", irpjTotal, totalRevenue, effectiveIrpjRate), value: irpjTotal, rate: rates.IRPJ_BASE },
-      { name: formatTaxLabel("CSLL", csllTotal, totalRevenue, effectiveCsllRate), value: csllTotal, rate: rates.CSLL },
-      { name: formatTaxLabel("CPP (INSS Patronal)", inssPatronal, monthlyPayroll), value: inssPatronal },
-      { name: formatTaxLabel("INSS s/ Pró-labore", totalINSSRetido, totalProLaboreBruto), value: totalINSSRetido },
+      { name: formatTaxLabel("IRPJ", irpjTotal, totalRevenue), value: irpjTotal },
+      { name: formatTaxLabel("CSLL", csllTotal, totalRevenue), value: csllTotal },
+      { name: "CPP (INSS Patronal)", value: inssPatronal },
+      { name: "INSS s/ Pró-labore", value: totalINSSRetido },
       { name: "IRRF s/ Pró-labore", value: totalIRRFRetido },
       ...breakdown,
     ].filter(i => i.value > 0.001),
-    notes: finalNotes,
+    notes: isDefault ? [`Plano '${planName}' usado.`, ...validationNotes] : validationNotes,
     partnerTaxes,
     fatorR: 0,
     effectiveDasRate: 0,
     annex: "N/A",
     optimizationNote: "",
-    // @ts-expect-error - Custom property for sorting
     order: isCurrentRules ? 5 : 4,
   };
 }
-
-// ======================================================================================
-// SECTION: SIMPLES NACIONAL ENGINE
-// ======================================================================================
 
 function _calculateSimples2026(
   values: TaxFormValues,
@@ -410,137 +316,82 @@ function _calculateSimples2026(
   fatorREffective: number,
   proLaboreOverride?: ProLaboreForm[]
 ): TaxDetails2026 | null {
-  if (!values.year || values.year < 2026) throw new Error("Ano inválido Simples Nacional 2026+");
-
-  const fiscalConfig = getFiscalParametersPostReform(values.year);
+  const fiscalConfig = getFiscalParametersPostReform(values.year!);
   const { 
-    domesticActivities = [], exportActivities = [], exchangeRate = 1, 
-    totalSalaryExpense = 0, proLabores = [], b2bRevenuePercentage = 100, 
+    domesticActivities = [], exportActivities = [], 
+    totalSalaryExpense = 0, proLabores = [], 
     rbt12, selectedPlan, creditGeneratingExpenses = 0 
   } = values;
 
   const activeProLabores = proLaboreOverride ?? proLabores;
   const totalProLaboreBruto = activeProLabores.reduce((s, p) => s + (p?.value || 0), 0);
-  
   const domesticRev = domesticActivities.reduce((s, a) => s + (a?.revenue || 0), 0);
   const exportRev = exportActivities.reduce((s, a) => s + ((a?.revenue || 0) * (values.exchangeRate || 1)), 0);
   const totalRev = domesticRev + exportRev;
 
   if (totalRev === 0 && totalProLaboreBruto === 0) return null;
 
-  // 1. Partner Taxes
   const { partnerTaxes, totalINSSRetido, totalIRRFRetido } = calculatePartnerTaxes(activeProLabores, fiscalConfig);
   const totalPayroll = totalSalaryExpense + totalProLaboreBruto;
-
-  // 2. DAS Calculation Variables
   const effectiveRbt12 = rbt12 > 0 ? rbt12 : totalRev * 12;
+  
   let totalDas = 0;
   let cppAnnexIV = 0;
-  let finalAnnex: Annex = "I"; // Default, will be overwritten
+  let finalAnnex: Annex = "I";
   
-  // Combine activities for processing
   const processableActivities = [
     ...domesticActivities.map(a => ({ ...a, isExport: false, revenue: a.revenue || 0 })),
     ...exportActivities.map(a => ({ ...a, isExport: true, revenue: (a.revenue || 0) * (values.exchangeRate || 1)}))
   ];
 
-  // 3. Process Activities for DAS
   processableActivities.forEach(activity => {
-    if (activity.revenue <= 0) return;
-
     const cnaeInfo = getCnaeData(activity.code);
     if (!cnaeInfo) return;
 
-    // Determine Annex
     let currentAnnex: Annex = normalizeAnnex(cnaeInfo.annex);
     if (cnaeInfo.requiresFatorR) {
-      const threshold = fiscalConfig.simples_nacional?.limite_fator_r ?? 0.28;
-      currentAnnex = fatorREffective >= threshold ? "III" : "V";
+      currentAnnex = fatorREffective >= 0.28 ? "III" : "V";
     }
     finalAnnex = currentAnnex;
 
-    const annexTable = fiscalConfig.simples_nacional?.[currentAnnex];
+    const annexTable = fiscalConfig.simples_nacional[currentAnnex];
     const bracket = safeFindBracket(effectiveRbt12, annexTable, { who: 'SimplesCalc', year: values.year });
 
     if (bracket) {
-      const nominalRate = bracket.rate;
-      const deduction = bracket.deduction;
-      
       let effectiveDasRate = effectiveRbt12 > 0 
-        ? ((effectiveRbt12 * nominalRate) - deduction) / effectiveRbt12 
-        : nominalRate;
+        ? ((effectiveRbt12 * bracket.rate) - bracket.deduction) / effectiveRbt12 
+        : bracket.rate;
 
-      // START OF FIX 1: Correct DAS Reduction
       const dist = bracket.distribution || {};
       const newIvaShare = (dist.CBS || 0) + (dist.IBS || 0);
       const allConsumptionShare = (dist.PIS || 0) + (dist.COFINS || 0) + (dist.ISS || 0) + (dist.ICMS || 0) + (dist.IPI || 0) + newIvaShare;
 
       if (activity.isExport) {
-        // Export is immune to ALL consumption taxes inside DAS
         effectiveDasRate *= (1 - allConsumptionShare);
-      } else if (isHybrid && values.year >= 2027) {
-        // Hybrid Regime (2027+):
-        // We REMOVE the new IVA (CBS/IBS) from the DAS because it is paid outside.
-        // We KEEP the legacy taxes (ISS/ICMS) inside the DAS (they fade out via the table distribution, not here).
+      } else if (isHybrid && values.year! >= 2027) {
         effectiveDasRate *= (1 - newIvaShare);
       }
-      // END OF FIX 1
-
       totalDas += activity.revenue * effectiveDasRate;
     }
-
-    if (currentAnnex === "IV") {
-      cppAnnexIV = calculateCpp(totalPayroll, fiscalConfig);
-    }
+    if (currentAnnex === "IV") cppAnnexIV = calculateCpp(totalPayroll, fiscalConfig);
   });
 
-  // 4. Hybrid IVA Calculation (Paying IBS/CBS outside DAS)
   let ivaTaxes = 0;
-  if (isHybrid && values.year >= 2027) {
-    const reformParams = fiscalConfig.reforma_tributaria;
-    
-    // AUDITORIA DE CÓDIGO: Lógica Simplificada
-    // Removemos os 'ifs' manuais de ano. Agora usamos as taxas que já vêm 
-    // calculadas corretamente do 'fiscalConfig' (baseado na TRANSITION_TABLE).
-    
-    // CBS (Federal)
-    // Em 2027/28 virá 8.4%. De 2029 em diante virá 8.5%.
-    const cbsCalc = calculateIvaLiability(
-        domesticActivities, 
-        creditGeneratingExpenses, 
-        reformParams.cbs_aliquota_padrao, 
-        'CBS'
-    );
-    
-    // IBS (Subnacional)
-    // Em 2027/28 virá 0.1%. Em 2029 virá 1.85%. Em 2033 virá 18.5%.
-    const ibsCalc = calculateIvaLiability(
-        domesticActivities, 
-        creditGeneratingExpenses, 
-        reformParams.ibs_aliquota_padrao, 
-        'IBS'
-    );
-    
+  if (isHybrid && values.year! >= 2027) {
+    const trans = fiscalConfig.reforma_tributaria;
+    const cbsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, trans.cbs_aliquota_padrao, 'CBS');
+    const ibsCalc = calculateIvaLiability(domesticActivities, creditGeneratingExpenses, trans.ibs_aliquota_padrao, 'IBS');
     ivaTaxes = cbsCalc.payable + ibsCalc.payable;
   }
 
-  // 5. Costs & Fees
   const totalTax = totalDas + ivaTaxes + cppAnnexIV + totalINSSRetido + totalIRRFRetido;
   const { fee: contabilizeiFee, planName, isDefault } = resolveContabilizeiFee(totalRev, selectedPlan, CONTABILIZEI_FEES_SIMPLES_NACIONAL);
   const totalMonthlyCost = totalTax + Number(contabilizeiFee ?? 0);
 
-  // 6. Labeling
   const baseLabel = proLaboreOverride ? 'Otimizado' : (isHybrid ? 'Híbrido' : 'Tradicional');
-  let regimeName = '';
-  if (baseLabel === 'Otimizado') {
-    regimeName = isHybrid 
-      ? 'Simples Nacional (Fator R Otimizado) Híbrido' 
-      : 'Simples Nacional (Fator R Otimizado)';
-  } else {
-    regimeName = `Simples Nacional ${baseLabel} (Anexo ${finalAnnex})`;
-  }
-
-  const effectiveDasRateTotal = totalRev > 0 ? totalDas / totalRev : 0;
+  const regimeName = proLaboreOverride 
+    ? (isHybrid ? 'Simples Nacional (Fator R Otimizado) Híbrido' : 'Simples Nacional (Fator R Otimizado)')
+    : `Simples Nacional ${baseLabel} (Anexo ${finalAnnex})`;
 
   return {
     regime: regimeName as any,
@@ -553,26 +404,20 @@ function _calculateSimples2026(
     proLabore: totalProLaboreBruto,
     fatorR: fatorREffective,
     effectiveRate: totalRev > 0 ? totalMonthlyCost / totalRev : 0,
-    effectiveDasRate: effectiveDasRateTotal,
+    effectiveDasRate: totalRev > 0 ? totalDas / totalRev : 0,
     contabilizeiFee,
     breakdown: [
-      { name: formatTaxLabel("DAS (Simples Nacional)", totalDas, totalRev, effectiveDasRateTotal), value: totalDas },
-      { name: formatTaxLabel("IVA Externo (IBS/CBS)", ivaTaxes, totalRev), value: ivaTaxes },
-      { name: formatTaxLabel("CPP (Anexo IV)", cppAnnexIV, totalPayroll), value: cppAnnexIV },
-      { name: formatTaxLabel("INSS s/ Pró-labore", totalINSSRetido, totalProLaboreBruto), value: totalINSSRetido },
+      { name: formatTaxLabel("DAS", totalDas, totalRev), value: totalDas },
+      { name: formatTaxLabel("IVA Externo", ivaTaxes, totalRev), value: ivaTaxes },
+      { name: "CPP (Anexo IV)", value: cppAnnexIV },
+      { name: "INSS s/ Pró-labore", value: totalINSSRetido },
       { name: "IRRF Pró-labore", value: totalIRRFRetido },
     ].filter(x => x.value > 0.001),
     notes: isDefault ? [`Plano '${planName}' usado.`] : [],
     partnerTaxes,
-    optimizationNote: proLaboreOverride 
-      ? `Para garantir a tributação reduzida do Anexo III (Fator R), ajustamos estrategicamente seu Pró-labore para ${formatCurrencyBRL(totalProLaboreBruto)}. Isso gera economia no imposto total.` 
-      : ""
+    optimizationNote: proLaboreOverride ? `Pró-labore ajustado para ${formatCurrencyBRL(totalProLaboreBruto)} para atingir o Fator R.` : ""
   };
 }
-
-// ======================================================================================
-// SECTION: ORCHESTRATOR
-// ======================================================================================
 
 function findOptimizedProLabore(
   values: TaxFormValues,
@@ -581,59 +426,29 @@ function findOptimizedProLabore(
   effectiveFp12: number,
   fiscalConfig: any
 ): { proLabores: ProLaboreForm[]; factor: number } | null {
-  const limiteFatorR = fiscalConfig.simples_nacional?.limite_fator_r ?? 0.28;
-  
-  if (currentFatorR >= limiteFatorR) return null; // Already optimized or not needed
-
-  // Calculate deficit
-  const targetAnnualPayroll = effectiveRbt12 * limiteFatorR;
-  const missingAnnual = Math.max(0, targetAnnualPayroll - effectiveFp12);
-
+  if (currentFatorR >= 0.28) return null;
+  const missingAnnual = Math.max(0, (effectiveRbt12 * 0.28) - effectiveFp12);
   if (missingAnnual <= 0) return null;
 
   const missingMonthly = missingAnnual / 12;
   const newProLabores: ProLaboreForm[] = JSON.parse(JSON.stringify(values.proLabores || []));
 
-  // NOVA LÓGICA: Distribuição Proporcional com correção exata de centavos
   if (newProLabores.length > 0) {
-    const totalInitialPL = newProLabores.reduce((s, p) => s + p.value, 0);
-    let distributedExtra = 0;
-    
-    newProLabores.forEach((partner, index) => {
-        const isLast = index === newProLabores.length - 1;
-
-        if (isLast) {
-            // O último sócio recebe exatamente o resto para não faltar nem sobrar 1 centavo
-            const remainingToDistribute = missingMonthly - distributedExtra;
-            partner.value = Math.round((partner.value + remainingToDistribute) * 100) / 100;
-        } else {
-            // Os demais recebem a proporção normal arredondada para 2 casas
-            const proportion = totalInitialPL > 0 ? (partner.value / totalInitialPL) : (1 / newProLabores.length);
-            const extraForPartner = Math.round((missingMonthly * proportion) * 100) / 100;
-            
-            distributedExtra += extraForPartner;
-            partner.value = Math.round((partner.value + extraForPartner) * 100) / 100;
-        }
+    const increasePerPartner = missingMonthly / newProLabores.length;
+    newProLabores.forEach(partner => {
+        partner.value = Number((partner.value + increasePerPartner).toFixed(2));
     });
   } else {
-    newProLabores.push({
-      value: Math.round(missingMonthly * 100) / 100,
-      hasOtherInssContribution: false,
-      otherContributionSalary: 0
-    });
+    newProLabores.push({ value: Number(missingMonthly.toFixed(2)), hasOtherInssContribution: false });
   }
 
-  const newFactor = (effectiveFp12 + missingAnnual) / effectiveRbt12;
-  return { proLabores: newProLabores, factor: newFactor };
+  return { proLabores: newProLabores, factor: 0.28 };
 }
 
 export function calculateTaxes2026(values: TaxFormValues): CalculationResults2026 {
-  const { year, rbt12 = 0, fp12 = 0, selectedCnaes = [], proLabores = [], totalSalaryExpense = 0 } = values;
-
-  if (!year || year < 2026) throw new Error("Ano inválido para engine 2026.");
-
-  // 1. Preliminaries
-  const config = getFiscalParametersPostReform(year);
+  const { year, rbt12 = 0, fp12 = 0, proLabores = [], totalSalaryExpense = 0 } = values;
+  const config = getFiscalParametersPostReform(year!);
+  
   const domesticRev = values.domesticActivities?.reduce((s, a) => s + (a?.revenue || 0), 0) ?? 0;
   const exportRev = values.exportActivities?.reduce((s, a) => s + ((a?.revenue || 0) * (values.exchangeRate || 1)), 0) ?? 0;
   const totalRev = domesticRev + exportRev;
@@ -643,57 +458,25 @@ export function calculateTaxes2026(values: TaxFormValues): CalculationResults202
   const effectiveFp12 = fp12 > 0 ? fp12 : (totalSalaryExpense + totalPL) * 12;
   const currentFatorR = effectiveRbt12 > 0 ? effectiveFp12 / effectiveRbt12 : 0;
 
-  // 2. Standard Calculations
   const lpFuture = calculateLucroPresumido2026(values, false);
+  const hasFatorRActivity = values.selectedCnaes.some(c => getCnaeData(c.code)?.requiresFatorR);
+
+  let simplesTrad = _calculateSimples2026(values, false, currentFatorR);
+  let simplesHyb = year! >= 2027 ? _calculateSimples2026(values, true, currentFatorR) : null;
   
-  let simplesTrad: TaxDetails2026 | null = null;
-  let simplesHyb: TaxDetails2026 | null = null;
-  let simplesOpt: TaxDetails2026 | null = null;
-  let simplesOptHyb: TaxDetails2026 | null = null;
+  let simplesOpt = null;
+  let simplesOptHyb = null;
 
-  const hasFatorRActivity = selectedCnaes.some(c => getCnaeData(c.code)?.requiresFatorR);
-
-  if (selectedCnaes.length > 0) {
-    // A. Traditional Simples (Base Calculation)
-    simplesTrad = _calculateSimples2026(values, false, currentFatorR);
-
-    // B. Hybrid Simples (Only for 2027 and beyond)
-    if (year >= 2027) {
-      simplesHyb = _calculateSimples2026(values, true, currentFatorR);
-    }
-    
-    // C. Optimized Scenarios (Only if a Fator R activity is present and optimization is possible)
-    if (hasFatorRActivity) {
-      const optimization = findOptimizedProLabore(values, currentFatorR, effectiveRbt12, effectiveFp12, config);
-      
-      if (optimization) {
-        const valuesOpt = { ...values, proLabores: optimization.proLabores };
-        // Optimized Traditional
-        simplesOpt = _calculateSimples2026(valuesOpt, false, optimization.factor, optimization.proLabores);
-        // Optimized Hybrid (2027+)
-        if (year >= 2027) {
-          simplesOptHyb = _calculateSimples2026(valuesOpt, true, optimization.factor, optimization.proLabores);
-        }
-      }
+  if (hasFatorRActivity) {
+    const opt = findOptimizedProLabore(values, currentFatorR, effectiveRbt12, effectiveFp12, config);
+    if (opt) {
+      const valuesOpt = { ...values, proLabores: opt.proLabores };
+      simplesOpt = _calculateSimples2026(valuesOpt, false, opt.factor, opt.proLabores);
+      if (year! >= 2027) simplesOptHyb = _calculateSimples2026(valuesOpt, true, opt.factor, opt.proLabores);
     }
   }
 
-
-  // 3. Normalization & Ordering
-  const normalize = (res: TaxDetails2026 | null, order: number) => {
-    if (!res) return null;
-    return {
-      ...res,
-      order,
-      fatorR: res.fatorR ?? 0,
-      effectiveDasRate: res.effectiveDasRate ?? 0,
-      annex: res.annex ?? "N/A",
-      optimizationNote: res.optimizationNote ?? "",
-      notes: res.notes ?? [],
-      breakdown: res.breakdown ?? [],
-      partnerTaxes: res.partnerTaxes ?? [],
-    };
-  };
+  const normalize = (res: any, order: number) => res ? { ...res, order } : null;
 
   return {
     lucroPresumido: normalize(lpFuture, 4),
