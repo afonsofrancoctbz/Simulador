@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -65,49 +64,53 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
     const hasOdontologyCnae = watchSelectedCnaes?.some(c => getCnaeData(c.code)?.category === "Odontologia");
 
     return (
-        <>
-            <FormProvider {...form}>
-                 <MultiStepFormProvider>
-                    <TaxCalculatorForm 
-                        year={year}
-                        onCnaeSelectorOpen={() => setIsCnaeSelectorOpen(true)}
-                        isLoading={isLoading}
-                        onSubmit={onSubmit}
-                    />
-                 </MultiStepFormProvider>
-            </FormProvider>
+        <div>
+            {/* Esta div esconde o formulário, modais e informações na hora da impressão */}
+            <div className="print-hidden">
+                <FormProvider {...form}>
+                     <MultiStepFormProvider>
+                        <TaxCalculatorForm 
+                            year={year}
+                            onCnaeSelectorOpen={() => setIsCnaeSelectorOpen(true)}
+                            isLoading={isLoading}
+                            onSubmit={onSubmit}
+                        />
+                     </MultiStepFormProvider>
+                </FormProvider>
 
-            {selectedCity && (
-                <section className='mt-12'>
-                    <CityInfoRenderer city={selectedCity} />
-                </section>
-            )}
+                {selectedCity && (
+                    <section className='mt-12'>
+                        <CityInfoRenderer city={selectedCity} />
+                    </section>
+                )}
 
-            {hasOdontologyCnae && (
-                <section className='mt-12'>
-                    <OdontologyInfoSection />
-                </section>
-            )}
+                {hasOdontologyCnae && (
+                    <section className='mt-12'>
+                        <OdontologyInfoSection />
+                    </section>
+                )}
 
-            {hasHealthCnae && !hasOdontologyCnae && (
-                 <section className='mt-12'>
-                    <HealthInfoSection />
-                </section>
-            )}
+                {hasHealthCnae && !hasOdontologyCnae && (
+                     <section className='mt-12'>
+                        <HealthInfoSection />
+                    </section>
+                )}
 
-            {year >= 2026 && (
-                <section className='mt-12'>
-                    <TaxReformInfoSection />
-                </section>
-            )}
+                {year >= 2026 && (
+                    <section className='mt-12'>
+                        <TaxReformInfoSection />
+                    </section>
+                )}
 
-            <CnaeSelector
-                open={isCnaeSelectorOpen}
-                onOpenChange={setIsCnaeSelectorOpen}
-                onConfirm={handleConfirmCnaes}
-                initialSelectedCnaes={form.getValues('selectedCnaes')}
-            />
+                <CnaeSelector
+                    open={isCnaeSelectorOpen}
+                    onOpenChange={setIsCnaeSelectorOpen}
+                    onConfirm={handleConfirmCnaes}
+                    initialSelectedCnaes={form.getValues('selectedCnaes')}
+                />
+            </div>
             
+            {/* O TaxResults fica FORA da div print-hidden para poder acionar a impressão */}
             <div id="results-container">
                  <TaxResults 
                     year={year}
@@ -119,6 +122,6 @@ export default function TaxCalculator({ year, onExportRevenueChange, onResultsCh
                     onYearChange={onYearChange}
                 />
             </div>
-        </>
+        </div>
     );
 }

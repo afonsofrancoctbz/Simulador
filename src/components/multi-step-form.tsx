@@ -3,12 +3,13 @@
 import { cn } from "@/lib/utils";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
+// 1. Removemos a numeração fixa do título
 const STEPS = [
-  { id: 1, title: "1. Empresa" },
-  { id: 2, title: "2. Folha e Sócios" },
-  { id: 3, title: "3. Faturamento Anual" },
-  { id: 4, title: "4. Atividades e Faturamento Mensal" },
-  { id: 5, title: "5. Plano" },
+  { id: 1, title: "Empresa" },
+  { id: 2, title: "Folha e Sócios" },
+  { id: 3, title: "Faturamento Anual" },
+  { id: 4, title: "Atividades e Faturamento Mensal" },
+  { id: 5, title: "Plano" },
 ];
 
 interface MultiStepFormContextType {
@@ -59,7 +60,8 @@ interface MultiStepFormProps {
 export function MultiStepForm({ steps, currentStep, onStepClick }: MultiStepFormProps) {
     return (
         <nav className="mb-8 p-1.5 bg-muted rounded-lg flex items-center justify-center gap-2 overflow-x-auto">
-            {steps.map(step => (
+            {/* 2. Adicionamos o index na função de map */}
+            {steps.map((step, index) => (
                 <button
                     key={step.id}
                     type="button"
@@ -71,7 +73,8 @@ export function MultiStepForm({ steps, currentStep, onStepClick }: MultiStepForm
                             : "bg-transparent text-muted-foreground hover:bg-background/60"
                     )}
                 >
-                    {step.title}
+                    {/* 3. Renderizamos a numeração dinâmica baseada na posição visível */}
+                    {index + 1}. {step.title}
                 </button>
             ))}
         </nav>

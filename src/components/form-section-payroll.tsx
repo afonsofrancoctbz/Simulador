@@ -1,12 +1,10 @@
-
-
 "use client";
 
 import { useEffect, useRef } from 'react';
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { Users, Wallet, Plus, Minus } from 'lucide-react';
+import { Users, Wallet, Plus, Minus, Info } from 'lucide-react';
 import { getFiscalParameters } from '@/config/fiscal';
-import { cn } from "@/lib/utils";
+import { cn, formatCurrencyBRL } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -15,14 +13,27 @@ import type { CalculatorFormValues } from './tax-calculator-form';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { NumericFormat } from 'react-number-format';
-import { formatCurrencyBRL } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
-
-export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
+// Alterado o tipo para number para aceitar anos futuros (2027, 2028...)
+export function FormSectionPayroll({ year }: { year: number }) {
     const form = useFormContext<CalculatorFormValues>();
-    const fiscalConfig = getFiscalParameters(year);
+    const { toast } = useToast();
+    
+    // --- FIX: LÓGICA DE ANO BASE ---
+    // Se o ano for 2026 ou maior (ex: 2027, 2030), usamos a base fiscal de 2026.
+    // Caso contrário, usamos a base de 2025.
+    const fiscalBaseYear = year >= 2026 ? 2026 : 2025;
+    
+    const fiscalConfig = getFiscalParameters(fiscalBaseYear);
     const MINIMUM_WAGE = fiscalConfig.salario_minimo;
     const TETO_INSS = fiscalConfig.teto_inss;
+    const ALIQUOTA_INSS = fiscalConfig.aliquota_inss_prolabore;
+    // -------------------------------
+    
+    // Cálculos para o texto informativo dinâmico
+    const valorMaximoInss = TETO_INSS * ALIQUOTA_INSS;
 
     const { fields, replace } = useFieldArray({
         control: form.control,
@@ -31,18 +42,37 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
 
     const numberOfPartners = form.watch("numberOfPartners");
 
+    // Sincroniza o número de campos de pró-labore com o número de sócios
     useEffect(() => {
         const currentProLabores = form.getValues('proLabores');
         const numPartners = isNaN(numberOfPartners) ? 1 : Math.max(1, numberOfPartners);
 
+        // Se a quantidade de sócios mudou, ajusta o array
         if (currentProLabores.length !== numPartners) {
             const newProLabores = Array.from({ length: numPartners }, (_, i) => {
+                // Mantém o valor existente ou cria um novo com o MÍNIMO DO ANO CORRETO
                 return currentProLabores[i] || { value: MINIMUM_WAGE, hasOtherInssContribution: false, otherContributionSalary: 0 };
             });
             replace(newProLabores);
         }
     }, [numberOfPartners, replace, form, MINIMUM_WAGE]);
 
+    // Função de Trava: Executada quando o usuário sai do campo (onBlur)
+    const handleProLaboreBlur = (index: number, currentValue: number) => {
+        // Se for 0, permitimos (pois o sistema calcula a otimização automática)
+        if (currentValue === 0) return;
+
+        // Se for maior que 0 e menor que o mínimo, forçamos o mínimo
+        if (currentValue < MINIMUM_WAGE) {
+            form.setValue(`proLabores.${index}.value`, MINIMUM_WAGE, { shouldValidate: true });
+            
+            toast({
+                title: "Valor Ajustado",
+                description: `O pró-labore não pode ser inferior ao salário mínimo vigente (${formatCurrencyBRL(MINIMUM_WAGE)}). Ajustamos para você.`,
+                variant: "default", 
+            });
+        }
+    };
 
     return (
         <Card className='shadow-lg overflow-hidden border bg-card'>
@@ -58,6 +88,29 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                 </div>
             </CardHeader>
             <CardContent className='p-6 md:p-8 space-y-8'>
+                
+                {/* --- Alerta Informativo (Solicitado) --- */}
+                <Alert className="bg-blue-50/80 border-blue-200 text-blue-900">
+                    <Info className="h-5 w-5 text-blue-700" />
+                    <AlertTitle className="text-blue-800 font-bold mb-2">Entenda o Pró-labore</AlertTitle>
+                    <AlertDescription className="space-y-3 text-sm leading-relaxed">
+                        <p>
+                            Pró-labore é a sua remuneração mensal como sócio da empresa. O valor que você define gera a guia de impostos com duas cobranças principais:
+                        </p>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>
+                                <strong>INSS:</strong> Contribuição de <strong>{(ALIQUOTA_INSS * 100).toFixed(0)}%</strong> sobre o pró-labore. O valor máximo que você paga é <strong>{formatCurrencyBRL(valorMaximoInss)}</strong> (teto da Previdência).
+                            </li>
+                            <li>
+                                <strong>IRRF (Imposto de Renda):</strong> A cobrança de Imposto de Renda é aplicada somente para pró-labore acima de R$ 5.000,00.).
+                            </li>
+                        </ul>
+                        <p className="text-xs font-semibold mt-2 pt-2 border-t border-blue-200">
+                            * O valor mínimo permitido por lei é de 1 salário mínimo ({formatCurrencyBRL(MINIMUM_WAGE)}). Se deixar R$ 0,00, calcularemos automaticamente o melhor cenário (Fator R ou Mínimo).
+                        </p>
+                    </AlertDescription>
+                </Alert>
+
                 <FormField control={form.control} name="totalSalaryExpense" render={({ field }) => {
                     const inputRef = useRef<HTMLInputElement>(null);
                     return (
@@ -80,7 +133,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                 />
                             </FormControl>
                             <FormDescription>
-                                Custo total mensal com funcionários.
+                                Custo total mensal com funcionários (se houver).
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -142,10 +195,14 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                             allowNegative={false}
                                                             value={field.value}
                                                             onValueChange={(values) => field.onChange(values.floatValue ?? 0)}
+                                                            onBlur={() => handleProLaboreBlur(index, field.value)} // TRAVA APLICADA AQUI
                                                             onFocus={() => inputRef.current?.select()}
                                                             placeholder={formatCurrencyBRL(MINIMUM_WAGE)}
                                                         />
                                                     </FormControl>
+                                                    <FormDescription className="text-xs text-muted-foreground">
+                                                        Mínimo: {formatCurrencyBRL(MINIMUM_WAGE)}. Deixe R$ 0,00 para cálculo automático do Fator R.
+                                                    </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             );
@@ -161,7 +218,7 @@ export function FormSectionPayroll({ year }: { year: 2025 | 2026 }) {
                                                     <div className="space-y-0.5">
                                                         <FormLabel>Outro vínculo INSS?</FormLabel>
                                                         <FormDescription className='text-xs'>
-                                                            Se já contribui como CLT, etc.
+                                                            Se já contribui como CLT em outra empresa.
                                                         </FormDescription>
                                                     </div>
                                                     <FormControl>

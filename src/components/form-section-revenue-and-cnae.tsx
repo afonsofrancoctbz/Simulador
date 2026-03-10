@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info, BadgeCheck, DollarSign } from 'lucide-react';
+import { BarChart, Search, Globe, Percent, Banknote, Landmark, FileText, AlertTriangle, X, Info, BadgeCheck, DollarSign, Lightbulb } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { getCnaeData } from "@/lib/cnae-helpers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +23,77 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+
+// ======================================================================================
+// Helper Component: NbsGuidancePopover
+// Exibe os textos legais EXATOS exigidos pela companhia
+// ======================================================================================
+function NbsGuidancePopover({ options }: { options: CnaeRelationship2026[] }) {
+    // Verifica quais tipos de benefícios estão presentes na lista de opções para exibir apenas o relevante
+    const has30Option = options.some(o => o.cClassTrib === '030_INTEL');
+    
+    const has60GovOption = options.some(o => 
+        o.cClassTrib === '060_SAUDE' && 
+        (o.nbsDescription.toLowerCase().includes('assessoria') || 
+         o.nbsDescription.toLowerCase().includes('relações públicas') ||
+         o.nbsDescription.toLowerCase().includes('tecnologia da informação'))
+    );
+
+    const has60GeneralOption = options.some(o => 
+        o.cClassTrib === '060_SAUDE' && !has60GovOption
+    );
+
+    // Se não houver opção especial, não exibe o ícone
+    if (!has30Option && !has60GovOption && !has60GeneralOption) return null;
+
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button 
+                    variant="link" 
+                    size="sm" 
+                    className="h-auto p-0 text-amber-800 hover:text-amber-950 font-normal text-xs ml-auto flex items-center gap-1.5 no-underline hover:underline"
+                >
+                    <Info className="h-3.5 w-3.5" />
+                    Ver critérios de escolha
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[450px] p-0 shadow-xl border-blue-100" align="end" side="bottom">
+                <div className="bg-blue-50/80 px-4 py-3 border-b border-blue-100 rounded-t-md flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-blue-600" />
+                    <span className="font-semibold text-sm text-blue-900">Critérios para escolha do benefício</span>
+                </div>
+                <div className="p-4 text-xs space-y-4 text-slate-600 bg-white rounded-b-md leading-relaxed text-justify">
+                    {has30Option && (
+                        <div>
+                            <span className="font-bold text-blue-700 block mb-1">Redução 30%:</span>
+                            Atividades regulamentadas e fiscalizadas por conselho de classe contam com redução de 30% nas alíquotas do IBS e da CBS, conforme lista e critérios do art. 127 da Lei Complementar nº 214/2025.
+                        </div>
+                    )}
+                    
+                    {has60GeneralOption && (
+                        <div>
+                            <span className="font-bold text-blue-700 block mb-1">Redução 60%:</span>
+                            Atividades de saúde, educação regular e produções artísticas e culturais nacionais contam com redução de 60% nas alíquotas do IBS e da CBS, conforme arts. 129, 130 e 139 da Lei Complementar nº 214/2025.
+                        </div>
+                    )}
+
+                    {has60GovOption && (
+                        <div>
+                            <span className="font-bold text-blue-700 block mb-1">Redução 60% Assessoria de imprensa:</span>
+                            Serviços de assessoria de imprensa, relações públicas e tecnologia da informação prestados para comunicação institucional da administração pública direta, autarquias e fundações públicas contam com redução de 60% nas alíquotas do IBS e da CBS, conforme art. 140 da Lei Complementar nº 214/2025.
+                        </div>
+                    )}
+                    <div className="pt-2 border-t mt-2 text-[1px] text-muted-foreground italic text-center">
+                        Caso não se enquadre, selecione a opção padrão (sem redução).
+                    </div>
+                </div>
+            </PopoverContent>
+        </Popover>
+    );
+}
 
 // ======================================================================================
 // 1. CnaeActivityCard: Componente para gerenciar CNAE e seleção de NBS
@@ -75,10 +145,15 @@ function CnaeActivityCard({ index, year, onRemove }: CnaeActivityCardProps) {
                     name={`selectedCnaes.${index}.nbsCode`}
                     render={({ field }) => (
                         <FormItem className="mt-4 p-3 rounded-md bg-amber-50 border border-amber-200">
-                            <FormLabel className="flex items-center gap-2 text-amber-900 font-semibold">
-                                <AlertTriangle className="h-4 w-4" />
-                                Ação Requerida: Selecione o Tipo de Serviço
-                            </FormLabel>
+                            <div className="flex items-center justify-between mb-2">
+                                <FormLabel className="flex items-center gap-2 text-amber-900 font-semibold m-0">
+                                    <AlertTriangle className="h-4 w-4" />
+                                    Selecione o Tipo de Serviço
+                                </FormLabel>
+                                {/* INSERÇÃO: Botão de Informação com os Textos Legais Exatos */}
+                                <NbsGuidancePopover options={nbsOptions} />
+                            </div>
+                            
                             <Select onValueChange={(value) => form.setValue(`selectedCnaes.${index}.nbsCode`, value)} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
@@ -345,7 +420,7 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, use o padrão de 5%.
+                                        Informe a alíquota de ISS do seu município para serviços (entre 2% e 5%). Se não souber, use o padrão de 5%. Apenas Para Lucro Presumido.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -396,35 +471,49 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
                             )}
                         />
                         <FormField
-                            control={form.control}
-                            name="creditGeneratingExpenses"
-                            render={({ field }) => {
-                                const inputRef = useRef<HTMLInputElement>(null);
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Despesas que Geram Crédito de IVA</FormLabel>
-                                            <FormControl>
-                                            <NumericFormat
-                                                customInput={Input}
-                                                getInputRef={inputRef}
-                                                thousandSeparator="."
-                                                decimalSeparator=","
-                                                prefix="R$ "
-                                                decimalScale={2}
-                                                fixedDecimalScale
-                                                placeholder="R$ 0,00"
-                                                value={field.value}
-                                                onValueChange={(values) => {
-                                                    field.onChange(values.floatValue || 0);
-                                                }}
-                                                onFocus={() => inputRef.current?.select()}
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            Ex: aluguel, energia, softwares, insumos. Não inclua folha de pagamento.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
+    control={form.control}
+    name="creditGeneratingExpenses"
+    render={({ field }) => {
+        const inputRef = useRef<HTMLInputElement>(null);
+        return (
+            <FormItem>
+                <div className="flex items-center gap-2">
+                    <FormLabel>Despesas que Geram Crédito (IVA)</FormLabel>
+                    {/* Tooltip opcional para explicação técnica */}
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger type="button">
+                                <Info className="h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                                <p>Na Reforma Tributária, o imposto pago nas suas compras vira crédito. O simulador assume que essas despesas foram tributadas pela alíquota padrão (cheia) para maximizar seu crédito estimado.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+                <FormControl>
+                    <NumericFormat
+                        customInput={Input}
+                        getInputRef={inputRef}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        prefix="R$ "
+                        decimalScale={2}
+                        fixedDecimalScale
+                        placeholder="R$ 0,00"
+                        value={field.value}
+                        onValueChange={(values) => {
+                            field.onChange(values.floatValue || 0);
+                        }}
+                        onFocus={() => inputRef.current?.select()}
+                    />
+                </FormControl>
+                {/* Nova Mensagem Aqui */}
+                <FormDescription>
+                    Informe gastos com fornecedores (aluguel, energia, software). <strong>Não inclua folha de pagamento.</strong> Esses valores reduzirão seu imposto a pagar.
+                </FormDescription>
+                <FormMessage />
+            </FormItem>
                                 );
                             }}
                         />
@@ -434,7 +523,3 @@ export function FormSectionRevenueAndCnae({ year, onCnaeSelectorOpen }: FormSect
         </div>
     );
 }
-    
-
-    
-    

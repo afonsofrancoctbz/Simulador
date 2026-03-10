@@ -26,8 +26,8 @@ export function ProfitStatementCard({ details }: { details: TaxDetails | null })
             <CardTitle className="text-2xl font-bold text-primary">
                 Demonstrativo de Lucro ({regimeTitle})
             </CardTitle>
-            <CardDescription className="text-md mt-2 text-muted-foreground">
-                Uma visão simplificada do resultado da sua empresa no cenário selecionado.
+            <CardDescription className="text-sm mt-1 text-muted-foreground">
+            "Uma visão simplificada do resultado da sua empresa no cenário selecionado. Este é um demonstrativo referencial; o lucro real pode variar caso você possua outras despesas no dia a dia que não estão listadas aqui."   
             </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-4 space-y-4">
@@ -55,9 +55,10 @@ export function ProfitStatementCard({ details }: { details: TaxDetails | null })
                 <span>{formatCurrencyBRL(profit)}</span>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center pt-4">
-                 A distribuição de lucros é isenta de Imposto de Renda para o sócio (Lei 9.249/95 – Art.10).
-            </p>
+            <p className="text-xs text-muted-foreground text-center pt-1">
+  A Lei nº 15.270, de 26 de novembro de 2025, alterou a Lei 9.249/95 para instituir, <br />A partir de 1º de janeiro de 2026, a retenção na fonte de 10% sobre lucros e dividendos 
+  distribuídos a pessoas físicas residentes no Brasil <br />quando o valor pago por uma mesma pessoa jurídica ultrapassar R$ 50.000,00 por mês e acima de R$ 600.000,00 ao&nbsp;ano.
+</p>
         </CardContent>
     </Card>
   );

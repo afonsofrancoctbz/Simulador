@@ -1,8 +1,9 @@
 /**
  * @fileOverview Lógica completa de análise e adequação do Fator R para empresas em migração
- * 
- * Esta é a lógica CRÍTICA que estava faltando no simulador.
- * Calcula como a empresa pode se enquadrar no Fator R de 28% e migrar para o Anexo III.
+ * * Atualizado para as regras de 2026:
+ * - Salário Mínimo: R$ 1.621,00
+ * - Isenção de IRPF: Até R$ 5.000,00
+ * - Encargos Patronais (PJ): 0% sobre Pró-labore (INSS embutido no DAS)
  */
 
 export interface DadosMensais {
@@ -35,7 +36,7 @@ export interface PlanoAdequacao {
   aumentoMensalNecessario: number;
   folhaBaseAtual: number;
   folhaTotalMensal: number;
-  custoComEncargos: number;     // Custo mensal incluindo encargos (31%)
+  custoComEncargos: number;     // Custo mensal (Ajustado para 0% de encargos patronais no Pró-labore)
 }
 
 export interface ProjecaoMes {
@@ -75,7 +76,6 @@ export interface AnaliseCompleta {
  * Calcula a situação atual da empresa com base nos dados dos últimos 12 meses
  */
 export function calcularSituacaoAtual(dadosMensais: DadosMensais[]): SituacaoAtual {
-  // 1. Validação de Segurança (Evita quebrar se o array vier vazio)
   if (!dadosMensais || dadosMensais.length !== 12) {
     return {
       rbt12: 0,
@@ -89,18 +89,12 @@ export function calcularSituacaoAtual(dadosMensais: DadosMensais[]): SituacaoAtu
     };
   }
 
-  // 2. CORREÇÃO DO ERRO "sum is not defined"
-  // Usamos 'acc' (acumulador) em vez de tentar chamar uma função sum() inexistente
   const rbt12 = dadosMensais.reduce((acc, item) => acc + (item.receita || 0), 0);
   const folha12 = dadosMensais.reduce((acc, item) => acc + (item.folha || 0), 0);
   
-  // Evita divisão por zero
   const fatorR = rbt12 > 0 ? folha12 / rbt12 : 0;
-  
-  // Define o anexo baseado no Fator R
   const anexo: 'III' | 'V' = fatorR >= 0.28 ? 'III' : 'V';
   
-  // Calcula alíquota efetiva estimada
   const aliquotaAtual = anexo === 'III' 
     ? calcularAliquotaEfetivaAnexoIII(rbt12)
     : calcularAliquotaEfetivaAnexoV(rbt12);
@@ -121,11 +115,7 @@ export function calcularSituacaoAtual(dadosMensais: DadosMensais[]): SituacaoAtu
   };
 }
 
-/**
- * Calcula a alíquota efetiva do Anexo III (tabela progressiva)
- */
 function calcularAliquotaEfetivaAnexoIII(rbt12: number): number {
-  // Tabela do Simples Nacional - Anexo III (simplificada)
   const faixas = [
     { ate: 180000, aliquota: 0.06, deducao: 0 },
     { ate: 360000, aliquota: 0.112, deducao: 9360 },
@@ -139,9 +129,6 @@ function calcularAliquotaEfetivaAnexoIII(rbt12: number): number {
   return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
 }
 
-/**
- * Calcula a alíquota efetiva do Anexo V (tabela progressiva)
- */
 function calcularAliquotaEfetivaAnexoV(rbt12: number): number {
   const faixas = [
       { ate: 180000, aliquota: 0.155, deducao: 0 },
@@ -156,23 +143,33 @@ function calcularAliquotaEfetivaAnexoV(rbt12: number): number {
   return (rbt12 * faixa.aliquota - faixa.deducao) / rbt12;
 }
 
-
 /**
- * Analisa o GAP necessário para atingir Fator R de 28%
+ * Analisa o GAP necessário para atingir Fator R de 28% (Com proteção anti-Infinity e regras 2026)
  */
 export function analisarGap(situacaoAtual: SituacaoAtual): AnaliseGap {
   const folhaNecessaria = situacaoAtual.rbt12 * 0.28;
-  const diferencaTotal = situacaoAtual.folha12 > 0 ? Math.max(0, folhaNecessaria - situacaoAtual.folha12) : folhaNecessaria;
-  const percentualAumento = situacaoAtual.folha12 > 0 ? (diferencaTotal / situacaoAtual.folha12) * 100 : Infinity;
+  const diferencaTotal = situacaoAtual.folha12 > 0 
+    ? Math.max(0, folhaNecessaria - situacaoAtual.folha12) 
+    : folhaNecessaria;
   
-  // Valida viabilidade (aumentos acima de 500% são questionáveis)
-  const viavel = percentualAumento <= 500;
-  let mensagemViabilidade;
+  let percentualAumento = 0;
+  let viavel = true;
+  let mensagemViabilidade = "";
 
-  if (!viavel) {
+  if (situacaoAtual.folha12 > 0) {
+    percentualAumento = (diferencaTotal / situacaoAtual.folha12) * 100;
+    viavel = percentualAumento <= 500;
+  } else if (diferencaTotal > 0) {
+    // Evita o erro Infinity% se a folha anterior for 0
+    percentualAumento = 100; 
+  }
+
+  if (situacaoAtual.folha12 === 0 && diferencaTotal > 0) {
+    mensagemViabilidade = `💡 Sua empresa não possui histórico de pró-labore. O ajuste criará uma folha do zero a partir do teto de isenção ou salário mínimo de 2026.`;
+  } else if (!viavel) {
     mensagemViabilidade = 
-      `⚠️ Aumento de ${percentualAumento.toFixed(0)}% pode não ser viável economicamente. ` +
-      `Considere contratar funcionários reais ou avaliar se vale a pena permanecer no Anexo V.`;
+      `⚠️ Aumento de ${percentualAumento.toFixed(0)}% exige cuidado. ` +
+      `Lembre-se que em 2026 o pró-labore de até R$ 5.000 é isento de IRPF, tornando ajustes mais altos muito mais vantajosos.`;
   }
 
   return {
@@ -185,7 +182,7 @@ export function analisarGap(situacaoAtual: SituacaoAtual): AnaliseGap {
 }
 
 /**
- * Gera um plano de adequação para X meses
+ * Gera um plano de adequação para X meses (Adequado para 2026)
  */
 export function gerarPlanoAdequacao(
   situacaoAtual: SituacaoAtual,
@@ -193,12 +190,22 @@ export function gerarPlanoAdequacao(
   mesesParaAdequacao: number
 ): PlanoAdequacao {
   if (mesesParaAdequacao <= 0) mesesParaAdequacao = 1;
-  const aumentoMensalNecessario = analiseGap.diferencaTotal / mesesParaAdequacao;
-  const folhaBaseAtual = situacaoAtual.folhaMensal;
-  const folhaTotalMensal = folhaBaseAtual + aumentoMensalNecessario;
   
-  // Encargos sobre a folha: INSS Patronal (20%) + FGTS (8%) + RAT (3%) = 31%
-  const TAXA_ENCARGOS = 0.31;
+  const SALARIO_MINIMO_2026 = 1621;
+  let aumentoMensalNecessario = analiseGap.diferencaTotal / mesesParaAdequacao;
+  const folhaBaseAtual = situacaoAtual.folhaMensal;
+  
+  let folhaTotalMensal = folhaBaseAtual + aumentoMensalNecessario;
+  
+  // Regra: Pró-labore não pode ser inferior a 1 Salário Mínimo (2026)
+  if (folhaTotalMensal > 0 && folhaTotalMensal < SALARIO_MINIMO_2026) {
+      folhaTotalMensal = SALARIO_MINIMO_2026;
+      aumentoMensalNecessario = folhaTotalMensal - folhaBaseAtual;
+  }
+
+  // Encargos sobre o pró-labore para a PJ no Simples Nacional: 0% 
+  // O sócio paga 11% retido, mas não há acréscimo de 31% para a PJ.
+  const TAXA_ENCARGOS = 0.00;
   const custoComEncargos = aumentoMensalNecessario * (1 + TAXA_ENCARGOS);
 
   return {
@@ -210,10 +217,6 @@ export function gerarPlanoAdequacao(
   };
 }
 
-/**
- * Gera a projeção mês a mês considerando a janela móvel de 12 meses
- * CRÍTICO: A cada mês, um mês antigo SAI do cálculo e um novo ENTRA
- */
 export function gerarProjecao(
   situacaoAtual: SituacaoAtual,
   plano: PlanoAdequacao,
@@ -222,27 +225,21 @@ export function gerarProjecao(
   const projecao: ProjecaoMes[] = [];
   let folhaAcumulada = situacaoAtual.folha12;
   
-  // Economia estimada ao migrar para Anexo III
   const aliquotaAnexoIII = calcularAliquotaEfetivaAnexoIII(situacaoAtual.rbt12);
   const diferencaAliquota = situacaoAtual.aliquotaAtual - aliquotaAnexoIII;
   const economiaMensal = situacaoAtual.receitaMensal * diferencaAliquota;
 
   for (let i = 0; i < plano.mesesParaAdequacao; i++) {
-    // Remove a folha do mês mais antigo (janela móvel)
     const mesAntigoIndex = i % 12;
     const folhaMesAntigo = dadosMensaisHistorico[mesAntigoIndex]?.folha || situacaoAtual.folhaMensal;
     
-    // Calcula nova folha acumulada
     folhaAcumulada = folhaAcumulada - folhaMesAntigo + plano.folhaTotalMensal;
     
-    // Calcula novo Fator R
     const fatorRProjetado = situacaoAtual.rbt12 > 0 ? folhaAcumulada / situacaoAtual.rbt12 : 0;
     const anexoProjetado: 'III' | 'V' = fatorRProjetado >= 0.28 ? 'III' : 'V';
     
-    // Calcula economia (só começa a economizar quando atingir Anexo III)
     const economiaEstimada = anexoProjetado === 'III' ? economiaMensal : 0;
 
-    // Gera datas (exemplo - ajuste conforme sua lógica de datas)
     const hoje = new Date();
     const mesReferencia = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
     const mesApuracao = new Date(hoje.getFullYear(), hoje.getMonth() + i + 1, 1);
@@ -265,9 +262,6 @@ export function gerarProjecao(
   return projecao;
 }
 
-/**
- * Calcula o ROI (Retorno sobre Investimento) da adequação
- */
 export function calcularROI(
   situacaoAtual: SituacaoAtual,
   plano: PlanoAdequacao,
@@ -294,23 +288,20 @@ export function calcularROI(
   };
 }
 
-/**
- * Gera recomendações personalizadas
- */
 export function gerarRecomendacoes(
   analiseCompleta: Omit<AnaliseCompleta, 'recomendacoes' | 'jaOtimizado'>
 ): string[] {
   const recomendacoes: string[] = [];
   const { analiseGap, roi, projecao } = analiseCompleta;
 
-  // Verifica viabilidade
   if (!analiseGap.viavel) {
-    recomendacoes.push(analiseGap.mensagemViabilidade!);
-    recomendacoes.push('💡 Considere contratar funcionários CLT em vez de aumentar apenas o pró-labore.');
+    if (analiseGap.mensagemViabilidade) {
+      recomendacoes.push(analiseGap.mensagemViabilidade);
+    }
+    recomendacoes.push('💡 Considere contratar funcionários reais (CLT) ou avaliar estrategicamente a permanência no Anexo V.');
     return recomendacoes;
   }
 
-  // Verifica payback
   if (roi.paybackMeses <= 6) {
     recomendacoes.push('✅ Excelente! O payback é rápido (menos de 6 meses). Recomendamos iniciar imediatamente.');
   } else if (roi.paybackMeses <= 12) {
@@ -319,12 +310,10 @@ export function gerarRecomendacoes(
     recomendacoes.push('⚠️ Payback superior a 1 ano. Avalie se a economia compensa no longo prazo.');
   }
 
-  // Economia anual
   recomendacoes.push(
     `💰 Economia anual estimada: **R$ ${roi.economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}**`
   );
 
-  // Quando atinge objetivo
   const mesAtinge = projecao.findIndex(p => p.anexoProjetado === 'III') + 1;
   if (mesAtinge > 0) {
     recomendacoes.push(
@@ -332,25 +321,24 @@ export function gerarRecomendacoes(
     );
   }
 
-  // Lembrete sobre defasagem
   recomendacoes.push(
     '⚠️ Lembre-se: a folha de pagamento é considerada com defasagem de 1 mês (folha do mês 11 afeta DAS do mês 12).'
+  );
+  
+  // Dica bônus baseada nas regras de 2026:
+  recomendacoes.push(
+    '🎯 Dica 2026: Com a isenção do Imposto de Renda para até R$ 5.000, aumentar seu pró-labore até este teto se tornou a estratégia mais rentável e segura para atingir os 28%.'
   );
 
   return recomendacoes;
 }
 
-/**
- * FUNÇÃO PRINCIPAL: Gera análise completa de adequação
- */
 export function gerarAnaliseCompleta(
   dadosMensais: DadosMensais[],
   mesesParaAdequacao: number = 4
 ): AnaliseCompleta {
-  // 1. Calcula situação atual
   const situacaoAtual = calcularSituacaoAtual(dadosMensais);
   
-  // 2. VERIFICAÇÃO DE SUCESSO IMEDIATO
   if (situacaoAtual.fatorR >= 0.28) {
     return {
       situacaoAtual,
@@ -363,19 +351,11 @@ export function gerarAnaliseCompleta(
     };
   }
 
-  // 3. Analisa o GAP
   const analiseGap = analisarGap(situacaoAtual);
-  
-  // 4. Gera plano de adequação
   const planoAdequacao = gerarPlanoAdequacao(situacaoAtual, analiseGap, mesesParaAdequacao);
-  
-  // 5. Gera projeção mês a mês
   const projecao = gerarProjecao(situacaoAtual, planoAdequacao, dadosMensais);
-  
-  // 6. Calcula ROI
   const roi = calcularROI(situacaoAtual, planoAdequacao, projecao);
   
-  // 7. Gera recomendações
   const analiseParaRecomendacoes = {
     situacaoAtual,
     analiseGap,
@@ -396,13 +376,8 @@ export function gerarAnaliseCompleta(
   };
 }
 
-/**
- * Função auxiliar para formatar datas
- */
 function formatarMesAno(data: Date): string {
   const mes = String(data.getMonth() + 1).padStart(2, '0');
   const ano = data.getFullYear();
   return `${mes}/${ano}`;
 }
-
-    

@@ -487,21 +487,35 @@ export function calculateTaxes(values: TaxFormValues): CalculationResults {
       
       const additionalMonthlyTotal = additionalAnnualPayrollNeeded / 12;
       
-      // NOVA LÓGICA: Divisão Igualitária
+      // NOVA LÓGICA: Divisão Proporcional com correção exata de centavos
       if (proLaboresOtimizado.length > 0) {
-          const increasePerPartner = additionalMonthlyTotal / proLaboresOtimizado.length;
-          
-          proLaboresOtimizado.forEach(partner => {
-              partner.value += increasePerPartner;
-          });
-      } else {
-        // Fallback caso não haja sócios (raro), cria um fictício
-        proLaboresOtimizado.push({
-          value: additionalMonthlyTotal,
-          hasOtherInssContribution: false,
-          otherContributionSalary: 0,
+        const totalInitialPL = proLaboresOtimizado.reduce((s, p) => s + p.value, 0);
+        let distributedExtra = 0;
+        
+        proLaboresOtimizado.forEach((partner, index) => {
+            const isLast = index === proLaboresOtimizado.length - 1;
+            
+            if (isLast) {
+                // O último sócio recebe exatamente o resto, garantindo que a soma bata os centavos
+                const remainingToDistribute = additionalMonthlyTotal - distributedExtra;
+                partner.value = Math.round((partner.value + remainingToDistribute) * 100) / 100;
+            } else {
+                // Os demais recebem a proporção normal arredondada para 2 casas
+                const proportion = totalInitialPL > 0 ? (partner.value / totalInitialPL) : (1 / proLaboresOtimizado.length);
+                const extraForPartner = Math.round((additionalMonthlyTotal * proportion) * 100) / 100;
+                
+                distributedExtra += extraForPartner;
+                partner.value = Math.round((partner.value + extraForPartner) * 100) / 100;
+            }
         });
-      }
+    } else {
+      // Fallback caso não haja sócios (raro), cria um fictício
+      proLaboresOtimizado.push({
+        value: Math.round(additionalMonthlyTotal * 100) / 100,
+        hasOtherInssContribution: false,
+        otherContributionSalary: 0,
+      });
+    }
 
       const valuesOtimizado = { ...values, proLabores: proLaboresOtimizado };
       const fatorROtimizado =
