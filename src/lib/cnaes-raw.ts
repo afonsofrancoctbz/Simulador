@@ -746,6 +746,7 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: false,
   },
   {
+<<<<<<< HEAD
     code: '9001-9/05',
     description: 'Produção de espetáculos de rodeios, vaquejadas e similares',
     category: 'Atividades artísticas, criativas e de espetáculos',
@@ -766,6 +767,8 @@ export const CNAE_DATA_RAW: CnaeData[] = [
     isRegulated: false,
   },
   {
+=======
+>>>>>>> fa0126b7f86db0cb54615ba58047d3716186f114
     code: '9001-9/99',
     description: 'Artes cênicas, espetáculos e atividades complementares não especificados anteriormente',
     category: 'Atividades artísticas, criativas e de espetáculos',
